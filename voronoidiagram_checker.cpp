@@ -65,17 +65,17 @@ namespace ovd
     /// the diagram should be of degree three (at least with point generators)
     bool VoronoiDiagramChecker::vertex_degree_ok(VoronoiDiagram* vd) {
         // the outermost init() vertices have special degree, all others == 6
-        BOOST_FOREACH(HEVertex v, hedi::vertices(vd->g) ) {
+        BOOST_FOREACH(HEVertex v, vd->g.vertices() ) {
             if ( vd->g[v].type == NORMAL ) {
-                if ( hedi::degree( v, vd->g ) != 6 )
+                if ( vd->g.degree( v ) != 6 )
                     return false;
             }
             if ( vd->g[v].type == OUTER ) {
-                if ( hedi::degree( v, vd->g ) != 4 )
+                if ( vd->g.degree( v ) != 4 )
                     return false;
             }
             if ( vd->g[v].type == VERTEXGEN ) {
-                if ( hedi::degree( v, vd->g ) != 0 )
+                if ( vd->g.degree( v ) != 0 )
                     return false;
             }
         }
@@ -109,7 +109,7 @@ namespace ovd
 
     /// check that no undecided vertices remain in the face
     bool  VoronoiDiagramChecker::noUndecidedInFace( VoronoiDiagram* vd, HEFace f ) {
-        VertexVector face_verts = hedi::face_vertices(f, vd->g);
+        VertexVector face_verts = vd->g.face_vertices(f);
         BOOST_FOREACH( HEVertex v, face_verts ) {
             if ( vd->g[v].status == UNDECIDED )
                 return false;
@@ -119,7 +119,7 @@ namespace ovd
         
 // check that for HEFace f the vertices TYPE are connected
 bool VoronoiDiagramChecker::faceVerticesConnected( VoronoiDiagram* vd, HEFace f, VoronoiVertexStatus Vtype ) {
-    VertexVector face_verts = hedi::face_vertices(f,vd->g);
+    VertexVector face_verts = vd->g.face_vertices(f);
     VertexVector type_verts;
     BOOST_FOREACH( HEVertex v, face_verts ) {
         if ( vd->g[v].status == Vtype )
@@ -131,12 +131,12 @@ bool VoronoiDiagramChecker::faceVerticesConnected( VoronoiDiagram* vd, HEFace f,
     
     // check that type_verts are connected
     HEEdge currentEdge = vd->g[f].edge;
-    HEVertex endVertex = hedi::source(currentEdge, vd->g); // stop when target here
+    HEVertex endVertex = vd->g.source(currentEdge); // stop when target here
     EdgeVector startEdges;
     bool done = false;
     while (!done) { 
-        HEVertex src = hedi::source( currentEdge, vd->g );
-        HEVertex trg = hedi::target( currentEdge, vd->g );
+        HEVertex src = vd->g.source( currentEdge );
+        HEVertex trg = vd->g.target( currentEdge );
         if ( vd->g[src].status != Vtype ) { // seach ?? - Vtype
             if ( vd->g[trg].status == Vtype ) {
                 // we have found ?? - Vtype
@@ -187,10 +187,10 @@ bool VoronoiDiagramChecker::current_face_equals_next_face(VoronoiDiagram* vd, HE
     if ( vd->g[e].face !=  vd->g[ vd->g[e].next ].face) {
         std::cout << " VD remove_vertex_set() ERROR.\n";
         std::cout << "current.face = " << vd->g[e].face << " IS NOT next_face = " << vd->g[ vd->g[e].next ].face << std::endl;
-        HEVertex c_trg = hedi::target( e , vd->g);
-        HEVertex c_src = hedi::source( e , vd->g);
-        HEVertex n_trg = hedi::target( vd->g[e].next , vd->g);
-        HEVertex n_src = hedi::source( vd->g[e].next , vd->g);
+        HEVertex c_trg = vd->g.target( e );
+        HEVertex c_src = vd->g.source( e );
+        HEVertex n_trg = vd->g.target( vd->g[e].next );
+        HEVertex n_src = vd->g.source( vd->g[e].next );
         
         std::cout << "current_edge = " << vd->g[c_src].index << " - " << vd->g[c_trg].index << "\n";
         std::cout << "next_edge = " << vd->g[n_src].index << " - " << vd->g[n_trg].index << "\n";

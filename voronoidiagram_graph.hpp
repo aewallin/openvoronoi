@@ -129,6 +129,7 @@ enum VoronoiFaceStatus {INCIDENT, NONINCIDENT};
 /// properties of a face in the voronoi diagram
 /// each face stores one edge on the boundary of the face
 struct FaceProps {
+    FaceProps( ) {}
     /// create face with given edge, generator, and type
     FaceProps( HEEdge e , Point gen, VoronoiFaceStatus t) {
         edge = e;
@@ -150,7 +151,7 @@ struct FaceProps {
 
 
 // the type of graph with which we construct the voronoi-diagram
-typedef HEDIGraph<     boost::listS,             // out-edges stored in a std::list
+typedef hedi::HEDIGraph<     boost::listS,             // out-edges stored in a std::list
                        boost::listS,             // vertex set stored here
                        boost::bidirectionalS,    // bidirectional graph.
                        VoronoiVertex,              // vertex properties
@@ -162,12 +163,12 @@ typedef HEDIGraph<     boost::listS,             // out-edges stored in a std::l
 // NOTE: if these listS etc. arguments ever change, they must also be updated
 // above where we do: adjacency_list_traits
 
-typedef boost::graph_traits< HEGraph >::vertex_descriptor  HEVertex;
-typedef boost::graph_traits< HEGraph >::vertex_iterator    HEVertexItr;
-typedef boost::graph_traits< HEGraph >::edge_iterator      HEEdgeItr;
-typedef boost::graph_traits< HEGraph >::out_edge_iterator  HEOutEdgeItr;
-typedef boost::graph_traits< HEGraph >::adjacency_iterator HEAdjacencyItr;
-typedef boost::graph_traits< HEGraph >::vertices_size_type HEVertexSize;
+typedef boost::graph_traits< HEGraph::BGLGraph >::vertex_descriptor  HEVertex;
+typedef boost::graph_traits< HEGraph::BGLGraph >::vertex_iterator    HEVertexItr;
+typedef boost::graph_traits< HEGraph::BGLGraph >::edge_iterator      HEEdgeItr;
+typedef boost::graph_traits< HEGraph::BGLGraph >::out_edge_iterator  HEOutEdgeItr;
+typedef boost::graph_traits< HEGraph::BGLGraph >::adjacency_iterator HEAdjacencyItr;
+typedef boost::graph_traits< HEGraph::BGLGraph >::vertices_size_type HEVertexSize;
 
 
 

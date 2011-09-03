@@ -52,7 +52,6 @@ class VoronoiDiagram {
         
         /// add a vertex generator at given position
         int add_vertex_site(const Point& p);
-        //void addLineSite(int idx1, int idx2);
         
         /// string repr
         std::string str() const;

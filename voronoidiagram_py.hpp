@@ -72,8 +72,8 @@ class VoronoiDiagram_py : public VoronoiDiagram {
             EdgeVector del = find_in_in_edges();
             BOOST_FOREACH( HEEdge e, del) {
                 boost::python::list edge;
-                HEVertex src = hedi::source(e,g);
-                HEVertex trg = hedi::target(e,g);
+                HEVertex src = g.source(e);
+                HEVertex trg = g.target(e);
                 edge.append( g[ src ].position );
                 edge.append( g[ trg ].position );
                 out.append( edge );
@@ -90,8 +90,8 @@ class VoronoiDiagram_py : public VoronoiDiagram {
             EdgeVector del = find_in_out_edges();
             BOOST_FOREACH( HEEdge e, del) {
                 boost::python::list edge;
-                HEVertex src = hedi::source(e,g);
-                HEVertex trg = hedi::target(e,g);
+                HEVertex src = g.source(e);
+                HEVertex trg = g.target(e);
                 edge.append( g[ src ].position );
                 edge.append( g[ trg ].position );
                 out.append( edge );
@@ -103,38 +103,38 @@ class VoronoiDiagram_py : public VoronoiDiagram {
         /// return list of generators to python
         boost::python::list getGenerators()  {
             boost::python::list plist;
-            for ( HEFace f=0;f<hedi::num_faces(g);++f ) {
+            for ( HEFace f=0;f< g.num_faces();++f ) {
                 plist.append( g[f].generator  );
             }
             return plist;
         }
         /// return list of vd vertices to python
-        boost::python::list getVoronoiVertices() const {
+        boost::python::list getVoronoiVertices()  {
             boost::python::list plist;
-            BOOST_FOREACH( HEVertex v, hedi::vertices(g) ) {
-                if ( hedi::degree( v, g ) == 6 ) {
+            BOOST_FOREACH( HEVertex v, g.vertices() ) {
+                if ( g.degree( v ) == 6 ) {
                     plist.append( g[v].position );
                 }
             }
             return plist;
         }
         /// return list of the three special far-vertices to python
-        boost::python::list getFarVoronoiVertices() const {
+        boost::python::list getFarVoronoiVertices()  {
             boost::python::list plist;
-            BOOST_FOREACH( HEVertex v, hedi::vertices(g) ) {
-                if ( hedi::degree( v , g) == 4 ) {
+            BOOST_FOREACH( HEVertex v, g.vertices() ) {
+                if ( g.degree( v ) == 4 ) {
                     plist.append( g[v].position );
                 }
             }
             return plist;
         }
         /// return list of vd-edges to python
-        boost::python::list getVoronoiEdges() const {
+        boost::python::list getVoronoiEdges()  {
             boost::python::list edge_list;
-            BOOST_FOREACH( HEEdge edge, hedi::edges(g) ) { // loop through each edge
+            BOOST_FOREACH( HEEdge edge, g.edges() ) { // loop through each edge
                     boost::python::list point_list; // the endpoints of each edge
-                    HEVertex v1 = hedi::source( edge, g );
-                    HEVertex v2 = hedi::target( edge, g );
+                    HEVertex v1 = g.source( edge );
+                    HEVertex v2 = g.target( edge );
                     point_list.append( g[v1].position );
                     point_list.append( g[v2].position );
                     edge_list.append(point_list);
@@ -144,10 +144,10 @@ class VoronoiDiagram_py : public VoronoiDiagram {
         /// return edges and generators to python
         boost::python::list getEdgesGenerators()  {
             boost::python::list edge_list;
-            BOOST_FOREACH( HEEdge edge, hedi::edges(g) ) {
+            BOOST_FOREACH( HEEdge edge, g.edges() ) {
                     boost::python::list point_list; // the endpoints of each edge
-                    HEVertex v1 = hedi::source( edge, g );
-                    HEVertex v2 = hedi::target( edge, g );
+                    HEVertex v1 = g.source( edge );
+                    HEVertex v2 = g.target( edge );
                     Point src = g[v1].position;
                     Point tar = g[v2].position;
                     int src_idx = g[v1].index;
@@ -167,8 +167,8 @@ class VoronoiDiagram_py : public VoronoiDiagram {
             EdgeVector output; // new vertices generated on these edges
             BOOST_FOREACH( HEVertex v, v0 ) {                                   
                 assert( g[v].status == IN ); // all verts in v0 are IN
-                BOOST_FOREACH( HEEdge edge, hedi::out_edges( v , g) ) {
-                    HEVertex adj_vertex = hedi::target( edge , g);
+                BOOST_FOREACH( HEEdge edge, g.out_edges( v ) ) {
+                    HEVertex adj_vertex = g.target( edge );
                     if ( g[adj_vertex].status == IN ) 
                         output.push_back(edge); // this is an IN-IN edge
                 }

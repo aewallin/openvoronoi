@@ -26,33 +26,18 @@
 
 namespace ovd
 {
-    
-Point::Point() {
-    x=0;
-    y=0;
-}
-
-Point::Point(double xin, double yin) {
-    x=xin;
-    y=yin;
-}
 
 Point::Point(const Point &p) {
     x=p.x;
     y=p.y;
 }
 
-
-//********     methods ********************** */
-
-
 double Point::norm() const {
     return sqrt( x*x + y*y  );
 }
 
-
 double Point::dot(const Point &p) const {
-    return x * p.x + y * p.y ; //+ z * p.z;
+    return x * p.x + y * p.y ; 
 }
 
 void Point::normalize() {
@@ -64,9 +49,7 @@ Point Point::xyPerp() const {
         return Point(-y, x);
 }
 
-
-double Point::xyDistanceToLine(const Point &p1, const Point &p2) const
-{
+double Point::xyDistanceToLine(const Point &p1, const Point &p2) const {
     // see for example
     // http://mathworld.wolfram.com/Point-LineDistance2-Dimensional.html
     if ((p1.x == p2.x) && (p1.y == p2.y)) {// no line in xy plane
@@ -86,8 +69,7 @@ double Point::xyDistanceToLine(const Point &p1, const Point &p2) const
 }
 
 
-bool Point::isRight(const Point &p1, const Point &p2) const
-{
+bool Point::isRight(const Point &p1, const Point &p2) const {
     // is Point right of line through points p1 and p2 ?, in the XY plane.
     // this is an ugly way of doing a determinant
     // should be prettyfied sometime...

@@ -16,8 +16,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with OpenCAMlib.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef POINT_H
-#define POINT_H
+#ifndef POINT_HPP
+#define POINT_HPP
 
 #include <string>
 #include <iostream>
@@ -26,14 +26,14 @@ namespace ovd
 {
 
 ///
-/// \brief a point or vector in 3D space specified by its coordinates (x, y, z)
+/// \brief a point or vector in 2D with coordinates (x, y)
 ///
 class Point {
     public:
-        /// create a point at (0,0,0)
-        Point();
-        /// create a point at (x,y,0)
-        Point(double x, double y);
+        /// create a point at (0,0)
+        Point(): x(0.0), y(0.0) {}
+        /// create a point at (x,y)
+        Point(double xi, double yi): x(xi), y(yi) {}
         /// create a point at p
         Point(const Point &p);
         /// destructor. empty.
@@ -95,4 +95,4 @@ const Point operator*(const double &a, const Point &p);
 
 } // end namespace
 #endif
-// end file point.h
+// end file point.hpp

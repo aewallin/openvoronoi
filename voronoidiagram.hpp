@@ -16,8 +16,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with OpenCAMlib.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef VORONOI_DIAGRAM_H
-#define VORONOI_DIAGRAM_H
+#ifndef VORONOI_DIAGRAM_HPP
+#define VORONOI_DIAGRAM_HPP
 
 #include <queue>
 #include <boost/tuple/tuple.hpp>
@@ -61,7 +61,7 @@ class VoronoiDiagram {
         
     protected:
         /// initialize the diagram with three generators
-        void init();
+        void initialize();
         /// among the vertices of f, find the one with the lowest detH value
         /// i.e. the one that is closest to the new generator Point p
         HEVertex find_seed_vertex(HEFace f, const Point& p);
@@ -117,7 +117,8 @@ class VoronoiDiagram {
         VertexVector modified_vertices;
         /// IN-vertices, i.e. to-be-deleted
         VertexVector v0;
-
+        
+        typedef std::queue<HEVertex> VertexQueue;
 };
 
 

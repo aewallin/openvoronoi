@@ -23,17 +23,14 @@
 #include "facegrid.hpp"
 #include "voronoidiagram_checker.hpp"
 
-namespace ovd
-{
-
-
+namespace ovd {
 
 VoronoiDiagram::VoronoiDiagram(double far, unsigned int n_bins) {
     fgrid = new FaceGrid(far, n_bins);
     vd_checker = new VoronoiDiagramChecker(this);
     far_radius=far;
     gen_count=3;
-    init();
+    initialize();
 }
 
 VoronoiDiagram::~VoronoiDiagram() { 
@@ -42,13 +39,13 @@ VoronoiDiagram::~VoronoiDiagram() {
 }
 
 // add one vertex at origo and three vertices at 'infinity' and their associated edges
-void VoronoiDiagram::init() {
+void VoronoiDiagram::initialize() {
     // add init vertices
-    HEVertex v0  = g.add_vertex(  );
+    HEVertex v0  = g.add_vertex();
+    HEVertex v01 = g.add_vertex();
+    HEVertex v02 = g.add_vertex();
+    HEVertex v03 = g.add_vertex();
     double far_multiplier = 6;
-    HEVertex v01 = g.add_vertex( );
-    HEVertex v02 = g.add_vertex(  );
-    HEVertex v03 = g.add_vertex(  );
     g[v01] = VoronoiVertex(Point(             0                 , -3.0*far_radius*far_multiplier    )               , OUT, OUTER);
     g[v02] = VoronoiVertex(Point(  +3.0*sqrt(3.0)*far_radius*far_multiplier/2.0, +3.0*far_radius*far_multiplier/2.0), OUT, OUTER);
     g[v03] = VoronoiVertex(Point(  -3.0*sqrt(3.0)*far_radius*far_multiplier/2.0, +3.0*far_radius*far_multiplier/2.0), OUT, OUTER);
@@ -59,11 +56,11 @@ void VoronoiDiagram::init() {
     Point gen2 = Point( -3.0*sqrt(3.0)*far_radius/2.0, -3.0*far_radius/2.0 );
     Point gen3 = Point( +3.0*sqrt(3.0)*far_radius/2.0, -3.0*far_radius/2.0 );
     g[v0].set_generators( gen1, gen2, gen3 ); 
-    HEVertex g1 = g.add_vertex(  );
-    g[g1] = VoronoiVertex( gen1 , OUT, VERTEXGEN);
-    HEVertex g2 = g.add_vertex( );
-    g[g2] = VoronoiVertex( gen2 , OUT, VERTEXGEN);
+    HEVertex g1 = g.add_vertex();
+    HEVertex g2 = g.add_vertex();
     HEVertex g3 = g.add_vertex();
+    g[g1] = VoronoiVertex( gen1 , OUT, VERTEXGEN);
+    g[g2] = VoronoiVertex( gen2 , OUT, VERTEXGEN);
     g[g3] = VoronoiVertex( gen3 , OUT, VERTEXGEN);
     // add face 1: v0-v1-v2 which encloses gen3
     HEEdge e1 =  g.add_edge( v0 , v01 );   
@@ -136,7 +133,9 @@ void VoronoiDiagram::init() {
 // this is roughly "algorithm A" from the paper, page 15/50
 int VoronoiDiagram::add_vertex_site(const Point& p) {
     HEVertex new_vert = g.add_vertex( );
-    g[new_vert].position=p; g[new_vert].type=VERTEXGEN; g[new_vert].status=OUT; 
+    g[new_vert].position=p; 
+    g[new_vert].type=VERTEXGEN; 
+    g[new_vert].status=OUT; 
     assert( p.norm() < far_radius );     // only add vertices within the far_radius circle
     gen_count++;
     HEFace closest_face = fgrid->grid_find_closest_face( p );
@@ -177,8 +176,8 @@ HEVertex VoronoiDiagram::find_seed_vertex(HEFace f, const Point& p) {
 // (C4) v should not be adjacent to two or more IN vertices (this would result in a loop/cycle!)
 // (C5) for an incident face containing v: v is adjacent to an IN vertex on this face
 void VoronoiDiagram::augment_vertex_set(HEVertex& v_seed, const Point& p) {
-    std::queue<HEVertex> Q; 
-    mark_vertex( v_seed, Q);
+    VertexQueue Q; 
+    mark_vertex( v_seed, Q );
     modified_vertices.push_back( v_seed );
     while( !Q.empty() ) {
         HEVertex v = Q.front();      assert( g.g[v].status == UNDECIDED );
@@ -204,6 +203,18 @@ void VoronoiDiagram::mark_vertex(HEVertex& v, std::queue<HEVertex>& Q) {
     mark_adjacent_faces( v );
     push_adjacent_vertices( v , Q);
 }
+
+void VoronoiDiagram::push_adjacent_vertices( HEVertex v, VertexQueue& Q) {
+    BOOST_FOREACH( HEVertex w, g.adjacent_vertices(v) ) {
+        if ( g[w].status == UNDECIDED ) {
+            if ( !g[w].in_queue ) { 
+                Q.push(w); // push adjacent undecided verts for testing.
+                g[w].in_queue=true;
+            }
+        }
+    }
+}
+
 
 // IN-Vertex v has three adjacent faces, mark nonincident faces incident
 // and push them to incident_faces
@@ -298,7 +309,7 @@ void VoronoiDiagram::check_vertex_on_edge(HEVertex q, HEEdge e) {
 }
 
 HEFace VoronoiDiagram::split_faces(const Point& p) {
-    HEFace newface =  g.add_face( ); // FaceProps( HEEdge(), p, NONINCIDENT ));
+    HEFace newface =  g.add_face(); 
     g[newface].generator = p;
     g[newface].status = NONINCIDENT;
     fgrid->add_face( g[newface] );
@@ -388,12 +399,11 @@ void VoronoiDiagram::split_face(HEFace newface, HEFace f) {
     HEEdge e_new = g.add_edge( new_source, new_target );
     g[e_new].next = new_next;
     g[e_new].face = f;
-    //, EdgeProps(new_next, f) ); 
     g[new_previous].next = e_new;
     g[f].edge = e_new; 
     // the twin edge that bounds the new face
     HEEdge e_twin = g.add_edge( new_target, new_source );
-    g[e_twin].next = twin_next;// , EdgeProps(twin_next, newface));
+    g[e_twin].next = twin_next; 
     g[e_twin].face = newface;
     g[twin_previous].next = e_twin;
     g[newface].edge = e_twin; 
@@ -415,16 +425,6 @@ EdgeVector VoronoiDiagram::find_in_out_edges() {
     return output;
 }
 
-void VoronoiDiagram::push_adjacent_vertices( HEVertex v, std::queue<HEVertex>& Q) {
-    BOOST_FOREACH( HEVertex w, g.adjacent_vertices(v) ) {
-        if ( g[w].status == UNDECIDED ) {
-            if ( !g[w].in_queue ) { 
-                Q.push(w); // push adjacent undecided verts for testing.
-                g[w].in_queue=true;
-            }
-        }
-    }
-}
 
 int VoronoiDiagram::adjacent_in_count(HEVertex v) {
     int in_count=0;

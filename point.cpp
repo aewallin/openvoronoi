@@ -22,7 +22,7 @@
 #include <sstream>
 
 #include "point.hpp"
-#include "numeric.hpp"
+//#include "numeric.hpp"
 
 namespace ovd
 {

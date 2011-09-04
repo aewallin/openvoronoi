@@ -20,7 +20,6 @@
 #include <cassert>
 
 #include "voronoivertex.hpp"
-#include "numeric.hpp"
 
 namespace ovd {
 
@@ -68,7 +67,7 @@ int VoronoiVertex::count = 0;
     /// H==0 on the edge of the circle
     /// H>9 outside the circle
     double VoronoiVertex::detH(const Point& pl) const {
-        return J2*(pl.x- _pk.x) - J3*(pl.y-_pk.y) + 0.5*J4*(square(pl.x-_pk.x) + square(pl.y-_pk.y));
+        return J2*(pl.x- _pk.x) - J3*(pl.y-_pk.y) + 0.5*J4*((pl.x-_pk.x)*(pl.x-_pk.x) + (pl.y-_pk.y)*(pl.y-_pk.y));
     }
     void VoronoiVertex::set_position() {
         double w = J4;
@@ -130,11 +129,11 @@ int VoronoiVertex::count = 0;
     }
     // calculate J2
     double VoronoiVertex::detH_J2(const Point& pi, const Point& pj) {
-        return (pi.y- _pk.y)*(square(pj.x- _pk.x)+square(pj.y- _pk.y))/2 - (pj.y- _pk.y)*(square(pi.x- _pk.x)+square(pi.y- _pk.y))/2;
+        return (pi.y- _pk.y)*( (pj.x- _pk.x)*(pj.x- _pk.x)+(pj.y- _pk.y)*(pj.y- _pk.y))/2 - (pj.y- _pk.y)*((pi.x- _pk.x)*(pi.x- _pk.x)+(pi.y- _pk.y)*(pi.y- _pk.y))/2;
     }
     // calculate J3
     double VoronoiVertex::detH_J3(const Point& pi, const Point& pj) {
-        return (pi.x- _pk.x)*(square(pj.x- _pk.x)+square(pj.y- _pk.y))/2 - (pj.x- _pk.x)*(square(pi.x- _pk.x)+square(pi.y- _pk.y))/2;
+        return (pi.x- _pk.x)*((pj.x- _pk.x)*(pj.x- _pk.x)+(pj.y- _pk.y)*(pj.y- _pk.y))/2 - (pj.x- _pk.x)*((pi.x- _pk.x)*(pi.x- _pk.x)+(pi.y- _pk.y)*(pi.y- _pk.y))/2;
     }
     // calculate J4
     double VoronoiVertex::detH_J4(const Point& pi, const Point& pj) {

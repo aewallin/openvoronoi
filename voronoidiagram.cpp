@@ -23,8 +23,6 @@
 #include "facegrid.hpp"
 #include "voronoidiagram_checker.hpp"
 
-//#include "numeric.hpp"
-
 namespace ovd
 {
 

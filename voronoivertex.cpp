@@ -91,7 +91,7 @@ int VoronoiVertex::count = 0;
             std::swap(pi,pj);
 
         assert( !pi.isRight(pj,pk) );
-        // 2) point _pk should have the largest angle. largest angle is opposite longest side.
+        // 2) point pk should have the largest angle. largest angle is opposite longest side.
         double longest_side = (pi - pj).norm();
         while (  ((pj - pk).norm() > longest_side) || (((pi - pk).norm() > longest_side)) ) { 
             std::swap(pi,pj); // cyclic rotation of points until pk is opposite the longest side pi-pj

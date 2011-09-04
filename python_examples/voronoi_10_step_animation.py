@@ -195,12 +195,12 @@ def circleGenerators(far, Nmax):
     #alfa=0
     #ofs=10
     plist=[]
-    radius=0.81234*far
+    radius=0.81234*float(far)
     for n in range(Nmax):
-        x=radius*math.cos(n*dalfa)
-        y=radius*math.sin(n*dalfa)
+        x=float(radius)*math.cos(float(n)*float(dalfa))
+        y=float(radius)*math.sin(float(n)*float(dalfa))
         plist.append( ovd.Point(x,y) )
-    random.shuffle(plist)
+    #random.shuffle(plist)
     return plist
     
     
@@ -232,10 +232,10 @@ if __name__ == "__main__":
     #vod.setAll(vd)
     drawFarCircle(myscreen, scale*vd.getFarRadius(), ovdvtk.orange)
     
-    Nmax = 20
+    Nmax = 2000
     
-    plist = randomGenerators(far, Nmax)
-    #plist = regularGridGenerators(far, Nmax)
+    #plist = randomGenerators(far, Nmax)
+    plist = regularGridGenerators(far, Nmax)
     #plist = circleGenerators(far, Nmax)
     
     #print plist[169]
@@ -247,7 +247,8 @@ if __name__ == "__main__":
     #ren = [1,2,3,4,5,59,60,61,62]
     #ren = [16,17]
     ren = range(0,Nmax,100)
-    ren = range(0,Nmax)
+    ren = range(0,Nmax,200)
+    #ren = [0,1,Nmax-2, Nmax-1, Nmax]
     nf=0
     for p in plist: #[0:20]:
         print "**********"

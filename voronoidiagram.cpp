@@ -233,7 +233,7 @@ void VoronoiDiagram::add_new_voronoi_vertices( const Point& p ) {
         HEFace twin_face = g[twin].face;      assert( g[twin_face].status == INCIDENT);
         g[q].set_generators( g[face].generator  , g[twin_face].generator  , p); 
 
-        check_vertex_on_edge(q, q_edges[m]);
+        //check_vertex_on_edge(q, q_edges[m]);
 
         g.insert_vertex_in_edge( q, q_edges[m] );
     }
@@ -285,7 +285,7 @@ void VoronoiDiagram::check_vertex_on_edge(HEVertex q, HEEdge e) {
             t = ( g[q].position - srcP).dot( trgP - srcP ) / ( trgP - srcP ).dot( trgP - srcP ) ;
             g[q].position = srcP + t*( trgP-srcP);
             dtl = g[q].position.xyDistanceToLine(srcP, trgP);
-            std::cout << "WARNING check_vertex_on_edge()  old_dtl= " << dtl_orig << " new_dtl= " << dtl  << "\n";
+            std::cout << "WARNING check_vertex_on_edge()  old_dtl= " << dtl_orig << " new_dtl= " << dtl  << " edgelength= " << ( trgP - srcP ).norm()   <<"\n";
         }
         assert( dtl < 1e-3* ( trgP - srcP ).norm() );
     }

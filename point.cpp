@@ -60,8 +60,7 @@ void Point::normalize() {
         *this *=(1/this->norm());
 }
 
-Point Point::xyPerp() const
-{
+Point Point::xyPerp() const {
         return Point(-y, x);
 }
 
@@ -101,7 +100,7 @@ bool Point::isRight(const Point &p1, const Point &p2) const
     double b2 = y - p1.y;
 
     double t = t1 * b1 + t2 * b2;
-    if (t > 0.00000000000001) /// \todo FIXME: hardcoded magic number...
+    if (t > 0.0) 
         return true;
     else
         return false;    

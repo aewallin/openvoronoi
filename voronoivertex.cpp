@@ -56,8 +56,8 @@ int VoronoiVertex::count = 0;
     }
     
     // set the generators and position the vertex
-    void VoronoiVertex::set_generators(const Point& pi, const Point& pj, const Point& pk) {
-        set_J(pi,pj,pk);
+    void VoronoiVertex::set_generators(const Point& p1, const Point& p2, const Point& p3) {
+        set_J(p1,p2,p3);
         set_position();
     }
     
@@ -67,12 +67,12 @@ int VoronoiVertex::count = 0;
     /// H==0 on the edge of the circle
     /// H>9 outside the circle
     double VoronoiVertex::detH(const Point& pl) const {
-        return J2*(pl.x- _pk.x) - J3*(pl.y-_pk.y) + 0.5*J4*((pl.x-_pk.x)*(pl.x-_pk.x) + (pl.y-_pk.y)*(pl.y-_pk.y));
+        return J2*(pl.x- pk.x) - J3*(pl.y-pk.y) + 0.5*J4*((pl.x-pk.x)*(pl.x-pk.x) + (pl.y-pk.y)*(pl.y-pk.y));
     }
     void VoronoiVertex::set_position() {
         double w = J4;
-        double x = -J2/w + _pk.x;
-        double y =  J3/w + _pk.y;
+        double x = -J2/w + pk.x;
+        double y =  J3/w + pk.y;
         position =  Point(x,y);
     }
 
@@ -85,49 +85,36 @@ int VoronoiVertex::count = 0;
     /// pi, pj, pk define the three PointGenerators that position this vertex
     void VoronoiVertex::set_J(const Point& p1, const Point& p2, const Point& p3) { 
         // 1) i-j-k should come in CCW order
-        Point pi(p1),pj(p2),pk(p3);
+        Point pi(p1),pj(p2);
+        pk=p3;
         if ( pi.isRight(pj,pk) ) 
             std::swap(pi,pj);
 
         assert( !pi.isRight(pj,pk) );
-        // 2) point _pk should have the largest angle 
-        // largest angle is opposite longest side.
-        Point pi__,pj__,pk__;
-        pi__ = pi;                          
-        pj__ = pj;                          
-        pk__ = pk;
+        // 2) point _pk should have the largest angle. largest angle is opposite longest side.
         double longest_side = (pi - pj).norm();
-        if (  (pj - pk).norm() > longest_side ) {
-            longest_side = (pj - pk).norm(); //j-k is longest, so i should be new k
-            pk__ = pi;                         // old  i-j-k 
-            pi__ = pj;                         // new  k-i-j
-            pj__ = pk;
+        while (  ((pj - pk).norm() > longest_side) || (((pi - pk).norm() > longest_side)) ) { 
+            std::swap(pi,pj); // cyclic rotation of points until pk is opposite the longest side pi-pj
+            std::swap(pi,pk);  
+            longest_side = (pi - pj).norm();
         }
-        if ( (pi - pk).norm() > longest_side ) { // i-k is longest, so j should be new k                    
-            pk__ = pj;                          // old  i-j-k
-            pj__ = pi;                          // new  j-k-i
-            pi__ = pk;
-        }
+        assert( !pi.isRight(pj,pk) );
+        assert( (pi - pj).norm() >=  (pj - pk).norm() );
+        assert( (pi - pj).norm() >=  (pk - pi).norm() );
         
-        assert( !pi__.isRight(pj__,pk__) );
-        assert( (pi__ - pj__).norm() >=  (pj__ - pk__).norm() );
-        assert( (pi__ - pj__).norm() >=  (pk__ - pi__).norm() );
-        // storing J2,J3,J4, and _pk allows us to call detH() later 
-        _pk = pk__;
-        
-        J2 = detH_J2( pi__, pj__);
-        J3 = detH_J3( pi__, pj__);
-        J4 = detH_J4( pi__, pj__);
+        J2 = detH_J2( pi, pj);
+        J3 = detH_J3( pi, pj);
+        J4 = detH_J4( pi, pj);
         assert( J4 != 0.0 ); // we need to divide by J4 later, so it better not be zero...
     }
     double VoronoiVertex::detH_J2(const Point& pi, const Point& pj) {
-        return (pi.y- _pk.y)*( (pj.x- _pk.x)*(pj.x- _pk.x)+(pj.y- _pk.y)*(pj.y- _pk.y))/2 - (pj.y- _pk.y)*((pi.x- _pk.x)*(pi.x- _pk.x)+(pi.y- _pk.y)*(pi.y- _pk.y))/2;
+        return (pi.y-pk.y)*( (pj.x-pk.x)*(pj.x-pk.x)+(pj.y-pk.y)*(pj.y-pk.y))/2 - (pj.y-pk.y)*((pi.x-pk.x)*(pi.x-pk.x)+(pi.y-pk.y)*(pi.y-pk.y))/2;
     }
     double VoronoiVertex::detH_J3(const Point& pi, const Point& pj) {
-        return (pi.x- _pk.x)*((pj.x- _pk.x)*(pj.x- _pk.x)+(pj.y- _pk.y)*(pj.y- _pk.y))/2 - (pj.x- _pk.x)*((pi.x- _pk.x)*(pi.x- _pk.x)+(pi.y- _pk.y)*(pi.y- _pk.y))/2;
+        return (pi.x-pk.x)*((pj.x-pk.x)*(pj.x-pk.x)+(pj.y-pk.y)*(pj.y-pk.y))/2 - (pj.x-pk.x)*((pi.x-pk.x)*(pi.x-pk.x)+(pi.y-pk.y)*(pi.y-pk.y))/2;
     }
     double VoronoiVertex::detH_J4(const Point& pi, const Point& pj) {
-        return (pi.x- _pk.x)*(pj.y- _pk.y) - (pj.x- _pk.x)*(pi.y- _pk.y);
+        return (pi.x-pk.x)*(pj.y-pk.y) - (pj.x-pk.x)*(pi.y-pk.y);
     }
 
 } // end ocl namespace

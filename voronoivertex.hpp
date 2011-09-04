@@ -70,7 +70,7 @@ protected:
     /// Eq.(24) from Sugihara&Iri 1994
     void set_position();
     /// set the J values
-    void set_J(const Point& pi, const Point& pj, const Point& pk);
+    void set_J(const Point& p1, const Point& p2, const Point& p3);
     /// calculate J2
     /// Eq(21) from Sugihara&Iri 1994
     /// see also Eq(4.6.4), page 256, of Okabe et al book
@@ -85,7 +85,7 @@ protected:
     double detH_J4(const Point& pi, const Point& pj);
 // DATA
     /// the reference point for J-calculations and detH
-    Point _pk;
+    Point pk;
     /// J2 determinant
     double J2;
     /// J3 determinant

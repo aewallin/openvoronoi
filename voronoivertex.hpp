@@ -1,7 +1,7 @@
 /*  
  *  Copyright 2010-2011 Anders Wallin (anders.e.e.wallin "at" gmail.com)
  *  
- *  This file is part of OpenCAMlib.
+ *  This file is part of OpenVoronoi.
  *
  *  OpenCAMlib is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -83,7 +83,7 @@ protected:
     /// Eq(23) from Sugihara&Iri 1994
     /// see also Eq(4.6.6), page 257, of Okabe et al book
     double detH_J4(const Point& pi, const Point& pj);
-// private DATA
+// DATA
     /// the reference point for J-calculations and detH
     Point _pk;
     /// J2 determinant

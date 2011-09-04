@@ -1,7 +1,7 @@
 /*  
  *  Copyright 2010-2011 Anders Wallin (anders.e.e.wallin "at" gmail.com)
  *  
- *  This file is part of OpenCAMlib.
+ *  This file is part of OpenVoronoi.
  *
  *  OpenCAMlib is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -83,37 +83,30 @@ int VoronoiVertex::count = 0;
     }*/
     /// set the J values
     /// pi, pj, pk define the three PointGenerators that position this vertex
-    void VoronoiVertex::set_J(const Point& pi, const Point& pj, const Point& pkin) { 
+    void VoronoiVertex::set_J(const Point& p1, const Point& p2, const Point& p3) { 
         // 1) i-j-k should come in CCW order
-        
-        Point pi_,pj_,pk_;
-        if ( pi.isRight(pj,pkin) ) {
-            pi_ = pj;
-            pj_ = pi;
-            pk_ = pkin;
-        } else {
-            pi_ = pi;
-            pj_ = pj;
-            pk_ = pkin;
-        }
-        assert( !pi_.isRight(pj_,pk_) );
+        Point pi(p1),pj(p2),pk(p3);
+        if ( pi.isRight(pj,pk) ) 
+            std::swap(pi,pj);
+
+        assert( !pi.isRight(pj,pk) );
         // 2) point _pk should have the largest angle 
         // largest angle is opposite longest side.
         Point pi__,pj__,pk__;
-        pi__ = pi_;                          
-        pj__ = pj_;                          
-        pk__ = pk_;
-        double longest_side = (pi_ - pj_).norm();
-        if (  (pj_ - pk_).norm() > longest_side ) {
-            longest_side = (pj_ - pk_).norm(); //j-k is longest, so i should be new k
-            pk__ = pi_;                         // old  i-j-k 
-            pi__ = pj_;                         // new  k-i-j
-            pj__ = pk_;
+        pi__ = pi;                          
+        pj__ = pj;                          
+        pk__ = pk;
+        double longest_side = (pi - pj).norm();
+        if (  (pj - pk).norm() > longest_side ) {
+            longest_side = (pj - pk).norm(); //j-k is longest, so i should be new k
+            pk__ = pi;                         // old  i-j-k 
+            pi__ = pj;                         // new  k-i-j
+            pj__ = pk;
         }
-        if ( (pi_ - pk_).norm() > longest_side ) { // i-k is longest, so j should be new k                    
-            pk__ = pj_;                          // old  i-j-k
-            pj__ = pi_;                          // new  j-k-i
-            pi__ = pk_;
+        if ( (pi - pk).norm() > longest_side ) { // i-k is longest, so j should be new k                    
+            pk__ = pj;                          // old  i-j-k
+            pj__ = pi;                          // new  j-k-i
+            pi__ = pk;
         }
         
         assert( !pi__.isRight(pj__,pk__) );
@@ -127,15 +120,12 @@ int VoronoiVertex::count = 0;
         J4 = detH_J4( pi__, pj__);
         assert( J4 != 0.0 ); // we need to divide by J4 later, so it better not be zero...
     }
-    // calculate J2
     double VoronoiVertex::detH_J2(const Point& pi, const Point& pj) {
         return (pi.y- _pk.y)*( (pj.x- _pk.x)*(pj.x- _pk.x)+(pj.y- _pk.y)*(pj.y- _pk.y))/2 - (pj.y- _pk.y)*((pi.x- _pk.x)*(pi.x- _pk.x)+(pi.y- _pk.y)*(pi.y- _pk.y))/2;
     }
-    // calculate J3
     double VoronoiVertex::detH_J3(const Point& pi, const Point& pj) {
         return (pi.x- _pk.x)*((pj.x- _pk.x)*(pj.x- _pk.x)+(pj.y- _pk.y)*(pj.y- _pk.y))/2 - (pj.x- _pk.x)*((pi.x- _pk.x)*(pi.x- _pk.x)+(pi.y- _pk.y)*(pi.y- _pk.y))/2;
     }
-    // calculate J4
     double VoronoiVertex::detH_J4(const Point& pi, const Point& pj) {
         return (pi.x- _pk.x)*(pj.y- _pk.y) - (pj.x- _pk.x)*(pi.y- _pk.y);
     }

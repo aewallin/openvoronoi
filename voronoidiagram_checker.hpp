@@ -28,34 +28,34 @@ class VoronoiDiagram;
 /// this class provides sanity-checks for the VoronoiDiagram class
 class VoronoiDiagramChecker {
 public:
-    VoronoiDiagramChecker() {}
+    VoronoiDiagramChecker(VoronoiDiagram* d) : vd(d) {}
     ~VoronoiDiagramChecker() {}
     
     /// sanity-check for the diagram, calls other sanity-check functions
-    bool isValid(VoronoiDiagram* vd);
+    bool isValid();
     
     /// check that number of faces equals the number of generators
-    bool face_count_equals_generator_count(VoronoiDiagram* vd);
+    bool face_count_equals_generator_count();
     
     /// the diagram should be of degree three (at least with point generators)
-    bool vertex_degree_ok(VoronoiDiagram* vd);
+    bool vertex_degree_ok();
     
     /// traverse the incident faces and check next-pointers
-    bool allIncidentFacesOK(VoronoiDiagram* vd);
+    bool allIncidentFacesOK();
     
     /// check that all vertices in the input vector are of type IN
-    bool allIn(VoronoiDiagram* vd, const VertexVector& q);
+    bool allIn( const VertexVector& q);
 
     /// check that no undecided vertices remain in the face
-    bool  noUndecidedInFace( VoronoiDiagram* vd, HEFace f );
+    bool  noUndecidedInFace(  HEFace f );
   
-    bool faceVerticesConnected(VoronoiDiagram* vd, HEFace f, VoronoiVertexStatus Vtype );
-    bool incidentFaceVerticesConnected( VoronoiDiagram* vd, VoronoiVertexStatus Vtype );
+    bool faceVerticesConnected( HEFace f, VoronoiVertexStatus Vtype );
+    bool incidentFaceVerticesConnected(  VoronoiVertexStatus Vtype );
     
-    bool detH_is_negative( VoronoiDiagram* vd, const Point& p, HEFace f, HEVertex minimalVertex );
+    bool detH_is_negative(  const Point& p, HEFace f, HEVertex minimalVertex );
     
-    bool current_face_equals_next_face(VoronoiDiagram* vd, HEEdge e); 
-    
+    bool current_face_equals_next_face( HEEdge e); 
+    VoronoiDiagram* vd;
 };
 
 } // end namespace

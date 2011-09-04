@@ -20,7 +20,10 @@
 #include <boost/foreach.hpp>
 
 #include "voronoidiagram.hpp"
-#include "numeric.hpp"
+#include "facegrid.hpp"
+#include "voronoidiagram_checker.hpp"
+
+//#include "numeric.hpp"
 
 namespace ovd
 {
@@ -29,6 +32,7 @@ namespace ovd
 
 VoronoiDiagram::VoronoiDiagram(double far, unsigned int n_bins) {
     fgrid = new FaceGrid(far, n_bins);
+    vd_checker = new VoronoiDiagramChecker(this);
     far_radius=far;
     gen_count=3;
     init();
@@ -36,6 +40,7 @@ VoronoiDiagram::VoronoiDiagram(double far, unsigned int n_bins) {
 
 VoronoiDiagram::~VoronoiDiagram() { 
     delete fgrid; 
+    delete vd_checker;
 }
 
 // add one vertex at origo and three vertices at 'infinity' and their associated edges
@@ -126,7 +131,7 @@ void VoronoiDiagram::init() {
     g[e6].twin = e7;
     g[e7].twin = e6;
 
-    assert( vdChecker.isValid(this) );
+    assert( vd_checker->isValid() );
 }
 
 // comments relate to Sugihara-Iri 1994 paper
@@ -144,7 +149,7 @@ int VoronoiDiagram::add_vertex_site(const Point& p) {
     remove_vertex_set( newface );
     g[new_vert].face = newface;
     reset_status();
-    assert( vdChecker.isValid(this) );
+    assert( vd_checker->isValid() );
     return g[new_vert].index;
 }
 
@@ -165,7 +170,7 @@ HEVertex VoronoiDiagram::find_seed_vertex(HEFace f, const Point& p) {
             }
         }
     }
-    assert( vdChecker.detH_is_negative( this, p, f, minimalVertex ) );
+    assert( vd_checker->detH_is_negative(  p, f, minimalVertex ) );
     return minimalVertex;
 }
 
@@ -192,7 +197,7 @@ void VoronoiDiagram::augment_vertex_set(HEVertex& v_seed, const Point& p) {
         Q.pop(); // delete from queue
     }
     // sanity-check: for all incident_faces the IN-vertices should be connected
-    assert( vdChecker.incidentFaceVerticesConnected( this,  IN ) );
+    assert( vd_checker->incidentFaceVerticesConnected(  IN ) );
 }
 
 void VoronoiDiagram::mark_vertex(HEVertex& v, std::queue<HEVertex>& Q) {
@@ -318,7 +323,7 @@ void VoronoiDiagram::remove_vertex_set( HEFace newface ) {
             if ( g[out_target].status == NEW ) { // the next vertex along the face should be "NEW"
                 if ( out_target != current_source ) { // but not where we came from
                     g[current_edge].next = edge; // this is the edge we want to take
-                    assert( vdChecker.current_face_equals_next_face( this, current_edge ) );
+                    assert( vd_checker->current_face_equals_next_face( current_edge ) );
                 }
             }
         }

@@ -21,6 +21,7 @@
 
 
 #include "voronoidiagram.hpp"
+#include "facegrid.hpp"
 
 namespace ovd
 {

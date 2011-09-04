@@ -25,11 +25,6 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/foreach.hpp> 
 
-#include "point.hpp"
-#include "numeric.hpp"
-
-
-    
 // bundled BGL properties, see: http://www.boost.org/doc/libs/1_44_0/libs/graph/doc/bundles.html
 
 // dcel notes from http://www.holmes3d.net/graphics/dcel/

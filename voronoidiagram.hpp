@@ -24,14 +24,14 @@
 
 #include "point.hpp"
 #include "voronoidiagram_graph.hpp"
-#include "voronoidiagram_checker.hpp"
-#include "halfedgediagram.hpp"
-#include "facegrid.hpp"
+//
+
 
 namespace ovd
 {
 
 class VoronoiDiagramChecker;
+class FaceGrid;
 
 /// \brief Voronoi diagram.
 ///
@@ -96,14 +96,15 @@ class VoronoiDiagram {
     // PRINT ETC
         void print_face(HEFace f);
         void print_vertices(VertexVector& q);
+    // HELPER-CLASSES
         /// sanity-checks on the diagram are done by this helper class
-        VoronoiDiagramChecker vdChecker;
-
+        VoronoiDiagramChecker* vd_checker;
+        /// a grid which allows fast nearest-neighbor search
+        FaceGrid* fgrid; // for grid-search
+        
     // DATA
         /// the half-edge diagram of the vd
         HEGraph g;
-        /// a grid which allows fast nearest-neighbor search
-        FaceGrid* fgrid; // for grid-search
         /// the voronoi diagram is constructed for sites within a circle with radius far_radius
         double far_radius;
         /// special initial/outer vertices

@@ -25,10 +25,10 @@ namespace ovd
 
     
     /// sanity-check for the diagram, calls other sanity-check functions
-    bool VoronoiDiagramChecker::isValid(VoronoiDiagram* vd) {
-        if (!vertex_degree_ok(vd) )
+    bool VoronoiDiagramChecker::isValid() {
+        if (!vertex_degree_ok() )
             return false;
-        if (!face_count_equals_generator_count(vd))
+        if (!face_count_equals_generator_count())
             return false;
         return true;
     }
@@ -36,7 +36,7 @@ namespace ovd
     
     
     /// check that number of faces equals the number of generators
-    bool VoronoiDiagramChecker::face_count_equals_generator_count(VoronoiDiagram* vd) {
+    bool VoronoiDiagramChecker::face_count_equals_generator_count() {
         // Euler formula for planar graphs
         // v - e + f = 2
         // in a half-edge diagram all edges occur twice, so:
@@ -63,7 +63,7 @@ namespace ovd
     
     
     /// the diagram should be of degree three (at least with point generators)
-    bool VoronoiDiagramChecker::vertex_degree_ok(VoronoiDiagram* vd) {
+    bool VoronoiDiagramChecker::vertex_degree_ok() {
         // the outermost init() vertices have special degree, all others == 6
         BOOST_FOREACH(HEVertex v, vd->g.vertices() ) {
             if ( vd->g[v].type == NORMAL ) {
@@ -84,14 +84,14 @@ namespace ovd
     
     
     /// traverse the incident faces and check next-pointers
-    bool VoronoiDiagramChecker::allIncidentFacesOK(VoronoiDiagram* vd) {
+    bool VoronoiDiagramChecker::allIncidentFacesOK() {
         // all incident faces should pass the sanity-check
         BOOST_FOREACH( HEFace f, vd->incident_faces ) {
-            if ( !faceVerticesConnected( vd, f, IN ) )
+            if ( !faceVerticesConnected(  f, IN ) )
                 return false; // IN vertices should be connected
-            if ( !faceVerticesConnected( vd, f, OUT ) )  // OUT vertices should be connected
+            if ( !faceVerticesConnected(  f, OUT ) )  // OUT vertices should be connected
                 return false;
-            if ( !noUndecidedInFace(vd, f ) )            // no UNDECIDED vertices should remain
+            if ( !noUndecidedInFace( f ) )            // no UNDECIDED vertices should remain
                 return false;
         }
         return true;
@@ -99,7 +99,7 @@ namespace ovd
     
     
     /// check that all vertices in the input vector are of type IN
-    bool VoronoiDiagramChecker::allIn(VoronoiDiagram* vd, const VertexVector& q) {
+    bool VoronoiDiagramChecker::allIn( const VertexVector& q) {
         BOOST_FOREACH( HEVertex v, q) {
             if ( vd->g[v].status != IN )
                 return false;
@@ -108,7 +108,7 @@ namespace ovd
     }
 
     /// check that no undecided vertices remain in the face
-    bool  VoronoiDiagramChecker::noUndecidedInFace( VoronoiDiagram* vd, HEFace f ) {
+    bool  VoronoiDiagramChecker::noUndecidedInFace(  HEFace f ) {
         VertexVector face_verts = vd->g.face_vertices(f);
         BOOST_FOREACH( HEVertex v, face_verts ) {
             if ( vd->g[v].status == UNDECIDED )
@@ -118,7 +118,7 @@ namespace ovd
     }
         
 // check that for HEFace f the vertices TYPE are connected
-bool VoronoiDiagramChecker::faceVerticesConnected( VoronoiDiagram* vd, HEFace f, VoronoiVertexStatus Vtype ) {
+bool VoronoiDiagramChecker::faceVerticesConnected(  HEFace f, VoronoiVertexStatus Vtype ) {
     VertexVector face_verts = vd->g.face_vertices(f);
     VertexVector type_verts;
     BOOST_FOREACH( HEVertex v, face_verts ) {
@@ -155,10 +155,10 @@ bool VoronoiDiagramChecker::faceVerticesConnected( VoronoiDiagram* vd, HEFace f,
         return true;
 }
 
-bool VoronoiDiagramChecker::incidentFaceVerticesConnected( VoronoiDiagram* vd, VoronoiVertexStatus Vtype ) {
+bool VoronoiDiagramChecker::incidentFaceVerticesConnected( VoronoiVertexStatus Vtype ) {
     // sanity check: IN-vertices for each face should be connected
     BOOST_FOREACH( HEFace f, vd->incident_faces ) {
-        if ( !faceVerticesConnected( vd, f, IN ) ) {
+        if ( !faceVerticesConnected(  f, IN ) ) {
             std::cout << " VoronoiDiagramChecker::incidentFaceVerticesConnected() ERROR, IN-vertices not connected.\n";
             std::cout << " printing all incident faces for debug: \n";
             BOOST_FOREACH( HEFace f, vd->incident_faces ) {
@@ -171,7 +171,7 @@ bool VoronoiDiagramChecker::incidentFaceVerticesConnected( VoronoiDiagram* vd, V
     return true;
 }
 
-bool VoronoiDiagramChecker::detH_is_negative( VoronoiDiagram* vd, const Point& p, HEFace f, HEVertex minimalVertex ) {
+bool VoronoiDiagramChecker::detH_is_negative(  const Point& p, HEFace f, HEVertex minimalVertex ) {
     double minimumH = vd->g[minimalVertex].detH(p);
     if (!(minimumH < 0) ) {
         std::cout << " VD find_seed_vertex() WARNING\n";
@@ -183,7 +183,7 @@ bool VoronoiDiagramChecker::detH_is_negative( VoronoiDiagram* vd, const Point& p
     return (minimumH < 0 );
 }
     
-bool VoronoiDiagramChecker::current_face_equals_next_face(VoronoiDiagram* vd, HEEdge e) {
+bool VoronoiDiagramChecker::current_face_equals_next_face( HEEdge e) {
     if ( vd->g[e].face !=  vd->g[ vd->g[e].next ].face) {
         std::cout << " VD remove_vertex_set() ERROR.\n";
         std::cout << "current.face = " << vd->g[e].face << " IS NOT next_face = " << vd->g[ vd->g[e].next ].face << std::endl;

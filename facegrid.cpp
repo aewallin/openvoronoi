@@ -18,6 +18,7 @@
  *  along with OpenCAMlib.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define NDEBUG 
 
 #include "facegrid.hpp"
 
@@ -127,7 +128,7 @@ HEFace FaceGrid::grid_find_closest_face(const Point& p) {
 
 // go through the HEFace set and return the one closest to p
 HEFace FaceGrid::find_closest_in_set( std::set<FaceProps>& set, const Point& p ) {
-    HEFace closest_face;
+    HEFace closest_face(0);
     double closest_distance = 3*far_radius; // a big number...
     double d;
     BOOST_FOREACH( FaceProps f, set ) {

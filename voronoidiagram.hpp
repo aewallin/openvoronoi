@@ -62,13 +62,14 @@ class VoronoiDiagram {
         
         /// add a vertex generator at given position
         int add_vertex_site(const Point& p);
-        
+        void push_vertex_site(const Point& p); 
         /// string repr
         std::string str() const;
         /// return the far radius
         double get_far_radius() const {return far_radius;}
         
         friend class VoronoiDiagramChecker;
+        void run();
         
     protected:
         /// initialize the diagram with three generators
@@ -129,6 +130,7 @@ class VoronoiDiagram {
         /// IN-vertices, i.e. to-be-deleted
         VertexVector v0;
         
+        std::vector<Point> vertex_sites;
 
 };
 

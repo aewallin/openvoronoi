@@ -52,13 +52,27 @@ def circleGenerators(far, Nmax):
     
 def timeVoronoi(Nmax):
     far = 1
-    vd = ovd.VoronoiDiagram(far,1200)
-    #plist = randomGenerators(far, Nmax)
+    vd = ovd.VoronoiDiagram(far, int( math.floor( math.sqrt(2)*math.sqrt(Nmax) ) ) )
+    plist = randomGenerators(far, Nmax)
     #plist = regularGridGenerators(far, Nmax)
-    plist = circleGenerators(far, Nmax)
+    #plist = circleGenerators(far, Nmax)
     t_before = time.time() 
     for p in plist: 
         vd.addVertexSite( p )
+    t_after = time.time()
+    return (t_after - t_before)
+
+def timeVoronoi_batch(Nmax):
+    far = 1
+    vd = ovd.VoronoiDiagram(far, int( math.floor( math.sqrt(2)*math.sqrt(Nmax) ) ) )
+    #vd = ovd.VoronoiDiagram(far, 1200 ) # use a fixed number of bins
+    plist = randomGenerators(far, Nmax)
+    #plist = regularGridGenerators(far, Nmax)
+    #plist = circleGenerators(far, Nmax)
+    for p in plist: 
+        vd.pushVertexSite( p )
+    t_before = time.time() 
+    vd.run()
     t_after = time.time()
     return (t_after - t_before)
     
@@ -73,9 +87,9 @@ if __name__ == "__main__":
 
     print Nmax_list
     #exit()
-    csvWriter = csv.writer(open('results_circ.csv', 'wb'), delimiter=',' )
+    csvWriter = csv.writer(open('results_rand_batch_o3.csv', 'wb'), delimiter=',' )
     for Nmax in Nmax_list:
-        t = timeVoronoi(Nmax)
+        t = timeVoronoi_batch(Nmax)
         print Nmax," gens took ", t ," seconds, ", float(t)/float(Nmax)," s/generator"
         csvWriter.writerow( [ Nmax, t ] )
         

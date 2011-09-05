@@ -31,8 +31,13 @@ endif(NOT BUILD_PY_LIB)
 #
 if (CMAKE_BUILD_TOOL MATCHES "make")
     MESSAGE(STATUS "setting gcc options: -Wall -Werror -Wno-deprecated -pedantic-errors")
-    add_definitions(-Wall  -Wno-deprecated -Werror -pedantic-errors)
-    # qt does not like
+    
+    # optimization:
+    add_definitions(-O3 -Wall  -Wno-deprecated -Werror -pedantic-errors)
+    
+    # NON-optimized build:
+    #add_definitions(-O3 -Wall  -Wno-deprecated -Werror -pedantic-errors)
+    
     add_definitions(-fPIC)
 endif (CMAKE_BUILD_TOOL MATCHES "make")
 

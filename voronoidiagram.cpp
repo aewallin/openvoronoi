@@ -17,6 +17,9 @@
  *  along with OpenCAMlib.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define NDEBUG  // this turns off assertions
+#include <cassert>
+
 #include <boost/foreach.hpp>
 
 #include "voronoidiagram.hpp"
@@ -37,6 +40,22 @@ VoronoiDiagram::~VoronoiDiagram() {
     delete fgrid; 
     delete vd_checker;
 }
+
+void VoronoiDiagram::run() {
+    //int n_bins = (int)( sqrt(2)*sqrt( vertex_sites.size() ) );
+    //if (n_bins < 10)
+    //    n_bins = 10;
+        
+    //fgrid = new FaceGrid(far_radius, n_bins);
+    BOOST_FOREACH( Point p, vertex_sites ) {
+        add_vertex_site(p);
+    }
+}
+
+void VoronoiDiagram::push_vertex_site(const Point& p) {
+    vertex_sites.push_back(p);
+}
+
 
 // add one vertex at origo and three vertices at 'infinity' and their associated edges
 void VoronoiDiagram::initialize() {
@@ -154,8 +173,8 @@ int VoronoiDiagram::add_vertex_site(const Point& p) {
 HEVertex VoronoiDiagram::find_seed_vertex(HEFace f, const Point& p) {
     VertexVector face_verts = g.face_vertices(f);
     assert( face_verts.size() >= 3 );
-    double minimumH; 
-    HEVertex minimalVertex;
+    double minimumH(0.0); 
+    HEVertex minimalVertex=HEVertex();
     bool first = true;
     BOOST_FOREACH( HEVertex q, face_verts) { // go thorugh all the vertices and find the one with smallest detH
         if ( g[q].status != OUT ) {

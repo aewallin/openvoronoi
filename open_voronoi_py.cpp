@@ -38,6 +38,8 @@ BOOST_PYTHON_MODULE(openvoronoi) {
     bp::class_< VoronoiDiagram_py, bp::bases<VoronoiDiagram> >("VoronoiDiagram")
         .def(bp::init<double, unsigned int>())
         .def("addVertexSite",  &VoronoiDiagram_py::add_vertex_site)
+        .def("pushVertexSite",  &VoronoiDiagram_py::push_vertex_site)
+        .def("run",  &VoronoiDiagram_py::run)
         //.def("addLineSite",  &VoronoiDiagram_py::addLineSite)
         .def("getGenerators",  &VoronoiDiagram_py::getGenerators)
         .def("getEdgesGenerators",  &VoronoiDiagram_py::getEdgesGenerators)

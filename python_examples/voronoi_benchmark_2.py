@@ -79,7 +79,7 @@ def timeVoronoi_batch(Nmax):
 if __name__ == "__main__":  
     far = 1
 
-    Nmax_exp = 30
+    Nmax_exp = 35
     exp_list = [0.5*x for x in range(5,Nmax_exp)]
     Nmax_list=[]
     for e in exp_list:
@@ -87,7 +87,7 @@ if __name__ == "__main__":
 
     print Nmax_list
     #exit()
-    csvWriter = csv.writer(open('results_rand_batch_o3.csv', 'wb'), delimiter=',' )
+    csvWriter = csv.writer(open('results_rand_fast.csv', 'wb'), delimiter=',' )
     for Nmax in Nmax_list:
         t = timeVoronoi_batch(Nmax)
         print Nmax," gens took ", t ," seconds, ", float(t)/float(Nmax)," s/generator"

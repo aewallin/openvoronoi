@@ -232,10 +232,10 @@ if __name__ == "__main__":
     #vod.setAll(vd)
     drawFarCircle(myscreen, scale*vd.getFarRadius(), ovdvtk.orange)
     
-    Nmax = 2000
+    Nmax = 200
     
-    #plist = randomGenerators(far, Nmax)
-    plist = regularGridGenerators(far, Nmax)
+    plist = randomGenerators(far, Nmax)
+    #plist = regularGridGenerators(far, Nmax)
     #plist = circleGenerators(far, Nmax)
     
     #print plist[169]
@@ -243,11 +243,11 @@ if __name__ == "__main__":
     n=1
     t_before = time.time() 
     #delay = 1.5 # 0.533
-    delay = 0.1 # 0.533
+    delay = 0.0 #1 # 0.533
     #ren = [1,2,3,4,5,59,60,61,62]
     #ren = [16,17]
     ren = range(0,Nmax,100)
-    ren = range(0,Nmax,200)
+    ren = range(0,Nmax,1)
     #ren = [0,1,Nmax-2, Nmax-1, Nmax]
     nf=0
     for p in plist: #[0:20]:

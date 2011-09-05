@@ -171,44 +171,48 @@ HEVertex VoronoiDiagram::find_seed_vertex(HEFace f, const Point& p) {
     return minimalVertex;
 }
 
-// from the "one million" paper, growing the v0-tree of "IN" vertices by "breadth-first search"
+// growing the v0/delete-tree of "IN" vertices by "weighted breadth-first search"
 // we start at the seed and add vertices with detH<0 provided that:
 // (C4) v should not be adjacent to two or more IN vertices (this would result in a loop/cycle!)
 // (C5) for an incident face containing v: v is adjacent to an IN vertex on this face
+//  we process UNDECIDED vertices adjacent to known IN-vertices in a "weighted breadth-first-search" manner
+//  where vertices with a large fabs(detH) are processed first, since we assume the detH to be more reliable the larger fabs(detH) is.
 void VoronoiDiagram::augment_vertex_set(HEVertex& v_seed, const Point& p) {
     VertexQueue Q; 
-    mark_vertex( v_seed, Q );
+    mark_vertex( v_seed, Q, p );
     modified_vertices.push_back( v_seed );
     while( !Q.empty() ) {
-        HEVertex v = Q.front();      assert( g.g[v].status == UNDECIDED );
-        double h = g[v].detH( p );  // mark IN and add to v0 if detH<0 and passes tests. otherwise OUT
-        if ( h < 0.0 ) { // try to mark IN
+        HEVertex v;
+        double h;
+        boost::tie( v, h ) = Q.top();      assert( g.g[v].status == UNDECIDED );
+        Q.pop(); 
+        if ( h < 0.0 ) { // mark IN if detH<0 and passes (C4) and (C5) tests. otherwise mark OUT
             if ( (adjacent_in_count(v) >= 2) || (!incidentFacesHaveAdjacentInVertex(v)) ) 
-                g[v].status = OUT;
+                g[v].status = OUT; // C4 or C5 violated, so mark OUT
             else
-                mark_vertex( v, Q);
-        } else { // detH was positive, so mark OUT
-            g[v].status = OUT;
+                mark_vertex( v, Q, p); // h<0 and no violations, so mark IN. push adjacent UNDECIDED vertices onto Q.
+        } else { 
+            g[v].status = OUT; // detH was positive (or zero), so mark OUT
         }
         modified_vertices.push_back( v );
-        Q.pop(); // delete from queue
     }
     // sanity-check: for all incident_faces the IN-vertices should be connected
     assert( vd_checker->incidentFaceVerticesConnected(  IN ) );
+    assert( vd_checker->incidentFaceVerticesConnected(  OUT ) );
 }
 
-void VoronoiDiagram::mark_vertex(HEVertex& v, std::queue<HEVertex>& Q) {
+void VoronoiDiagram::mark_vertex(HEVertex& v, VertexQueue& Q, const Point& p) {
     g[v].status = IN;
     v0.push_back( v );
     mark_adjacent_faces( v );
-    push_adjacent_vertices( v , Q);
+    push_adjacent_vertices( v , Q, p);
 }
 
-void VoronoiDiagram::push_adjacent_vertices( HEVertex v, VertexQueue& Q) {
+void VoronoiDiagram::push_adjacent_vertices( HEVertex v, VertexQueue& Q, const Point& p) {
     BOOST_FOREACH( HEVertex w, g.adjacent_vertices(v) ) {
         if ( g[w].status == UNDECIDED ) {
             if ( !g[w].in_queue ) { 
-                Q.push(w); // push adjacent undecided verts for testing.
+                Q.push( VertexDetPair(w , g[w].detH(p) ) ); // push adjacent undecided verts for testing.
                 g[w].in_queue=true;
             }
         }

@@ -32,6 +32,17 @@ namespace ovd
 class VoronoiDiagramChecker;
 class FaceGrid;
 
+// typedef std::queue<HEVertex> VertexQueue;
+typedef std::pair<HEVertex, double> VertexDetPair;
+class abs_comparison {
+public:
+  bool operator() (const VertexDetPair& lhs, const VertexDetPair&rhs) const {
+    return ( fabs(lhs.second) < fabs(rhs.second) );
+  }
+};
+
+typedef std::priority_queue< VertexDetPair , std::vector<VertexDetPair>, abs_comparison > VertexQueue;
+
 /// \brief Voronoi diagram.
 ///
 /// see http://en.wikipedia.org/wiki/Voronoi_diagram
@@ -75,8 +86,8 @@ class VoronoiDiagram {
         bool incidentFacesHaveAdjacentInVertex(HEVertex v);
 
         void mark_adjacent_faces(HEVertex v);
-        void push_adjacent_vertices( HEVertex v , std::queue<HEVertex>& Q);
-        void mark_vertex(HEVertex& v, std::queue<HEVertex>& Q); 
+        void push_adjacent_vertices( HEVertex v , VertexQueue& Q, const Point& p);
+        void mark_vertex(HEVertex& v, VertexQueue& Q,  const Point& p); 
         /// add the new vertices  
         void add_new_voronoi_vertices( const Point& p);
         /// split faces when adding new generator p
@@ -118,7 +129,7 @@ class VoronoiDiagram {
         /// IN-vertices, i.e. to-be-deleted
         VertexVector v0;
         
-        typedef std::queue<HEVertex> VertexQueue;
+
 };
 
 

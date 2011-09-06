@@ -24,6 +24,7 @@
 
 namespace ovd {
 
+inline double sq(double x) {return x*x;}
 
 int VoronoiVertex::count = 0;
 
@@ -68,7 +69,7 @@ int VoronoiVertex::count = 0;
     /// H==0 on the edge of the circle
     /// H>9 outside the circle
     double VoronoiVertex::detH(const Point& pl) const {
-        return J2*(pl.x- pk.x) - J3*(pl.y-pk.y) + 0.5*J4*((pl.x-pk.x)*(pl.x-pk.x) + (pl.y-pk.y)*(pl.y-pk.y));
+        return J2*(pl.x- pk.x) - J3*(pl.y-pk.y) + 0.5*J4*( sq(pl.x-pk.x) + sq(pl.y-pk.y) );
     }
     void VoronoiVertex::set_position() {
         double w = J4;
@@ -109,10 +110,10 @@ int VoronoiVertex::count = 0;
         assert( J4 != 0.0 ); // we need to divide by J4 later, so it better not be zero...
     }
     double VoronoiVertex::detH_J2(const Point& pi, const Point& pj) {
-        return (pi.y-pk.y)*( (pj.x-pk.x)*(pj.x-pk.x)+(pj.y-pk.y)*(pj.y-pk.y))/2 - (pj.y-pk.y)*((pi.x-pk.x)*(pi.x-pk.x)+(pi.y-pk.y)*(pi.y-pk.y))/2;
+        return (pi.y-pk.y)*( sq(pj.x-pk.x)+sq(pj.y-pk.y) )/2 - (pj.y-pk.y)*( sq(pi.x-pk.x)+sq(pi.y-pk.y) )/2;
     }
     double VoronoiVertex::detH_J3(const Point& pi, const Point& pj) {
-        return (pi.x-pk.x)*((pj.x-pk.x)*(pj.x-pk.x)+(pj.y-pk.y)*(pj.y-pk.y))/2 - (pj.x-pk.x)*((pi.x-pk.x)*(pi.x-pk.x)+(pi.y-pk.y)*(pi.y-pk.y))/2;
+        return (pi.x-pk.x)*( sq(pj.x-pk.x)+sq(pj.y-pk.y) )/2 - (pj.x-pk.x)*( sq(pi.x-pk.x)+sq(pi.y-pk.y) )/2;
     }
     double VoronoiVertex::detH_J4(const Point& pi, const Point& pj) {
         return (pi.x-pk.x)*(pj.y-pk.y) - (pj.x-pk.x)*(pi.y-pk.y);

@@ -93,10 +93,21 @@ namespace ovd {
 
 // use traits-class here so that EdgePros can store data of type HEEdge
 // typedef of the VD-graph follows below. 
-typedef boost::adjacency_list_traits<boost::listS, 
-                                     boost::listS, 
+
+// vecS is slightly faster than listS
+// vecS   5.72us * n log(n)
+// listS  6.18 * n log(n)
+#define OUT_EDGE_CONTAINER boost::vecS 
+
+// note: cannot use vecS since remove_vertex invalidates iterators/edge_descriptors (?)
+#define VERTEX_CONTAINER boost::listS
+#define EDGE_LIST_CONTAINER boost::listS
+
+
+typedef boost::adjacency_list_traits<OUT_EDGE_CONTAINER, 
+                                     VERTEX_CONTAINER, 
                                      boost::bidirectionalS, 
-                                     boost::listS >::edge_descriptor HEEdge;
+                                     EDGE_LIST_CONTAINER >::edge_descriptor HEEdge;
 typedef unsigned int HEFace;    
                         
 
@@ -105,16 +116,9 @@ typedef unsigned int HEFace;
 /// and the HEFace to which this HEEdge belongs
 struct EdgeProps {
     EdgeProps() {}
-    EdgeProps(HEEdge n, HEFace f){
-        next = n;
-        face = f;
-    }
+    EdgeProps(HEEdge n, HEFace f): next(n), face(f) {}
     /// create edge with given next, twin, and face
-    EdgeProps(HEEdge n, HEEdge t, HEFace f){
-        next = n;
-        twin = t;
-        face = f;
-    }
+    EdgeProps(HEEdge n, HEEdge t, HEFace f): next(n), twin(t), face(f) {}
     /// the next edge, counterclockwise, from this edge
     HEEdge next; 
     /// the twin edge
@@ -151,14 +155,14 @@ struct FaceProps {
 
 
 // the type of graph with which we construct the voronoi-diagram
-typedef hedi::HEDIGraph<     boost::listS,             // out-edges stored in a std::list
-                       boost::listS,             // vertex set stored here
+typedef hedi::HEDIGraph< OUT_EDGE_CONTAINER,             // out-edges stored in a std::list
+                       VERTEX_CONTAINER,             // vertex set stored here
                        boost::bidirectionalS,    // bidirectional graph.
                        VoronoiVertex,              // vertex properties
                        EdgeProps,                // edge properties
                        FaceProps,                // face properties
                        boost::no_property,       // graph properties
-                       boost::listS              // edge storage
+                       EDGE_LIST_CONTAINER              // edge storage
                        > HEGraph;
 // NOTE: if these listS etc. arguments ever change, they must also be updated
 // above where we do: adjacency_list_traits

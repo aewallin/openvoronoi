@@ -35,16 +35,16 @@ class Point {
         /// create a point at (x,y)
         Point(double xi, double yi): x(xi), y(yi) {}
         /// create a point at p
-        Point(const Point &p);
-        /// destructor. empty.
-        virtual ~Point() {};
+        Point(const Point &p): x(p.x), y(p.y) {}
+        
+        virtual ~Point() {}
         
         /// dot product
         double dot(const Point &p) const;
         
         /// norm of vector, or distance from (0,0,0) to *this
         double norm() const; 
-        
+        double norm_sq() const; 
         /// scales vector so that norm()==1.0
         void normalize();
         

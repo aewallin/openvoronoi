@@ -157,14 +157,31 @@ int VoronoiDiagram::add_vertex_site(const Point& p) {
     g[new_vert].status=OUT; 
     assert( p.norm() < far_radius );     // only add vertices within the far_radius circle
     gen_count++;
-    HEFace closest_face = fgrid->grid_find_closest_face( p );
+    
+    // 1)
+    HEFace closest_face = fgrid->grid_find_closest_face( p ); // faster grid-search
+    //HEFace closest_face = fgrid->find_closest_face( p ); // naive exhaustive search (SLOW!)
+    
+    // 2)
     HEVertex v_seed = find_seed_vertex( closest_face, p );    
+    
+    // 3)
     augment_vertex_set(v_seed, p); 
+    
+    // 4)
     add_new_voronoi_vertices( p );    
+    
+    // 5)
     HEFace newface = split_faces( p );
+    
+    // 6)
     remove_vertex_set( newface );
     g[new_vert].face = newface;
+    
+    // 7
     reset_status();
+    
+    
     assert( vd_checker->isValid() );
     return g[new_vert].index;
 }
@@ -174,7 +191,7 @@ HEVertex VoronoiDiagram::find_seed_vertex(HEFace f, const Point& p) {
     VertexVector face_verts = g.face_vertices(f);
     assert( face_verts.size() >= 3 );
     double minimumH(0.0); 
-    HEVertex minimalVertex=HEVertex();
+    HEVertex minimalVertex=  HEVertex() ;
     bool first = true;
     BOOST_FOREACH( HEVertex q, face_verts) { // go thorugh all the vertices and find the one with smallest detH
         if ( g[q].status != OUT ) {
@@ -186,7 +203,7 @@ HEVertex VoronoiDiagram::find_seed_vertex(HEFace f, const Point& p) {
             }
         }
     }
-    assert( vd_checker->detH_is_negative(  p, f, minimalVertex ) );
+    assert( vd_checker->detH_is_negative( p, f, minimalVertex ) );
     return minimalVertex;
 }
 
@@ -197,8 +214,8 @@ HEVertex VoronoiDiagram::find_seed_vertex(HEFace f, const Point& p) {
 //  we process UNDECIDED vertices adjacent to known IN-vertices in a "weighted breadth-first-search" manner
 //  where vertices with a large fabs(detH) are processed first, since we assume the detH to be more reliable the larger fabs(detH) is.
 void VoronoiDiagram::augment_vertex_set(HEVertex& v_seed, const Point& p) {
-    VertexQueue Q; 
-    mark_vertex( v_seed, Q, p );
+    //VertexQueue Q; 
+    mark_vertex( v_seed, p );
     modified_vertices.push_back( v_seed );
     while( !Q.empty() ) {
         HEVertex v;
@@ -209,7 +226,7 @@ void VoronoiDiagram::augment_vertex_set(HEVertex& v_seed, const Point& p) {
             if ( (adjacent_in_count(v) >= 2) || (!incidentFacesHaveAdjacentInVertex(v)) ) 
                 g[v].status = OUT; // C4 or C5 violated, so mark OUT
             else
-                mark_vertex( v, Q, p); // h<0 and no violations, so mark IN. push adjacent UNDECIDED vertices onto Q.
+                mark_vertex( v,  p); // h<0 and no violations, so mark IN. push adjacent UNDECIDED vertices onto Q.
         } else { 
             g[v].status = OUT; // detH was positive (or zero), so mark OUT
         }
@@ -220,14 +237,14 @@ void VoronoiDiagram::augment_vertex_set(HEVertex& v_seed, const Point& p) {
     assert( vd_checker->incidentFaceVerticesConnected(  OUT ) );
 }
 
-void VoronoiDiagram::mark_vertex(HEVertex& v, VertexQueue& Q, const Point& p) {
+void VoronoiDiagram::mark_vertex(HEVertex& v,  const Point& p) {
     g[v].status = IN;
     v0.push_back( v );
     mark_adjacent_faces( v );
-    push_adjacent_vertices( v , Q, p);
+    push_adjacent_vertices( v ,  p);
 }
 
-void VoronoiDiagram::push_adjacent_vertices( HEVertex v, VertexQueue& Q, const Point& p) {
+void VoronoiDiagram::push_adjacent_vertices( HEVertex v, const Point& p) {
     BOOST_FOREACH( HEVertex w, g.adjacent_vertices(v) ) {
         if ( g[w].status == UNDECIDED ) {
             if ( !g[w].in_queue ) { 

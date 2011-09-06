@@ -72,10 +72,8 @@ int VoronoiVertex::count = 0;
         return J2*(pl.x- pk.x) - J3*(pl.y-pk.y) + 0.5*J4*( sq(pl.x-pk.x) + sq(pl.y-pk.y) );
     }
     void VoronoiVertex::set_position() {
-        double w = J4;
-        double x = -J2/w + pk.x;
-        double y =  J3/w + pk.y;
-        position =  Point(x,y);
+        position.x =  -J2/J4 + pk.x; 
+        position.y =   J3/J4 + pk.y;
     }
 
     // this allows sorting points
@@ -109,14 +107,14 @@ int VoronoiVertex::count = 0;
         J4 = detH_J4( pi, pj);
         assert( J4 != 0.0 ); // we need to divide by J4 later, so it better not be zero...
     }
-    double VoronoiVertex::detH_J2(const Point& pi, const Point& pj) {
-        return (pi.y-pk.y)*( sq(pj.x-pk.x)+sq(pj.y-pk.y) )/2 - (pj.y-pk.y)*( sq(pi.x-pk.x)+sq(pi.y-pk.y) )/2;
+    double VoronoiVertex::detH_J2(const Point& pi, const Point& pj) { // eq.21 of Sugihara&Iri 1994
+        return (pi.y-pk.y)*( sq(pj.x-pk.x)+sq(pj.y-pk.y) )/2.0 - (pj.y-pk.y)*( sq(pi.x-pk.x)+sq(pi.y-pk.y) )/2.0;
     }
-    double VoronoiVertex::detH_J3(const Point& pi, const Point& pj) {
-        return (pi.x-pk.x)*( sq(pj.x-pk.x)+sq(pj.y-pk.y) )/2 - (pj.x-pk.x)*( sq(pi.x-pk.x)+sq(pi.y-pk.y) )/2;
+    double VoronoiVertex::detH_J3(const Point& pi, const Point& pj) { // eq.22 of Sugihara&Iri 1994
+        return (pi.x-pk.x)*( sq(pj.x-pk.x)+sq(pj.y-pk.y) )/2.0 - (pj.x-pk.x)*( sq(pi.x-pk.x)+sq(pi.y-pk.y) )/2.0;
     }
     double VoronoiVertex::detH_J4(const Point& pi, const Point& pj) {
-        return (pi.x-pk.x)*(pj.y-pk.y) - (pj.x-pk.x)*(pi.y-pk.y);
+        return (pi.x-pk.x)*(pj.y-pk.y) - (pj.x-pk.x)*(pi.y-pk.y); // eq.23 of Sugihara&Iri 1994
     }
 
 } // end ocl namespace

@@ -24,15 +24,13 @@
 #include <set>
 #include <vector>
 
-#include <boost/multi_array.hpp> // for bucketing in FaceGrid
+#include <boost/multi_array.hpp> 
 
 #include "voronoidiagram_graph.hpp"
 #include "point.hpp"
 
 namespace ovd
 {
-
-//struct FaceProps;
 
 typedef std::vector<FaceProps>                   FacePropVector;
 typedef boost::multi_array< FacePropVector* , 2> Grid;
@@ -61,11 +59,11 @@ class FaceGrid {
         /// convert an x-coordinate into the corresponding grid index
         GridIndex get_grid_index( double x );
         /// go through all faces in the set and find the closest one to Point p
-        HEFace find_closest_in_set( std::set<FaceProps>& set, const Point&p );
+        HEFace find_closest_in_set( const Point& p );
         /// add neighbors at distance dist from (row,col) to the set
-        void insert_faces_from_neighbors( std::set<FaceProps>& set, GridIndex row, GridIndex col , GridIndex dist );
+        void insert_faces_from_neighbors(  GridIndex row, GridIndex col , GridIndex dist );
         /// add faces from (row,col) to the set
-        void insert_faces_from_bucket( std::set<FaceProps>& set, GridIndex row, GridIndex col );
+        void insert_faces_from_bucket(  GridIndex row, GridIndex col );
     // DATA
         /// all generators should fit within this radius from the origin
         double far_radius;
@@ -76,6 +74,8 @@ class FaceGrid {
         /// a 2D grid where each cell contains a 
         /// pointer to a vector of FaceProps, corresponding to the faces in the cell
         Grid* grid;
+        typedef std::vector<FaceProps> FaceSetContainer;
+        FaceSetContainer face_set;
 };
 
 

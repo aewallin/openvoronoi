@@ -96,16 +96,16 @@ class HEDIGraph {
         typedef std::vector<Face> FaceVector;
         typedef std::vector<Edge> EdgeVector;  
 
-        TFaceProperties& operator[](Face f)  { return faces[f];  }
-        const TFaceProperties& operator[](Face f) const  { return faces[f]; } 
+        inline TFaceProperties& operator[](Face f)  { return faces[f];  }
+        inline const TFaceProperties& operator[](Face f) const  { return faces[f]; } 
         
         
-        TEdgeProperties& operator[](Edge e)  { return g[e];  }
-        const TEdgeProperties& operator[](Edge e) const  { return g[e];  }
+        inline TEdgeProperties& operator[](Edge e)  { return g[e];  }
+        inline const TEdgeProperties& operator[](Edge e) const  { return g[e];  }
         
         
-        TVertexProperties& operator[](Vertex v)  { return g[v];  }
-        const TVertexProperties& operator[](Vertex v) const  { return g[v];  }
+        inline TVertexProperties& operator[](Vertex v)  { return g[v];  }
+        inline const TVertexProperties& operator[](Vertex v) const  { return g[v];  }
         
 //DATA
         std::vector< TFaceProperties > faces;

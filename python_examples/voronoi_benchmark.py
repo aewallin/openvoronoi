@@ -235,22 +235,23 @@ if __name__ == "__main__":
     #vod.setAll(vd)
     #drawFarCircle(myscreen, scale*vd.getFarRadius(), ovdvtk.orange)
     
-    Nmax = 100
+    Nmax = 1000
     
-    #plist = randomGenerators(far, Nmax)
+    plist = randomGenerators(far, Nmax)
     #plist = regularGridGenerators(far, Nmax)
-    plist = circleGenerators(far, Nmax)
+    #plist = circleGenerators(far, Nmax)
     
     t_before = time.time() 
     for p in plist: 
         vd.addVertexSite( p )
-
-    vod.setAll(vd)
-    myscreen.render()
-            
     t_after = time.time()
     calctime = t_after-t_before
     print " VD done in ", calctime," s, ", calctime/Nmax," s per generator"
+    
+    vod.setAll(vd)
+    myscreen.render()
+            
+
         
     print "PYTHON All DONE."
 

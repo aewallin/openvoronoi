@@ -64,7 +64,7 @@ def timeVoronoi(Nmax):
 
 def timeVoronoi_batch(Nmax):
     far = 1
-    vd = ovd.VoronoiDiagram(far, int( math.floor( math.sqrt(2)*math.sqrt(Nmax) ) ) )
+    vd = ovd.VoronoiDiagram(far, int( math.floor( math.sqrt(16)*math.sqrt(Nmax) ) ) )
     #vd = ovd.VoronoiDiagram(far, 1200 ) # use a fixed number of bins
     plist = randomGenerators(far, Nmax)
     #plist = regularGridGenerators(far, Nmax)
@@ -79,7 +79,7 @@ def timeVoronoi_batch(Nmax):
 if __name__ == "__main__":  
     far = 1
 
-    Nmax_exp = 35
+    Nmax_exp = 40
     exp_list = [0.5*x for x in range(5,Nmax_exp)]
     Nmax_list=[]
     for e in exp_list:
@@ -87,10 +87,10 @@ if __name__ == "__main__":
 
     print Nmax_list
     #exit()
-    csvWriter = csv.writer(open('results_rand_fast.csv', 'wb'), delimiter=',' )
+    csvWriter = csv.writer(open('results_rand_opt.csv', 'wb'), delimiter=',' )
     for Nmax in Nmax_list:
         t = timeVoronoi_batch(Nmax)
-        print Nmax," gens took ", t ," seconds, ", float(t)/float(Nmax)," s/generator"
+        print Nmax," gens took ", t ," seconds, ", 1e6*float(t)/(float(Nmax)*float(math.log10(Nmax)))," us/n*log(n)"
         csvWriter.writerow( [ Nmax, t ] )
         
 

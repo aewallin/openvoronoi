@@ -33,7 +33,7 @@ if (CMAKE_BUILD_TOOL MATCHES "make")
     MESSAGE(STATUS "setting gcc options: -Wall -Werror -Wno-deprecated -pedantic-errors")
     
     # optimization:
-    add_definitions(-O3 -ffast-math -Wall  -Wno-deprecated -Werror -pedantic-errors)
+    add_definitions(-O3  -Wall  -Wno-deprecated -Werror -pedantic-errors)
     
     # NON-optimized build:
     #add_definitions(-O3 -Wall  -Wno-deprecated -Werror -pedantic-errors)

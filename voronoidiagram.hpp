@@ -87,8 +87,8 @@ class VoronoiDiagram {
         bool incidentFacesHaveAdjacentInVertex(HEVertex v);
 
         void mark_adjacent_faces(HEVertex v);
-        void push_adjacent_vertices( HEVertex v , VertexQueue& Q, const Point& p);
-        void mark_vertex(HEVertex& v, VertexQueue& Q,  const Point& p); 
+        void push_adjacent_vertices( HEVertex v ,  const Point& p);
+        void mark_vertex(HEVertex& v,  const Point& p); 
         /// add the new vertices  
         void add_new_voronoi_vertices( const Point& p);
         /// split faces when adding new generator p
@@ -131,6 +131,7 @@ class VoronoiDiagram {
         VertexVector v0;
         
         std::vector<Point> vertex_sites;
+        VertexQueue Q; 
 
 };
 

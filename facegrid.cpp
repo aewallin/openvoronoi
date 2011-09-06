@@ -1,6 +1,5 @@
-/*  $Id$
- * 
- *  Copyright 2010 Anders Wallin (anders.e.e.wallin "at" gmail.com)
+/*  
+ *  Copyright 2010-2011 Anders Wallin (anders.e.e.wallin "at" gmail.com)
  *  
  *  This file is part of OpenCAMlib.
  *
@@ -19,20 +18,13 @@
 */
 
 #define NDEBUG 
+#include <cassert>
 
 #include "facegrid.hpp"
 
-namespace ovd
-{
-
-
-/* ****************** FaceList ******************************** */
+namespace ovd {
 
 FaceGrid::FaceGrid() {
-    //std::cout << " FaceGrid() constructor.\n";
-    far_radius = 1;
-    nbins = 100;
-    binwidth = 2*far_radius/nbins;
     assert(0); // DO NOT use. There are problems because operator= is not defined...
 }
 
@@ -46,7 +38,6 @@ FaceGrid::~FaceGrid() {
 }
 
 FaceGrid::FaceGrid(double far, unsigned int n_bins) {
-    //std::cout << " FaceGrid(far, n_bins)\n";
     far_radius = 3.1*far;
     nbins = n_bins;
     binwidth = 2*far_radius/nbins;
@@ -54,44 +45,35 @@ FaceGrid::FaceGrid(double far, unsigned int n_bins) {
     for ( GridIndex m=0 ; m<nbins ; ++m ) {
         for ( GridIndex n=0 ; n<nbins ; ++n ) {
             (*grid)[m][n] = new FacePropVector();
-            FacePropVector* bucket = (*grid)[m][n];
-            bucket->clear();
-            //(*grid)[m][n].clear();
         }
     }
-    //std::cout << " FaceGrid(far, n_bins) done.\n";
 }
 
+// insert f_prop into the correct bucket
 void FaceGrid::add_face(FaceProps f_prop) {
-    //std::cout << " FaceGrid::add_face\n";
-    // insert into correct bin here
     GridIndex row = get_grid_index( f_prop.generator.x );
     GridIndex col = get_grid_index( f_prop.generator.y );
-    //std::cout << " get buccket row="<< row << " col="<<col<<"\n";
     FacePropVector* bucket = (*grid)[row][col];
-    //std::cout << " add face to buccket \n";
     bucket->push_back( f_prop );
 } 
 
 GridIndex FaceGrid::get_grid_index( double x ) {
     GridIndex idx;
     idx = (int)( floor( (x+far_radius)/binwidth ) );                
-    assert( idx >= 0 );     
-    assert( idx <= nbins );
-    //std::cout << " get_grid_index output = "<< idx << std::endl;
+    assert( (idx >= 0) && (idx <= nbins) );     
     return idx;
 }
 
 /// simple implementation to find the closest face to the new generator p
 HEFace FaceGrid::find_closest_face(const Point& p) {
     HEFace closest_face;
-    std::set<FaceProps> fset; // the set we are searching in
+    face_set.clear(); // the set we are searching in
     for ( GridIndex m=0 ; m<nbins ; ++m ) {
         for ( GridIndex n=0 ; n<nbins ; ++n ) {
-            insert_faces_from_bucket( fset, m, n ); // add ALL
+            insert_faces_from_bucket(  m, n ); // add ALL
         }
     }
-    closest_face = find_closest_in_set( fset , p );
+    closest_face = find_closest_in_set(  p );
     return closest_face;
 }
     
@@ -103,36 +85,30 @@ HEFace FaceGrid::find_closest_face(const Point& p) {
 // - find the cells within a radius = distance-to-found-point
 // -- in these cells, search all points and find the closest one
 HEFace FaceGrid::grid_find_closest_face(const Point& p) {
-    //std::cout << " grid_find_closest_face( "<< p << " ) \n";
-    HEFace closest_face;
-    std::set<FaceProps> fset;
+    face_set.clear();
     GridIndex row = get_grid_index( p.x );
     GridIndex col = get_grid_index( p.y );
-    //std::cout << "closest cell is ( " << row << " , " << col << " ) \n" ;
-    insert_faces_from_bucket( fset, row, col ); // the closest bucket
+    insert_faces_from_bucket( row, col ); // the closest bucket
     GridIndex dist = 0;
     do {
         dist++;
-        insert_faces_from_neighbors( fset, row, col , dist );
-        //assert( dist < nbins );
-    } while (fset.empty());
-    //std::cout << " fset.size() = " << fset.size() << "  at dist= " << dist << "\n";
-    GridIndex max_dist = (int)( ceil( sqrt((double)2)*dist ) ); // expand up to this radius, to be sure to find the closest point
+        insert_faces_from_neighbors(  row, col , dist );
+    } while (face_set.empty());
+    GridIndex max_dist = (int)( ceil( sqrt(2.0)*dist ) ); // expand up to this radius, to be sure to find the closest point
     for (GridIndex d = dist; d<=max_dist;d++)
-        insert_faces_from_neighbors( fset, row, col , d );
+        insert_faces_from_neighbors(  row, col , d );
 
-    closest_face = find_closest_in_set( fset , p ); // among the faces found, find the closest one
-    return closest_face;
+    return find_closest_in_set( p ); // among the faces found, find the closest one
 }
 
 
 // go through the HEFace set and return the one closest to p
-HEFace FaceGrid::find_closest_in_set( std::set<FaceProps>& set, const Point& p ) {
+HEFace FaceGrid::find_closest_in_set(  const Point& p ) {
     HEFace closest_face(0);
-    double closest_distance = 3*far_radius; // a big number...
+    double closest_distance = 30*far_radius; // a big number...
     double d;
-    BOOST_FOREACH( FaceProps f, set ) {
-        d = ( f.generator - p).norm();
+    BOOST_FOREACH( FaceProps f, face_set ) {
+        d = (f.generator - p).norm_sq();
         if (d<closest_distance ) {
             closest_distance=d;
             closest_face=f.idx;
@@ -141,27 +117,29 @@ HEFace FaceGrid::find_closest_in_set( std::set<FaceProps>& set, const Point& p )
     return closest_face;
 }
     
-void FaceGrid::insert_faces_from_neighbors( std::set<FaceProps>& set, GridIndex row, GridIndex col , GridIndex dist ) {
+void FaceGrid::insert_faces_from_neighbors(  GridIndex row, GridIndex col , GridIndex dist ) {
     // insert faces from neighbors of (row,col) at distance dist
     GridIndex min_row = (row >= dist ? row-dist : 0); // N
     GridIndex max_row = (row <= nbins-dist-1 ? row+dist : nbins-1); // S
     GridIndex max_col = (col <= nbins-dist-1 ? col+dist : nbins-1); // E
     GridIndex min_col = (col >= dist  ? col-dist : 0); // W
     for (GridIndex c = min_col; c<=max_col; c++) {
-        insert_faces_from_bucket( set, min_row , c );
-        insert_faces_from_bucket( set, max_row , c );
+        insert_faces_from_bucket( min_row , c );
+        insert_faces_from_bucket( max_row , c );
     }
     for (GridIndex r = min_row; r<=max_row; r++) {
-        insert_faces_from_bucket( set, r, min_col );
-        insert_faces_from_bucket( set, r, max_col );
+        insert_faces_from_bucket( r, min_col );
+        insert_faces_from_bucket( r, max_col );
     }
 }
     
-void FaceGrid::insert_faces_from_bucket( std::set<FaceProps>& set, GridIndex row, GridIndex col ) {
+void FaceGrid::insert_faces_from_bucket( GridIndex row, GridIndex col ) {
     FacePropVector* bucket = (*grid)[row][col];
     BOOST_FOREACH( FaceProps f, *bucket ) {
-        set.insert(f);
+        //face_set.insert(f);
+        face_set.push_back(f);
     }
 }
 
 } // end namespace
+// end of facegrid.cpp

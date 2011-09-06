@@ -27,14 +27,20 @@
 namespace ovd
 {
 
+/*
 Point::Point(const Point &p) {
     x=p.x;
     y=p.y;
-}
+}*/
 
 double Point::norm() const {
     return sqrt( x*x + y*y  );
 }
+
+double Point::norm_sq() const {
+    return x*x + y*y;
+}
+
 
 double Point::dot(const Point &p) const {
     return x * p.x + y * p.y ; 

@@ -41,6 +41,54 @@ enum VoronoiVertexType {OUTER, NORMAL, VERTEXGEN};
 
 typedef std::map<VoronoiVertexType, unsigned int> VertexDegreeMap;
 
+class VertexPositioner {
+public:
+    static inline double sq(double x) {return x*x;}
+    static Point position(const Point& p1, const Point& p2, const Point& p3) {
+        Point pi(p1),pj(p2),pk(p3);
+        if ( pi.isRight(pj,pk) ) 
+            std::swap(pi,pj);
+        assert( !pi.isRight(pj,pk) );
+        // 2) point pk should have the largest angle. largest angle is opposite longest side.
+        double longest_side = (pi - pj).norm();
+        while (  ((pj - pk).norm() > longest_side) || (((pi - pk).norm() > longest_side)) ) { 
+            std::swap(pi,pj); // cyclic rotation of points until pk is opposite the longest side pi-pj
+            std::swap(pi,pk);  
+            longest_side = (pi - pj).norm();
+        }
+        assert( !pi.isRight(pj,pk) );
+        assert( (pi - pj).norm() >=  (pj - pk).norm() );
+        assert( (pi - pj).norm() >=  (pk - pi).norm() );
+        double J2 = (pi.y-pk.y)*( sq(pj.x-pk.x)+sq(pj.y-pk.y) )/2.0 - (pj.y-pk.y)*( sq(pi.x-pk.x)+sq(pi.y-pk.y) )/2.0;
+        double J3 = (pi.x-pk.x)*( sq(pj.x-pk.x)+sq(pj.y-pk.y) )/2.0 - (pj.x-pk.x)*( sq(pi.x-pk.x)+sq(pi.y-pk.y) )/2.0;
+        double J4 = (pi.x-pk.x)*(pj.y-pk.y) - (pj.x-pk.x)*(pi.y-pk.y);
+        assert( J4 != 0.0 );
+        return Point(   -J2/J4 + pk.x ,  J3/J4 + pk.y );
+    }
+
+};
+
+
+class Site {
+public:
+    Site() {}
+    virtual ~Site() {}
+    virtual Point apex_point(const Point& p) = 0;
+};
+
+class PointSite : public Site {
+public:
+    PointSite( const Point& p): _p(p) {}
+    ~PointSite() {}
+    Point apex_point(const Point& p) {
+        return _p;
+    }
+    void position( const Point& p ) {
+        _p = p;
+    }
+private:
+    Point _p;
+};
 
 
 /// properties of a vertex in the voronoi diagram
@@ -52,12 +100,6 @@ public:
     VoronoiVertex( Point p, VoronoiVertexStatus st, VoronoiVertexType t);
     void init();
     void reset();
-    void set_generators(const Point& pi, const Point& pj, const Point& pk);
-    /// based on precalculated J2, J3, J4, calculate the H determinant (in-circle predicate) for input Point pl
-    /// Eq.(20) from Sugihara&Iri 1994
-    /// H<0 means point p is inside the clearance-circle
-    /// H>0 means point is outside clearance circle
-    double detH(const Point& p) const;
     /// index of vertex
     int index;
     /// vertex status. when the incremental algorithm runs
@@ -71,36 +113,30 @@ public:
     typedef unsigned int HEFace; 
     HEFace face; // the face associated with this vertex, if type==VERTEXGEN
     friend class VoronoiDiagramChecker;
+    
+    void init_dist(const Point& p) {
+        r = dist(p);
+    }
+    void update_dist(const Point& p) {
+        double d = dist(p);
+        if (d<r)
+            r=d;
+    }
+    
+    double dist(const Point& p) const {
+        return (position-p).norm_sq(); 
+    }
+    
+    double in_circle(const Point& p) {
+        return dist(p) - r;
+    }
+    
+    Site* site;
 protected:
-    /// based on previously calculated J2, J3, and J4, set the position of the vertex
-    /// Eq.(24) from Sugihara&Iri 1994
-    void set_position();
-    /// set the J values
-    void set_J(const Point& p1, const Point& p2, const Point& p3);
-    /// calculate J2
-    /// Eq(21) from Sugihara&Iri 1994
-    /// see also Eq(4.6.4), page 256, of Okabe et al book
-    double detH_J2(const Point& pi, const Point& pj);
-    /// calculate J3
-    /// Eq(22) from Sugihara&Iri 1994
-    /// see also Eq(4.6.5), page 257, of Okabe et al book
-    double detH_J3(const Point& pi, const Point& pj);
-    /// calculate J4
-    /// Eq(23) from Sugihara&Iri 1994
-    /// see also Eq(4.6.6), page 257, of Okabe et al book
-    double detH_J4(const Point& pi, const Point& pj);
-// DATA
-    /// the reference point for J-calculations and detH
-    Point pk;
-    /// J2 determinant
-    double J2;
-    /// J3 determinant
-    double J3;
-    /// J4 determinant
-    double J4;
     /// global vertex count
     static int count;
     static VertexDegreeMap expected_degree;
+    double r;
 };
 
 

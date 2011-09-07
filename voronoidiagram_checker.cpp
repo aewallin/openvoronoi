@@ -174,8 +174,8 @@ bool VoronoiDiagramChecker::incidentFaceVerticesConnected( VoronoiVertexStatus V
     return true;
 }
 
-bool VoronoiDiagramChecker::detH_is_negative(  const Point& p, HEFace f, HEVertex minimalVertex ) {
-    double minimumH = vd->g[minimalVertex].detH(p);
+bool VoronoiDiagramChecker::inCircle_is_negative(  const Point& p, HEFace f, HEVertex minimalVertex ) {
+    double minimumH = vd->g[minimalVertex].in_circle(p);
     if (!(minimumH < 0) ) {
         std::cout << " VD find_seed_vertex() WARNING\n";
         std::cout << " WARNING: searching for seed when inserting " << p << " \n";

@@ -69,12 +69,18 @@ void VoronoiDiagram::initialize() {
     g[v02] = VoronoiVertex(Point(  +3.0*sqrt(3.0)*far_radius*far_multiplier/2.0, +3.0*far_radius*far_multiplier/2.0), OUT, OUTER);
     g[v03] = VoronoiVertex(Point(  -3.0*sqrt(3.0)*far_radius*far_multiplier/2.0, +3.0*far_radius*far_multiplier/2.0), OUT, OUTER);
     
+    g[v0].init_dist( g[v01].position );
+    g[v01].init_dist( g[v02].position );
+    g[v02].init_dist( g[v03].position );
+    g[v03].init_dist( g[v01].position );
+        
     out_verts[0]=v01; out_verts[1]=v02; out_verts[2]=v03;
     // the locations of the initial generators:
     Point gen1 = Point( 0, 3.0*far_radius);
     Point gen2 = Point( -3.0*sqrt(3.0)*far_radius/2.0, -3.0*far_radius/2.0 );
     Point gen3 = Point( +3.0*sqrt(3.0)*far_radius/2.0, -3.0*far_radius/2.0 );
-    g[v0].set_generators( gen1, gen2, gen3 ); 
+    g[v0].position = VertexPositioner::position( gen1, gen2, gen3 );
+     
     HEVertex g1 = g.add_vertex();
     HEVertex g2 = g.add_vertex();
     HEVertex g3 = g.add_vertex();
@@ -99,7 +105,8 @@ void VoronoiDiagram::initialize() {
     g[e3].next = e1;
     g[g3].face = f1;
     
-    // add face 2: v0-v2-v3 which encloses gen1
+    
+    // add face 2: v0-v02-v03 which encloses gen1
     HEEdge e4 = g.add_edge( v0, v02   );   
     HEEdge e5 = g.add_edge( v02, v03  );
     HEEdge e6 = g.add_edge( v03, v0   ); 
@@ -157,36 +164,27 @@ int VoronoiDiagram::add_vertex_site(const Point& p) {
     g[new_vert].status=OUT; 
     assert( p.norm() < far_radius );     // only add vertices within the far_radius circle
     gen_count++;
-    
     // 1)
     HEFace closest_face = fgrid->grid_find_closest_face( p ); // faster grid-search
-    //HEFace closest_face = fgrid->find_closest_face( p ); // naive exhaustive search (SLOW!)
-    
     // 2)
-    HEVertex v_seed = find_seed_vertex( closest_face, p );    
-    
+    HEVertex v_seed = find_seed_vertex(closest_face, p) ;
     // 3)
     augment_vertex_set(v_seed, p); 
-    
     // 4)
     add_new_voronoi_vertices( p );    
-    
     // 5)
     HEFace newface = split_faces( p );
-    
     // 6)
     remove_vertex_set( newface );
     g[new_vert].face = newface;
-    
     // 7
     reset_status();
-    
-    
     assert( vd_checker->isValid() );
     return g[new_vert].index;
 }
 
 // evaluate H on all face vertices and return vertex with the lowest H
+/*
 HEVertex VoronoiDiagram::find_seed_vertex(HEFace f, const Point& p) {
     VertexVector face_verts = g.face_vertices(f);
     assert( face_verts.size() >= 3 );
@@ -196,6 +194,7 @@ HEVertex VoronoiDiagram::find_seed_vertex(HEFace f, const Point& p) {
     BOOST_FOREACH( HEVertex q, face_verts) { // go thorugh all the vertices and find the one with smallest detH
         if ( g[q].status != OUT ) {
             double h = g[q].detH( p ); 
+            std::cout << "    H: " << g[q].index << " detH= " << g[q].detH(p) << " r=" << g[q].inCircle(p) << "\n";
             if ( first || (h<minimumH) ) {
                 minimumH = h;
                 minimalVertex = q;
@@ -203,7 +202,30 @@ HEVertex VoronoiDiagram::find_seed_vertex(HEFace f, const Point& p) {
             }
         }
     }
+    std::cout << "RETURN H: " << g[minimalVertex].index << " detH= " << g[minimalVertex].detH(p) << " r=" << g[minimalVertex].inCircle(p) << "\n";
     assert( vd_checker->detH_is_negative( p, f, minimalVertex ) );
+    return minimalVertex;
+}*/
+
+
+// evaluate H on all face vertices and return vertex with the lowest H
+HEVertex VoronoiDiagram::find_seed_vertex(HEFace f, const Point& p) {
+    VertexVector face_verts = g.face_vertices(f);
+    assert( face_verts.size() >= 3 );
+    double minPred(0.0); 
+    HEVertex minimalVertex=  HEVertex() ;
+    bool first = true;
+    BOOST_FOREACH( HEVertex q, face_verts) { // go thorugh all the vertices and find the one with smallest detH
+        if ( g[q].status != OUT ) {
+            double h = g[q].in_circle( p ); 
+            if ( first || (h<minPred) ) {
+                minPred = h;
+                minimalVertex = q;
+                first = false;
+            }
+        }
+    }
+    assert( vd_checker->inCircle_is_negative( p, f, minimalVertex ) );
     return minimalVertex;
 }
 
@@ -214,7 +236,6 @@ HEVertex VoronoiDiagram::find_seed_vertex(HEFace f, const Point& p) {
 //  we process UNDECIDED vertices adjacent to known IN-vertices in a "weighted breadth-first-search" manner
 //  where vertices with a large fabs(detH) are processed first, since we assume the detH to be more reliable the larger fabs(detH) is.
 void VoronoiDiagram::augment_vertex_set(HEVertex& v_seed, const Point& p) {
-    //VertexQueue Q; 
     mark_vertex( v_seed, p );
     modified_vertices.push_back( v_seed );
     while( !Q.empty() ) {
@@ -246,11 +267,9 @@ void VoronoiDiagram::mark_vertex(HEVertex& v,  const Point& p) {
 
 void VoronoiDiagram::push_adjacent_vertices( HEVertex v, const Point& p) {
     BOOST_FOREACH( HEVertex w, g.adjacent_vertices(v) ) {
-        if ( g[w].status == UNDECIDED ) {
-            if ( !g[w].in_queue ) { 
-                Q.push( VertexDetPair(w , g[w].detH(p) ) ); // push adjacent undecided verts for testing.
+        if ( (g[w].status == UNDECIDED) && (!g[w].in_queue) ) {
+                Q.push( VertexDetPair(w , g[w].in_circle(p) ) ); // push adjacent undecided verts for testing.
                 g[w].in_queue=true;
-            }
         }
     }
 }
@@ -276,7 +295,6 @@ void VoronoiDiagram::mark_adjacent_faces( HEVertex v) {
 void VoronoiDiagram::add_new_voronoi_vertices( const Point& p ) {
     assert( !v0.empty() );
     EdgeVector q_edges = find_in_out_edges(); //, OUT); // new vertices generated on these IN-OUT edges
-    assert( !q_edges.empty() );
     
     for( unsigned int m=0; m<q_edges.size(); ++m )  {  // create new vertices on all edges q_edges[]
         HEVertex q = g.add_vertex();
@@ -285,15 +303,16 @@ void VoronoiDiagram::add_new_voronoi_vertices( const Point& p ) {
         HEFace face = g[q_edges[m]].face;     assert(  g[face].status == INCIDENT);
         HEEdge twin = g[q_edges[m]].twin;
         HEFace twin_face = g[twin].face;      assert( g[twin_face].status == INCIDENT);
-        g[q].set_generators( g[face].generator  , g[twin_face].generator  , p); 
 
+        g[q].position = VertexPositioner::position( g[face].generator  , g[twin_face].generator  , p );
+        g[q].init_dist(p);
         //check_vertex_on_edge(q, q_edges[m]);
-
         g.insert_vertex_in_edge( q, q_edges[m] );
     }
 }
 
 // check that vertex q is positioned on the edge e
+/*
 void VoronoiDiagram::check_vertex_on_edge(HEVertex q, HEEdge e) {
     // sanity check on new vertex
     if (!(g[q].position.norm() < 18*far_radius)) {
@@ -343,10 +362,7 @@ void VoronoiDiagram::check_vertex_on_edge(HEVertex q, HEEdge e) {
         }
         assert( dtl < 1e-3* ( trgP - srcP ).norm() );
     }
-    
-
-    
-}
+}*/
 
 HEFace VoronoiDiagram::split_faces(const Point& p) {
     HEFace newface =  g.add_face(); 
@@ -378,6 +394,7 @@ void VoronoiDiagram::remove_vertex_set( HEFace newface ) {
         }
         current_edge = g[current_edge].next; // jump to the next edge
     } while (g[current_edge].next != start_edge);
+    
     BOOST_FOREACH( HEVertex v, v0 ) {      // it should now be safe to delete all IN vertices
         assert( g[v].status == IN );
         g.delete_vertex(v); // this also removes edges connecting to v
@@ -401,8 +418,8 @@ void VoronoiDiagram::reset_status() {
 }
 
 
-// amont the edges of HEFace f
-// find the NEW vertex with signature NEW->s
+// among the edges of HEFace f
+// find the NEW vertex with status-signature NEW->s
 boost::tuple<HEEdge, HEVertex, HEEdge> VoronoiDiagram::find_new_vertex(HEFace f, VoronoiVertexStatus s) {
     HEVertex v;
     HEEdge prev;
@@ -462,6 +479,7 @@ EdgeVector VoronoiDiagram::find_in_out_edges() {
                 output.push_back(edge); // this is an IN-OUT edge
         }
     }
+    assert( !output.empty() );
     return output;
 }
 

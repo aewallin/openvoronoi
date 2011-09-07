@@ -114,7 +114,10 @@ class VoronoiDiagram_py : public VoronoiDiagram {
             boost::python::list plist;
             BOOST_FOREACH( HEVertex v, g.vertices() ) {
                 if ( g.degree( v ) == 6 ) {
-                    plist.append( g[v].position );
+                    boost::python::list pd;
+                    pd.append( g[v].position );
+                    pd.append( g[v].dist() );
+                    plist.append(pd);
                 }
             }
             return plist;
@@ -124,7 +127,10 @@ class VoronoiDiagram_py : public VoronoiDiagram {
             boost::python::list plist;
             BOOST_FOREACH( HEVertex v, g.vertices() ) {
                 if ( g.degree( v ) == 4 ) {
-                    plist.append( g[v].position );
+                    boost::python::list pd;
+                    pd.append( g[v].position );
+                    pd.append( g[v].dist() );
+                    plist.append(pd);
                 }
             }
             return plist;

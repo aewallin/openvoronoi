@@ -69,10 +69,7 @@ void VoronoiDiagram::initialize() {
     g[v02] = VoronoiVertex(Point(  +3.0*sqrt(3.0)*far_radius*far_multiplier/2.0, +3.0*far_radius*far_multiplier/2.0), OUT, OUTER);
     g[v03] = VoronoiVertex(Point(  -3.0*sqrt(3.0)*far_radius*far_multiplier/2.0, +3.0*far_radius*far_multiplier/2.0), OUT, OUTER);
     
-    g[v0].init_dist( g[v01].position );
-    g[v01].init_dist( g[v02].position );
-    g[v02].init_dist( g[v03].position );
-    g[v03].init_dist( g[v01].position );
+
         
     out_verts[0]=v01; out_verts[1]=v02; out_verts[2]=v03;
     // the locations of the initial generators:
@@ -80,7 +77,13 @@ void VoronoiDiagram::initialize() {
     Point gen2 = Point( -3.0*sqrt(3.0)*far_radius/2.0, -3.0*far_radius/2.0 );
     Point gen3 = Point( +3.0*sqrt(3.0)*far_radius/2.0, -3.0*far_radius/2.0 );
     g[v0].position = VertexPositioner::position( gen1, gen2, gen3 );
-     
+    
+     g[v0].init_dist( gen1 );
+    g[v01].init_dist( gen3 );
+    g[v02].init_dist( gen1 );
+    g[v03].init_dist( gen2 );
+    
+    
     HEVertex g1 = g.add_vertex();
     HEVertex g2 = g.add_vertex();
     HEVertex g3 = g.add_vertex();
@@ -306,13 +309,13 @@ void VoronoiDiagram::add_new_voronoi_vertices( const Point& p ) {
 
         g[q].position = VertexPositioner::position( g[face].generator  , g[twin_face].generator  , p );
         g[q].init_dist(p);
-        //check_vertex_on_edge(q, q_edges[m]);
+        check_vertex_on_edge(q, q_edges[m]);
         g.insert_vertex_in_edge( q, q_edges[m] );
     }
 }
 
 // check that vertex q is positioned on the edge e
-/*
+
 void VoronoiDiagram::check_vertex_on_edge(HEVertex q, HEEdge e) {
     // sanity check on new vertex
     if (!(g[q].position.norm() < 18*far_radius)) {
@@ -326,6 +329,19 @@ void VoronoiDiagram::check_vertex_on_edge(HEVertex q, HEEdge e) {
     Point trgP = g[trg].position;
     Point srcP = g[src].position;
     Point newP = g[q].position;
+    
+    {
+        double dtl_orig = g[q].position.xyDistanceToLine(srcP, trgP);
+        //double dtl(dtl_orig);
+        if (dtl_orig > 1e-3* ( trgP - srcP ).norm() ) {
+            double t = ( g[q].position - srcP).dot( trgP - srcP ) / ( trgP - srcP ).dot( trgP - srcP ) ;
+            //g[q].position = srcP + t*( trgP-srcP);
+            //dtl = g[q].position.xyDistanceToLine(srcP, trgP);
+            std::cout << "WARNING!! check_vertex_on_edge()  dtl= " << dtl_orig << " t= " << t  << " edgelength= " << ( trgP - srcP ).norm()   <<"\n";
+        }
+    }
+    
+    
     if (( trgP - srcP ).norm() <= 0 ) {
         std::cout << "WARNING check_vertex_on_edge() zero-length edge! \n";
         g[q].position = srcP;
@@ -345,6 +361,7 @@ void VoronoiDiagram::check_vertex_on_edge(HEVertex q, HEEdge e) {
         if ( warn ) {
             std::cout << "WARNING: check_vertex_on_edge() t_old= " << torig << " CORRECTED t_new= " << t << "\n";
             std::cout << "src= " << srcP << " new= " << newP << " trg= " << trgP << "\n";
+            std::cout << " (src-trg).norm()= " << (srcP-trgP).norm() << "\n";
             g[q].position = srcP + t*( trgP-srcP);
             t = ( g[q].position - srcP).dot( trgP - srcP ) / ( trgP - srcP ).dot( trgP - srcP ) ;
             
@@ -362,7 +379,7 @@ void VoronoiDiagram::check_vertex_on_edge(HEVertex q, HEEdge e) {
         }
         assert( dtl < 1e-3* ( trgP - srcP ).norm() );
     }
-}*/
+}
 
 HEFace VoronoiDiagram::split_faces(const Point& p) {
     HEFace newface =  g.add_face(); 

@@ -11,6 +11,7 @@ import time
 import datetime
 # import ocl
 # import pyocl
+import openvoronoi as ovd
 import math
 
 white = (1,1,1)
@@ -31,6 +32,138 @@ lblue= ( float(125)/255,float(191)/255,float(255)/255 )
 cyan=  (0,1,1)
 mag = ( float(153)/255 , float(42)/255 , float(165)/255  )
 
+
+class VD:
+    def __init__(self, myscreen, vd, scale=1):
+        self.myscreen = myscreen
+        self.gen_pts=[ovd.Point(0,0)]
+        self.generators = PointCloud(pointlist=self.gen_pts)
+        self.verts=[]
+        self.far=[]
+        self.edges =[]
+        self.gens =[]
+        self.generatorColor = green
+        self.vertexColor = red
+        self.edgeColor = cyan
+        self.vdtext  = Text()
+        self.vertexRadius = scale/60
+        self.vdtext.SetPos( (50, myscreen.height-150) )
+        self.Ngen = 0
+        self.vdtext_text = ""
+        self.setVDText(vd)
+        self.scale=scale
+        
+        myscreen.addActor(self.vdtext)
+        
+    def setVDText(self, vd):
+        self.Ngen = len( vd.getGenerators() )-3
+        self.vdtext_text = "VD with " + str(self.Ngen) + " generators.\n"
+        #self.vdtext_text += "YELLOW = New point-generator/site\n"
+        #self.vdtext_text += "PINK = Seed vertex\n"
+        #self.vdtext_text += "RED = Delete vertices/edges\n"
+        #self.vdtext_text += "GREEN = Modified VD edges\n"
+        self.vdtext.SetText( self.vdtext_text )
+        
+        
+    def setGenerators(self, vd):
+        for p in self.gens:
+            self.myscreen.removeActor(p)
+        #self.verts = []
+        for pt in vd.getGenerators():
+            p = self.scale*pt
+            actor = Sphere( center=(p.x,p.y, 0), radius=self.vertexRadius, color=self.generatorColor )
+            self.gens.append(actor)
+            self.myscreen.addActor( actor )
+        """
+        if len(self.gen_pts)>0:
+            myscreen.removeActor( self.generators ) 
+        #self.generators=[]
+        self.gen_pts = []
+        for p in vd.getGenerators():
+            self.gen_pts.append(self.scale*p)
+        self.generators= ovdvtk.PointCloud(pointlist=self.gen_pts) 
+        self.generators.SetPoints()
+        myscreen.addActor(self.generators)
+        self.setVDText(vd)
+        """
+        self.myscreen.render() 
+    
+    def setFar(self, vd):
+        for pt in vd.getFarVoronoiVertices():
+            p=self.scale*pt[0]
+            self.myscreen.addActor( Sphere( center=(p.x,p.y, 0), radius=self.vertexRadius, color=pink ) )
+            cir_actor = Circle( center=(p.x,p.y,0), radius=math.sqrt(pt[1])*self.scale, color=self.vertexColor )
+            #self.verts.append(cir_actor)
+            self.myscreen.addActor(cir_actor)
+            
+        self.myscreen.render() 
+    
+    def setVertices(self, vd, clearance_disk=0):
+        for p in self.verts:
+            self.myscreen.removeActor(p)
+        self.verts = []
+        for pt in vd.getVoronoiVertices():
+            p = self.scale*pt[0]
+            actor = Sphere( center=(p.x,p.y, 0), radius=self.vertexRadius, color=self.vertexColor )
+            self.verts.append(actor)
+            self.myscreen.addActor( actor )
+            if clearance_disk:
+                #draw clearance-disk
+                cir_actor = Circle( center=(p.x,p.y,0), radius=math.sqrt(pt[1])*self.scale, color=self.vertexColor )
+                self.verts.append(cir_actor)
+                self.myscreen.addActor(cir_actor)
+            
+        self.myscreen.render() 
+        
+    def setEdgesPolydata(self, vd):
+        self.edges = []
+        self.edges = vd.getEdgesGenerators()
+        self.epts = vtk.vtkPoints()
+        nid = 0
+        lines=vtk.vtkCellArray()
+        for e in self.edges:
+            p1 = self.scale*e[0]
+            p2 = self.scale*e[1] 
+            self.epts.InsertNextPoint( p1.x, p1.y, 0)
+            self.epts.InsertNextPoint( p2.x, p2.y, 0)
+            line = vtk.vtkLine()
+            line.GetPointIds().SetId(0,nid)
+            line.GetPointIds().SetId(1,nid+1)
+            nid = nid+2
+            lines.InsertNextCell(line)
+        
+        linePolyData = vtk.vtkPolyData()
+        linePolyData.SetPoints(self.epts)
+        linePolyData.SetLines(lines)
+        
+        mapper = vtk.vtkPolyDataMapper()
+        mapper.SetInput(linePolyData)
+        
+        self.edge_actor = vtk.vtkActor()
+        self.edge_actor.SetMapper(mapper)
+        self.edge_actor.GetProperty().SetColor( cyan )
+        self.myscreen.addActor( self.edge_actor )
+        self.myscreen.render() 
+
+    def setEdges(self, vd):
+        for e in self.edges:
+            self.myscreen.removeActor(e)
+        self.edges = []
+        for e in vd.getEdgesGenerators():
+            p1 = self.scale*e[0]  
+            p2 = self.scale*e[1] 
+            actor = Line( p1=( p1.x,p1.y, 0), p2=(p2.x,p2.y, 0), color=self.edgeColor )
+            self.myscreen.addActor(actor)
+            self.edges.append(actor)
+        self.myscreen.render() 
+        
+    def setAll(self, vd):
+        self.setGenerators(vd)
+        self.setFar(vd)
+        #self.setVertices(vd)
+        #self.setEdgesPolydata(vd)
+        self.setEdges(vd)
+        
 
 def drawOCLtext(myscreen):
     t = Text()

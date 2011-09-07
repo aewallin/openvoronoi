@@ -126,7 +126,9 @@ public:
     double dist(const Point& p) const {
         return (position-p).norm_sq(); 
     }
-    
+    double dist() const {
+        return r;
+    }
     double in_circle(const Point& p) {
         return dist(p) - r;
     }

@@ -37,7 +37,7 @@ def randomGenerators(far, Nmax):
         plist.append( ovd.Point(x,y) )
     return plist
     
-def circleGenerators(far, Nmax):
+def circleGenerators(far, Nmax, shuffle=1, seed=0):
     # POINTS ON A CIRCLE
     dalfa= float(2*math.pi)/float(Nmax-1)
     plist=[]
@@ -46,8 +46,12 @@ def circleGenerators(far, Nmax):
         x=float(radius)*math.cos(float(n)*float(dalfa))
         y=float(radius)*math.sin(float(n)*float(dalfa))
         plist.append( ovd.Point(x,y) )
-    random.seed()
-    random.shuffle(plist)
+    if shuffle:
+        if seed:
+            random.seed(seed)
+        else:
+            random.seed()
+        random.shuffle(plist)
     return plist
     
 def timeVoronoi(Nmax):
@@ -66,8 +70,8 @@ def timeVoronoi_batch(Nmax):
     far = 1
     vd = ovd.VoronoiDiagram(far, int( math.floor( math.sqrt(16)*math.sqrt(Nmax) ) ) )
     #vd = ovd.VoronoiDiagram(far, 1200 ) # use a fixed number of bins
-    plist = randomGenerators(far, Nmax)
-    #plist = regularGridGenerators(far, Nmax)
+    #plist = randomGenerators(far, Nmax)
+    plist = regularGridGenerators(far, Nmax)
     #plist = circleGenerators(far, Nmax)
     for p in plist: 
         vd.pushVertexSite( p )
@@ -75,7 +79,7 @@ def timeVoronoi_batch(Nmax):
     vd.run()
     t_after = time.time()
     return (t_after - t_before)
-    
+
 if __name__ == "__main__":  
     far = 1
 

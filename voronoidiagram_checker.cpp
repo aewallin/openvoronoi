@@ -20,67 +20,71 @@
 #include "voronoidiagram_checker.hpp"
 #include "voronoidiagram.hpp"
 
-namespace ovd
-{
+namespace ovd {
 
     
-    /// sanity-check for the diagram, calls other sanity-check functions
-    bool VoronoiDiagramChecker::isValid() {
-        if (!vertex_degree_ok() )
-            return false;
-        if (!face_count_equals_generator_count())
-            return false;
-        return true;
+/// sanity-check for the diagram, calls other sanity-check functions
+bool VoronoiDiagramChecker::isValid() {
+    if (!vertex_degree_ok() )
+        return false;
+    if (!face_count_equals_generator_count())
+        return false;
+    return true;
+}
+    
+    
+    
+/// check that number of faces equals the number of generators
+bool VoronoiDiagramChecker::face_count_equals_generator_count() {
+    // Euler formula for planar graphs
+    // v - e + f = 2
+    // in a half-edge diagram all edges occur twice, so:
+    // f = 2-v+e
+    //int vertex_count = hedi::num_vertices(vd->g);
+    /*int vertex_count = 0;
+    BOOST_FOREACH( HEVertex v, hedi::vertices( vd->g ) ) {
+        if ( vd->g[v].type == NORMAL )
+            vertex_count++;
     }
-    
-    
-    
-    /// check that number of faces equals the number of generators
-    bool VoronoiDiagramChecker::face_count_equals_generator_count() {
-        // Euler formula for planar graphs
-        // v - e + f = 2
-        // in a half-edge diagram all edges occur twice, so:
-        // f = 2-v+e
-        //int vertex_count = hedi::num_vertices(vd->g);
-        /*int vertex_count = 0;
-        BOOST_FOREACH( HEVertex v, hedi::vertices( vd->g ) ) {
-            if ( vd->g[v].type == NORMAL )
-                vertex_count++;
-        }
-        int face_count = (vertex_count- 4)/2 + 3; // degree three graph
-        //int face_count = hed.num_faces();
-        if (face_count != vd->gen_count) {
-            std::cout << " face_count_equals_generator_count() ERROR:\n";
-            std::cout << " num_vertices = " << vertex_count << "\n";
-            std::cout << " gen_count = " << vd->gen_count << "\n";
-            std::cout << " face_count = " << face_count << "\n";
-        }
-        return ( face_count == vd->gen_count );
-        * */
-        return true;
+    int face_count = (vertex_count- 4)/2 + 3; // degree three graph
+    //int face_count = hed.num_faces();
+    if (face_count != vd->gen_count) {
+        std::cout << " face_count_equals_generator_count() ERROR:\n";
+        std::cout << " num_vertices = " << vertex_count << "\n";
+        std::cout << " gen_count = " << vd->gen_count << "\n";
+        std::cout << " face_count = " << face_count << "\n";
     }
+    return ( face_count == vd->gen_count );
+    * */
+    return true;
+}
 
     
     
-    /// the diagram should be of degree three (at least with point generators)
-    bool VoronoiDiagramChecker::vertex_degree_ok() {
-        // the outermost init() vertices have special degree, all others == 6
-        BOOST_FOREACH(HEVertex v, vd->g.vertices() ) {
-            if ( vd->g[v].type == NORMAL ) {
-                if ( vd->g.degree( v ) != 6 )
-                    return false;
-            }
-            if ( vd->g[v].type == OUTER ) {
-                if ( vd->g.degree( v ) != 4 )
-                    return false;
-            }
-            if ( vd->g[v].type == VERTEXGEN ) {
-                if ( vd->g.degree( v ) != 0 )
-                    return false;
-            }
+/// the diagram should be of degree three (at least with point generators)
+bool VoronoiDiagramChecker::vertex_degree_ok() {
+    // the outermost init() vertices have special degree, all others == 6
+    BOOST_FOREACH(HEVertex v, vd->g.vertices() ) {
+        
+        if ( vd->g.degree(v) != VoronoiVertex::expected_degree[ vd->g[v].type ] )
+            return false;
+            
+       /* 
+        if ( vd->g[v].type == NORMAL ) {
+            if ( vd->g.degree( v ) != 6 )
+                return false;
         }
-        return true;
+        if ( vd->g[v].type == OUTER ) {
+            if ( vd->g.degree( v ) != 4 )
+                return false;
+        }
+        if ( vd->g[v].type == VERTEXGEN ) {
+            if ( vd->g.degree( v ) != 0 )
+                return false;
+        }*/
     }
+    return true;
+}
     
     
     /// traverse the incident faces and check next-pointers
@@ -166,7 +170,6 @@ bool VoronoiDiagramChecker::incidentFaceVerticesConnected( VoronoiVertexStatus V
             } 
             return false;
         }
-        //assert( vdChecker.faceVerticesConnected( this, f, IN ) );
     }
     return true;
 }

@@ -17,7 +17,7 @@
  *  along with OpenCAMlib.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#define NDEBUG 
+//#define NDEBUG 
 #include <cassert>
 
 #include "facegrid.hpp"

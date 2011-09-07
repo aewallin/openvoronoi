@@ -20,6 +20,8 @@
 #ifndef VODI_VERTEX_HPP
 #define VODI_VERTEX_HPP
 
+#include <map>
+
 #include "point.hpp"
 
 
@@ -36,6 +38,10 @@ enum VoronoiVertexStatus {OUT, IN, UNDECIDED, NEW };
 // VERTEXGEN are vertex generators, should have degree==0
 // NORMAL are normal voronoi-vertices, should have degree==6  (degree 3 graph with double-edges)
 enum VoronoiVertexType {OUTER, NORMAL, VERTEXGEN};
+
+typedef std::map<VoronoiVertexType, unsigned int> VertexDegreeMap;
+
+
 
 /// properties of a vertex in the voronoi diagram
 class VoronoiVertex {
@@ -64,7 +70,7 @@ public:
     
     typedef unsigned int HEFace; 
     HEFace face; // the face associated with this vertex, if type==VERTEXGEN
-    
+    friend class VoronoiDiagramChecker;
 protected:
     /// based on previously calculated J2, J3, and J4, set the position of the vertex
     /// Eq.(24) from Sugihara&Iri 1994
@@ -94,7 +100,7 @@ protected:
     double J4;
     /// global vertex count
     static int count;
-    
+    static VertexDegreeMap expected_degree;
 };
 
 

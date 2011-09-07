@@ -19,7 +19,7 @@
 #ifndef HEDI_H
 #define HEDI_H
 
-#define NDEBUG 
+//#define NDEBUG 
 
 #include <vector>
 #include <list>
@@ -205,7 +205,7 @@ VertexVector face_vertices(Face face_idx) {
     Edge current = g[startedge].next;
     do {
         Vertex current_target = boost::target( current, g); 
-        assert( current_target != start_target );
+        //assert( current_target != start_target );
         verts.push_back(current_target);
         current = g[current].next;
     } while ( current != startedge );

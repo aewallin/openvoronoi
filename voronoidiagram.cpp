@@ -17,7 +17,7 @@
  *  along with OpenCAMlib.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#define NDEBUG  // this turns off assertions
+//#define NDEBUG  // this turns off assertions
 #include <cassert>
 
 #include <boost/foreach.hpp>

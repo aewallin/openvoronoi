@@ -31,7 +31,7 @@ namespace ovd {
 VoronoiDiagram::VoronoiDiagram(double far, unsigned int n_bins) {
     fgrid = new FaceGrid(far, n_bins);
     vd_checker = new VoronoiDiagramChecker(this);
-    vpos = new VertexPositioner();
+    vpos = new VertexPositioner(this);
     far_radius=far;
     gen_count=3;
     initialize();
@@ -312,7 +312,7 @@ void VoronoiDiagram::add_new_voronoi_vertices( HEVertex new_site ) {
         
         // params should be(?):existing Edge e, new Site s
         //g[q].position = vpos->position( g[face].generator  , g[twin_face].generator  , p );
-        g[q].position = vpos->position( this, q_edges[m], new_site );
+        g[q].position = vpos->position(  q_edges[m], new_site );
         g[q].init_dist( g[new_site].position );
         //check_vertex_on_edge(q, q_edges[m]);
         g.insert_vertex_in_edge( q, q_edges[m] );

@@ -47,14 +47,88 @@ namespace ovd {
     }
 
     // signature: edge, new_site 
-    Point VertexPositioner::position(VoronoiDiagram* vd, HEEdge e, HEVertex v) {
+    Point VertexPositioner::position(HEEdge e, HEVertex v) {
         HEFace face = vd->g[e].face;     assert(  vd->g[face].status == INCIDENT);
         HEEdge twin = vd->g[e].twin;
         HEFace twin_face = vd->g[twin].face;      assert( vd->g[twin_face].status == INCIDENT);
         
-        return position( vd->g[face].generator  , vd->g[twin_face].generator  , vd->g[v].position );
+        Point p = position( vd->g[face].generator  , vd->g[twin_face].generator  , vd->g[v].position );
+        assert( check_far_circle(p) );
+        return p;
     }
 
 
+bool VertexPositioner::check_far_circle(const Point& p) {
+    if (!(p.norm() < 18*vd->far_radius)) {
+        std::cout << "WARNING check_far_circle() new vertex outside far_radius! \n";
+        std::cout << p << " norm=" << p.norm() << " far_radius=" << vd->far_radius << "\n"; 
+        return false;
+    }
+    return true;
+}
 
+/*    
+void VoronoiDiagram::check_vertex_on_edge(HEVertex q, HEEdge e) {
+    // sanity check on new vertex
+
+    assert( g[q].position.norm() < 18*far_radius);
+    
+    HEVertex trg = g.target(e);
+    HEVertex src = g.source(e);
+    Point trgP = g[trg].position;
+    Point srcP = g[src].position;
+    Point newP = g[q].position;
+    
+    {
+        double dtl_orig = g[q].position.xyDistanceToLine(srcP, trgP);
+        //double dtl(dtl_orig);
+        if (dtl_orig > 1e-3* ( trgP - srcP ).norm() ) {
+            double t = ( g[q].position - srcP).dot( trgP - srcP ) / ( trgP - srcP ).dot( trgP - srcP ) ;
+            //g[q].position = srcP + t*( trgP-srcP);
+            //dtl = g[q].position.xyDistanceToLine(srcP, trgP);
+            std::cout << "WARNING!! check_vertex_on_edge()  dtl= " << dtl_orig << " t= " << t  << " edgelength= " << ( trgP - srcP ).norm()   <<"\n";
+        }
+    }
+    
+    
+    if (( trgP - srcP ).norm() <= 0 ) {
+        std::cout << "WARNING check_vertex_on_edge() zero-length edge! \n";
+        g[q].position = srcP;
+    } else {
+        assert( ( trgP - srcP ).norm() > 0.0 ); // edge has finite length
+        assert( ( trgP - srcP ).dot( trgP - srcP ) > 0.0 ); // length squared
+        double torig = ((newP - srcP).dot( trgP - srcP )) / ( trgP - srcP ).dot( trgP - srcP ) ;
+        bool warn = false;
+        double t(torig);
+        if (torig < 0.0) { // clamp the t-parameter to [0,1]
+            warn = true;
+            t=0.0;
+        } else if (torig> 1.0) {
+            warn = true;
+            t=1.0;
+        }
+        if ( warn ) {
+            std::cout << "WARNING: check_vertex_on_edge() t_old= " << torig << " CORRECTED t_new= " << t << "\n";
+            std::cout << "src= " << srcP << " new= " << newP << " trg= " << trgP << "\n";
+            std::cout << " (src-trg).norm()= " << (srcP-trgP).norm() << "\n";
+            g[q].position = srcP + t*( trgP-srcP);
+            t = ( g[q].position - srcP).dot( trgP - srcP ) / ( trgP - srcP ).dot( trgP - srcP ) ;
+            
+        }
+        // now we are clamped:
+        assert( t >= 0.0 );
+        assert( t <= 1.0 );        
+        double dtl_orig = g[q].position.xyDistanceToLine(srcP, trgP);
+        double dtl(dtl_orig);
+        if (dtl_orig > 1e-3* ( trgP - srcP ).norm() ) {
+            t = ( g[q].position - srcP).dot( trgP - srcP ) / ( trgP - srcP ).dot( trgP - srcP ) ;
+            g[q].position = srcP + t*( trgP-srcP);
+            dtl = g[q].position.xyDistanceToLine(srcP, trgP);
+            std::cout << "WARNING check_vertex_on_edge()  old_dtl= " << dtl_orig << " new_dtl= " << dtl  << " edgelength= " << ( trgP - srcP ).norm()   <<"\n";
+        }
+        assert( dtl < 1e-3* ( trgP - srcP ).norm() );
+    }
+}*/
+
+    
 }

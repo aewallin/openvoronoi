@@ -79,11 +79,10 @@ class VoronoiDiagram {
         /// among the vertices of f, find the one with the lowest detH value
         /// i.e. the one that is closest to the new generator Point p
         HEVertex find_seed_vertex(HEFace f, const Point& p);
-        //HEVertex r_find_seed_vertex(HEFace f, const Point& p);
         
         /// breadth-first search based Tree-expansion algorithm
         void augment_vertex_set(HEVertex& v_seed, const Point& p);        
-        //void r_augment_vertex_set(HEVertex& v_seed, const Point& p);
+        
         /// find all IN-OUT edges adjacent to q-verts
         EdgeVector find_in_out_edges(); 
 
@@ -106,8 +105,6 @@ class VoronoiDiagram {
         void reset_status();
         
         boost::tuple<HEEdge, HEVertex, HEEdge> find_new_vertex(HEFace f, VoronoiVertexStatus s1);
-
-        //void check_vertex_on_edge(HEVertex q, HEEdge e);
         
     // PRINT ETC
         void print_face(HEFace f);

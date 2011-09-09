@@ -29,12 +29,17 @@ class VoronoiDiagram;
 
 class VertexPositioner {
 public:
-    inline double sq(double x) {return x*x;}
+    VertexPositioner(VoronoiDiagram* vodi): vd(vodi) {}
+    
     Point position(const Point& p1, const Point& p2, const Point& p3);
 
     // signature: edge, new_site 
-    Point position(VoronoiDiagram* vd, HEEdge e, HEVertex v);
-
+    Point position( HEEdge e, HEVertex v);
+private:
+    bool check_far_circle(const Point& p);
+    
+    VoronoiDiagram* vd;
+    inline double sq(double x) {return x*x;}
 };
 
 }

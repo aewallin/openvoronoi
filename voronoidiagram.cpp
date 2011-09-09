@@ -31,6 +31,7 @@ namespace ovd {
 VoronoiDiagram::VoronoiDiagram(double far, unsigned int n_bins) {
     fgrid = new FaceGrid(far, n_bins);
     vd_checker = new VoronoiDiagramChecker(this);
+    vpos = new VertexPositioner();
     far_radius=far;
     gen_count=3;
     initialize();
@@ -39,6 +40,7 @@ VoronoiDiagram::VoronoiDiagram(double far, unsigned int n_bins) {
 VoronoiDiagram::~VoronoiDiagram() { 
     delete fgrid; 
     delete vd_checker;
+    delete vpos;
 }
 
 void VoronoiDiagram::run() {
@@ -76,7 +78,8 @@ void VoronoiDiagram::initialize() {
     Point gen1 = Point( 0, 3.0*far_radius);
     Point gen2 = Point( -3.0*sqrt(3.0)*far_radius/2.0, -3.0*far_radius/2.0 );
     Point gen3 = Point( +3.0*sqrt(3.0)*far_radius/2.0, -3.0*far_radius/2.0 );
-    g[v0].position = VertexPositioner::position( gen1, gen2, gen3 );
+    g[v0].position = Point(0,0);
+    //vpos->position( gen1, gen2, gen3 );
     
      g[v0].init_dist( gen1 );
     g[v01].init_dist( gen3 );
@@ -174,7 +177,7 @@ int VoronoiDiagram::add_vertex_site(const Point& p) {
     // 3)
     augment_vertex_set(v_seed, p); 
     // 4)
-    add_new_voronoi_vertices( p );    
+    add_new_voronoi_vertices( new_vert );    
     // 5)
     HEFace newface = split_faces( p );
     // 6)
@@ -295,7 +298,7 @@ void VoronoiDiagram::mark_adjacent_faces( HEVertex v) {
 
 // the set v0 are IN vertices that should be removed
 // generate new voronoi-vertices on all edges connecting v0 to OUT-vertices
-void VoronoiDiagram::add_new_voronoi_vertices( const Point& p ) {
+void VoronoiDiagram::add_new_voronoi_vertices( HEVertex new_site ) {
     assert( !v0.empty() );
     EdgeVector q_edges = find_in_out_edges(); //, OUT); // new vertices generated on these IN-OUT edges
     
@@ -303,19 +306,21 @@ void VoronoiDiagram::add_new_voronoi_vertices( const Point& p ) {
         HEVertex q = g.add_vertex();
         g[q].status = NEW;
         modified_vertices.push_back(q);
-        HEFace face = g[q_edges[m]].face;     assert(  g[face].status == INCIDENT);
-        HEEdge twin = g[q_edges[m]].twin;
-        HEFace twin_face = g[twin].face;      assert( g[twin_face].status == INCIDENT);
-
-        g[q].position = VertexPositioner::position( g[face].generator  , g[twin_face].generator  , p );
-        g[q].init_dist(p);
-        check_vertex_on_edge(q, q_edges[m]);
+        //HEFace face = g[q_edges[m]].face;     assert(  g[face].status == INCIDENT);
+        //HEEdge twin = g[q_edges[m]].twin;
+        //HEFace twin_face = g[twin].face;      assert( g[twin_face].status == INCIDENT);
+        
+        // params should be(?):existing Edge e, new Site s
+        //g[q].position = vpos->position( g[face].generator  , g[twin_face].generator  , p );
+        g[q].position = vpos->position( this, q_edges[m], new_site );
+        g[q].init_dist( g[new_site].position );
+        //check_vertex_on_edge(q, q_edges[m]);
         g.insert_vertex_in_edge( q, q_edges[m] );
     }
 }
 
 // check that vertex q is positioned on the edge e
-
+/*
 void VoronoiDiagram::check_vertex_on_edge(HEVertex q, HEEdge e) {
     // sanity check on new vertex
     if (!(g[q].position.norm() < 18*far_radius)) {
@@ -379,7 +384,7 @@ void VoronoiDiagram::check_vertex_on_edge(HEVertex q, HEEdge e) {
         }
         assert( dtl < 1e-3* ( trgP - srcP ).norm() );
     }
-}
+}*/
 
 HEFace VoronoiDiagram::split_faces(const Point& p) {
     HEFace newface =  g.add_face(); 

@@ -46,7 +46,7 @@ class VD:
         self.vertexColor = red
         self.edgeColor = cyan
         self.vdtext  = Text()
-        self.vertexRadius = scale/60
+        self.vertexRadius = scale/6
         self.vdtext.SetPos( (50, myscreen.height-150) )
         self.Ngen = 0
         self.vdtext_text = ""
@@ -68,7 +68,7 @@ class VD:
     def setGenerators(self, vd):
         for p in self.gens:
             self.myscreen.removeActor(p)
-        #self.verts = []
+        self.gens = []
         for pt in vd.getGenerators():
             p = self.scale*pt
             actor = Sphere( center=(p.x,p.y, 0), radius=self.vertexRadius, color=self.generatorColor )

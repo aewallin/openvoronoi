@@ -41,7 +41,7 @@ def writeFrame( w2if, lwr, n ):
     lwr.SetFileName( filename )
     #lwr.Write()
 
-def regularGridGenerators(far, Nmax):
+def regularGridGenerators(far, Nmax, shuffle=0):
     # REGULAR GRID
     rows = int(math.sqrt(Nmax))
     print "rows= ",rows
@@ -51,14 +51,9 @@ def regularGridGenerators(far, Nmax):
         for m in range(rows):
             x=gpos[0]+gpos[1]*n
             y=gpos[0]+gpos[1]*m
-            # rotation
-            #alfa = 0
-            #xt=x
-            #yt=y
-            #x = xt*math.cos(alfa)-yt*math.sin(alfa)
-            #y = xt*math.sin(alfa)+yt*math.cos(alfa)
             plist.append( ovd.Point(x,y) )
-    random.shuffle(plist)
+    if shuffle:
+        random.shuffle(plist)
     return plist
 
 def randomGenerators(far, Nmax):
@@ -70,22 +65,17 @@ def randomGenerators(far, Nmax):
         plist.append( ovd.Point(x,y) )
     return plist
     
-def circleGenerators(far, Nmax):
+def circleGenerators(far, Nmax, shuffle=0):
     # POINTS ON A CIRCLE
-    #"""
-    #cpos=[50,50]
-    #npts = 100
     dalfa= float(2*math.pi)/float(Nmax-1)
-    #dgamma= 10*2*math.pi/npts
-    #alfa=0
-    #ofs=10
     plist=[]
     radius=0.81234*float(far)
     for n in range(Nmax):
         x=float(radius)*math.cos(float(n)*float(dalfa))
         y=float(radius)*math.sin(float(n)*float(dalfa))
         plist.append( ovd.Point(x,y) )
-    #random.shuffle(plist)
+    if shuffle:
+        random.shuffle(plist)
     return plist
     
     

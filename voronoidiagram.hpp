@@ -24,6 +24,7 @@
 
 #include "point.hpp"
 #include "voronoidiagram_graph.hpp"
+#include "vertex_positioner.hpp"
 
 
 namespace ovd
@@ -69,6 +70,7 @@ class VoronoiDiagram {
         double get_far_radius() const {return far_radius;}
         
         friend class VoronoiDiagramChecker;
+        friend class VertexPositioner;
         void run();
         
     protected:
@@ -93,7 +95,7 @@ class VoronoiDiagram {
         void push_adjacent_vertices( HEVertex v ,  const Point& p);
         void mark_vertex(HEVertex& v,  const Point& p); 
         /// add the new vertices  
-        void add_new_voronoi_vertices( const Point& p);
+        void add_new_voronoi_vertices( HEVertex v);
         /// split faces when adding new generator p
         HEFace split_faces(const Point& p);
         /// split the face
@@ -105,7 +107,7 @@ class VoronoiDiagram {
         
         boost::tuple<HEEdge, HEVertex, HEEdge> find_new_vertex(HEFace f, VoronoiVertexStatus s1);
 
-        void check_vertex_on_edge(HEVertex q, HEEdge e);
+        //void check_vertex_on_edge(HEVertex q, HEEdge e);
         
     // PRINT ETC
         void print_face(HEFace f);
@@ -115,7 +117,8 @@ class VoronoiDiagram {
         VoronoiDiagramChecker* vd_checker;
         /// a grid which allows fast nearest-neighbor search
         FaceGrid* fgrid; // for grid-search
-        
+        /// this positions vertices
+        VertexPositioner* vpos;
     // DATA
         /// the half-edge diagram of the vd
         HEGraph g;

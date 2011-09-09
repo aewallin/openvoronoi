@@ -41,32 +41,6 @@ enum VoronoiVertexType {OUTER, NORMAL, VERTEXGEN};
 
 typedef std::map<VoronoiVertexType, unsigned int> VertexDegreeMap;
 
-class VertexPositioner {
-public:
-    static inline double sq(double x) {return x*x;}
-    static Point position(const Point& p1, const Point& p2, const Point& p3) {
-        Point pi(p1),pj(p2),pk(p3);
-        if ( pi.isRight(pj,pk) ) 
-            std::swap(pi,pj);
-        assert( !pi.isRight(pj,pk) );
-        // 2) point pk should have the largest angle. largest angle is opposite longest side.
-        double longest_side = (pi - pj).norm();
-        while (  ((pj - pk).norm() > longest_side) || (((pi - pk).norm() > longest_side)) ) { 
-            std::swap(pi,pj); // cyclic rotation of points until pk is opposite the longest side pi-pj
-            std::swap(pi,pk);  
-            longest_side = (pi - pj).norm();
-        }
-        assert( !pi.isRight(pj,pk) );
-        assert( (pi - pj).norm() >=  (pj - pk).norm() );
-        assert( (pi - pj).norm() >=  (pk - pi).norm() );
-        double J2 = (pi.y-pk.y)*( sq(pj.x-pk.x)+sq(pj.y-pk.y) )/2.0 - (pj.y-pk.y)*( sq(pi.x-pk.x)+sq(pi.y-pk.y) )/2.0;
-        double J3 = (pi.x-pk.x)*( sq(pj.x-pk.x)+sq(pj.y-pk.y) )/2.0 - (pj.x-pk.x)*( sq(pi.x-pk.x)+sq(pi.y-pk.y) )/2.0;
-        double J4 = (pi.x-pk.x)*(pj.y-pk.y) - (pj.x-pk.x)*(pi.y-pk.y);
-        assert( J4 != 0.0 );
-        return Point(   -J2/J4 + pk.x ,  J3/J4 + pk.y );
-    }
-
-};
 
 
 class Site {
@@ -85,6 +59,9 @@ public:
     }
     void position( const Point& p ) {
         _p = p;
+    }
+    Point position() const {
+        return _p;
     }
 private:
     Point _p;

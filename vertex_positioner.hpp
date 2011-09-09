@@ -31,12 +31,17 @@ class VertexPositioner {
 public:
     VertexPositioner(VoronoiDiagram* vodi): vd(vodi) {}
     
-    Point position(const Point& p1, const Point& p2, const Point& p3);
-
     // signature: edge, new_site 
     Point position( HEEdge e, HEVertex v);
 private:
+    Point position(const Point& p1, const Point& p2, const Point& p3);
+
+
+    bool check_on_edge(HEEdge e, const Point& p);
+    bool check_in_edge(HEEdge e, const Point& p);
     bool check_far_circle(const Point& p);
+    bool check_dist(HEEdge e, const Point& p, HEVertex v);
+    bool equal(double d1, double d2);
     
     VoronoiDiagram* vd;
     inline double sq(double x) {return x*x;}

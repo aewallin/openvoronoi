@@ -46,7 +46,7 @@ class VD:
         self.vertexColor = red
         self.edgeColor = cyan
         self.vdtext  = Text()
-        self.vertexRadius = scale/6
+        self.vertexRadius = scale/50
         self.vdtext.SetPos( (50, myscreen.height-150) )
         self.Ngen = 0
         self.vdtext_text = ""

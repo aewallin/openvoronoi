@@ -120,7 +120,7 @@ if __name__ == "__main__":
     n=1
     t_before = time.time() 
     #delay = 1.5 # 0.533
-    delay = 1 #1 # 0.533
+    delay = 2 #1 # 0.533
     #ren = [1,2,3,4,5,59,60,61,62]
     #ren = [16,17]
     ren = range(0,Nmax,100)

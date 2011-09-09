@@ -24,38 +24,46 @@
 namespace ovd {
 
 
-    Point VertexPositioner::position(const Point& p1, const Point& p2, const Point& p3) {
-        Point pi(p1),pj(p2),pk(p3);
-        if ( pi.isRight(pj,pk) ) 
-            std::swap(pi,pj);
-        assert( !pi.isRight(pj,pk) );
-        // 2) point pk should have the largest angle. largest angle is opposite longest side.
-        double longest_side = (pi - pj).norm();
-        while (  ((pj - pk).norm() > longest_side) || (((pi - pk).norm() > longest_side)) ) { 
-            std::swap(pi,pj); // cyclic rotation of points until pk is opposite the longest side pi-pj
-            std::swap(pi,pk);  
-            longest_side = (pi - pj).norm();
-        }
-        assert( !pi.isRight(pj,pk) );
-        assert( (pi - pj).norm() >=  (pj - pk).norm() );
-        assert( (pi - pj).norm() >=  (pk - pi).norm() );
-        double J2 = (pi.y-pk.y)*( sq(pj.x-pk.x)+sq(pj.y-pk.y) )/2.0 - (pj.y-pk.y)*( sq(pi.x-pk.x)+sq(pi.y-pk.y) )/2.0;
-        double J3 = (pi.x-pk.x)*( sq(pj.x-pk.x)+sq(pj.y-pk.y) )/2.0 - (pj.x-pk.x)*( sq(pi.x-pk.x)+sq(pi.y-pk.y) )/2.0;
-        double J4 = (pi.x-pk.x)*(pj.y-pk.y) - (pj.x-pk.x)*(pi.y-pk.y);
-        assert( J4 != 0.0 );
-        return Point( -J2/J4 + pk.x, J3/J4 + pk.y );
+Point VertexPositioner::position(const Point& p1, const Point& p2, const Point& p3) {
+    Point pi(p1),pj(p2),pk(p3);
+    if ( pi.isRight(pj,pk) ) 
+        std::swap(pi,pj);
+    assert( !pi.isRight(pj,pk) );
+    // 2) point pk should have the largest angle. largest angle is opposite longest side.
+    double longest_side = (pi - pj).norm();
+    while (  ((pj - pk).norm() > longest_side) || (((pi - pk).norm() > longest_side)) ) { 
+        std::swap(pi,pj); // cyclic rotation of points until pk is opposite the longest side pi-pj
+        std::swap(pi,pk);  
+        longest_side = (pi - pj).norm();
     }
+    assert( !pi.isRight(pj,pk) );
+    assert( (pi - pj).norm() >=  (pj - pk).norm() );
+    assert( (pi - pj).norm() >=  (pk - pi).norm() );
+    double J2 = (pi.y-pk.y)*( sq(pj.x-pk.x)+sq(pj.y-pk.y) )/2.0 - (pj.y-pk.y)*( sq(pi.x-pk.x)+sq(pi.y-pk.y) )/2.0;
+    double J3 = (pi.x-pk.x)*( sq(pj.x-pk.x)+sq(pj.y-pk.y) )/2.0 - (pj.x-pk.x)*( sq(pi.x-pk.x)+sq(pi.y-pk.y) )/2.0;
+    double J4 = (pi.x-pk.x)*(pj.y-pk.y) - (pj.x-pk.x)*(pi.y-pk.y);
+    assert( J4 != 0.0 );
+    return Point( -J2/J4 + pk.x, J3/J4 + pk.y );
+}
 
-    // signature: edge, new_site 
-    Point VertexPositioner::position(HEEdge e, HEVertex v) {
-        HEFace face = vd->g[e].face;     assert(  vd->g[face].status == INCIDENT);
-        HEEdge twin = vd->g[e].twin;
-        HEFace twin_face = vd->g[twin].face;      assert( vd->g[twin_face].status == INCIDENT);
-        
-        Point p = position( vd->g[face].generator  , vd->g[twin_face].generator  , vd->g[v].position );
-        assert( check_far_circle(p) );
-        return p;
+// signature: edge, new_site 
+Point VertexPositioner::position(HEEdge e, HEVertex v) {
+    HEFace face = vd->g[e].face;     assert(  vd->g[face].status == INCIDENT);
+    HEEdge twin = vd->g[e].twin;
+    HEFace twin_face = vd->g[twin].face;      assert( vd->g[twin_face].status == INCIDENT);
+    
+    Point p = position( vd->g[face].generator  , vd->g[twin_face].generator  , vd->g[v].position );
+    check_far_circle(p);
+    if ( !check_in_edge(e, p) ) {
+        std::cout << " gen1= " << vd->g[face].generator << "\n";
+        std::cout << " gen2= " << vd->g[twin_face].generator << "\n";
+        std::cout << " gen3= " << vd->g[v].position << "\n";
     }
+    
+    check_on_edge(e, p);
+    check_dist(e, p, v);
+    return p;
+}
 
 
 bool VertexPositioner::check_far_circle(const Point& p) {
@@ -67,68 +75,78 @@ bool VertexPositioner::check_far_circle(const Point& p) {
     return true;
 }
 
-/*    
-void VoronoiDiagram::check_vertex_on_edge(HEVertex q, HEEdge e) {
-    // sanity check on new vertex
-
-    assert( g[q].position.norm() < 18*far_radius);
-    
-    HEVertex trg = g.target(e);
-    HEVertex src = g.source(e);
-    Point trgP = g[trg].position;
-    Point srcP = g[src].position;
-    Point newP = g[q].position;
-    
-    {
-        double dtl_orig = g[q].position.xyDistanceToLine(srcP, trgP);
-        //double dtl(dtl_orig);
-        if (dtl_orig > 1e-3* ( trgP - srcP ).norm() ) {
-            double t = ( g[q].position - srcP).dot( trgP - srcP ) / ( trgP - srcP ).dot( trgP - srcP ) ;
-            //g[q].position = srcP + t*( trgP-srcP);
-            //dtl = g[q].position.xyDistanceToLine(srcP, trgP);
-            std::cout << "WARNING!! check_vertex_on_edge()  dtl= " << dtl_orig << " t= " << t  << " edgelength= " << ( trgP - srcP ).norm()   <<"\n";
-        }
-    }
-    
-    
+bool VertexPositioner::check_in_edge(HEEdge e, const Point& p) {
+    HEVertex trg = vd->g.target(e);
+    HEVertex src = vd->g.source(e);
+    Point trgP = vd->g[trg].position;
+    Point srcP = vd->g[src].position;
+    Point newP = p; //vd->g[q].position;
     if (( trgP - srcP ).norm() <= 0 ) {
-        std::cout << "WARNING check_vertex_on_edge() zero-length edge! \n";
-        g[q].position = srcP;
+        std::cout << "WARNING check_vertex_In_edge() zero-length edge! \n";
     } else {
         assert( ( trgP - srcP ).norm() > 0.0 ); // edge has finite length
         assert( ( trgP - srcP ).dot( trgP - srcP ) > 0.0 ); // length squared
-        double torig = ((newP - srcP).dot( trgP - srcP )) / ( trgP - srcP ).dot( trgP - srcP ) ;
-        bool warn = false;
-        double t(torig);
-        if (torig < 0.0) { // clamp the t-parameter to [0,1]
-            warn = true;
-            t=0.0;
-        } else if (torig> 1.0) {
-            warn = true;
-            t=1.0;
+        double t = ((newP - srcP).dot( trgP - srcP )) / ( trgP - srcP ).dot( trgP - srcP ) ;
+        if ( t < 0.0 || t > 1.0  ) {
+            std::cout << "WARNING: check_vertex_In_edge() t= " << t << "\n";
+            std::cout << "    edge= " << vd->g[src].index << " - " << vd->g[trg].index << "\n";
+            std::cout << "    src= " << vd->g[src].index << "  " << srcP << "\n";
+            std::cout << "    new= " <<  newP << "\n";
+            std::cout << "    trg= " << vd->g[trg].index << "  " << trgP << "\n";
+            std::cout << "    (src-trg).norm()= " << (srcP-trgP).norm() << "\n";
+            return false;
         }
-        if ( warn ) {
-            std::cout << "WARNING: check_vertex_on_edge() t_old= " << torig << " CORRECTED t_new= " << t << "\n";
-            std::cout << "src= " << srcP << " new= " << newP << " trg= " << trgP << "\n";
-            std::cout << " (src-trg).norm()= " << (srcP-trgP).norm() << "\n";
-            g[q].position = srcP + t*( trgP-srcP);
-            t = ( g[q].position - srcP).dot( trgP - srcP ) / ( trgP - srcP ).dot( trgP - srcP ) ;
-            
-        }
-        // now we are clamped:
-        assert( t >= 0.0 );
-        assert( t <= 1.0 );        
-        double dtl_orig = g[q].position.xyDistanceToLine(srcP, trgP);
-        double dtl(dtl_orig);
-        if (dtl_orig > 1e-3* ( trgP - srcP ).norm() ) {
-            t = ( g[q].position - srcP).dot( trgP - srcP ) / ( trgP - srcP ).dot( trgP - srcP ) ;
-            g[q].position = srcP + t*( trgP-srcP);
-            dtl = g[q].position.xyDistanceToLine(srcP, trgP);
-            std::cout << "WARNING check_vertex_on_edge()  old_dtl= " << dtl_orig << " new_dtl= " << dtl  << " edgelength= " << ( trgP - srcP ).norm()   <<"\n";
-        }
-        assert( dtl < 1e-3* ( trgP - srcP ).norm() );
     }
-}*/
-
-    
+    return true;
 }
+
+bool VertexPositioner::check_on_edge(HEEdge e, const Point& p) {
+    HEVertex trg = vd->g.target(e);
+    HEVertex src = vd->g.source(e);
+    Point trgP = vd->g[trg].position;
+    Point srcP = vd->g[src].position;
+    Point newP = p;
+    double dtl = p.xyDistanceToLine(srcP, trgP);
+    if (dtl > 1e-3* ( trgP - srcP ).norm() ) {
+        std::cout << "WARNING!! check_vertex_on_edge()  dtl= " << dtl << "\n";
+        std::cout << "    edge= " << vd->g[src].index << " - " << vd->g[trg].index << "\n";
+        std::cout << "    (src-trg).norm()= " << (srcP-trgP).norm() << "\n";
+        return false;
+    }
+    return true;
+}
+
+// distance to adjacent sites should be equal
+bool VertexPositioner::check_dist(HEEdge e, const Point& p, HEVertex v) {
+    HEVertex trg = vd->g.target(e);
+    HEVertex src = vd->g.source(e);
+    HEFace face = vd->g[e].face;     
+    HEEdge twin = vd->g[e].twin;
+    HEFace twin_face = vd->g[twin].face;      
+    
+    double d1 = (p - vd->g[face].generator).norm_sq();
+    double d2 = (p - vd->g[twin_face].generator).norm_sq();  
+    double d3 = (p - vd->g[v].position).norm_sq(); 
+        
+    if ( !equal(d1,d2) || !equal(d1,d3) || !equal(d2,d3) ) {
+        std::cout << "WARNING check_dist() ! \n";
+        std::cout << "  src.dist= " << vd->g[src].dist() << "\n";
+        std::cout << "  trg.dist= " << vd->g[trg].dist() << "\n";
+    
+        std::cout << "  d1= " << d1 << "\n"; 
+        std::cout << "  d2= " << d2 << "\n";
+        std::cout << "  d3= " << d3 << "\n";
+        return false;
+    }
+    return true;
+}
+
+bool VertexPositioner::equal(double d1, double d2) {
+    bool tol = 1e-3;
+    if ( fabs(d1-d2) > tol*std::max(d1,d2) )
+        return false;
+    return true;
+}
+    
+    
+} // end namespace

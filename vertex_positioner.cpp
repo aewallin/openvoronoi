@@ -54,7 +54,7 @@ Point VertexPositioner::position(HEEdge e, HEVertex v) {
     
     Point p = position( vd->g[face].generator  , vd->g[twin_face].generator  , vd->g[v].position );
     check_far_circle(p);
-    if ( !check_in_edge(e, p) ) {
+    if ( !check_in_edge(e, p, v) ) {
         std::cout << " gen1= " << vd->g[face].generator << "\n";
         std::cout << " gen2= " << vd->g[twin_face].generator << "\n";
         std::cout << " gen3= " << vd->g[v].position << "\n";
@@ -75,14 +75,14 @@ bool VertexPositioner::check_far_circle(const Point& p) {
     return true;
 }
 
-bool VertexPositioner::check_in_edge(HEEdge e, const Point& p) {
+bool VertexPositioner::check_in_edge(HEEdge e, const Point& p, HEVertex v) {
     HEVertex trg = vd->g.target(e);
     HEVertex src = vd->g.source(e);
     Point trgP = vd->g[trg].position;
     Point srcP = vd->g[src].position;
     Point newP = p; //vd->g[q].position;
     if (( trgP - srcP ).norm() <= 0 ) {
-        std::cout << "WARNING check_vertex_In_edge() zero-length edge! \n";
+        std::cout << "WARNING check_vertex_in_edge() zero-length edge! \n";
     } else {
         assert( ( trgP - srcP ).norm() > 0.0 ); // edge has finite length
         assert( ( trgP - srcP ).dot( trgP - srcP ) > 0.0 ); // length squared
@@ -90,14 +90,34 @@ bool VertexPositioner::check_in_edge(HEEdge e, const Point& p) {
         if ( t < 0.0 || t > 1.0  ) {
             std::cout << "WARNING: check_vertex_In_edge() t= " << t << "\n";
             std::cout << "    edge= " << vd->g[src].index << " - " << vd->g[trg].index << "\n";
-            std::cout << "    src= " << vd->g[src].index << "  " << srcP << "\n";
-            std::cout << "    new= " <<  newP << "\n";
-            std::cout << "    trg= " << vd->g[trg].index << "  " << trgP << "\n";
+            std::cout << "    src= " << vd->g[src].index << "  " << srcP << " error= " << error(e,srcP,v) << "\n";
+            std::cout << "    new= " <<  newP << " error= " << error(e,p,v) << "\n";
+            std::cout << "    trg= " << vd->g[trg].index << "  " << trgP << " error= " << error(e,trgP,v) << "\n";
             std::cout << "    (src-trg).norm()= " << (srcP-trgP).norm() << "\n";
+            int Nmax = 100;
+            double dt =1.0/(double)(Nmax-1);
+            for (int n=0;n<Nmax;++n) {
+                double mt = n*dt;
+                Point mp = srcP + mt*(trgP-srcP);
+                std::cout << "    mid= " <<  mp << " error= " << error(e, mp ,v) << "\n";
+            }
             return false;
         }
     }
     return true;
+}
+
+double VertexPositioner::error(HEEdge e, const Point& p, HEVertex v) {
+    //HEVertex trg = vd->g.target(e);
+    //HEVertex src = vd->g.source(e);
+    HEFace face = vd->g[e].face;     
+    HEEdge twin = vd->g[e].twin;
+    HEFace twin_face = vd->g[twin].face; 
+    // distance from point p to all three generators
+    double d1 = (p - vd->g[face].generator).norm_sq();
+    double d2 = (p - vd->g[twin_face].generator).norm_sq();  
+    double d3 = (p - vd->g[v].position).norm_sq(); 
+    return sq(d1-d2)+sq(d1-d3)+sq(d2-d3);
 }
 
 bool VertexPositioner::check_on_edge(HEEdge e, const Point& p) {

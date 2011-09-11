@@ -115,17 +115,19 @@ if __name__ == "__main__":
     
     plist = randomGenerators(far, Nmax) + regularGridGenerators(far, Nmax) + circleGenerators(far, Nmax)
     
+    
+    plist = [ ovd.Point(0.622289, 0.522162),  ovd.Point(0.81234, 0), ovd.Point(0.81234, -1.98966e-16)]
     #print plist[169]
     #exit()
     n=1
     t_before = time.time() 
     #delay = 1.5 # 0.533
-    delay = 2 #1 # 0.533
-    #ren = [1,2,3,4,5,59,60,61,62]
+    delay = 0.2 #1 # 0.533
+    ren = [1,2,3,4,5,59,60,61,62]
     #ren = [16,17]
-    ren = range(0,Nmax,100)
-    ren = range(0,len(plist)+1,1)
-    ren = [29]
+    #ren = range(0,Nmax,100)
+    #ren = range(0,len(plist)+1,1)
+    #ren = [29]
     #ren = [0,1,Nmax-2, Nmax-1, Nmax]
     nf=0
     for p in plist: #[0:20]:

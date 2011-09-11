@@ -38,10 +38,11 @@ private:
 
 
     bool check_on_edge(HEEdge e, const Point& p);
-    bool check_in_edge(HEEdge e, const Point& p);
+    bool check_in_edge(HEEdge e, const Point& p, HEVertex v);
     bool check_far_circle(const Point& p);
     bool check_dist(HEEdge e, const Point& p, HEVertex v);
     bool equal(double d1, double d2);
+    double error(HEEdge e, const Point& p, HEVertex v);
     
     VoronoiDiagram* vd;
     inline double sq(double x) {return x*x;}

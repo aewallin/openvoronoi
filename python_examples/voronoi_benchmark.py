@@ -93,7 +93,7 @@ if __name__ == "__main__":
     vod = ovdvtk.VD(myscreen,vd,float(scale))
     drawFarCircle(myscreen, vd.getFarRadius(), ovdvtk.orange)
     
-    Nmax = 10
+    Nmax = 1000
     
     #plist = randomGenerators(far, Nmax)
     #plist = regularGridGenerators(far, Nmax)

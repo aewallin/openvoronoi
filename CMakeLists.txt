@@ -32,14 +32,27 @@ endif(NOT BUILD_PY_LIB)
 if (CMAKE_BUILD_TOOL MATCHES "make")
     MESSAGE(STATUS "setting gcc options: -Wall -Werror -Wno-deprecated -pedantic-errors")
     
-    # optimization:
-    add_definitions(-O3  -Wall  -Wno-deprecated -Werror -pedantic-errors)
     
     # NON-optimized build:
-    #add_definitions(-O3 -Wall  -Wno-deprecated -Werror -pedantic-errors)
+    add_definitions( -Wall  -Wno-deprecated -Werror -pedantic-errors)
     
     add_definitions(-fPIC)
 endif (CMAKE_BUILD_TOOL MATCHES "make")
+
+
+option(BUILD_TYPE
+  "Build type: Release=ON/Debug=OFF  " ON)
+
+if (BUILD_TYPE)
+    MESSAGE(STATUS " CMAKE_BUILD_TYPE = Release")
+    set(CMAKE_BUILD_TYPE Release)
+endif(BUILD_TYPE)
+
+if (NOT BUILD_TYPE)
+    MESSAGE(STATUS " CMAKE_BUILD_TYPE = Debug")
+    set(CMAKE_BUILD_TYPE Debug)
+endif(NOT BUILD_TYPE)
+
 
 #
 # this figures out the Python include directories and adds them to the

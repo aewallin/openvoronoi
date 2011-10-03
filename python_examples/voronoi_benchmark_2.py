@@ -69,6 +69,7 @@ def timeVoronoi(Nmax):
 def timeVoronoi_batch(Nmax):
     far = 1
     vd = ovd.VoronoiDiagram(far, int( math.floor( math.sqrt(16)*math.sqrt(Nmax) ) ) )
+    
     #vd = ovd.VoronoiDiagram(far, 1200 ) # use a fixed number of bins
     #plist = randomGenerators(far, Nmax)
     plist = regularGridGenerators(far, Nmax)

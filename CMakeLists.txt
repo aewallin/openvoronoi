@@ -66,9 +66,7 @@ execute_process(
 )
 include_directories(${Python_Includes})
 
-
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
-
 
 # find BOOST and boost-python
 find_package( Boost COMPONENTS python REQUIRED)
@@ -80,6 +78,29 @@ if(Boost_FOUND)
     MESSAGE(STATUS "boost_LIBRARY_DIRS is: " ${Boost_LIBRARY_DIRS})
     MESSAGE(STATUS "Boost_LIBRARIES is: " ${Boost_LIBRARIES})    
 endif()
+
+################ create version_string.hpp, http://stackoverflow.com/questions/3780667
+# include the output directory, where the version_string.hpp file is generated
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
+# a custom target that is always built
+add_custom_target(
+    version_string 
+    ALL
+    DEPENDS ver_string 
+)
+# creates version_string.hpp using cmake script
+add_custom_command(
+    OUTPUT ver_string ${CMAKE_CURRENT_BINARY_DIR}/version_string.hpp
+    COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}
+                                            -P ${CMAKE_CURRENT_SOURCE_DIR}/version_string.cmake
+)
+
+# version_string.hpp is a generated file
+set_source_files_properties(
+    ${CMAKE_CURRENT_BINARY_DIR}/version_string.hpp
+    PROPERTIES GENERATED TRUE
+    HEADER_FILE_ONLY TRUE
+)
 
 
 
@@ -104,7 +125,7 @@ set( OVD_INCLUDE_FILES
     ${OpenVoronoi_SOURCE_DIR}/voronoidiagram_checker.hpp
     ${OpenVoronoi_SOURCE_DIR}/vertex_positioner.hpp
     ${OpenVoronoi_SOURCE_DIR}/facegrid.hpp
-    
+    ${CMAKE_CURRENT_BINARY_DIR}/version_string.hpp
 )
 
 
@@ -116,6 +137,12 @@ add_library(
     STATIC
     ${OVD_SRC}
 )
+
+add_dependencies( 
+    libopenvoronoi
+    version_string 
+)
+
 set_target_properties(libopenvoronoi PROPERTIES PREFIX "") 
     
 

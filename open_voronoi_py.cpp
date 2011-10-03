@@ -55,6 +55,7 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         .def("getDeleteEdges",  &VoronoiDiagram_py::getDeleteEdges)
         .def("getModEdges",  &VoronoiDiagram_py::getModEdges)
         .def("__str__", &VoronoiDiagram_py::str)
+        .def("version", &VoronoiDiagram_py::version)
     ;
     bp::enum_<VoronoiVertexStatus>("VoronoiVertexStatus")
         .value("OUT", OUT)   

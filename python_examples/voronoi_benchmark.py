@@ -89,7 +89,7 @@ if __name__ == "__main__":
     myscreen.camera.SetClippingRange(-(zmult+1)*camPos,(zmult+1)*camPos)
     myscreen.camera.SetFocalPoint(0.0, 0, 0)
     vd = ovd.VoronoiDiagram(far,1200)
-    
+    print vd.version()
     vod = ovdvtk.VD(myscreen,vd,float(scale))
     drawFarCircle(myscreen, vd.getFarRadius(), ovdvtk.orange)
     

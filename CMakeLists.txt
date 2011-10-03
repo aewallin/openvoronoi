@@ -94,18 +94,16 @@ add_custom_command(
     COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}
                                             -P ${CMAKE_CURRENT_SOURCE_DIR}/version_string.cmake
 )
-
 # version_string.hpp is a generated file
 set_source_files_properties(
     ${CMAKE_CURRENT_BINARY_DIR}/version_string.hpp
     PROPERTIES GENERATED TRUE
     HEADER_FILE_ONLY TRUE
 )
-
+################ end create version_string.hpp
 
 
 # this defines the source-files
-
 set(OVD_SRC
     ${OpenVoronoi_SOURCE_DIR}/voronoidiagram.cpp
     ${OpenVoronoi_SOURCE_DIR}/voronoivertex.cpp
@@ -114,7 +112,6 @@ set(OVD_SRC
     ${OpenVoronoi_SOURCE_DIR}/point.cpp
     ${OpenVoronoi_SOURCE_DIR}/vertex_positioner.cpp
 )
-
 
 set( OVD_INCLUDE_FILES  
     ${OpenVoronoi_SOURCE_DIR}/point.hpp
@@ -132,29 +129,26 @@ set( OVD_INCLUDE_FILES
 # include directories
 include_directories( ${OpenVoronoi_SOURCE_DIR} )
 
+# the pure c++ shared library
 add_library(
     libopenvoronoi
     STATIC
     ${OVD_SRC}
 )
-
 add_dependencies( 
     libopenvoronoi
     version_string 
 )
-
 set_target_properties(libopenvoronoi PROPERTIES PREFIX "") 
-    
-
-    # this makes the Python module
-    add_library(
-        openvoronoi
-        MODULE
-        open_voronoi_py.cpp
-    )
-    MESSAGE(STATUS "linking python binary with boost: " ${Boost_PYTHON_LIBRARY})
-    target_link_libraries(openvoronoi libopenvoronoi ${Boost_LIBRARIES} ) #${Boost_PYTHON_LIBRARY})
-    set_target_properties(openvoronoi PROPERTIES PREFIX "") 
+# this makes the Python module
+add_library(
+    openvoronoi
+    MODULE
+    open_voronoi_py.cpp
+)
+MESSAGE(STATUS "linking python binary with boost: " ${Boost_PYTHON_LIBRARY})
+target_link_libraries(openvoronoi libopenvoronoi ${Boost_LIBRARIES} ) #${Boost_PYTHON_LIBRARY})
+set_target_properties(openvoronoi PROPERTIES PREFIX "") 
 
 
 #

@@ -40,7 +40,22 @@ public:
 private:
     inline double sq(double x) {return x*x;}
     /// point-point-point positioner
-    Point ppp_position(const Point& p1, const Point& p2, const Point& p3);
+    Point ppp_solver(const Point& p1, const Point& p2, const Point& p3);
+    int lll_solver(Site* s1, Site* s2, Site* s3); // linear 3x3 system
+    
+    int solver(Site* s1, Site* s2, Site* s3,  double solns[][3] ); 
+    int qqq_solver( double l0[], double l1[], int xi, int yi, int ti, double xk, double yk, int kk, double rk, double solns[][3]);
+    
+    // int qll_solver( double l0[], double l1[], int xi, int yi, int ti, double xk, double yk, int kk, double rk);
+    int qll_solve( double a0, double b0, double c0, double d0, 
+                      double e0, double f0, double g0, 
+                      double a1, double b1, 
+                      double a2, double b2, 
+                      double soln[][3]);
+      
+    int quadratic_roots(double a, double b, double c, double roots[]);
+
+
     Point position(Site* p1, Site* p2, Site* p3);
     //virtual Point position(PointSite* s1, PointSite* s2, PointSite* s3);
     

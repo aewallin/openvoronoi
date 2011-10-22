@@ -68,6 +68,14 @@ public:
     /// return closest point on site to given point p
     virtual Point apex_point(const Point& p) = 0;
     virtual const Point position() const = 0;
+    Eqp eqp() {return eq;} 
+    bool is_linear() {return (eq.q==0); }
+    
+    virtual double x() {assert(0); return 0;}
+    virtual double y() {assert(0); return 0;}
+    virtual double r() {assert(0); return 0;}
+    virtual double k() {assert(0); return 0;}
+
 protected:
     Eqp eq;
 };
@@ -83,15 +91,14 @@ public:
         eq.c = p.x*p.x + p.y*p.y;
     }
     ~PointSite() {}
-    virtual Point apex_point(const Point& p) {
-        return _p;
-    }
-    //void position( const Point& p ) {
-    //    _p = p;
-    //}
+    virtual Point apex_point(const Point& p) { return _p; }
     virtual const Point position() const {
         return _p;
     }
+    virtual double x() {return _p.x;}
+    virtual double y() {return _p.y;}
+    virtual double r() {return 0;}
+    virtual double k() {return 1;}
 private:
     PointSite() {} // don't use!
     Point _p;
@@ -142,6 +149,10 @@ public:
     Point apex_point(const Point& p) {
         return Point(0,0); // FIXME
     }
+    virtual double x() {return _center.x;}
+    virtual double y() {return _center.y;}
+    virtual double r() {return _radius;}
+    virtual double k() {return 1;} // ?
 private:
     ArcSite() {} // don't use!
     Point _start;

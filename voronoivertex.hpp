@@ -21,6 +21,7 @@
 #define VODI_VERTEX_HPP
 
 #include <map>
+#include <cmath>
 
 #include "point.hpp"
 
@@ -44,6 +45,21 @@ enum VoronoiVertexType {OUTER, NORMAL, VERTEXGEN};
 
 typedef std::map<VoronoiVertexType, unsigned int> VertexDegreeMap;
 
+/// equation-parameters
+/// the offset in direction k by a distance t of a general site (point,line,circle) can be expressed as
+/// q ( x*x + y*y - t*t ) + a x + b y + c + k t = 0
+/// the parameters (q,a,b,k,c) are set as:
+/// line:   (0,   a,   b,    k, c)              line ax+by+c=0  where a*a+b*b=1
+/// circle: (1, -2x, -2y, -2kr, x*x+y*y-r*r)    circle center at (x,y) and radius r
+/// point:  (1, -2x, -2y, 0, x*x+y*y)           point at (x,y)
+struct Eqp {
+    int q;
+    double a;
+    double b;
+    double c;
+    double k;
+};
+
 /// Base-class for a voronoi-diagram site, or generator.
 class Site {
 public:
@@ -52,25 +68,87 @@ public:
     /// return closest point on site to given point p
     virtual Point apex_point(const Point& p) = 0;
     virtual const Point position() const = 0;
+protected:
+    Eqp eq;
 };
 
 /// point, or vertex site.
 class PointSite : public Site {
 public:
-    PointSite() {}
-    PointSite( const Point& p): _p(p) {}
+    PointSite( const Point& p): _p(p) {
+        eq.q = 1;
+        eq.a = -2*p.x;
+        eq.b = -2*p.y;
+        eq.k = 0;
+        eq.c = p.x*p.x + p.y*p.y;
+    }
     ~PointSite() {}
-    Point apex_point(const Point& p) {
+    virtual Point apex_point(const Point& p) {
         return _p;
     }
-    void position( const Point& p ) {
-        _p = p;
-    }
-    const Point position() const {
+    //void position( const Point& p ) {
+    //    _p = p;
+    //}
+    virtual const Point position() const {
         return _p;
     }
 private:
+    PointSite() {} // don't use!
     Point _p;
+};
+
+/// line-segment site
+class LineSite : public Site {
+public:
+    LineSite( const Point& s, const Point& e): _start(s), _end(e) {
+        eq.q = 0;
+        eq.a = _end.y - _start.y;
+        eq.b = _start.x - _end.x;
+        eq.k = 1; // ??
+        eq.c = _end.x*_start.y - _start.x*_end.y;
+        // now normalize
+        double d = sqrt( eq.a*eq.a + eq.b*eq.b );
+        eq.a /= d;
+        eq.b /= d;
+        eq.c /= d;
+    }
+    ~LineSite() {}
+    virtual Point apex_point(const Point& p) {
+        //return p.closestPoint(_start,_end);
+        return Point(0,0); // FIXME
+    }
+    virtual const Point position() const {
+        return _start; // FIXME!!
+    }
+
+private:
+    LineSite() {} // don't use!
+    Point _start;
+    Point _end;
+};
+
+/// arc or circle site
+class ArcSite : public Site {
+public:
+    ArcSite( const Point& s, const Point& e, const Point& c, bool dir): _start(s), _end(e), _center(c), _dir(dir) {
+        _radius = (_center - _start).norm();
+        eq.q = 1;
+        eq.a = -2*_center.x;
+        eq.b = -2*_center.y;
+        eq.k = -2*_radius; // ?? k
+        eq.c = _center.x*_center.x + _center.y*_center.y - _radius*_radius;
+    }
+    ~ArcSite() {}
+    Point apex_point(const Point& p) {
+        return Point(0,0); // FIXME
+    }
+private:
+    ArcSite() {} // don't use!
+    Point _start;
+    Point _end;
+    Point _center;
+    bool _dir; // CW or CCW
+    double _radius; // redundant?
 };
 
 

@@ -65,6 +65,8 @@ class VoronoiDiagram {
         
         /// add a vertex generator at given position, and update the diagram
         int add_vertex_site(const Point& p);
+        void add_line_site(int idx1, int idx2);
+        
         /// in "batch mode" we can first push all vertices, then call run()
         void push_vertex_site(const Point& p); 
         /// string repr

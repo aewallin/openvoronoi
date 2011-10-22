@@ -94,7 +94,6 @@ void VoronoiDiagram::initialize() {
     HEEdge e3 =  g.add_edge( v02, v0  ); 
     HEFace f1 =  g.add_face( ); 
     g[f1].edge = e2;
-    //g[f1].generator = gen3;
     g[f1].site = new PointSite(gen3);
     g[f1].status = NONINCIDENT;
     
@@ -113,7 +112,6 @@ void VoronoiDiagram::initialize() {
     HEEdge e6 = g.add_edge( v03, v0   ); 
     HEFace f2 =  g.add_face();
     g[f2].edge = e5;
-    //g[f2].generator = gen1;
     g[f2].site = new PointSite(gen1);
     g[f2].status = NONINCIDENT;
     
@@ -132,7 +130,6 @@ void VoronoiDiagram::initialize() {
     HEEdge e9 = g.add_edge( v01, v0  ); 
     HEFace f3 =  g.add_face();
     g[f3].edge = e8;
-    //g[f3].generator = gen2;
     g[f3].site = new PointSite(gen2);
     g[f3].status = NONINCIDENT;
     fgrid->add_face( g[f3] );
@@ -161,13 +158,13 @@ void VoronoiDiagram::initialize() {
 // comments relate to Sugihara-Iri 1994 paper
 // this is roughly "algorithm A" from the paper, page 15/50
 int VoronoiDiagram::add_vertex_site(const Point& p) {
+    assert( p.norm() < far_radius );     // only add vertices within the far_radius circle
+    
     HEVertex new_vert = g.add_vertex();
     g[new_vert].position=p; 
     g[new_vert].type=VERTEXGEN; 
     g[new_vert].status=OUT; 
     g[new_vert].site = new PointSite(p);
-    
-    assert( p.norm() < far_radius );     // only add vertices within the far_radius circle
     gen_count++;
     HEFace closest_face = fgrid->grid_find_closest_face( p ); 
     HEVertex v_seed = find_seed_vertex(closest_face, g[new_vert].site ) ;
@@ -180,6 +177,45 @@ int VoronoiDiagram::add_vertex_site(const Point& p) {
     reset_status();
     assert( vd_checker->isValid() );
     return g[new_vert].index;
+}
+
+void VoronoiDiagram::add_line_site(int idx1, int idx2) {
+    // find the vertices corresponding to idx1 and idx2
+    HEVertex start, end;
+    bool start_found=false;
+    bool end_found=false;
+    BOOST_FOREACH( HEVertex v, g.vertices() ) {
+        if ( g[v].index == idx1 ) {
+            start = v;
+            start_found = true;
+        }
+        if (g[v].index == idx2) {
+            end = v;
+            end_found = true;
+        }
+    }
+    assert(start_found);
+    assert(end_found);
+    std::cout << " found startvert = " << start << "\n";
+    std::cout << "   found endvert = " << end << "\n";
+    
+    LineSite* line_site = new LineSite( g[start].position, g[end].position) ;
+    // seed-face is face of start-point
+    HEFace closest_face = g[start].face; // fgrid->grid_find_closest_face( p );
+    // seed 
+    HEVertex v_seed = find_seed_vertex(closest_face, line_site ) ;
+    std::cout << "   seed  = " << v_seed << "\n";
+    augment_vertex_set(v_seed, line_site );
+    add_new_voronoi_vertices( line_site );    
+    HEFace newface = split_faces( line_site );
+    remove_vertex_set( newface );
+    
+    //g[new_vert].face = newface;
+    
+    reset_status();
+    assert( vd_checker->isValid() );
+    return; // g[new_vert].index;
+
 }
 
 // evaluate H-determinant on all face vertices and return vertex with the lowest H

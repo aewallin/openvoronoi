@@ -30,6 +30,7 @@ inline double sq(double x) {return x*x;}
 
 int VoronoiVertex::count = 0;
 
+// the expected degree of a vertex. checked by topology-checker
 VertexDegreeMap VoronoiVertex::expected_degree = boost::assign::map_list_of 
     (OUTER,4) 
     (NORMAL,6) 
@@ -55,11 +56,14 @@ VoronoiVertex::VoronoiVertex( Point p, VoronoiVertexStatus st, VoronoiVertexType
     type=t;
     init();
 }
+
+/// set index, increase count, initialize in_queue to false.
 void VoronoiVertex::init() {
     index = count;
     count++;
     in_queue = false;
 }
+/// set in_queue false, and status to UNDECIDED
 void VoronoiVertex::reset() {
     in_queue = false;
     status = UNDECIDED;

@@ -176,10 +176,11 @@ bool VoronoiDiagramChecker::incidentFaceVerticesConnected( VoronoiVertexStatus V
 
 bool VoronoiDiagramChecker::inCircle_is_negative(  const Point& p, HEFace f, HEVertex minimalVertex ) {
     double minimumH = vd->g[minimalVertex].in_circle(p);
+    
     if (!(minimumH <= 0) ) {
         std::cout << " VD find_seed_vertex() WARNING\n";
         std::cout << " WARNING: searching for seed when inserting " << p << " \n";
-        std::cout << " WARNING: closest face is " << f << " with generator " << vd->g[f].generator << " \n";
+    //    std::cout << " WARNING: closest face is " << f << " with generator " << vd->g[f].generator << " \n";
         std::cout << " WARNING: minimal vd-vertex " << vd->g[minimalVertex].index << " has inCircle= " << minimumH  << "\n";
     }
     

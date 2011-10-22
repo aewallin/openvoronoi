@@ -80,7 +80,7 @@ if __name__ == "__main__":
     
     scale=1
     myscreen.render()
-    random.seed(42)
+    random.seed(44)
     far = 1
     
     camPos = far
@@ -88,12 +88,12 @@ if __name__ == "__main__":
     myscreen.camera.SetPosition(camPos/float(1000), camPos/float(1000), zmult*camPos) 
     myscreen.camera.SetClippingRange(-(zmult+1)*camPos,(zmult+1)*camPos)
     myscreen.camera.SetFocalPoint(0.0, 0, 0)
-    vd = ovd.VoronoiDiagram(far,1200)
+    vd = ovd.VoronoiDiagram(far,120)
     print vd.version()
     vod = ovdvtk.VD(myscreen,vd,float(scale))
     drawFarCircle(myscreen, vd.getFarRadius(), ovdvtk.orange)
     
-    Nmax = 1000
+    Nmax = 50
     
     #plist = randomGenerators(far, Nmax)
     #plist = regularGridGenerators(far, Nmax)

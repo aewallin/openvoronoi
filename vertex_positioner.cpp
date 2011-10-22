@@ -21,10 +21,13 @@
 #include "vertex_positioner.hpp"
 #include "voronoidiagram.hpp"
 
+#include "voronoivertex.hpp"
+
 namespace ovd {
 
 
-Point VertexPositioner::position(const Point& p1, const Point& p2, const Point& p3) {
+/// point-point-point vertex positioner based on Sugihara & Iri paper
+Point VertexPositioner::ppp_position(const Point& p1, const Point& p2, const Point& p3) {
     Point pi(p1),pj(p2),pk(p3);
     if ( pi.isRight(pj,pk) ) 
         std::swap(pi,pj);
@@ -46,22 +49,31 @@ Point VertexPositioner::position(const Point& p1, const Point& p2, const Point& 
     return Point( -J2/J4 + pk.x, J3/J4 + pk.y );
 }
 
+
+Point VertexPositioner::position(Site* s1, Site* s2, Site* s3) {
+    return ppp_position( s1->position(), s2->position(), s3->position() );
+}
+
 // signature: edge, new_site 
-Point VertexPositioner::position(HEEdge e, HEVertex v) {
+Point VertexPositioner::position(HEEdge e, Site* s) {
     HEFace face = vd->g[e].face;     assert(  vd->g[face].status == INCIDENT);
     HEEdge twin = vd->g[e].twin;
     HEFace twin_face = vd->g[twin].face;      assert( vd->g[twin_face].status == INCIDENT);
     
-    Point p = position( vd->g[face].generator  , vd->g[twin_face].generator  , vd->g[v].position );
+    // Point p = position( vd->g[face].generator  , vd->g[twin_face].generator  , vd->g[v].position );
+    
+    Point p = position( vd->g[face].site  , vd->g[twin_face].site  , s );
+    
     check_far_circle(p);
+    /*
     if ( !check_in_edge(e, p, v) ) {
         std::cout << " gen1= " << vd->g[face].generator << "\n";
         std::cout << " gen2= " << vd->g[twin_face].generator << "\n";
         std::cout << " gen3= " << vd->g[v].position << "\n";
-    }
+    }*/
     
     check_on_edge(e, p);
-    check_dist(e, p, v);
+    //check_dist(e, p, v);
     return p;
 }
 
@@ -114,8 +126,8 @@ double VertexPositioner::error(HEEdge e, const Point& p, HEVertex v) {
     HEEdge twin = vd->g[e].twin;
     HEFace twin_face = vd->g[twin].face; 
     // distance from point p to all three generators
-    double d1 = (p - vd->g[face].generator).norm_sq();
-    double d2 = (p - vd->g[twin_face].generator).norm_sq();  
+    double d1 = (p - vd->g[face].site->position() ).norm_sq();
+    double d2 = (p - vd->g[twin_face].site->position() ).norm_sq();  
     double d3 = (p - vd->g[v].position).norm_sq(); 
     return sq(d1-d2)+sq(d1-d3)+sq(d2-d3);
 }
@@ -144,8 +156,8 @@ bool VertexPositioner::check_dist(HEEdge e, const Point& p, HEVertex v) {
     HEEdge twin = vd->g[e].twin;
     HEFace twin_face = vd->g[twin].face;      
     
-    double d1 = (p - vd->g[face].generator).norm_sq();
-    double d2 = (p - vd->g[twin_face].generator).norm_sq();  
+    double d1 = (p - vd->g[face].site->position() ).norm_sq();
+    double d2 = (p - vd->g[twin_face].site->position() ).norm_sq();  
     double d3 = (p - vd->g[v].position).norm_sq(); 
         
     if ( !equal(d1,d2) || !equal(d1,d3) || !equal(d2,d3) ) {

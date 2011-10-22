@@ -47,13 +47,13 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         .def("getFarVoronoiVertices",  &VoronoiDiagram_py::getFarVoronoiVertices)
         .def("getFarRadius",  &VoronoiDiagram_py::get_far_radius)
         .def("getVoronoiEdges",  &VoronoiDiagram_py::getVoronoiEdges)
-        .def("getClosestFaceGenerator",  &VoronoiDiagram_py::getClosestFaceGenerator)
-        .def("getSeedVertex",  &VoronoiDiagram_py::getSeedVertex) 
+        //.def("getClosestFaceGenerator",  &VoronoiDiagram_py::getClosestFaceGenerator)
+        //.def("getSeedVertex",  &VoronoiDiagram_py::getSeedVertex) 
         //.def("getSeedVertexLine",  &VoronoiDiagram_py::getSeedVertexLine) 
-        .def("getDeleteSet",  &VoronoiDiagram_py::getDeleteSet) //getDeleteSetLine(
+        //.def("getDeleteSet",  &VoronoiDiagram_py::getDeleteSet) //getDeleteSetLine(
         //.def("getDeleteSetLine",  &VoronoiDiagram_py::getDeleteSetLine)
-        .def("getDeleteEdges",  &VoronoiDiagram_py::getDeleteEdges)
-        .def("getModEdges",  &VoronoiDiagram_py::getModEdges)
+        //.def("getDeleteEdges",  &VoronoiDiagram_py::getDeleteEdges)
+        //.def("getModEdges",  &VoronoiDiagram_py::getModEdges)
         .def("__str__", &VoronoiDiagram_py::str)
         .def("version", &VoronoiDiagram_py::version)
     ;

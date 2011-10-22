@@ -197,7 +197,7 @@ VertexVector adjacent_vertices(  Vertex v) {
 
 /// return all vertices of given face
 
-VertexVector face_vertices(Face face_idx) {
+VertexVector face_vertices(Face face_idx) const {
     VertexVector verts;
     Edge startedge = faces[face_idx].edge; // the edge where we start
     Vertex start_target = boost::target( startedge, g); 

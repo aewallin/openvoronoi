@@ -27,7 +27,6 @@ namespace ovd
 {
 
 /// \brief python wrapper for VoronoiDiagram
-///
 class VoronoiDiagram_py : public VoronoiDiagram {
     public:
         VoronoiDiagram_py() : VoronoiDiagram() {}
@@ -35,6 +34,7 @@ class VoronoiDiagram_py : public VoronoiDiagram {
         VoronoiDiagram_py(double far, unsigned int n_bins) 
             : VoronoiDiagram( far, n_bins) {}
         
+        /*
         // for visualizing the closest face (returns it's generator)
         Point getClosestFaceGenerator( const Point p ) {
             HEFace closest_face = fgrid->grid_find_closest_face( p );
@@ -100,12 +100,13 @@ class VoronoiDiagram_py : public VoronoiDiagram {
             reset_status();            
             return out;
         }
-
+        */
+        
         /// return list of generators to python
         boost::python::list getGenerators()  {
             boost::python::list plist;
             for ( HEFace f=0;f< g.num_faces();++f ) {
-                plist.append( g[f].generator  );
+                plist.append( g[f].site->position()  );
             }
             return plist;
         }

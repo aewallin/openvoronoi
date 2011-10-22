@@ -25,9 +25,7 @@
 namespace ovd
 {
 
-///
 /// \brief a point or vector in 2D with coordinates (x, y)
-///
 class Point {
     public:
         /// create a point at (0,0)
@@ -36,29 +34,22 @@ class Point {
         Point(double xi, double yi): x(xi), y(yi) {}
         /// create a point at p
         Point(const Point &p): x(p.x), y(p.y) {}
-        
-        virtual ~Point() {}
-        
+        virtual ~Point() {}        
         /// dot product
         double dot(const Point &p) const;
-        
         /// norm of vector, or distance from (0,0,0) to *this
         double norm() const; 
+        /// squared norm (avoiding sqrt() might be faster in some cases)
         double norm_sq() const; 
         /// scales vector so that norm()==1.0
         void normalize();
-        
         /// return perpendicular in the xy plane, rotated 90 degree to the left
         Point xyPerp() const;
-        
-        
+        /// distance from this to p1-p2 line
         double xyDistanceToLine(const Point &p1, const Point &p2) const;
         bool isRight(const Point &p1, const Point &p2) const;
-        
         /// retrun true if Point within line segment p1-p2
         bool isInside(const Point& p1, const Point& p2) const;
-            
-        
         /// assignment
         Point &operator=(const Point &p);
         /// addition
@@ -69,7 +60,6 @@ class Point {
         const Point operator+(const Point &p)const;
         /// subtraction
         const Point operator-(const Point &p) const;
-
         /// scalar multiplication
         Point &operator*=(const double &a);  // scalar multiplication with Point *= scalar
         /// Point * scalar
@@ -78,12 +68,10 @@ class Point {
         bool operator==(const Point &p) const;
         /// inequality
         bool operator!=(const Point &p) const;
-
         /// string repr
         friend std::ostream& operator<<(std::ostream &stream, const Point &p);
         /// string repr
         std::string str() const;
-
         /// X coordinate
         double x;
         /// Y coordinate

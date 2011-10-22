@@ -27,31 +27,37 @@
 
 namespace ovd {
 
-/// voronoi-vertices can have one of these four different states
-/// as we incrementally construct the diagram the type is updated as follows:
+
+/// As we incrementally construct the diagram voronoi-vertices can have one of these four different states. 
+/// The status is updated as follows:
 /// OUT-vertices will not be deleted
 /// IN-vertices will be deleted
 /// UNDECIDED-vertices have not been examied yet
 /// NEW-vertices are constructed on OUT-IN edges
 enum VoronoiVertexStatus {OUT, IN, UNDECIDED, NEW };
-// OUTER vertices are special vertices added in init(), should have degree==4
-// VERTEXGEN are vertex generators, should have degree==0
-// NORMAL are normal voronoi-vertices, should have degree==6  (degree 3 graph with double-edges)
+
+/// This is the permanent type of a vertex in the diagram. 
+/// OUTER vertices are special vertices added in init(), should have degree==4
+/// VERTEXGEN are vertex generators, should have degree==0
+/// NORMAL are normal voronoi-vertices, should have degree==6  (degree 3 graph with double-edges)
 enum VoronoiVertexType {OUTER, NORMAL, VERTEXGEN};
 
 typedef std::map<VoronoiVertexType, unsigned int> VertexDegreeMap;
 
-
-
+/// Base-class for a voronoi-diagram site, or generator.
 class Site {
 public:
     Site() {}
     virtual ~Site() {}
+    /// return closest point on site to given point p
     virtual Point apex_point(const Point& p) = 0;
+    virtual const Point position() const = 0;
 };
 
+/// point, or vertex site.
 class PointSite : public Site {
 public:
+    PointSite() {}
     PointSite( const Point& p): _p(p) {}
     ~PointSite() {}
     Point apex_point(const Point& p) {
@@ -60,7 +66,7 @@ public:
     void position( const Point& p ) {
         _p = p;
     }
-    Point position() const {
+    const Point position() const {
         return _p;
     }
 private:
@@ -69,11 +75,13 @@ private:
 
 
 /// properties of a vertex in the voronoi diagram
+/// an object of this type is held in the BGL-graph for each vertex.
 class VoronoiVertex {
 public:
     VoronoiVertex();
     /// construct vertex at position p with type t
     VoronoiVertex( Point p, VoronoiVertexStatus st);
+    /// vertex with given position, status, and type
     VoronoiVertex( Point p, VoronoiVertexStatus st, VoronoiVertexType t);
     void init();
     void reset();
@@ -91,25 +99,24 @@ public:
     HEFace face; // the face associated with this vertex, if type==VERTEXGEN
     friend class VoronoiDiagramChecker;
     
+    /// initialize clerance-disk
     void init_dist(const Point& p) {
         r = dist(p);
     }
+    /// update clearance-disk
     void update_dist(const Point& p) {
         double d = dist(p);
         if (d<r)
             r=d;
     }
-    
-    double dist(const Point& p) const {
-        return (position-p).norm_sq(); 
-    }
-    double dist() const {
-        return r;
-    }
-    double in_circle(const Point& p) {
-        return dist(p) - r;
-    }
-    
+    /// return distance to a point from this vertex
+    double dist(const Point& p) const { return (position-p).norm_sq(); }
+    /// return clearance-disk radius
+    double dist() const { return r; }
+    /// in-circle predicate 
+    double in_circle(const Point& p) const { return dist(p) - r; }
+    /// if this vertex is a Site (PointSite, or end-point of a line-segment or arc)
+    /// then we store a pointer to the site here.
     Site* site;
 protected:
     /// global vertex count

@@ -135,9 +135,9 @@ enum VoronoiFaceStatus {INCIDENT, NONINCIDENT};
 struct FaceProps {
     FaceProps( ) {}
     /// create face with given edge, generator, and type
-    FaceProps( HEEdge e , Point gen, VoronoiFaceStatus t) {
+    FaceProps( HEEdge e , Site* s, VoronoiFaceStatus t) {
         edge = e;
-        generator = gen;
+        site = s;
         status = t;
     }
     /// operator for sorting faces
@@ -146,8 +146,9 @@ struct FaceProps {
     HEFace idx;
     /// one edge that bounds this face
     HEEdge edge;
-    /// the generator for this face
-    Point generator;
+    /// the site/generator for this face
+    //Point generator;
+    Site* site;
     /// face status (either incident or nonincident)
     VoronoiFaceStatus status;
 };

@@ -57,12 +57,15 @@ class VoronoiDiagram {
         /// ctor
         VoronoiDiagram() {}
         /// create diagram with given far-radius and number of bins
+        /// \param far radius of circle centered at (0,0) within which all sites must lie
+        /// \param n_bins number of bins used for nearest vd-vertex bucket-search
         VoronoiDiagram(double far, unsigned int n_bins);
         /// dtor
         virtual ~VoronoiDiagram();
         
-        /// add a vertex generator at given position
+        /// add a vertex generator at given position, and update the diagram
         int add_vertex_site(const Point& p);
+        /// in "batch mode" we can first push all vertices, then call run()
         void push_vertex_site(const Point& p); 
         /// string repr
         std::string str() const;
@@ -71,17 +74,18 @@ class VoronoiDiagram {
         
         friend class VoronoiDiagramChecker;
         friend class VertexPositioner;
+        /// "batch mode", runs add_vertex_site(p) on all sites p in the vector vertex_sites
         void run();
         std::string version() const { return VERSION_STRING; }
     protected:
         /// initialize the diagram with three generators
         void initialize();
-        /// among the vertices of f, find the one with the lowest detH value
-        /// i.e. the one that is closest to the new generator Point p
-        HEVertex find_seed_vertex(HEFace f, const Point& p);
+        /// among the vertices of f, find the one with most clearance-disk violation to new Site
+        /// i.e. the vertex that is closest to the new Site
+        HEVertex find_seed_vertex(HEFace f, Site* site) const;
         
         /// breadth-first search based Tree-expansion algorithm
-        void augment_vertex_set(HEVertex& v_seed, const Point& p);        
+        void augment_vertex_set(HEVertex& v_seed, Site* site);        
         
         /// find all IN-OUT edges adjacent to q-verts
         EdgeVector find_in_out_edges(); 
@@ -91,12 +95,12 @@ class VoronoiDiagram {
         bool incidentFacesHaveAdjacentInVertex(HEVertex v);
 
         void mark_adjacent_faces(HEVertex v);
-        void push_adjacent_vertices( HEVertex v ,  const Point& p);
-        void mark_vertex(HEVertex& v,  const Point& p); 
+        void push_adjacent_vertices( HEVertex v ,  Site* site);
+        void mark_vertex(HEVertex& v,  Site* site); 
         /// add the new vertices  
-        void add_new_voronoi_vertices( HEVertex v);
+        void add_new_voronoi_vertices( Site* site);
         /// split faces when adding new generator p
-        HEFace split_faces(const Point& p);
+        HEFace split_faces( Site* site);
         /// split the face
         void split_face(HEFace new_f, HEFace f);
         /// remove vertices in the set

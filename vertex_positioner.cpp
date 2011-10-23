@@ -1,6 +1,11 @@
 /*  
  *  Copyright 2010-2011 Anders Wallin (anders.e.e.wallin "at" gmail.com)
- *  
+ * 
+ *  Idea and code for point/line/arc voronoi-vertex positioning code by
+ *  Andy Payone, andy "at" payne "dot" org, November, 2010
+ *  see: http://www.payne.org/index.php/Calculating_Voronoi_Nodes
+ * 
+ * 
  *  This file is part of OpenVoronoi.
  *
  *  OpenCAMlib is free software: you can redistribute it and/or modify
@@ -69,14 +74,12 @@ Point VertexPositioner::position(Site* s1, Site* s2, Site* s3) {
 }
 
 int VertexPositioner::solver(Site* s1, Site* s2, Site* s3, double solns[][3] ) {
-    double vectors[3][4]; // hold eqn data here. three equations with parameters (a,b,k,c) each
+    double vectors[3][4]; // hold eqn data here. three equations with four parameters (a,b,k,c) each
     // indexes and count of linear/quadratic eqns
     int linear[3],    linear_count = 0;
     int quadratic[3], quadratic_count = 0;
-    
     double xk, yk, rk;
     int kk;
-    
     // populate vectors
     vectors[0][0] = s1->eqp().a;
     vectors[0][1] = s1->eqp().b;
@@ -138,22 +141,13 @@ int VertexPositioner::solver(Site* s1, Site* s2, Site* s3, double solns[][3] ) {
         linear[linear_count++] = vi; // now we have a new linear eqn
     }
     assert(linear_count == 2); // At this point, we should have exactly two linear equations.
-    
-    /*
-    std::cout <<" vectors:\n";
-    for (int m=0;m<3;m++) {
-        std::cout << vectors[m][0] << "\t" << vectors[m][1] << "\t" << vectors[m][2] << "\t" << vectors[m][3] << "\n";
-    }*/
-    
+        
     // TODO:  pick the solution appraoch with the best numerical stability.
     
     // index shuffling determines if we solve:
     // x and y in terms of t
     // y and t in terms of x
-    // t and x in terms of y
-    //double solns[2][3]; 
-    
-    
+    // t and x in terms of y    
     int scount = qqq_solver(vectors[linear[0]], vectors[linear[1]], 0, 1, 2, xk, yk, kk, rk, solns);
     if (scount < 0) { // negative scoung when discriminant is zero, so shuffle around coord-indexes:
         scount = qqq_solver(vectors[linear[0]], vectors[linear[1]], 2, 0, 1, xk, yk, kk, rk, solns);
@@ -168,7 +162,9 @@ int VertexPositioner::solver(Site* s1, Site* s2, Site* s3, double solns[][3] ) {
 // l0 first linear eqn
 // l1 second linear eqn
 // xi,yi,ti  indexes to shuffle around
+// xk, yk, kk, rk = params of one ('last') quadratic site (point or arc)
 // solns = output solution triplets (x,y,t) or (u,v,t)
+// returns number of solutions found
 int VertexPositioner::qqq_solver( double l0[], double l1[], int xi, int yi, int ti, 
       double xk, double yk, int kk, double rk , double solns[][3] ) {
     
@@ -183,16 +179,9 @@ int VertexPositioner::qqq_solver( double l0[], double l1[], int xi, int yi, int 
     double kj = l1[ti];
     double cj = l1[3];
     double d = ai*bj - aj*bi; // chop!
-    if (d == 0) {// no solution can be found!
-        //assert(0);
-        
-        /*
-        std::cout << " qqq_solver() ZERO discriminant -> no solution! \n";
-        for (int m=0;m<4;m++)
-            std::cout << l0[m] << "   " << l1[m] << "\n";
-        */
+    if (d == 0) // no solution can be found!
         return -1;
-    }
+    
     double a0 =  (bi*kj - bj*ki) / d;
     double a1 = -(ai*kj - aj*ki) / d;
     double b0 =  (bi*cj - bj*ci) / d;
@@ -216,9 +205,8 @@ int VertexPositioner::qqq_solver( double l0[], double l1[], int xi, int yi, int 
     for (int i=0; i<scount; i++) {
         solns[i][xi] = isolns[i][0];       // u       x
         solns[i][yi] = isolns[i][1];       // v       y
-        solns[i][ti] = isolns[i][2]; // t       t  chop!
+        solns[i][ti] = isolns[i][2];       // t       t  chop!
     }
-    //std::cout << " qqq_solver() found " << scount << " roots\n";
     return scount;
 }
 
@@ -256,6 +244,8 @@ int VertexPositioner::qll_solve( double a0, double b0, double c0, double d0,
     return rcount;
 }
 
+/// solves: a*x*x + b*x + c = 0
+/// returns number of roots found, and the values in roots[]
 int VertexPositioner::quadratic_roots(double a, double b, double c, double roots[]) {
     if ((a == 0) and (b == 0))
         return 0;
@@ -301,13 +291,17 @@ int VertexPositioner::lll_solver(Site* s1, Site* s2, Site* s3) {
 }
 
 
-// signature: edge, new_site 
+// calculate the position of a new vertex on the given edge s
+// the edge e holds information about which face it belongs to.
+// each face holds information about which site/generator created it
+// so the three sites defining the position of the vertex are:
+// - site to the left of HEEdge e
+// - site to the right of HEEdge e
+// - given new Site s
 Point VertexPositioner::position(HEEdge e, Site* s) {
     HEFace face = vd->g[e].face;     assert(  vd->g[face].status == INCIDENT);
     HEEdge twin = vd->g[e].twin;
     HEFace twin_face = vd->g[twin].face;      assert( vd->g[twin_face].status == INCIDENT);
-    
-    // Point p = position( vd->g[face].generator  , vd->g[twin_face].generator  , vd->g[v].position );
     
     Point p = position( vd->g[face].site  , vd->g[twin_face].site  , s );
     
@@ -324,7 +318,7 @@ Point VertexPositioner::position(HEEdge e, Site* s) {
     return p;
 }
 
-
+// new vertices should lie within the far_radius
 bool VertexPositioner::check_far_circle(const Point& p) {
     if (!(p.norm() < 18*vd->far_radius)) {
         std::cout << "WARNING check_far_circle() new vertex outside far_radius! \n";
@@ -334,6 +328,7 @@ bool VertexPositioner::check_far_circle(const Point& p) {
     return true;
 }
 
+// new vertices should lie "on" or at least "close" to the HEEdge e they were supposed to lie on
 bool VertexPositioner::check_in_edge(HEEdge e, const Point& p, HEVertex v) {
     HEVertex trg = vd->g.target(e);
     HEVertex src = vd->g.source(e);

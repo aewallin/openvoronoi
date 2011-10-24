@@ -43,6 +43,8 @@ enum VoronoiVertexStatus {OUT, IN, UNDECIDED, NEW };
 /// NORMAL are normal voronoi-vertices, should have degree==6  (degree 3 graph with double-edges)
 enum VoronoiVertexType {OUTER, NORMAL, VERTEXGEN};
 
+/// a map of this type is used by topology-checker to check that all vertices
+/// have the expected (correct) degree (i.e. number of edges)
 typedef std::map<VoronoiVertexType, unsigned int> VertexDegreeMap;
 
 /// equation-parameters
@@ -53,7 +55,7 @@ typedef std::map<VoronoiVertexType, unsigned int> VertexDegreeMap;
 /// circle: (1, -2x, -2y, -2kr, x*x+y*y-r*r)    circle center at (x,y) and radius r
 /// point:  (1, -2x, -2y, 0, x*x+y*y)           point at (x,y)
 struct Eqp {
-    int q;
+    int q; // q=1 for quadratic, q=0 for linear eqn
     double a;
     double b;
     double c;
@@ -107,6 +109,7 @@ private:
 /// line-segment site
 class LineSite : public Site {
 public:
+    /// create line-site between start and end Point.
     LineSite( const Point& s, const Point& e): _start(s), _end(e) {
         eq.q = 0;
         eq.a = _end.y - _start.y;
@@ -120,9 +123,20 @@ public:
         eq.c /= d;
     }
     ~LineSite() {}
+    /// closest point on start-end segment to given point.
+    /// project onto line and return either the projected point
+    /// or one endpoint of the linesegment
     virtual Point apex_point(const Point& p) {
-        //return p.closestPoint(_start,_end);
-        return Point(0,0); // FIXME
+        Point s_q = p-_start;
+        Point s_e = _end - _start;
+        double t = s_q.dot(s_e) / s_e.dot(s_e);
+        if (t<0)
+            return _start;
+        if (t>1)
+            return _end;
+        else {
+            return _start + t*_end;
+        }
     }
     virtual const Point position() const {
         return _start; // FIXME!!
@@ -204,13 +218,14 @@ public:
     double dist() const { return r; }
     /// in-circle predicate 
     double in_circle(const Point& p) const { return dist(p) - r; }
-    /// if this vertex is a Site (PointSite, or end-point of a line-segment or arc)
-    /// then we store a pointer to the site here.
+    /// if this vertex is a PointSite, then we store a pointer to the site here.
     Site* site;
 protected:
     /// global vertex count
     static int count;
+    /// map for checking topology correctness
     static VertexDegreeMap expected_degree;
+    /// clearance-disk radius, i.e. the closest site is at this distance
     double r;
 };
 

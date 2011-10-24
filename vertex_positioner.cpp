@@ -58,6 +58,8 @@ Point VertexPositioner::ppp_solver(const Point& p1, const Point& p2, const Point
 Point VertexPositioner::position(Site* s1, Site* s2, Site* s3) {
     int count;
     double solns[2][3];
+    //double uppert = 1e308;
+    
     if ( s1->is_linear() && s2->is_linear() && s3->is_linear() )
         count =  lll_solver(s1,s2,s3);
     else

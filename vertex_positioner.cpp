@@ -44,12 +44,14 @@ Point VertexPositioner::position(HEEdge e, Site* s) {
     HEFace twin_face = vd->g[twin].face;      assert( vd->g[twin_face].status == INCIDENT);
     
     std::cout << " position: " <<  vd->g[face].site->str() << " " << vd->g[twin_face].site->str() << " " << s->str() << "\n";
-    std::cout << " k-vals: e.k = " <<  vd->g[e].k << " twin.k = " << vd->g[twin].k  << "\n";
+    //std::cout << " k-vals: e.k = " <<  vd->g[e].k << " twin.k = " << vd->g[twin].k  << "\n";
+    //HEVertex src = vd->g.source(e);
+    //HEVertex trg = vd->g.target(e);
+    //std::cout << " edge.source= " << vd->g[src].position << " target= " << vd->g[trg].position << "\n";
     
+    Point p = position( vd->g[face].site  , vd->g[e].k, vd->g[twin_face].site  , vd->g[twin].k, s );
     
-    Point p = position( vd->g[face].site  , vd->g[twin_face].site  , s );
-    
-    check_far_circle(p);
+    //check_far_circle(p);
     /*
     if ( !check_in_edge(e, p, v) ) {
         std::cout << " gen1= " << vd->g[face].generator << "\n";
@@ -57,48 +59,64 @@ Point VertexPositioner::position(HEEdge e, Site* s) {
         std::cout << " gen3= " << vd->g[v].position << "\n";
     }*/
     
-    check_on_edge(e, p);
+    //check_on_edge(e, p);
     //check_dist(e, p, v);
     return p;
 }
 
-Point VertexPositioner::position(Site* s1, Site* s2, Site* s3) {
-    int count;
-    double solns[2][3];
+Point VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Site* s3) {
+    assert( (k1==1) || (k1 == -1) );
+    assert( (k2==1) || (k2 == -1) );
+    
+    
+    int count1=0,count2=0;
+    double solns1[2][3];
+    double solns2[2][3];
     //double uppert = 1e308;
     
     if ( s1->is_linear() && s2->is_linear() && s3->is_linear() )
-        count =  lll_solver(s1,s2,s3);
-    else
-        count = solver(s1,s2,s3, solns);
-    
+        count1 =  lll_solver(s1,s2,s3);
+    else {
+        count1 = solver(s1,k1,s2,k2,s3,+1, solns1);
+        if (!s3->isPoint())
+            count2 = solver(s1,k1,s2,k2,s3,-1, solns2);
+    }
     //std::cout << count << " solutions found by solver \n";
     std::vector<Point> pts;
-    for (int m=0;m<count;m++) {
-        std::cout << " new: " << m << " :  ( " << solns[m][0] << " , " << solns[m][1] << " , " << solns[m][2] << " )\n";
-        if ( solns[m][2] > 0 )  { // t-value
-            pts.push_back( Point(solns[m][0], solns[m][1] ) );
+    for (int m=0;m<count1;m++) {
+        if ( solns1[m][2] > 0 )  { // t-value
+            pts.push_back( Point(solns1[m][0], solns1[m][1] ) );
+            std::cout << "+1 new: " << m << " :  ( " << solns1[m][0] << " , " << solns1[m][1] << " , " << solns1[m][2] << " )\n";
         }
     }
+    
+    for (int m=0;m<count2;m++) {
+        if ( solns2[m][2] > 0 )  { // t-value
+            pts.push_back( Point(solns2[m][0], solns2[m][1] ) );
+            std::cout << "-1 new: " << m << " :  ( " << solns2[m][0] << " , " << solns2[m][1] << " , " << solns2[m][2] << " )\n";
+        }
+    }
+    if (pts.size()!=1)
+        std::cout << "error pts.size() = " << pts.size() << " count1=" << count1 << " count2=" << count2 << "\n";
     // after filtering only one point should remain
     assert( pts.size() == 1);
     
-    Point pt = ppp_solver( s1->position(), s2->position(), s3->position() );
-    std::cout << " old: " << pt << "\n";
+    //Point pt = ppp_solver( s1->position(), s2->position(), s3->position() );
+    //std::cout << " old: " << pt << "\n";
     return pts[0];
 }
 
-int VertexPositioner::solver(Site* s1, Site* s2, Site* s3, double solns[][3] ) {
+int VertexPositioner::solver(Site* s1, double k1, Site* s2, double k2, Site* s3, double k3, double solns[][3] ) {
     double vectors[3][4]; // hold eqn data here. three equations with four parameters (a,b,k,c) each
     // indexes and count of linear/quadratic eqns
     int linear[3],    linear_count = 0;
     int quadratic[3], quadratic_count = 0;
     double xk, yk, rk;
-    int kk;
+    double kk;
     // populate vectors
     vectors[0][0] = s1->eqp().a;
     vectors[0][1] = s1->eqp().b;
-    vectors[0][2] = s1->eqp().k;
+    vectors[0][2] = s1->eqp().k * k1;
     vectors[0][3] = s1->eqp().c;
     if ( s1->is_linear() )
         linear[linear_count++] = 0;
@@ -107,11 +125,13 @@ int VertexPositioner::solver(Site* s1, Site* s2, Site* s3, double solns[][3] ) {
         xk = s1->x(); // point: (x,y, r=0, kk=1)  circle( x,y,r,k[i] )
         yk = s1->y();
         rk = s1->r();
-        kk = s1->k();
+        kk = s1->k()*k1;
+        if (s1->isPoint())
+            kk=k1;
     }
     vectors[1][0] = s2->eqp().a;
     vectors[1][1] = s2->eqp().b;
-    vectors[1][2] = s2->eqp().k;
+    vectors[1][2] = s2->eqp().k * k2;
     vectors[1][3] = s2->eqp().c;
     if ( s2->is_linear() )
         linear[linear_count++] = 1;
@@ -120,12 +140,15 @@ int VertexPositioner::solver(Site* s1, Site* s2, Site* s3, double solns[][3] ) {
         xk = s2->x(); // point: (x,y, r=0, kk=1)  circle( x,y,r,k[i] )
         yk = s2->y();
         rk = s2->r();
-        kk = s2->k();
+        kk = s2->k()*k2;
+        if (s2->isPoint())
+            kk=k2;
+
     }
     
     vectors[2][0] = s3->eqp().a;
     vectors[2][1] = s3->eqp().b;
-    vectors[2][2] = s3->eqp().k;
+    vectors[2][2] = s3->eqp().k * k3;
     vectors[2][3] = s3->eqp().c;
     if ( s3->is_linear() )
         linear[linear_count++] = 2;
@@ -134,29 +157,57 @@ int VertexPositioner::solver(Site* s1, Site* s2, Site* s3, double solns[][3] ) {
         xk = s3->x(); // point: (x,y, r=0, kk=1)  circle( x,y,r,k[i] )
         yk = s3->y();
         rk = s3->r();
-        kk = s3->k();
+        kk = s3->k()*k3;
+        if (s3->isPoint())
+            kk=k3;
+
     }
         
     assert( linear_count < 3 ); // ==3 should be caught above by lll_solve()
     assert( quadratic_count > 0); // we should have one or more quadratic
     
-    //std::cout << " linear_count = " << linear_count << "\n";
-    //std::cout << " quadratic_count = " << quadratic_count << "\n";
+    /*
+    for(int m=0;m<3;m++) {
+        std::cout << m << " : " << vectors[m][0] << "  "  << vectors[m][1] << "  "  << vectors[m][2] << "  "  << vectors[m][3]  << "\n"; 
+    }
+    
+    
+    std::cout << " linear_count = " << linear_count << " : ";
+    for (int m=0;m<linear_count;m++)
+        std::cout << " " << linear[m] ;
+    std::cout << "\n";
+    std::cout << " quadratic_count = " << quadratic_count << " : ";
+    for (int m=0;m<quadratic_count;m++)
+        std::cout << " " << quadratic[m] ;
+    std::cout << "\n";
+    */
     
     // now subtract one quadratic from another to obtain a system
     // of one quadratic and two linear eqns
     int v0 = quadratic[0]; // the one we subtract from the others
-    int j;
     // Subtract one quadratic equation from all the others,
     // making new linear equations.
     for(int i=1; i<quadratic_count; i++) {
         int vi = quadratic[i]; // the one to do subtraction on
-        for(j=0; j<4; j++) // four parameters: a,b,k,c
+        for(int j=0; j<4; j++) // four parameters: a,b,k,c
             vectors[vi][j] -= vectors[v0][j];
         linear[linear_count++] = vi; // now we have a new linear eqn
     }
     assert(linear_count == 2); // At this point, we should have exactly two linear equations.
-        
+
+    /*
+    std::cout << " AFTER SUBTRACT linear_count = " << linear_count << " : ";
+    for (int m=0;m<linear_count;m++)
+        std::cout << " " << linear[m] ;
+    std::cout << "\n";
+    std::cout << " quadratic_count = " << quadratic_count << " : ";
+    for (int m=0;m<quadratic_count;m++)
+        std::cout << " " << quadratic[m] ;
+    std::cout << "\n";
+    for(int m=0;m<3;m++) {
+        std::cout << m << " : " << vectors[m][0] << "  "  << vectors[m][1] << "  "  << vectors[m][2] << "  "  << vectors[m][3]  << "\n"; 
+    }
+    */
     // TODO:  pick the solution appraoch with the best numerical stability.
     
     // index shuffling determines if we solve:
@@ -181,7 +232,7 @@ int VertexPositioner::solver(Site* s1, Site* s2, Site* s3, double solns[][3] ) {
 // solns = output solution triplets (x,y,t) or (u,v,t)
 // returns number of solutions found
 int VertexPositioner::qqq_solver( double l0[], double l1[], int xi, int yi, int ti, 
-      double xk, double yk, int kk, double rk , double solns[][3] ) {
+      double xk, double yk, double kk, double rk , double solns[][3] ) {
     
     double isolns[2][3];
     double aargs[3][2];
@@ -207,7 +258,7 @@ int VertexPositioner::qqq_solver( double l0[], double l1[], int xi, int yi, int 
     aargs[1][0] = 1.0;
     aargs[1][1] = -2*yk;
     aargs[2][0] = -1.0;
-    aargs[2][1] = -2*rk; // * kk!! (kk == sign of quadratic offset ?)
+    aargs[2][1] = -2*rk*kk; // (kk == sign of quadratic offset ?)
     
     // this solves for w, and returns either 0, 1, or 2 triplets of (u,v,t) in isolns
     int scount = qll_solve( aargs[xi][0], aargs[xi][1],
@@ -222,6 +273,7 @@ int VertexPositioner::qqq_solver( double l0[], double l1[], int xi, int yi, int 
         solns[i][yi] = isolns[i][1];       // v       y
         solns[i][ti] = isolns[i][2];       // t       t  chop!
     }
+    //std::cout << "  qqq_solve found " << scount << " roots\n";
     return scount;
 }
 
@@ -238,21 +290,21 @@ int VertexPositioner::qll_solve( double a0, double b0, double c0, double d0,
                       double a2, double b2, 
                       double soln[][3])
 {
-    double a, b, c;
-    double roots[2], t;
+    double roots[2];
     // TODO:  optimize using abs(a0) == abs(c0) == abs(d0) == 1
-    a = (a0*(a1*a1) + c0*(a2*a2) + e0); // chop
-    b = (2*a0*a1*b1 + 2*a2*b2*c0 + a1*b0 + a2*d0 + f0); // chop
-    c = a0*(b1*b1) + c0*(b2*b2) + b0*b1 + b2*d0 + g0;
+    double a = (a0*(a1*a1) + c0*(a2*a2) + e0); // chop
+    double b = (2*a0*a1*b1 + 2*a2*b2*c0 + a1*b0 + a2*d0 + f0); // chop
+    double c = a0*(b1*b1) + c0*(b2*b2) + b0*b1 + b2*d0 + g0;
     int rcount = quadratic_roots(a, b, c, roots); // solves a*w^2 + b*w + c = 0
-    if (rcount == 0)    // No roots, no solutions
+    if (rcount == 0) { // No roots, no solutions
+        std::cout << " qll_solve no w roots. no solutions.\n";
         return 0;
-
+    }
     for (int i=0; i<rcount; i++) {
-        t = roots[i];
-        soln[i][0] = a1*t + b1; // u
-        soln[i][1] = a2*t + b2; // v
-        soln[i][2] = t;         // t
+        double w = roots[i];
+        soln[i][0] = a1*w + b1; // u
+        soln[i][1] = a2*w + b2; // v
+        soln[i][2] = w;         // t
     }
     return rcount;
 }
@@ -260,8 +312,10 @@ int VertexPositioner::qll_solve( double a0, double b0, double c0, double d0,
 /// solves: a*x*x + b*x + c = 0
 /// returns number of roots found (0, 1, or 2) and the values in roots[]
 int VertexPositioner::quadratic_roots(double a, double b, double c, double roots[]) {
-    if ((a == 0) and (b == 0))
+    if ((a == 0) and (b == 0)) {
+        std::cout << " quadratic_roots() a == b == 0. no roots.\n";
         return 0;
+    }
     if (a == 0) {
         roots[0] = -c / b;
         return 1;
@@ -276,10 +330,11 @@ int VertexPositioner::quadratic_roots(double a, double b, double c, double roots
             roots[0] = 0;
             return 1;
         } else {
+            std::cout << " quadratic_roots() b == 0. no roots.\n";
             return 0;
         }
     }
-    double disc = (b*b - 4*a*c); // discriminant, chop!
+    double disc = chop(b*b - 4*a*c); // discriminant, chop!
     if (disc > 0) {
         double q;
         if (b > 0)
@@ -293,6 +348,7 @@ int VertexPositioner::quadratic_roots(double a, double b, double c, double roots
         roots[0] = (-b / (2*a));
         return 1;
     }
+    std::cout << " quadratic_roots() disc < 0. no roots. disc= " << disc << "\n";
     return 0;
 }
 

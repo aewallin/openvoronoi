@@ -78,6 +78,7 @@ public:
     virtual double r() {assert(0); return 0;}
     virtual double k() {assert(0); return 0;}
     virtual std::string str() const {return "Site";}
+    virtual bool isPoint() {return false;}
 protected:
     Eqp eq;
 };
@@ -100,7 +101,8 @@ public:
     virtual double x() {return _p.x;}
     virtual double y() {return _p.y;}
     virtual double r() {return 0;}
-    virtual double k() {return 1;}
+    virtual double k() {return 0;}
+    virtual bool isPoint() {return true;}
     virtual std::string str() const {return "PointSite";}
 private:
     PointSite() {} // don't use!
@@ -140,6 +142,7 @@ public:
         }
     }
     virtual const Point position() const {
+        assert(0);
         return _start; // FIXME!!
     }
     virtual std::string str() const {return "LineSite";}

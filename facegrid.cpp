@@ -51,6 +51,7 @@ FaceGrid::FaceGrid(double far, unsigned int n_bins) {
 
 // insert f_prop into the correct bucket
 void FaceGrid::add_face(FaceProps f_prop) {
+    assert( f_prop.site->isPoint() );
     GridIndex row = get_grid_index( f_prop.site->position().x );
     GridIndex col = get_grid_index( f_prop.site->position().y );
     FacePropVector* bucket = (*grid)[row][col];
@@ -108,6 +109,7 @@ HEFace FaceGrid::find_closest_in_set(  const Point& p ) {
     double closest_distance = 30*far_radius; // a big number...
     double d;
     BOOST_FOREACH( FaceProps f, face_set ) {
+        assert( f.site->isPoint() );
         d = (f.site->position() - p).norm_sq();
         if (d<closest_distance ) {
             closest_distance=d;

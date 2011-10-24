@@ -96,13 +96,17 @@ if __name__ == "__main__":
     vod = ovdvtk.VD(myscreen,vd,float(scale))
     drawFarCircle(myscreen, vd.getFarRadius(), ovdvtk.orange)
     
-    Nmax = 30
+    Nmax = 3
     
     #plist = randomGenerators(far, Nmax)
     #plist = regularGridGenerators(far, Nmax)
     #plist = circleGenerators(far, Nmax)
     
-    plist = randomGenerators(far, Nmax) 
+    #plist = randomGenerators(far, Nmax) 
+    plist = []
+    plist.append( ovd.Point(0.0,0.1) )
+    plist.append( ovd.Point(0,0.9) )
+    plist.append( ovd.Point(-0.15, -0.15) )
     #+ regularGridGenerators(far, Nmax) + circleGenerators(far, Nmax)
 
     #plist = [ovd.Point(0,0)]
@@ -117,7 +121,7 @@ if __name__ == "__main__":
     id1 = id_list[0]
     id2 = id_list[1]
     print "add segment ",id1, " to ", id2
-    #vd.addLineSite( id1, id2 )
+    vd.addLineSite( id1, id2 )
     drawLine(myscreen, plist[0], plist[1] )
     
     t_after = time.time()

@@ -106,10 +106,12 @@ class VoronoiDiagram_py : public VoronoiDiagram {
         boost::python::list getGenerators()  {
             boost::python::list plist;
             for ( HEFace f=0;f< g.num_faces();++f ) {
-                plist.append( g[f].site->position()  );
+                if ( g[f].site->isPoint() )
+                    plist.append( g[f].site->position()  );
             }
             return plist;
         }
+        
         /// return list of vd vertices to python
         boost::python::list getVoronoiVertices()  {
             boost::python::list plist;

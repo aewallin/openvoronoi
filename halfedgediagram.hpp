@@ -348,7 +348,7 @@ void insert_vertex_in_edge(Vertex v, Edge e ) {
     Edge twin_previous = previous_edge(twin);
     assert( g[twin_previous].face == g[twin].face );
     
-    Edge e1 = add_edge( source, v );
+    Edge e1 = add_edge( source, v ); // these replace e
     Edge e2 = add_edge( v, target );
     
     // preserve the left/right face link
@@ -359,8 +359,7 @@ void insert_vertex_in_edge(Vertex v, Edge e ) {
     g[e1].next = e2;
     g[e2].next = g[e].next;
     
-    
-    Edge te1 = add_edge( twin_source, v  );
+    Edge te1 = add_edge( twin_source, v  ); // these replace twin
     Edge te2 = add_edge( v, twin_target  );
     
     g[te1].face = twin_face;
@@ -446,6 +445,11 @@ void clear_vertex( Vertex v) {
 /// remove given vertex
 void remove_vertex( Vertex v) { 
     boost::remove_vertex( v , g );
+}
+
+/// remove given vertex
+void remove_edge( Edge e) { 
+    boost::remove_edge( e , g );
 }
 
 }; // end class definition

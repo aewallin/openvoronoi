@@ -308,28 +308,94 @@ void VoronoiDiagram::mark_adjacent_faces( HEVertex v) {
     }
 }
 
-// the set v0 are IN vertices that should be removed
-// generate new voronoi-vertices on all edges connecting v0 to OUT-vertices
+// generate new voronoi-vertices on all IN-OUT edges 
 void VoronoiDiagram::add_new_vertices( Site* new_site ) {
     assert( !v0.empty() );
     EdgeVector q_edges = find_in_out_edges();       // new vertices generated on these IN-OUT edges
-    for( unsigned int m=0; m<q_edges.size(); ++m )  {  // create new vertices on all found IN-OUT edges 
+    for( unsigned int m=0; m<q_edges.size(); ++m )  {   
         HEVertex q = g.add_vertex();
         g[q].status = NEW;
         modified_vertices.push_back(q);
-        g[q].position = vpos->position(  q_edges[m], new_site );
-        g[q].init_dist( new_site->apex_point( g[q].position ) ); 
-        g.insert_vertex_in_edge( q, q_edges[m] );
+        g[q].position = vpos->position( q_edges[m], new_site ); // set position
+        g[q].init_dist( new_site->apex_point( g[q].position ) ); // set clearance-disk
+        //g.insert_vertex_in_edge( q, q_edges[m] );
+        add_vertex_in_edge(q, q_edges[m] );
     }
 }
 
+void VoronoiDiagram::add_vertex_in_edge( HEVertex v, HEEdge e) {
+    // the vertex v is in the middle of edge e
+    //                    face
+    //                    e1   e2
+    // previous-> source  -> v -> target -> next
+    //            tw_trg  <- v <- tw_src <- tw_previous
+    //                    te2  te1
+    //                    twin_face
+    HEEdge twin = g[e].twin;
+    HEVertex source = g.source(e); //boost::source( e , g );
+    HEVertex target = g.target(e); //boost::target( e , g);
+    HEVertex twin_source = g.source(twin); //boost::source( twin , g);
+    HEVertex twin_target = g.target(twin); //boost::target( twin , g );
+    assert( source == twin_target );    
+    assert( target == twin_source );
+    HEFace face = g[e].face;
+    HEFace twin_face = g[twin].face;
+    HEEdge previous = g.previous_edge(e);
+    assert( g[previous].face == g[e].face );
+    HEEdge twin_previous = g.previous_edge(twin);
+    assert( g[twin_previous].face == g[twin].face );
+    
+    HEEdge e1 = g.add_edge( source, v ); // these replace e
+    HEEdge e2 = g.add_edge( v, target );    
+    // preserve the left/right face link
+    g[e1].face = face;
+    g[e2].face = face;
+    // next-pointers
+    g[previous].next = e1;
+    g[e1].next = e2;
+    g[e2].next = g[e].next;
+    // k-vals
+    g[e1].k = g[e].k;
+    g[e2].k = g[e].k;
+    
+    HEEdge te1 = g.add_edge( twin_source, v  ); // these replace twin
+    HEEdge te2 = g.add_edge( v, twin_target  );
+    
+    g[te1].face = twin_face;
+    g[te2].face = twin_face;
+    
+    g[twin_previous].next = te1;
+    g[te1].next = te2;
+    g[te2].next = g[twin].next;
+    
+    // TWINNING (note indices 'cross', see ASCII art above)
+    g[e1].twin = te2;
+    g[te2].twin = e1;
+    g[e2].twin = te1;
+    g[te1].twin = e2;
+    // k-vals
+    g[te1].k = g[twin].k;
+    g[te2].k = g[twin].k;
+        
+    // update the faces (required here?)
+    g[face].edge = e1;
+    g[twin_face].edge = te1;
+    
+    // finally, remove the old edge
+    g.remove_edge(e);
+    g.remove_edge(twin);
+    //boost::remove_edge( e   , g);
+    //boost::remove_edge( twin, g);
+}
+
 // add a new face corresponding to the new Site
-// call split_face() on all the incident_faces that should be split
+// call add_new_edge() on all the incident_faces that should be split
 HEFace VoronoiDiagram::add_new_face(Site* s) { 
     HEFace newface =  g.add_face(); 
     g[newface].site = s;
     g[newface].status = NONINCIDENT;
-    fgrid->add_face( g[newface] );
+    if (s->isPoint() )
+        fgrid->add_face( g[newface] ); 
     BOOST_FOREACH( HEFace f, incident_faces ) {
         add_new_edge(newface, f); // each INCIDENT face is split into two parts: newface and f
     }
@@ -347,12 +413,14 @@ void VoronoiDiagram::add_new_edge(HEFace newface, HEFace f) {
     // and:              twin_next <- new_source <- new_target <- twin_previous    
     HEEdge e_new = g.add_edge( new_source, new_target );
     g[e_new].next = new_next;
+    g[e_new].k = g[new_next].k; // the next edge is on the same face, so has the correct k-value
     g[e_new].face = f;
     g[new_previous].next = e_new;
     g[f].edge = e_new; 
     // the twin edge that bounds the new face
     HEEdge e_twin = g.add_edge( new_target, new_source );
     g[e_twin].next = twin_next; 
+    g[e_twin].k = g[twin_next].k;
     g[e_twin].face = newface;
     g[twin_previous].next = e_twin;
     g[newface].edge = e_twin; 

@@ -196,16 +196,17 @@ void VoronoiDiagram::add_line_site(int idx1, int idx2) {
     }
     assert(start_found);
     assert(end_found);
-    std::cout << " found startvert = " << start << "\n";
-    std::cout << "   found endvert = " << end << "\n";
+    std::cout << " found startvert = " << start << " " << g[start].position <<"\n";
+    std::cout << "   found endvert = " << end << " " << g[end].position << "\n";
     
     LineSite* line_site = new LineSite( g[start].position, g[end].position) ;
     // seed-face is face of start-point
     HEFace closest_face = g[start].face; // fgrid->grid_find_closest_face( p );
     // seed 
     HEVertex v_seed = find_seed_vertex(closest_face, line_site ) ;
-    std::cout << "   seed  = " << v_seed << "\n";
+    std::cout << "   seed  = " << v_seed << " " << g[v_seed].position << "\n";
     augment_vertex_set(v_seed, line_site );
+    std::cout << "   v0.size() = " << v0.size() << "\n";
     add_new_voronoi_vertices( line_site );    
     HEFace newface = split_faces( line_site );
     remove_vertex_set( newface );

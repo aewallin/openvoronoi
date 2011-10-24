@@ -31,28 +31,36 @@
 namespace ovd {
 
 
-/// point-point-point vertex positioner based on Sugihara & Iri paper
-Point VertexPositioner::ppp_solver(const Point& p1, const Point& p2, const Point& p3) {
-    Point pi(p1),pj(p2),pk(p3);
-    if ( pi.isRight(pj,pk) ) 
-        std::swap(pi,pj);
-    assert( !pi.isRight(pj,pk) );
-    // 2) point pk should have the largest angle. largest angle is opposite longest side.
-    double longest_side = (pi - pj).norm();
-    while (  ((pj - pk).norm() > longest_side) || (((pi - pk).norm() > longest_side)) ) { 
-        std::swap(pi,pj); // cyclic rotation of points until pk is opposite the longest side pi-pj
-        std::swap(pi,pk);  
-        longest_side = (pi - pj).norm();
-    }
-    assert( !pi.isRight(pj,pk) );
-    assert( (pi - pj).norm() >=  (pj - pk).norm() );
-    assert( (pi - pj).norm() >=  (pk - pi).norm() );
-    double J2 = (pi.y-pk.y)*( sq(pj.x-pk.x)+sq(pj.y-pk.y) )/2.0 - (pj.y-pk.y)*( sq(pi.x-pk.x)+sq(pi.y-pk.y) )/2.0;
-    double J3 = (pi.x-pk.x)*( sq(pj.x-pk.x)+sq(pj.y-pk.y) )/2.0 - (pj.x-pk.x)*( sq(pi.x-pk.x)+sq(pi.y-pk.y) )/2.0;
-    double J4 = (pi.x-pk.x)*(pj.y-pk.y) - (pj.x-pk.x)*(pi.y-pk.y);
-    assert( J4 != 0.0 );
-    return Point( -J2/J4 + pk.x, J3/J4 + pk.y );
+// calculate the position of a new vertex on the given edge s
+// the edge e holds information about which face it belongs to.
+// each face holds information about which site/generator created it
+// so the three sites defining the position of the vertex are:
+// - site to the left of HEEdge e
+// - site to the right of HEEdge e
+// - given new Site s
+Point VertexPositioner::position(HEEdge e, Site* s) {
+    HEFace face = vd->g[e].face;     assert(  vd->g[face].status == INCIDENT);
+    HEEdge twin = vd->g[e].twin;
+    HEFace twin_face = vd->g[twin].face;      assert( vd->g[twin_face].status == INCIDENT);
+    
+    std::cout << " position: " <<  vd->g[face].site->str() << " " << vd->g[twin_face].site->str() << " " << s->str() << "\n";
+    Point p = position( vd->g[face].site  , vd->g[twin_face].site  , s );
+    
+    check_far_circle(p);
+    /*
+    if ( !check_in_edge(e, p, v) ) {
+        std::cout << " gen1= " << vd->g[face].generator << "\n";
+        std::cout << " gen2= " << vd->g[twin_face].generator << "\n";
+        std::cout << " gen3= " << vd->g[v].position << "\n";
+    }*/
+    
+    check_on_edge(e, p);
+    //check_dist(e, p, v);
+    return p;
 }
+
+
+
 
 
 Point VertexPositioner::position(Site* s1, Site* s2, Site* s3) {
@@ -66,13 +74,19 @@ Point VertexPositioner::position(Site* s1, Site* s2, Site* s3) {
         count = solver(s1,s2,s3, solns);
     
     //std::cout << count << " solutions found by solver \n";
-    for (int m=0;m<count;m++)
+    std::vector<Point> pts;
+    for (int m=0;m<count;m++) {
         std::cout << " new: " << m << " :  ( " << solns[m][0] << " , " << solns[m][1] << " , " << solns[m][2] << " )\n";
+        if ( solns[m][2] > 0 )  { // t-value
+            pts.push_back( Point(solns[m][0], solns[m][1] ) );
+        }
+    }
+    // after filtering only one point should remain
+    assert( pts.size() == 1);
     
     Point pt = ppp_solver( s1->position(), s2->position(), s3->position() );
     std::cout << " old: " << pt << "\n";
-    return pt;
-    //ppp_solver( s1->position(), s2->position(), s3->position() );
+    return pts[0];
 }
 
 int VertexPositioner::solver(Site* s1, Site* s2, Site* s3, double solns[][3] ) {
@@ -214,18 +228,17 @@ int VertexPositioner::qqq_solver( double l0[], double l1[], int xi, int yi, int 
 
 /// Solve a system of one quadratic equation, and two linear equations.
 /// 
-/// a0 u^2 + b0 u + c0 v^2 + d0 v + e0 w^2 + f0 w + g0 = 0
-/// u = a1 w + b1
-/// v = a2 w + b2
-/// solve for w
-/// then u and v, t can be calculated from w
+/// (1) a0 u^2 + b0 u + c0 v^2 + d0 v + e0 w^2 + f0 w + g0 = 0
+/// (2) u = a1 w + b1
+/// (3) v = a2 w + b2
+/// solve (1) for w (can have 0, 1, or 2 roots)
+/// then substitute into (2) and (3) to find (u, v, t)
 int VertexPositioner::qll_solve( double a0, double b0, double c0, double d0, 
                       double e0, double f0, double g0, 
                       double a1, double b1, 
                       double a2, double b2, 
                       double soln[][3])
 {
-    //std::cout << " qll_solver() \n";
     double a, b, c;
     double roots[2], t;
     // TODO:  optimize using abs(a0) == abs(c0) == abs(d0) == 1
@@ -242,12 +255,11 @@ int VertexPositioner::qll_solve( double a0, double b0, double c0, double d0,
         soln[i][1] = a2*t + b2; // v
         soln[i][2] = t;         // t
     }
-    //std::cout << " qll_solver() found " << rcount << " roots\n";
     return rcount;
 }
 
 /// solves: a*x*x + b*x + c = 0
-/// returns number of roots found, and the values in roots[]
+/// returns number of roots found (0, 1, or 2) and the values in roots[]
 int VertexPositioner::quadratic_roots(double a, double b, double c, double roots[]) {
     if ((a == 0) and (b == 0))
         return 0;
@@ -288,37 +300,32 @@ int VertexPositioner::quadratic_roots(double a, double b, double c, double roots
 int VertexPositioner::lll_solver(Site* s1, Site* s2, Site* s3) {
     std::cout << " lll_solver() \n";
     assert(0); // NOT implemented yet!
-    //return Point(0,0);
     return 0;
 }
 
-
-// calculate the position of a new vertex on the given edge s
-// the edge e holds information about which face it belongs to.
-// each face holds information about which site/generator created it
-// so the three sites defining the position of the vertex are:
-// - site to the left of HEEdge e
-// - site to the right of HEEdge e
-// - given new Site s
-Point VertexPositioner::position(HEEdge e, Site* s) {
-    HEFace face = vd->g[e].face;     assert(  vd->g[face].status == INCIDENT);
-    HEEdge twin = vd->g[e].twin;
-    HEFace twin_face = vd->g[twin].face;      assert( vd->g[twin_face].status == INCIDENT);
-    
-    Point p = position( vd->g[face].site  , vd->g[twin_face].site  , s );
-    
-    check_far_circle(p);
-    /*
-    if ( !check_in_edge(e, p, v) ) {
-        std::cout << " gen1= " << vd->g[face].generator << "\n";
-        std::cout << " gen2= " << vd->g[twin_face].generator << "\n";
-        std::cout << " gen3= " << vd->g[v].position << "\n";
-    }*/
-    
-    check_on_edge(e, p);
-    //check_dist(e, p, v);
-    return p;
+/// point-point-point vertex positioner based on Sugihara & Iri paper
+Point VertexPositioner::ppp_solver(const Point& p1, const Point& p2, const Point& p3) {
+    Point pi(p1),pj(p2),pk(p3);
+    if ( pi.isRight(pj,pk) ) 
+        std::swap(pi,pj);
+    assert( !pi.isRight(pj,pk) );
+    // 2) point pk should have the largest angle. largest angle is opposite longest side.
+    double longest_side = (pi - pj).norm();
+    while (  ((pj - pk).norm() > longest_side) || (((pi - pk).norm() > longest_side)) ) { 
+        std::swap(pi,pj); // cyclic rotation of points until pk is opposite the longest side pi-pj
+        std::swap(pi,pk);  
+        longest_side = (pi - pj).norm();
+    }
+    assert( !pi.isRight(pj,pk) );
+    assert( (pi - pj).norm() >=  (pj - pk).norm() );
+    assert( (pi - pj).norm() >=  (pk - pi).norm() );
+    double J2 = (pi.y-pk.y)*( sq(pj.x-pk.x)+sq(pj.y-pk.y) )/2.0 - (pj.y-pk.y)*( sq(pi.x-pk.x)+sq(pi.y-pk.y) )/2.0;
+    double J3 = (pi.x-pk.x)*( sq(pj.x-pk.x)+sq(pj.y-pk.y) )/2.0 - (pj.x-pk.x)*( sq(pi.x-pk.x)+sq(pi.y-pk.y) )/2.0;
+    double J4 = (pi.x-pk.x)*(pj.y-pk.y) - (pj.x-pk.x)*(pi.y-pk.y);
+    assert( J4 != 0.0 );
+    return Point( -J2/J4 + pk.x, J3/J4 + pk.y );
 }
+
 
 // new vertices should lie within the far_radius
 bool VertexPositioner::check_far_circle(const Point& p) {

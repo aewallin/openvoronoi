@@ -103,11 +103,12 @@ namespace ovd {
 #define VERTEX_CONTAINER boost::listS
 #define EDGE_LIST_CONTAINER boost::listS
 
-
+// type of edge-descriptors in the graph
 typedef boost::adjacency_list_traits<OUT_EDGE_CONTAINER, 
                                      VERTEX_CONTAINER, 
                                      boost::bidirectionalS, 
                                      EDGE_LIST_CONTAINER >::edge_descriptor HEEdge;
+// type of face-descriptors in the graph
 typedef unsigned int HEFace;    
                         
 
@@ -124,10 +125,12 @@ struct EdgeProps {
     /// the twin edge
     HEEdge twin;
     /// the face to which this edge belongs
-    HEFace face; 
+    HEFace face; // each face corresponds to an input Site/generator
 };
 
-/// types of faces in the voronoi diagram
+/// Status of faces in the voronoi diagram
+/// INCIDENT faces contain one or more IN-vertex
+/// NONINCIDENT faces contain only OUT-vertices
 enum VoronoiFaceStatus {INCIDENT, NONINCIDENT};
 
 /// properties of a face in the voronoi diagram
@@ -135,35 +138,28 @@ enum VoronoiFaceStatus {INCIDENT, NONINCIDENT};
 struct FaceProps {
     FaceProps( ) {}
     /// create face with given edge, generator, and type
-    FaceProps( HEEdge e , Site* s, VoronoiFaceStatus t) {
-        edge = e;
-        site = s;
-        status = t;
-    }
+    FaceProps( HEEdge e , Site* s, VoronoiFaceStatus st) : edge(e), site(s), status(st) {}
     /// operator for sorting faces
     bool operator<(const FaceProps& f) const {return (this->idx<f.idx);}
     /// face index
     HEFace idx;
     /// one edge that bounds this face
     HEEdge edge;
-    /// the site/generator for this face
-    //Point generator;
+    /// the site/generator for this face (either PointSite, LineSite, or ArcSite)
     Site* site;
     /// face status (either incident or nonincident)
     VoronoiFaceStatus status;
 };
 
-
-
 // the type of graph with which we construct the voronoi-diagram
-typedef hedi::HEDIGraph< OUT_EDGE_CONTAINER,             // out-edges stored in a std::list
-                       VERTEX_CONTAINER,             // vertex set stored here
+typedef hedi::HEDIGraph< OUT_EDGE_CONTAINER,     // out-edges stored in a std::list
+                       VERTEX_CONTAINER,         // vertex set stored here
                        boost::bidirectionalS,    // bidirectional graph.
-                       VoronoiVertex,              // vertex properties
+                       VoronoiVertex,            // vertex properties
                        EdgeProps,                // edge properties
                        FaceProps,                // face properties
                        boost::no_property,       // graph properties
-                       EDGE_LIST_CONTAINER              // edge storage
+                       EDGE_LIST_CONTAINER       // edge storage
                        > HEGraph;
 // NOTE: if these listS etc. arguments ever change, they must also be updated
 // above where we do: adjacency_list_traits
@@ -175,15 +171,12 @@ typedef boost::graph_traits< HEGraph::BGLGraph >::out_edge_iterator  HEOutEdgeIt
 typedef boost::graph_traits< HEGraph::BGLGraph >::adjacency_iterator HEAdjacencyItr;
 typedef boost::graph_traits< HEGraph::BGLGraph >::vertices_size_type HEVertexSize;
 
-
-
 // these containers are used instead of iterators when accessing
 // adjacent vertices, edges, faces.
 // FIXME: it may be faster to rewrite the code so it uses iterators, as does the BGL.
 typedef std::vector<HEVertex> VertexVector;
 typedef std::vector<HEFace> FaceVector;
 typedef std::vector<HEEdge> EdgeVector;  
-
 
 } // end namespace
 #endif

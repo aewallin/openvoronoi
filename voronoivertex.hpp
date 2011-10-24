@@ -51,9 +51,9 @@ typedef std::map<VoronoiVertexType, unsigned int> VertexDegreeMap;
 /// the offset in direction k by a distance t of a general site (point,line,circle) can be expressed as
 /// q ( x*x + y*y - t*t ) + a x + b y + c + k t = 0
 /// the parameters (q,a,b,k,c) are set as:
-/// line:   (0,   a,   b,    k, c)              line ax+by+c=0  where a*a+b*b=1
+/// line:   (0,   a,   b,    k, c          )    line ax+by+c=0  where a*a+b*b=1
 /// circle: (1, -2x, -2y, -2kr, x*x+y*y-r*r)    circle center at (x,y) and radius r
-/// point:  (1, -2x, -2y, 0, x*x+y*y)           point at (x,y)
+/// point:  (1, -2x, -2y,    0, x*x+y*y    )    point at (x,y)
 struct Eqp {
     int q; // q=1 for quadratic, q=0 for linear eqn
     double a;
@@ -77,7 +77,7 @@ public:
     virtual double y() {assert(0); return 0;}
     virtual double r() {assert(0); return 0;}
     virtual double k() {assert(0); return 0;}
-
+    virtual std::string str() const {return "Site";}
 protected:
     Eqp eq;
 };
@@ -101,6 +101,7 @@ public:
     virtual double y() {return _p.y;}
     virtual double r() {return 0;}
     virtual double k() {return 1;}
+    virtual std::string str() const {return "PointSite";}
 private:
     PointSite() {} // don't use!
     Point _p;
@@ -141,7 +142,7 @@ public:
     virtual const Point position() const {
         return _start; // FIXME!!
     }
-
+    virtual std::string str() const {return "LineSite";}
 private:
     LineSite() {} // don't use!
     Point _start;
@@ -167,6 +168,7 @@ public:
     virtual double y() {return _center.y;}
     virtual double r() {return _radius;}
     virtual double k() {return 1;} // ?
+    virtual std::string str() const {return "ArcSite";}
 private:
     ArcSite() {} // don't use!
     Point _start;

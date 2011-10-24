@@ -117,7 +117,7 @@ if __name__ == "__main__":
     id1 = id_list[0]
     id2 = id_list[1]
     print "add segment ",id1, " to ", id2
-    #vd.addLineSite( id1, id2 )
+    vd.addLineSite( id1, id2 )
     drawLine(myscreen, plist[0], plist[1] )
     
     t_after = time.time()

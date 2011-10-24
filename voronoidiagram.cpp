@@ -208,7 +208,7 @@ void VoronoiDiagram::insert_line_site(int idx1, int idx2) {
     
     LineSite* line_site = new LineSite( g[start].position, g[end].position) ;
     // seed-face is face of start-point
-    HEFace closest_face = g[start].face; // fgrid->grid_find_closest_face( p );
+    HEFace closest_face = g[start].face; 
     // seed 
     HEVertex v_seed = find_seed_vertex(closest_face, line_site ) ;
     std::cout << "   seed  = " << v_seed << " " << g[v_seed].position << "\n";
@@ -225,32 +225,6 @@ void VoronoiDiagram::insert_line_site(int idx1, int idx2) {
     return; // g[new_vert].index;
 
 }
-
-// evaluate H-determinant on all face vertices and return vertex with the lowest H
-// this H-determinant way works for point-sites only
-/*
-HEVertex VoronoiDiagram::find_seed_vertex(HEFace f, const Point& p) {
-    VertexVector face_verts = g.face_vertices(f);
-    assert( face_verts.size() >= 3 );
-    double minimumH(0.0); 
-    HEVertex minimalVertex=  HEVertex() ;
-    bool first = true;
-    BOOST_FOREACH( HEVertex q, face_verts) { // go thorugh all the vertices and find the one with smallest detH
-        if ( g[q].status != OUT ) {
-            double h = g[q].detH( p ); 
-            std::cout << "    H: " << g[q].index << " detH= " << g[q].detH(p) << " r=" << g[q].inCircle(p) << "\n";
-            if ( first || (h<minimumH) ) {
-                minimumH = h;
-                minimalVertex = q;
-                first = false;
-            }
-        }
-    }
-    std::cout << "RETURN H: " << g[minimalVertex].index << " detH= " << g[minimalVertex].detH(p) << " r=" << g[minimalVertex].inCircle(p) << "\n";
-    assert( vd_checker->detH_is_negative( p, f, minimalVertex ) );
-    return minimalVertex;
-}*/
-
 
 // find amount of clearance-disk violation on all face vertices and return vertex with the largest violation
 HEVertex VoronoiDiagram::find_seed_vertex(HEFace f, Site* site) const { //const Point& p) {
@@ -304,26 +278,21 @@ void VoronoiDiagram::augment_vertex_set( HEVertex& v_seed, Site* site ) {
 }
 
 // mark vertex IN. mark adjacent faces INCIDENT
-// push adjacent vertices onto queue 
+// push adjacent UNDECIDED vertices onto queue 
 void VoronoiDiagram::mark_vertex(HEVertex& v,  Site* site) {
     g[v].status = IN;
     v0.push_back( v );
     mark_adjacent_faces( v );
-    push_adjacent_vertices( v ,  site);
-}
-
-// push adjacent vertices onto queue
-// when pushing onto queue we also evaluate in_circle predicate so that we process vertices in the correct order
-void VoronoiDiagram::push_adjacent_vertices( HEVertex v, Site* site ) {
+    
+    // also push the v-adjacent vertices onto the queue
     BOOST_FOREACH( HEVertex w, g.adjacent_vertices(v) ) {
         if ( (g[w].status == UNDECIDED) && (!g[w].in_queue) ) {
-                // push adjacent undecided verts onto queue for processing
+                // when pushing onto queue we also evaluate in_circle predicate so that we process vertices in the correct order
                 vertexQueue.push( VertexDetPair(w , g[w].in_circle( site->apex_point(g[w].position) ) ) ); 
                 g[w].in_queue=true;
         }
     }
 }
-
 
 // IN-Vertex v has three adjacent faces, mark nonincident faces incident
 // and push them to the incident_faces queue
@@ -445,7 +414,7 @@ void VoronoiDiagram::remove_vertex_set( HEFace newface ) {
 }
 
 // at the end after an incremental insertion of a new site,
-// reset status of modified_vertices and incident_faces,
+// reset status of modified_vertices to UNDECIDED and incident_faces to NONINCIDENT,
 // so that we are ready for the next insertion.
 void VoronoiDiagram::reset_status() {
     BOOST_FOREACH( HEVertex v, modified_vertices ) {
@@ -479,7 +448,7 @@ EdgeVector VoronoiDiagram::find_in_out_edges() {
 }
 
 // number of IN vertices adjacent to given vertex v
-// predicate C4 i.e. "adjacent in-count"
+// predicate C4 i.e. "adjacent in-count" from Sugihara&Iri 1992 "one million" paper
 bool VoronoiDiagram::predicate_c4(HEVertex v) {
     int in_count=0;
     BOOST_FOREACH( HEVertex w, g.adjacent_vertices(v) ) {
@@ -489,11 +458,12 @@ bool VoronoiDiagram::predicate_c4(HEVertex v) {
     return (in_count >= 2);
 }
 
-// does any of the three faces that are adjacent to the given IN-vertex v have an IN-vertex ?
+// do any of the three faces that are adjacent to the given IN-vertex v have an IN-vertex ?
+// predicate C5 i.e. "connectedness"  from Sugihara&Iri 1992 "one million" paper
 bool VoronoiDiagram::predicate_c5(HEVertex v) {
     FaceVector adj_faces = g.adjacent_faces(v);   
     assert( adj_faces.size() == 3 );
-    FaceVector adjacent_incident_faces;
+    FaceVector adjacent_incident_faces; // find the ajacent incident faces
     BOOST_FOREACH( HEFace f, adj_faces ) {
         if ( g[f].status == INCIDENT )
             adjacent_incident_faces.push_back( f );
@@ -501,7 +471,7 @@ bool VoronoiDiagram::predicate_c5(HEVertex v) {
     assert( !adjacent_incident_faces.empty() );
     
     bool all_found = true;
-    BOOST_FOREACH( HEFace f, adjacent_incident_faces ) { // check each adjacent face f
+    BOOST_FOREACH( HEFace f, adjacent_incident_faces ) { // check each adjacent face f for an IN-vertex
         bool face_ok=false;
         BOOST_FOREACH( HEVertex w, g.face_vertices(f) ) { 
             if ( w != v && g[w].status == IN && g.has_edge(w,v) )  // v should be adjacent to an IN vertex on the face

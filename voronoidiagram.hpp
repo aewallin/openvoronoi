@@ -64,11 +64,11 @@ class VoronoiDiagram {
         VoronoiDiagram(double far, unsigned int n_bins);
         /// dtor
         virtual ~VoronoiDiagram();
-        
-        /// add a vertex generator at given position, and update the diagram
+        /// insert a point site into the diagram 
+        /// returns an integer handle to the inserted point. use this integer when inserting lines/arcs
         int insert_point_site(const Point& p);
+        /// insert a line-segment site into the diagram
         void insert_line_site(int idx1, int idx2);
-
         /// string repr
         std::string print() const;
         /// return the far radius
@@ -81,37 +81,22 @@ class VoronoiDiagram {
     protected:
         /// initialize the diagram with three generators
         void initialize();
-        /// among the vertices of f, find the one with most clearance-disk violation to new Site
-        /// i.e. the vertex that is closest to the new Site
         HEVertex find_seed_vertex(HEFace f, Site* site) const;
-        /// breadth-first search based Tree-expansion algorithm
-        void augment_vertex_set(HEVertex& v_seed, Site* site);        
-        
-        /// find all IN-OUT edges adjacent to q-verts
         EdgeVector find_in_out_edges(); 
-
-        bool predicate_c4(HEVertex v);
-        bool predicate_c5(HEVertex v);
-        
-        //FaceVector adjacent_incident_faces(HEVertex v);
-        
-
-        void mark_adjacent_faces(HEVertex v);
-        void push_adjacent_vertices( HEVertex v ,  Site* site);
-        void mark_vertex(HEVertex& v,  Site* site); 
-        /// add the new vertices  
-        void add_new_vertices( Site* site);
-        /// split faces when adding new generator p
-        HEFace add_new_face(Site* site);
-        /// split the face
-        void add_new_edge(HEFace new_f, HEFace f);
-        /// remove vertices in the set
-        void remove_vertex_set( HEFace newface );
-        /// set all modified vertices to UNDECIDED and all faces to NONINCIDENT
-        void reset_status();
-        
         boost::tuple<HEEdge, HEVertex, HEEdge> find_new_vertex(HEFace f, VoronoiVertexStatus s1);
         
+        void augment_vertex_set(HEVertex& v_seed, Site* site);        
+        bool predicate_c4(HEVertex v);
+        bool predicate_c5(HEVertex v);
+        void mark_adjacent_faces(HEVertex v);
+        void mark_vertex(HEVertex& v,  Site* site); 
+        void   add_new_vertices( Site* site);
+        HEFace add_new_face(Site* site);
+        void   add_new_edge(HEFace new_f, HEFace f);
+
+        void remove_vertex_set( HEFace newface );
+        void reset_status();
+
     // PRINT ETC
         void print_face(HEFace f);
         void print_vertices(VertexVector& q);
@@ -119,8 +104,8 @@ class VoronoiDiagram {
         /// sanity-checks on the diagram are done by this helper class
         VoronoiDiagramChecker* vd_checker;
         /// a grid-search algorithm which allows fast nearest-neighbor search
-        FaceGrid* fgrid; // for grid-search
-        /// an algorith for positioning vertices
+        FaceGrid* fgrid;
+        /// an algorithm for positioning vertices
         VertexPositioner* vpos;
     // DATA
         /// the half-edge diagram of the vd

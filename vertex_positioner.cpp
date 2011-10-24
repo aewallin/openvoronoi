@@ -62,10 +62,6 @@ Point VertexPositioner::position(HEEdge e, Site* s) {
     return p;
 }
 
-
-
-
-
 Point VertexPositioner::position(Site* s1, Site* s2, Site* s3) {
     int count;
     double solns[2][3];

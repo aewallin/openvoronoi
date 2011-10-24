@@ -37,11 +37,8 @@ BOOST_PYTHON_MODULE(openvoronoi) {
     ;
     bp::class_< VoronoiDiagram_py, bp::bases<VoronoiDiagram> >("VoronoiDiagram")
         .def(bp::init<double, unsigned int>())
-        .def("addVertexSite",  &VoronoiDiagram_py::add_vertex_site)
-        .def("addLineSite",  &VoronoiDiagram_py::add_line_site)
-        .def("pushVertexSite",  &VoronoiDiagram_py::push_vertex_site)
-        .def("run",  &VoronoiDiagram_py::run)
-        //.def("addLineSite",  &VoronoiDiagram_py::addLineSite)
+        .def("addVertexSite",  &VoronoiDiagram_py::insert_point_site)
+        .def("addLineSite",  &VoronoiDiagram_py::insert_line_site)
         .def("getGenerators",  &VoronoiDiagram_py::getGenerators)
         .def("getEdgesGenerators",  &VoronoiDiagram_py::getEdgesGenerators)
         .def("getVoronoiVertices",  &VoronoiDiagram_py::getVoronoiVertices)
@@ -55,7 +52,7 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         //.def("getDeleteSetLine",  &VoronoiDiagram_py::getDeleteSetLine)
         //.def("getDeleteEdges",  &VoronoiDiagram_py::getDeleteEdges)
         //.def("getModEdges",  &VoronoiDiagram_py::getModEdges)
-        .def("__str__", &VoronoiDiagram_py::str)
+        .def("__str__", &VoronoiDiagram_py::print)
         .def("version", &VoronoiDiagram_py::version)
     ;
     bp::enum_<VoronoiVertexStatus>("VoronoiVertexStatus")

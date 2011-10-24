@@ -44,6 +44,9 @@ Point VertexPositioner::position(HEEdge e, Site* s) {
     HEFace twin_face = vd->g[twin].face;      assert( vd->g[twin_face].status == INCIDENT);
     
     std::cout << " position: " <<  vd->g[face].site->str() << " " << vd->g[twin_face].site->str() << " " << s->str() << "\n";
+    std::cout << " k-vals: e.k = " <<  vd->g[e].k << " twin.k = " << vd->g[twin].k  << "\n";
+    
+    
     Point p = position( vd->g[face].site  , vd->g[twin_face].site  , s );
     
     check_far_circle(p);

@@ -33,7 +33,7 @@ namespace ovd
 class VoronoiDiagramChecker;
 class FaceGrid;
 
-// typedef std::queue<HEVertex> VertexQueue;
+
 typedef std::pair<HEVertex, double> VertexDetPair;
 class abs_comparison {
 public:
@@ -42,6 +42,8 @@ public:
   }
 };
 
+// vertices for processing held in this queue
+// sorted by decreasing fabs() of in_circle-predicate, so that the vertices whose IN/OUT status we are 'most certain' about are processed first
 typedef std::priority_queue< VertexDetPair , std::vector<VertexDetPair>, abs_comparison > VertexQueue;
 
 /// \brief Voronoi diagram.
@@ -64,20 +66,17 @@ class VoronoiDiagram {
         virtual ~VoronoiDiagram();
         
         /// add a vertex generator at given position, and update the diagram
-        int add_vertex_site(const Point& p);
-        void add_line_site(int idx1, int idx2);
-        
-        /// in "batch mode" we can first push all vertices, then call run()
-        void push_vertex_site(const Point& p); 
+        int insert_point_site(const Point& p);
+        void insert_line_site(int idx1, int idx2);
+
         /// string repr
-        std::string str() const;
+        std::string print() const;
         /// return the far radius
         double get_far_radius() const {return far_radius;}
         
         friend class VoronoiDiagramChecker;
         friend class VertexPositioner;
-        /// "batch mode", runs add_vertex_site(p) on all sites p in the vector vertex_sites
-        void run();
+
         std::string version() const { return VERSION_STRING; }
     protected:
         /// initialize the diagram with three generators
@@ -85,26 +84,27 @@ class VoronoiDiagram {
         /// among the vertices of f, find the one with most clearance-disk violation to new Site
         /// i.e. the vertex that is closest to the new Site
         HEVertex find_seed_vertex(HEFace f, Site* site) const;
-        
         /// breadth-first search based Tree-expansion algorithm
         void augment_vertex_set(HEVertex& v_seed, Site* site);        
         
         /// find all IN-OUT edges adjacent to q-verts
         EdgeVector find_in_out_edges(); 
 
-        int adjacent_in_count(HEVertex v);
-        FaceVector adjacent_incident_faces(HEVertex v);
-        bool incidentFacesHaveAdjacentInVertex(HEVertex v);
+        bool predicate_c4(HEVertex v);
+        bool predicate_c5(HEVertex v);
+        
+        //FaceVector adjacent_incident_faces(HEVertex v);
+        
 
         void mark_adjacent_faces(HEVertex v);
         void push_adjacent_vertices( HEVertex v ,  Site* site);
         void mark_vertex(HEVertex& v,  Site* site); 
         /// add the new vertices  
-        void add_new_voronoi_vertices( Site* site);
+        void add_new_vertices( Site* site);
         /// split faces when adding new generator p
-        HEFace split_faces( Site* site);
+        HEFace add_new_face(Site* site);
         /// split the face
-        void split_face(HEFace new_f, HEFace f);
+        void add_new_edge(HEFace new_f, HEFace f);
         /// remove vertices in the set
         void remove_vertex_set( HEFace newface );
         /// set all modified vertices to UNDECIDED and all faces to NONINCIDENT
@@ -118,9 +118,9 @@ class VoronoiDiagram {
     // HELPER-CLASSES
         /// sanity-checks on the diagram are done by this helper class
         VoronoiDiagramChecker* vd_checker;
-        /// a grid which allows fast nearest-neighbor search
+        /// a grid-search algorithm which allows fast nearest-neighbor search
         FaceGrid* fgrid; // for grid-search
-        /// this positions vertices
+        /// an algorith for positioning vertices
         VertexPositioner* vpos;
     // DATA
         /// the half-edge diagram of the vd
@@ -131,16 +131,15 @@ class VoronoiDiagram {
         HEVertex out_verts[3];
         /// the number of generators
         int gen_count;
-        /// temporary variable for incident faces
+        /// temporary variable for incident faces, will be reset to NONINCIDENT after a site has been inserted
         FaceVector incident_faces;
         /// temporary variable for in-vertices, out-vertices that need to be reset
-        /// after each generator has been inserted
+        /// after a site has been inserted
         VertexVector modified_vertices;
         /// IN-vertices, i.e. to-be-deleted
         VertexVector v0;
-        
-        std::vector<Point> vertex_sites;
-        VertexQueue Q; 
+        /// queue of vertices to be processed
+        VertexQueue vertexQueue; 
 
 };
 

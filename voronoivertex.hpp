@@ -41,7 +41,7 @@ enum VoronoiVertexStatus {OUT, IN, UNDECIDED, NEW };
 /// OUTER vertices are special vertices added in init(), should have degree==4
 /// VERTEXGEN are vertex generators, should have degree==0
 /// NORMAL are normal voronoi-vertices, should have degree==6  (degree 3 graph with double-edges)
-enum VoronoiVertexType {OUTER, NORMAL, VERTEXGEN};
+enum VoronoiVertexType {OUTER, NORMAL, VERTEXGEN, ENDPOINT};
 
 /// a map of this type is used by topology-checker to check that all vertices
 /// have the expected (correct) degree (i.e. number of edges)

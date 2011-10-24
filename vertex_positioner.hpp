@@ -20,12 +20,17 @@
 #ifndef VERTEX_POSITIONER_HPP
 #define VERTEX_POSITIONER_HPP
 
+#include <boost/tuple/tuple.hpp>
+
 #include "voronoidiagram_graph.hpp"
 #include "voronoivertex.hpp"
 
 namespace ovd {
 
 class VoronoiDiagram;
+
+
+typedef boost::tuple<Point, double> PointDoubleTuple;
 
 /// Calculates the (x,y) position of vertices in a voronoi diagram
 class VertexPositioner {
@@ -34,6 +39,7 @@ public:
     /// calculate the position of a new voronoi-vertex lying on the given edge
     /// with the given new site 
     Point position( HEEdge e, Site* s);
+
 private:
     inline double sq(double x) {return x*x;}
     /// point-point-point positioner

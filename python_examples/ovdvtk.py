@@ -94,7 +94,7 @@ class VD:
         for pt in vd.getFarVoronoiVertices():
             p=self.scale*pt[0]
             self.myscreen.addActor( Sphere( center=(p.x,p.y, 0), radius=self.vertexRadius, color=pink ) )
-            cir_actor = Circle( center=(p.x,p.y,0), radius=math.sqrt(pt[1])*self.scale, color=self.vertexColor )
+            cir_actor = Circle( center=(p.x,p.y,0), radius=(pt[1])*self.scale, color=self.vertexColor )
             #self.verts.append(cir_actor)
             self.myscreen.addActor(cir_actor)
             

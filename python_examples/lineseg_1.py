@@ -120,8 +120,8 @@ if __name__ == "__main__":
         n=n+1
     id1 = id_list[0]
     id2 = id_list[1]
-    id3 = id_list[2]
-    id4 = id_list[3]
+    #id3 = id_list[2]
+    #id4 = id_list[3]
     print "add segment ",id1, " to ", id2
     vd.addLineSite( id1, id2 )
     drawLine(myscreen, plist[0], plist[1] )

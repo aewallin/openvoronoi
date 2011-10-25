@@ -138,7 +138,7 @@ public:
         if (t>1)
             return _end;
         else {
-            return _start + t*_end;
+            return _start + t*(_end-_start);
         }
     }
     virtual const Point position() const {
@@ -212,11 +212,11 @@ public:
         r = dist(p);
     }
     /// update clearance-disk
-    void update_dist(const Point& p) {
-        double d = dist(p);
-        if (d<r)
-            r=d;
-    }
+    //void update_dist(const Point& p) {
+    //    double d = dist(p);
+    //    if (d<r)
+    //        r=d;
+    //}
     /// return distance to a point from this vertex
     double dist(const Point& p) const { return (position-p).norm(); }
     /// return clearance-disk radius

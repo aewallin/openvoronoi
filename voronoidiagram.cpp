@@ -213,7 +213,7 @@ void VoronoiDiagram::insert_line_site(int idx1, int idx2) {
     HEVertex v_seed = find_seed_vertex(closest_face, line_site ) ;
     std::cout << "   seed  = " << v_seed << " " << g[v_seed].position << "\n";
     augment_vertex_set(v_seed, line_site );
-    std::cout << "   v0.size() = " << v0.size() << "\n";
+    std::cout << "   after augment: v0.size() = " << v0.size() << "\n";
     add_new_vertices( line_site );    
     HEFace newface = add_new_face( line_site );
     remove_vertex_set( newface );
@@ -243,6 +243,7 @@ HEVertex VoronoiDiagram::find_seed_vertex(HEFace f, Site* site) const { //const 
             }
         }
     }
+    assert( minPred < 0 );
     // FIXME not using Point p anymore: assert( vd_checker->inCircle_is_negative( p, f, minimalVertex ) );
     return minimalVertex;
 }
@@ -288,7 +289,7 @@ void VoronoiDiagram::mark_vertex(HEVertex& v,  Site* site) {
     BOOST_FOREACH( HEVertex w, g.adjacent_vertices(v) ) {
         if ( (g[w].status == UNDECIDED) && (!g[w].in_queue) ) {
                 // when pushing onto queue we also evaluate in_circle predicate so that we process vertices in the correct order
-                vertexQueue.push( VertexDetPair(w , g[w].in_circle( site->apex_point(g[w].position) ) ) ); 
+                vertexQueue.push( VertexDetPair(w , g[w].in_circle(site->apex_point(g[w].position)) ) ); 
                 g[w].in_queue=true;
         }
     }
@@ -318,8 +319,7 @@ void VoronoiDiagram::add_new_vertices( Site* new_site ) {
         modified_vertices.push_back(q);
         g[q].position = vpos->position( q_edges[m], new_site ); // set position
         g[q].k3 = vpos->get_k3();
-        g[q].init_dist( new_site->apex_point( g[q].position ) ); // set clearance-disk
-        //g.insert_vertex_in_edge( q, q_edges[m] );
+        g[q].init_dist( new_site->apex_point( g[q].position ) ); // set initial clearance-disk
         add_vertex_in_edge(q, q_edges[m] );
     }
 }

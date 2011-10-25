@@ -218,7 +218,7 @@ public:
             r=d;
     }
     /// return distance to a point from this vertex
-    double dist(const Point& p) const { return (position-p).norm_sq(); }
+    double dist(const Point& p) const { return (position-p).norm(); }
     /// return clearance-disk radius
     double dist() const { return r; }
     /// in-circle predicate 

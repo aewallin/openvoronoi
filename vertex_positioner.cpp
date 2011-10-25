@@ -44,10 +44,15 @@ Point VertexPositioner::position(HEEdge e, Site* s) {
     HEFace twin_face = vd->g[twin].face;      assert( vd->g[twin_face].status == INCIDENT);
     
     std::cout << " position: " <<  vd->g[face].site->str() << " " << vd->g[twin_face].site->str() << " " << s->str() << "\n";
-    //std::cout << " k-vals: e.k = " <<  vd->g[e].k << " twin.k = " << vd->g[twin].k  << "\n";
-    //HEVertex src = vd->g.source(e);
-    //HEVertex trg = vd->g.target(e);
-    //std::cout << " edge.source= " << vd->g[src].position << " target= " << vd->g[trg].position << "\n";
+
+    std::cout << " k-vals: e.k = " <<  vd->g[e].k << " twin.k = " << vd->g[twin].k  << "\n";
+    HEVertex src = vd->g.source(e);
+    HEVertex trg = vd->g.target(e);
+    double t_src = vd->g[src].dist();
+    double t_trg = vd->g[trg].dist();
+    double t_min = std::min( t_src, t_trg );
+    double t_max = std::max( t_src, t_trg );
+    std::cout << " t-vals t_min= " << t_min << " t_max= " << t_max << "\n";
     
     Point p = position( vd->g[face].site  , vd->g[e].k, vd->g[twin_face].site  , vd->g[twin].k, s );
     

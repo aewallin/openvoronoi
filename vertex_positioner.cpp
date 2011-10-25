@@ -55,7 +55,7 @@ Point VertexPositioner::position(HEEdge e, Site* s) {
     std::cout << " t-vals t_min= " << t_min << " t_max= " << t_max << "\n";
     //if ( s->isPoint() )
         t_min = 0;
-        t_max = 100;
+        t_max = 1000000;
     std::cout << " clipped t-vals t_min= " << t_min << " t_max= " << t_max << "\n";
     
     Point p = position( vd->g[face].site  , vd->g[e].k, vd->g[twin_face].site  , vd->g[twin].k, s );
@@ -94,34 +94,37 @@ Point VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Site*
     // restrict to positive t-values below t_max
     std::vector<Point> pts;
     std::vector<double> k3s;
+    std::vector<double> ts;
     for (int m=0;m<count1;m++) {
-        std::cout << "+1 new: " << m << " :  ( " << solns1[m][0] << " , " << solns1[m][1] << " , " << solns1[m][2] << " )\n";
+        
         if ( (solns1[m][2] >= t_min) && (solns1[m][2] <= t_max) )  { // t-value
-            
+            std::cout << "+1 new: " << m << " :  ( " << solns1[m][0] << " , " << solns1[m][1] << " , " << solns1[m][2] << " )\n";
             pts.push_back( Point(solns1[m][0], solns1[m][1] ) );
             k3s.push_back( +1 );
+            ts.push_back( solns1[m][2] );
         }
     }
     for (int m=0;m<count2;m++) {
-        std::cout << "-1 new: " << m << " :  ( " << solns2[m][0] << " , " << solns2[m][1] << " , " << solns2[m][2] << " )\n";
+        
         if ( (solns2[m][2] >= t_min) && (solns2[m][2] <= t_max) )  { // t-value
-            
+            std::cout << "-1 new: " << m << " :  ( " << solns2[m][0] << " , " << solns2[m][1] << " , " << solns2[m][2] << " )\n";
             pts.push_back( Point(solns2[m][0], solns2[m][1] ) );
             k3s.push_back( -1  );
+            ts.push_back( solns2[m][2] );
         }
     }
     
     std::cout << "solutions: pts.size() = " << pts.size() << " count1=" << count1 << " count2=" << count2 << "\n";
     // further filtering here
     if ( pts.size() == 1) {
-        std::cout << " returning k3= " << k3s[0] << " pt= " << pts[0] << "\n";
+        std::cout << " returning k3= " << k3s[0] << " pt= " << pts[0] << " t=" << ts[0] << "\n";
         k3 = k3s[0];
         return pts[0];
     } else if (pts.size()>1) {
         for (unsigned int m=0;m<pts.size();m++)  {
             std::cout << m << " : " << pts[m] << "\n";
         }
-        std::cout << " returning k3= " << k3s[0] << " pt= " << pts[0] << "\n";
+        std::cout << " returning k3= " << k3s[0] << " pt= " << pts[0] << " t=" << ts[0] << "\n";
         k3 = k3s[0];
         return pts[0];
     } 

@@ -130,9 +130,9 @@ public:
     /// project onto line and return either the projected point
     /// or one endpoint of the linesegment
     virtual Point apex_point(const Point& p) {
-        Point s_q = p-_start;
+        Point s_p = p-_start;
         Point s_e = _end - _start;
-        double t = s_q.dot(s_e) / s_e.dot(s_e);
+        double t = s_p.dot(s_e) / s_e.dot(s_e);
         if (t<0)
             return _start;
         if (t>1)

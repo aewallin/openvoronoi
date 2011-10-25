@@ -52,7 +52,7 @@ class VD:
         self.vdtext_text = ""
         self.setVDText(vd)
         self.scale=scale
-        
+        self.clearance_disk = 0
         myscreen.addActor(self.vdtext)
     def setVertexRadius(self, r):
         self.vertexRadius=r
@@ -100,7 +100,7 @@ class VD:
             
         self.myscreen.render() 
     
-    def setVertices(self, vd, clearance_disk=0):
+    def setVertices(self, vd):
         for p in self.verts:
             self.myscreen.removeActor(p)
         self.verts = []
@@ -109,7 +109,7 @@ class VD:
             actor = Sphere( center=(p.x,p.y, 0), radius=self.vertexRadius, color=self.vertexColor )
             self.verts.append(actor)
             self.myscreen.addActor( actor )
-            if clearance_disk:
+            if self.clearance_disk:
                 #draw clearance-disk
                 cir_actor = Circle( center=(p.x,p.y,0), radius=pt[1]*self.scale, color=self.vertexColor )
                 self.verts.append(cir_actor)
@@ -161,7 +161,7 @@ class VD:
         
     def setAll(self, vd):
         self.setGenerators(vd)
-        self.setFar(vd)
+        #self.setFar(vd)
         #self.setVertices(vd)
         #self.setEdgesPolydata(vd)
         self.setEdges(vd)

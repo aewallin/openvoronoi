@@ -175,7 +175,7 @@ int VoronoiDiagram::insert_point_site(const Point& p) {
     HEFace newface = add_new_face( g[new_vert].site );
     remove_vertex_set( newface );
     g[new_vert].face = newface;
-
+    
     reset_status();
     assert( vd_checker->isValid() );
     return g[new_vert].index;
@@ -214,14 +214,15 @@ void VoronoiDiagram::insert_line_site(int idx1, int idx2) {
     std::cout << "   seed  = " << v_seed << " " << g[v_seed].position << "\n";
     augment_vertex_set(v_seed, line_site );
     std::cout << "   after augment: v0.size() = " << v0.size() << "\n";
-    add_new_vertices( line_site );    
-    HEFace newface = add_new_face( line_site );
-    remove_vertex_set( newface );
+    add_new_vertices( line_site );  
+      
+    //HEFace newface = add_new_face( line_site );
+    //remove_vertex_set( newface );
     
     //g[new_vert].face = newface;
     
     reset_status();
-    assert( vd_checker->isValid() );
+    //assert( vd_checker->isValid() );
     return; // g[new_vert].index;
 
 }

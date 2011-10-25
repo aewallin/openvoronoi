@@ -39,7 +39,7 @@ public:
     /// calculate the position of a new voronoi-vertex lying on the given edge
     /// with the given new site 
     Point position( HEEdge e, Site* s);
-
+    double get_k3() const {return k3;}
 private:
     inline double sq(double x) {return x*x;}
     /// point-point-point positioner
@@ -74,6 +74,9 @@ private:
     double error(HEEdge e, const Point& p, HEVertex v);
 // DATA
     VoronoiDiagram* vd;
+    double t_min;
+    double t_max;
+    double k3; // the offset-direction to the new site
 };
 
 

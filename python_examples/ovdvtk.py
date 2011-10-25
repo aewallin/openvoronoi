@@ -54,6 +54,8 @@ class VD:
         self.scale=scale
         
         myscreen.addActor(self.vdtext)
+    def setVertexRadius(self, r):
+        self.vertexRadius=r
         
     def setVDText(self, vd):
         self.Ngen = len( vd.getGenerators() )-3
@@ -109,7 +111,7 @@ class VD:
             self.myscreen.addActor( actor )
             if clearance_disk:
                 #draw clearance-disk
-                cir_actor = Circle( center=(p.x,p.y,0), radius=math.sqrt(pt[1])*self.scale, color=self.vertexColor )
+                cir_actor = Circle( center=(p.x,p.y,0), radius=pt[1]*self.scale, color=self.vertexColor )
                 self.verts.append(cir_actor)
                 self.myscreen.addActor(cir_actor)
             

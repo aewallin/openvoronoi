@@ -50,9 +50,13 @@ Point VertexPositioner::position(HEEdge e, Site* s) {
     HEVertex trg = vd->g.target(e);
     double t_src = vd->g[src].dist();
     double t_trg = vd->g[trg].dist();
-    double t_min = std::min( t_src, t_trg );
-    double t_max = std::max( t_src, t_trg );
+    t_min = std::min( t_src, t_trg );
+    t_max = std::max( t_src, t_trg );
     std::cout << " t-vals t_min= " << t_min << " t_max= " << t_max << "\n";
+    //if ( s->isPoint() )
+        t_min = 0;
+        t_max = 100;
+    std::cout << " clipped t-vals t_min= " << t_min << " t_max= " << t_max << "\n";
     
     Point p = position( vd->g[face].site  , vd->g[e].k, vd->g[twin_face].site  , vd->g[twin].k, s );
     
@@ -73,7 +77,6 @@ Point VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Site*
     assert( (k1==1) || (k1 == -1) );
     assert( (k2==1) || (k2 == -1) );
     
-    
     int count1=0,count2=0;
     double solns1[2][3];
     double solns2[2][3];
@@ -83,32 +86,50 @@ Point VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Site*
         count1 =  lll_solver(s1,s2,s3);
     else {
         count1 = solver(s1,k1,s2,k2,s3,+1, solns1);
-        if (!s3->isPoint())
-            count2 = solver(s1,k1,s2,k2,s3,-1, solns2);
+        if (!s3->isPoint()) // for points k3=+1 allways
+            count2 = solver(s1,k1,s2,k2,s3,-1, solns2); // for lineSite or ArcSite we may try k3=-1 also
     }
     //std::cout << count << " solutions found by solver \n";
+    
+    // restrict to positive t-values below t_max
     std::vector<Point> pts;
+    std::vector<double> k3s;
     for (int m=0;m<count1;m++) {
-        if ( solns1[m][2] > 0 )  { // t-value
+        std::cout << "+1 new: " << m << " :  ( " << solns1[m][0] << " , " << solns1[m][1] << " , " << solns1[m][2] << " )\n";
+        if ( (solns1[m][2] >= t_min) && (solns1[m][2] <= t_max) )  { // t-value
+            
             pts.push_back( Point(solns1[m][0], solns1[m][1] ) );
-            std::cout << "+1 new: " << m << " :  ( " << solns1[m][0] << " , " << solns1[m][1] << " , " << solns1[m][2] << " )\n";
+            k3s.push_back( +1 );
         }
     }
-    
     for (int m=0;m<count2;m++) {
-        if ( solns2[m][2] > 0 )  { // t-value
+        std::cout << "-1 new: " << m << " :  ( " << solns2[m][0] << " , " << solns2[m][1] << " , " << solns2[m][2] << " )\n";
+        if ( (solns2[m][2] >= t_min) && (solns2[m][2] <= t_max) )  { // t-value
+            
             pts.push_back( Point(solns2[m][0], solns2[m][1] ) );
-            std::cout << "-1 new: " << m << " :  ( " << solns2[m][0] << " , " << solns2[m][1] << " , " << solns2[m][2] << " )\n";
+            k3s.push_back( -1  );
         }
     }
-    if (pts.size()!=1)
-        std::cout << "error pts.size() = " << pts.size() << " count1=" << count1 << " count2=" << count2 << "\n";
-    // after filtering only one point should remain
-    assert( pts.size() == 1);
     
-    //Point pt = ppp_solver( s1->position(), s2->position(), s3->position() );
-    //std::cout << " old: " << pt << "\n";
-    return pts[0];
+    std::cout << "solutions: pts.size() = " << pts.size() << " count1=" << count1 << " count2=" << count2 << "\n";
+    // further filtering here
+    if ( pts.size() == 1) {
+        std::cout << " returning k3= " << k3s[0] << " pt= " << pts[0] << "\n";
+        k3 = k3s[0];
+        return pts[0];
+    } else if (pts.size()>1) {
+        for (unsigned int m=0;m<pts.size();m++)  {
+            std::cout << m << " : " << pts[m] << "\n";
+        }
+        std::cout << " returning k3= " << k3s[0] << " pt= " << pts[0] << "\n";
+        k3 = k3s[0];
+        return pts[0];
+    } 
+    
+    
+    std::cout << " NO solutions found!\n";
+    assert(0);
+    return Point(0,0);
 }
 
 int VertexPositioner::solver(Site* s1, double k1, Site* s2, double k2, Site* s3, double k3, double solns[][3] ) {

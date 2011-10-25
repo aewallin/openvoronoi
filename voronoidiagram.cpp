@@ -317,6 +317,7 @@ void VoronoiDiagram::add_new_vertices( Site* new_site ) {
         g[q].status = NEW;
         modified_vertices.push_back(q);
         g[q].position = vpos->position( q_edges[m], new_site ); // set position
+        g[q].k3 = vpos->get_k3();
         g[q].init_dist( new_site->apex_point( g[q].position ) ); // set clearance-disk
         //g.insert_vertex_in_edge( q, q_edges[m] );
         add_vertex_in_edge(q, q_edges[m] );
@@ -407,8 +408,8 @@ void VoronoiDiagram::add_new_edge(HEFace newface, HEFace f) {
     HEVertex new_source; // this Vertex is found as OUT-NEW-IN
     HEVertex new_target; // this Vertex is found as IN-NEW-OUT
     HEEdge new_previous, new_next, twin_next, twin_previous;
-    boost::tie( new_previous, new_source, twin_next) = find_new_vertex(f, OUT);
-    boost::tie( twin_previous, new_target, new_next) = find_new_vertex(f, IN);
+    boost::tie( new_previous, new_source, twin_next) = find_new_vertex(f, OUT); // NEW->OUT vertex
+    boost::tie( twin_previous, new_target, new_next) = find_new_vertex(f, IN);  // NEW->IN  vertex
     // now connect:   new_previous -> new_source -> new_target -> new_next
     // and:              twin_next <- new_source <- new_target <- twin_previous    
     HEEdge e_new = g.add_edge( new_source, new_target );
@@ -420,7 +421,16 @@ void VoronoiDiagram::add_new_edge(HEFace newface, HEFace f) {
     // the twin edge that bounds the new face
     HEEdge e_twin = g.add_edge( new_target, new_source );
     g[e_twin].next = twin_next; 
-    g[e_twin].k = g[twin_next].k;
+    
+    // the NEW vertice were generated with vpos, which has set the offset direction k3
+    /*
+    if ( g[new_target].k3 != g[new_source].k3 ) {
+        std::cout << " Error: g[new_target].k3= " << g[new_target].k3 << " g[new_source].k3 " << g[new_source].k3 << "\n";
+        std::cout << " Error: g[new_target].position= " << g[new_target].position << " g[new_source].position " << g[new_source].position << "\n";
+    }
+    assert( g[new_target].k3 == g[new_source].k3 );
+    */
+    g[e_twin].k = g[new_source].k3; //g[twin_next].k;
     g[e_twin].face = newface;
     g[twin_previous].next = e_twin;
     g[newface].edge = e_twin; 

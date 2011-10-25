@@ -110,7 +110,6 @@ typedef boost::adjacency_list_traits<OUT_EDGE_CONTAINER,
                                      EDGE_LIST_CONTAINER >::edge_descriptor HEEdge;
 // type of face-descriptors in the graph
 typedef unsigned int HEFace;    
-                        
 
 /// properties of an edge in the voronoi diagram
 /// each edge stores a pointer to the next HEEdge 

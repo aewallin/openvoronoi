@@ -225,6 +225,7 @@ public:
     double in_circle(const Point& p) const { return dist(p) - r; }
     /// if this vertex is a PointSite, then we store a pointer to the site here.
     Site* site;
+    double k3; // the offset-direction to the newly inserted site..
 protected:
     /// global vertex count
     static int count;
@@ -232,6 +233,7 @@ protected:
     static VertexDegreeMap expected_degree;
     /// clearance-disk radius, i.e. the closest site is at this distance
     double r;
+    
 };
 
 

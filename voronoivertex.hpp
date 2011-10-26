@@ -79,6 +79,7 @@ public:
     virtual double k() {assert(0); return 0;}
     virtual std::string str() const {return "Site";}
     virtual bool isPoint() {return false;}
+    virtual bool in_region(const Point& p) {return false;}
 protected:
     Eqp eq;
 };
@@ -104,6 +105,7 @@ public:
     virtual double k() {return 0;}
     virtual bool isPoint() {return true;}
     virtual std::string str() const {return "PointSite";}
+    virtual bool in_region(const Point& p) {return true;}
 private:
     PointSite() {} // don't use!
     Point _p;
@@ -146,6 +148,21 @@ public:
         return _start; // FIXME!!
     }
     virtual std::string str() const {return "LineSite";}
+    virtual bool in_region(const Point& p) {
+        Point s_p = p-_start;
+        Point s_e = _end - _start;
+        double t = s_p.dot(s_e) / s_e.dot(s_e);
+        
+        // rounding... UGLY
+        double eps = 1e-11;
+        if (fabs(t) < eps) 
+            t= 0;
+        else if ( fabs(t-1.0) < eps )
+            t= 1;
+        
+        //std::cout << "in_region t= " << t << "\n";
+        return ( (t>=0) && (t<=1) );
+    }
 private:
     LineSite() {} // don't use!
     Point _start;

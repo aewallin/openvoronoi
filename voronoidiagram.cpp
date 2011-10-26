@@ -344,7 +344,7 @@ HEVertex VoronoiDiagram::find_seed_vertex(HEFace f, Site* site) const { //const 
     BOOST_FOREACH( HEVertex q, face_verts) { // go thorugh all the vertices and find the one with smallest detH
         if ( g[q].status != OUT ) {
             double h = g[q].in_circle( site->apex_point( g[q].position ) ); 
-            if ( first || (h<minPred) ) {
+            if ( first || ( (h<minPred) && (site->in_region(g[q].position) ) ) ) {
                 minPred = h;
                 minimalVertex = q;
                 first = false;
@@ -371,11 +371,12 @@ void VoronoiDiagram::augment_vertex_set( HEVertex& v_seed, Site* site ) {
         double h;
         boost::tie( v, h ) = vertexQueue.top();      assert( g.g[v].status == UNDECIDED );
         vertexQueue.pop(); 
-        if ( h < 0.0 ) { // mark IN if detH<0 and passes (C4) and (C5) tests. otherwise mark OUT
-            if ( predicate_c4(v) || !predicate_c5(v) ) 
+        if ( h < 0.0 ) { // mark IN if detH<0 and passes (C4) and (C5) tests and in_region(). otherwise mark OUT
+            if ( predicate_c4(v) || !predicate_c5(v) || !site->in_region(g[v].position) ) 
                 g[v].status = OUT; // C4 or C5 violated, so mark OUT
-            else
+            else {
                 mark_vertex( v,  site); // h<0 and no violations, so mark IN. push adjacent UNDECIDED vertices onto Q.
+            }
         } else { 
             g[v].status = OUT; // detH was positive (or zero), so mark OUT
         }

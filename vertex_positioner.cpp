@@ -96,19 +96,21 @@ Point VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Site*
     std::vector<double> k3s;
     std::vector<double> ts;
     for (int m=0;m<count1;m++) {
-        
-        if ( (solns1[m][2] >= t_min) && (solns1[m][2] <= t_max) )  { // t-value
-            std::cout << "+1 new: " << m << " :  ( " << solns1[m][0] << " , " << solns1[m][1] << " , " << solns1[m][2] << " )\n";
+        Point pt(solns1[m][0], solns1[m][1] ) ;
+        std::cout << "+1 new: " << m << " :  ( " << solns1[m][0] << " , " << solns1[m][1] << " , " << solns1[m][2] << " in_region=" << s3->in_region(pt) << " )\n";
+        if ( (solns1[m][2] >= t_min) && (solns1[m][2] <= t_max) && s3->in_region(pt) )  { // t-value
+            //std::cout << "+1 new: " << m << " :  ( " << solns1[m][0] << " , " << solns1[m][1] << " , " << solns1[m][2] << " )\n";
             pts.push_back( Point(solns1[m][0], solns1[m][1] ) );
             k3s.push_back( +1 );
             ts.push_back( solns1[m][2] );
         }
     }
     for (int m=0;m<count2;m++) {
-        
-        if ( (solns2[m][2] >= t_min) && (solns2[m][2] <= t_max) )  { // t-value
-            std::cout << "-1 new: " << m << " :  ( " << solns2[m][0] << " , " << solns2[m][1] << " , " << solns2[m][2] << " )\n";
-            pts.push_back( Point(solns2[m][0], solns2[m][1] ) );
+        Point pt(solns2[m][0], solns2[m][1] ) ;
+        std::cout << "-1 new: " << m << " :  ( " << solns2[m][0] << " , " << solns2[m][1] << " , " << solns2[m][2] << " in_region=" << s3->in_region(pt) << " )\n";
+        if ( (solns2[m][2] >= t_min) && (solns2[m][2] <= t_max) && s3->in_region(pt) )  { // t-value
+            //std::cout << "-1 new: " << m << " :  ( " << solns2[m][0] << " , " << solns2[m][1] << " , " << solns2[m][2] << " in_region=" << s3->in_region(pt) << " )\n";
+            pts.push_back( pt );
             k3s.push_back( -1  );
             ts.push_back( solns2[m][2] );
         }
@@ -122,7 +124,7 @@ Point VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Site*
         return pts[0];
     } else if (pts.size()>1) {
         for (unsigned int m=0;m<pts.size();m++)  {
-            std::cout << m << " : " << pts[m] << "\n";
+            std::cout << m << " : " << pts[m] << " in_region= " << s3->in_region(pts[m]) << "\n";
         }
         std::cout << " returning k3= " << k3s[0] << " pt= " << pts[0] << " t=" << ts[0] << "\n";
         k3 = k3s[0];

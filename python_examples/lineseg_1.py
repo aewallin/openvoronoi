@@ -123,7 +123,7 @@ if __name__ == "__main__":
     #id3 = id_list[2]
     #id4 = id_list[3]
     print "add segment ",id1, " to ", id2
-    vd.addLineSite( id1, id2 )
+    vd.addLineSite3( id1, id2 )
     drawLine(myscreen, plist[0], plist[1] )
     
     #vd.addLineSite( id3, id4 )

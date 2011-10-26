@@ -69,6 +69,9 @@ class VoronoiDiagram {
         int insert_point_site(const Point& p);
         /// insert a line-segment site into the diagram
         void insert_line_site(int idx1, int idx2);
+        void insert_line_site1(int idx1, int idx2);
+        void insert_line_site2(int idx1, int idx2);
+        void insert_line_site3(int idx1, int idx2);
         /// string repr
         std::string print() const;
         /// return the far radius

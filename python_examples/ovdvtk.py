@@ -42,8 +42,9 @@ class VD:
         self.far=[]
         self.edges =[]
         self.gens =[]
-        self.generatorColor = green
-        self.vertexColor = red
+        self.generatorColor = yellow
+        self.vertexColor = blue
+        self.seedColor = pink
         self.edgeColor = cyan
         self.vdtext  = Text()
         self.vertexRadius = scale/50
@@ -106,9 +107,19 @@ class VD:
         self.verts = []
         for pt in vd.getVoronoiVertices():
             p = self.scale*pt[0]
-            actor = Sphere( center=(p.x,p.y, 0), radius=self.vertexRadius, color=self.vertexColor )
+            vcolor = cyan
+            status = pt[2]
+            if status == ovd.VoronoiVertexStatus.IN:
+                vcolor = red
+            elif status == ovd.VoronoiVertexStatus.NEW:
+                vcolor = green
+            elif status == ovd.VoronoiVertexStatus.OUT:
+                vcolor = blue
+            actor = Sphere( center=(p.x,p.y, 0), radius=self.vertexRadius, color=vcolor )
             self.verts.append(actor)
             self.myscreen.addActor( actor )
+            
+            
             if self.clearance_disk:
                 #draw clearance-disk
                 cir_actor = Circle( center=(p.x,p.y,0), radius=pt[1]*self.scale, color=self.vertexColor )
@@ -162,7 +173,7 @@ class VD:
     def setAll(self, vd):
         self.setGenerators(vd)
         #self.setFar(vd)
-        #self.setVertices(vd)
+        self.setVertices(vd)
         #self.setEdgesPolydata(vd)
         self.setEdges(vd)
         

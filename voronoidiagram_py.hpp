@@ -120,6 +120,7 @@ class VoronoiDiagram_py : public VoronoiDiagram {
                     boost::python::list pd;
                     pd.append( g[v].position );
                     pd.append( g[v].dist() );
+                    pd.append( g[v].status );
                     plist.append(pd);
                 }
             }

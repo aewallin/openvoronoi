@@ -180,6 +180,113 @@ int VoronoiDiagram::insert_point_site(const Point& p) {
     assert( vd_checker->isValid() );
     return g[new_vert].index;
 }
+void VoronoiDiagram::insert_line_site1(int idx1, int idx2) {
+    // find the vertices corresponding to idx1 and idx2
+    HEVertex start, end;
+    bool start_found=false;
+    bool end_found=false;
+    BOOST_FOREACH( HEVertex v, g.vertices() ) {
+        if ( g[v].index == idx1 ) {
+            start = v;
+            start_found = true;
+        }
+        if (g[v].index == idx2) {
+            end = v;
+            end_found = true;
+        }
+    }
+    assert(start_found);
+    assert(end_found);
+    std::cout << " found startvert = " << start << " " << g[start].position <<"\n";
+    std::cout << "   found endvert = " << end << " " << g[end].position << "\n";
+    
+    g[start].type=ENDPOINT; 
+    g[start].status=OUT; 
+    g[end].type=ENDPOINT; 
+    g[end].status=OUT; 
+    
+    LineSite* line_site = new LineSite( g[start].position, g[end].position) ;
+    // seed-face is face of start-point
+    HEFace closest_face = g[start].face; 
+    // seed 
+    HEVertex v_seed = find_seed_vertex(closest_face, line_site ) ;
+    g[v_seed].status = IN;
+    
+    std::cout << "   seed  = " << v_seed << " " << g[v_seed].position << "\n";
+}
+
+void VoronoiDiagram::insert_line_site2(int idx1, int idx2) {
+    // find the vertices corresponding to idx1 and idx2
+    HEVertex start, end;
+    bool start_found=false;
+    bool end_found=false;
+    BOOST_FOREACH( HEVertex v, g.vertices() ) {
+        if ( g[v].index == idx1 ) {
+            start = v;
+            start_found = true;
+        }
+        if (g[v].index == idx2) {
+            end = v;
+            end_found = true;
+        }
+    }
+    assert(start_found);
+    assert(end_found);
+    std::cout << " found startvert = " << start << " " << g[start].position <<"\n";
+    std::cout << "   found endvert = " << end << " " << g[end].position << "\n";
+    
+    g[start].type=ENDPOINT; 
+    g[start].status=OUT; 
+    g[end].type=ENDPOINT; 
+    g[end].status=OUT; 
+    
+    LineSite* line_site = new LineSite( g[start].position, g[end].position) ;
+    // seed-face is face of start-point
+    HEFace closest_face = g[start].face; 
+    // seed 
+    HEVertex v_seed = find_seed_vertex(closest_face, line_site ) ;
+    std::cout << "   seed  = " << v_seed << " " << g[v_seed].position << "\n";
+    augment_vertex_set(v_seed, line_site );
+    std::cout << "   after augment: v0.size() = " << v0.size() << "\n";
+    
+    
+}
+
+void VoronoiDiagram::insert_line_site3(int idx1, int idx2) {
+    // find the vertices corresponding to idx1 and idx2
+    HEVertex start, end;
+    bool start_found=false;
+    bool end_found=false;
+    BOOST_FOREACH( HEVertex v, g.vertices() ) {
+        if ( g[v].index == idx1 ) {
+            start = v;
+            start_found = true;
+        }
+        if (g[v].index == idx2) {
+            end = v;
+            end_found = true;
+        }
+    }
+    assert(start_found);
+    assert(end_found);
+    std::cout << " found startvert = " << start << " " << g[start].position <<"\n";
+    std::cout << "   found endvert = " << end << " " << g[end].position << "\n";
+    
+    g[start].type=ENDPOINT; 
+    g[start].status=OUT; 
+    g[end].type=ENDPOINT; 
+    g[end].status=OUT; 
+    
+    LineSite* line_site = new LineSite( g[start].position, g[end].position) ;
+    // seed-face is face of start-point
+    HEFace closest_face = g[start].face; 
+    // seed 
+    HEVertex v_seed = find_seed_vertex(closest_face, line_site ) ;
+    augment_vertex_set(v_seed, line_site );
+    std::cout << "   after augment: v0.size() = " << v0.size() << "\n";
+    add_new_vertices( line_site ); 
+    
+}
 
 void VoronoiDiagram::insert_line_site(int idx1, int idx2) {
     // find the vertices corresponding to idx1 and idx2

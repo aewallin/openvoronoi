@@ -68,7 +68,13 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         .value("INCIDENT", INCIDENT)
         .value("NONINCIDENT", NONINCIDENT)
     ;
-        bp::class_<Point>("Point") 
+    bp::enum_<VoronoiEdgeType>("VoronoiEdgeType")
+        .value("LINE", LINE)
+        .value("PARABOLA", PARABOLA)
+        .value("ELLIPSE", ELLIPSE)
+        .value("HYPERBOLA", HYPERBOLA)
+    ;
+    bp::class_<Point>("Point") 
         .def(bp::init<double, double>())
         .def(bp::init<Point>())
         .def(bp::other<double>() * bp::self)

@@ -124,6 +124,9 @@ void VoronoiDiagram::initialize() {
     g[e9].next = e7;
     g[g2].face = f3;
     
+    //v0-v2 edge e1(e9) has gen3 and gen2 as neighbors
+
+    
     // twin edges
     g[e1].twin = e9;
     g[e9].twin = e1;
@@ -517,11 +520,15 @@ void VoronoiDiagram::add_new_edge(HEFace newface, HEFace f) {
     HEVertex new_source; // this Vertex is found as OUT-NEW-IN
     HEVertex new_target; // this Vertex is found as IN-NEW-OUT
     HEEdge new_previous, new_next, twin_next, twin_previous;
+    Site* f_site = g[f].site;
+    Site* new_site = g[newface].site;
+    
     boost::tie( new_previous, new_source, twin_next) = find_new_vertex(f, OUT); // NEW->OUT vertex
     boost::tie( twin_previous, new_target, new_next) = find_new_vertex(f, IN);  // NEW->IN  vertex
     // now connect:   new_previous -> new_source -> new_target -> new_next
     // and:              twin_next <- new_source <- new_target <- twin_previous    
     HEEdge e_new = g.add_edge( new_source, new_target );
+    g[e_new].set_parameters( f_site, new_site );
     g[e_new].next = new_next;
     g[e_new].k = g[new_next].k; // the next edge is on the same face, so has the correct k-value
     g[e_new].face = f;
@@ -529,6 +536,10 @@ void VoronoiDiagram::add_new_edge(HEFace newface, HEFace f) {
     g[f].edge = e_new; 
     // the twin edge that bounds the new face
     HEEdge e_twin = g.add_edge( new_target, new_source );
+    
+    g[e_twin].set_parameters( new_site, f_site );
+    std::cout << g[e_new].type << "\n";
+    
     g[e_twin].next = twin_next; 
     
     // the NEW vertice were generated with vpos, which has set the offset direction k3

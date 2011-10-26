@@ -148,6 +148,7 @@ class VoronoiDiagram_py : public VoronoiDiagram {
                     HEVertex v2 = g.target( edge );
                     point_list.append( g[v1].position );
                     point_list.append( g[v2].position );
+                    point_list.append( g[edge].type );
                     edge_list.append(point_list);
             }
             return edge_list;

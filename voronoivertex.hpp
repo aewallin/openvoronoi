@@ -55,7 +55,6 @@ typedef std::map<VoronoiVertexType, unsigned int> VertexDegreeMap;
 /// circle: (1, -2x, -2y, -2kr, x*x+y*y-r*r)    circle center at (x,y) and radius r
 /// point:  (1, -2x, -2y,    0, x*x+y*y    )    point at (x,y)
 struct Eqp {
-    int q; // q=1 for quadratic, q=0 for linear eqn
     double a;
     double b;
     double c;
@@ -71,14 +70,20 @@ public:
     virtual Point apex_point(const Point& p) = 0;
     virtual const Point position() const = 0;
     Eqp eqp() {return eq;} 
-    bool is_linear() {return (eq.q==0); }
+    bool is_linear() {return isLine(); }
     
-    virtual double x() {assert(0); return 0;}
-    virtual double y() {assert(0); return 0;}
-    virtual double r() {assert(0); return 0;}
-    virtual double k() {assert(0); return 0;}
-    virtual std::string str() const {return "Site";}
-    virtual bool isPoint() {return false;}
+    virtual double x() const {assert(0); return 0;}
+    virtual double y() const {assert(0); return 0;}
+    virtual double r() const {assert(0); return 0;}
+    virtual double k() const {assert(0); return 0;}
+
+    virtual double a() const {assert(0); return 0;}
+    virtual double b() const {assert(0); return 0;}
+    virtual double c() const {assert(0); return 0;}
+    
+    virtual std::string str() const {assert(0); return "Site";}
+    virtual bool isPoint() const { return false;}
+    virtual bool isLine() const {  return false;}
     virtual bool in_region(const Point& p) {return false;}
 protected:
     Eqp eq;
@@ -88,7 +93,7 @@ protected:
 class PointSite : public Site {
 public:
     PointSite( const Point& p): _p(p) {
-        eq.q = 1;
+        //eq.q = 1;
         eq.a = -2*p.x;
         eq.b = -2*p.y;
         eq.k = 0;
@@ -99,11 +104,11 @@ public:
     virtual const Point position() const {
         return _p;
     }
-    virtual double x() {return _p.x;}
-    virtual double y() {return _p.y;}
-    virtual double r() {return 0;}
-    virtual double k() {return 0;}
-    virtual bool isPoint() {return true;}
+    virtual double x() const {return _p.x;}
+    virtual double y() const {return _p.y;}
+    virtual double r() const {return 0;}
+    virtual double k() const {return 0;}
+    virtual bool isPoint() const {return true;}
     virtual std::string str() const {return "PointSite";}
     virtual bool in_region(const Point& p) {return true;}
 private:
@@ -116,7 +121,7 @@ class LineSite : public Site {
 public:
     /// create line-site between start and end Point.
     LineSite( const Point& s, const Point& e): _start(s), _end(e) {
-        eq.q = 0;
+        //eq.q = 0;
         eq.a = _end.y - _start.y;
         eq.b = _start.x - _end.x;
         eq.k = 1; // ??
@@ -163,6 +168,11 @@ public:
         //std::cout << "in_region t= " << t << "\n";
         return ( (t>=0) && (t<=1) );
     }
+    virtual bool isLine() const {return true;}
+    virtual double a() const { return eq.a; }
+    virtual double b() const { return eq.b; }
+    virtual double c() const { return eq.c; }
+
 private:
     LineSite() {} // don't use!
     Point _start;
@@ -174,7 +184,7 @@ class ArcSite : public Site {
 public:
     ArcSite( const Point& s, const Point& e, const Point& c, bool dir): _start(s), _end(e), _center(c), _dir(dir) {
         _radius = (_center - _start).norm();
-        eq.q = 1;
+        //eq.q = 1;
         eq.a = -2*_center.x;
         eq.b = -2*_center.y;
         eq.k = -2*_radius; // ?? k
@@ -184,10 +194,10 @@ public:
     Point apex_point(const Point& p) {
         return Point(0,0); // FIXME
     }
-    virtual double x() {return _center.x;}
-    virtual double y() {return _center.y;}
-    virtual double r() {return _radius;}
-    virtual double k() {return 1;} // ?
+    virtual double x() const {return _center.x;}
+    virtual double y() const {return _center.y;}
+    virtual double r() const {return _radius;}
+    virtual double k() const {return 1;} // ?
     virtual std::string str() const {return "ArcSite";}
 private:
     ArcSite() {} // don't use!

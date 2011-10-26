@@ -111,6 +111,18 @@ typedef boost::adjacency_list_traits<OUT_EDGE_CONTAINER,
 // type of face-descriptors in the graph
 typedef unsigned int HEFace;    
 
+/*
+ * bisector formulas
+ * x = x1 - x2 - x3*t +/- x4 * sqrt( square(x5+x6*t) - square(x7+x8*t) )
+ * (same formula for y-coordinate)
+ * line (line/line)
+ * parabola (circle/line)
+ * hyperbola (circle/circle)
+ * ellipse (circle/circle)
+*/
+                            
+enum VoronoiEdgeType {LINE, PARABOLA, ELLIPSE, HYPERBOLA};
+
 /// properties of an edge in the voronoi diagram
 /// each edge stores a pointer to the next HEEdge 
 /// and the HEFace to which this HEEdge belongs
@@ -126,7 +138,86 @@ struct EdgeProps {
     /// the face to which this edge belongs
     HEFace face; // each face corresponds to an input Site/generator
     double k; // offset-direction from the adjacent site, either +1 or -1
+    VoronoiEdgeType type;
+    Point point(double t) const {
+        double xc = x[0] - x[1] - x[2]*t + x[3] * sqrt( (x[4]+x[5]*t)*(x[4]+x[5]*t) - (x[6]+x[7]*t)*(x[6]+x[7]*t) );
+        double yc = y[0] - y[1] - y[2]*t + y[3] * sqrt( (y[4]+y[5]*t)*(y[4]+y[5]*t) - (y[6]+y[7]*t)*(y[6]+y[7]*t) );
+        return Point(xc,yc);
+    }
+    double x[8];
+    double y[8];
+    void set_parameters(Site* s1, Site* s2) {
+        if (s1->isPoint() && s2->isPoint())        // PP
+            set_pp_parameters(s1,s2);
+        else if (s1->isPoint() && s2->isLine())    // PL
+            set_pl_parameters(s1,s2);
+        else if (s2->isPoint() && s1->isLine())    // LP
+            set_pl_parameters(s2,s1);
+        else if (s1->isLine() && s2->isLine())     // LL
+            set_ll_parameters(s2,s1);
+            
+            // AP
+            // PA
+            // AA
+            // AL
+            // LA
+    }
+    // called for point(s1)-point(s2) edges
+    void set_pp_parameters(Site* s1, Site* s2) {
+        std::cout << " set_pp \n";
+        type = LINE;
+    }
+    // called for point(s1)-line(s2) edges
+    void set_pl_parameters(Site* s1, Site* s2) {
+        std::cout << " set_pl \n";
+        type = PARABOLA;
+        double alfa3 = s2->a()*s1->x() + s2->b()*s1->y() + s2->c();
+        x[0]=s1->x();       // xc1
+        x[1]=s2->a()*alfa3; // alfa1*alfa3
+        x[2]=-s2->a();      // -alfa1 = - a2
+        x[3]=s2->b();       // alfa2 = b2
+        x[4]=0;             // alfa4 = r1 
+        x[5]=+1;            // lambda1
+        x[6]= alfa3;        // alfa3= a2*xc1+b2*yc1+d2?
+        x[7]=-1;            // -1 
+
+        y[0]=s1->y();       // yc1
+        y[1]=s2->b()*alfa3; // alfa2*alfa3
+        y[2]=-s2->b();      // -alfa2
+        y[3]=s2->a();       // alfa1
+        y[4]=0;             // alfa4 = r1
+        y[5]=+1;            // lambda1
+        y[6]=alfa3;         // alfa3
+        y[7]=-1;            // -1
+    }
+    // line(s1)-line(s2) edge
+    void set_ll_parameters(Site* s1, Site* s2) {  // Held thesis p96
+        std::cout << " set_ll \n";
+        type = LINE;
+        double delta = s1->a()*s2->b() - s1->b()*s2->a();
+        assert( delta != 0 );
+        x[0]= ( (s1->b() * s2->c()) - (s2->b() * s1->c()) ) / delta;  // alfa1 = (b1*d2-b2*d1) / delta
+        x[1]=0;
+        x[2]= -(s2->b()-s1->b()); // -alfa3 = -( b2-b1 )
+        x[3]=0;
+        x[4]=0;
+        x[5]=0;
+        x[6]=0;
+        x[7]=0;
+        
+        y[0]= ( (s2->a()*s1->c()) - (s1->a()*s2->c()) ) / delta;  // alfa2 = (a2*d1-a1*d2) / delta
+        y[1]= 0;
+        y[2]= -(s1->a()-s2->a());  // -alfa4 = -( a1-a2 )
+        y[3]=0;
+        y[4]=0;
+        y[5]=0;
+        y[6]=0;
+        y[7]=0;
+        y[8]=0;
+    }
+    // arc: d=sqrt( sq(xc1-xc2) + sq(yc1-yc2) )
 };
+
 
 /// Status of faces in the voronoi diagram
 /// INCIDENT faces contain one or more IN-vertex

@@ -323,8 +323,8 @@ void VoronoiDiagram::insert_line_site(int idx1, int idx2) {
     std::cout << "   after augment: v0.size() = " << v0.size() << "\n";
     add_new_vertices( line_site );  
       
-    //HEFace newface = add_new_face( line_site );
-    //remove_vertex_set( newface );
+    HEFace newface = add_new_face( line_site );
+    remove_vertex_set( newface );
     
     //g[new_vert].face = newface;
     

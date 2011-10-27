@@ -345,7 +345,7 @@ void VoronoiDiagram::insert_line_site(int idx1, int idx2) {
     add_separator(start_face, line_site, start);
     add_separator(end_face, line_site, end);
     
-    // add_new_face( line_site );
+    add_new_face( line_site );
     
     //HEFace newface = add_new_face( line_site );
     //remove_vertex_set( newface );
@@ -409,6 +409,9 @@ void VoronoiDiagram::add_separator(HEFace f, Site* s, HEVertex endp) {
     HEEdge e2_tw = g.add_edge( v2, endp );
     HEEdge e1 = g.add_edge( endp, v1 );
     HEEdge e1_tw = g.add_edge( v1, endp );
+    // set these for new edges: next, face, twin, k
+    
+    // twin
     g.twin_edges(e1,e1_tw);
     g.twin_edges(e2,e2_tw);
     
@@ -417,10 +420,16 @@ void VoronoiDiagram::add_separator(HEFace f, Site* s, HEVertex endp) {
     g[e1].type = SEPARATOR;
     g[e1_tw].type = SEPARATOR;
     
+    // face
     g[e2].face = f;
     g[e1_tw].face = f;
     g[f].edge = e2;
-    // next, face, twin, k
+    
+    // k
+    g[e2].k    = g[v2].k3;
+    g[e2_tw].k = g[v2].k3;
+    g[e1].k    = g[v1].k3;
+    g[e1_tw].k = g[v1].k3;
     
     // next-pointers for endpoint-face
     g[v1_previous].next = e1_tw;
@@ -605,8 +614,6 @@ void VoronoiDiagram::add_vertex_in_edge( HEVertex v, HEEdge e) {
     // finally, remove the old edge
     g.remove_edge(e);
     g.remove_edge(twin);
-    //boost::remove_edge( e   , g);
-    //boost::remove_edge( twin, g);
 }
 
 // add a new face corresponding to the new Site
@@ -618,7 +625,8 @@ HEFace VoronoiDiagram::add_new_face(Site* s) {
     if (s->isPoint() )
         fgrid->add_face( g[newface] ); 
     BOOST_FOREACH( HEFace f, incident_faces ) {
-        add_new_edge(newface, f); // each INCIDENT face is split into two parts: newface and f
+        if ( g[f].status == INCIDENT ) // end-point faces already dealt with in add_separator()
+            add_new_edge(newface, f); // each INCIDENT face is split into two parts: newface and f
     }
     return newface;
 }

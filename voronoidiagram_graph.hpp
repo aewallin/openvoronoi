@@ -139,10 +139,18 @@ struct EdgeProps {
     HEFace face; // each face corresponds to an input Site/generator
     double k; // offset-direction from the adjacent site, either +1 or -1
     VoronoiEdgeType type;
+    inline double sq(double x) const {return x*x;}
     Point point(double t) const {
-        double xc = x[0] - x[1] - x[2]*t + x[3] * sqrt( (x[4]+x[5]*t)*(x[4]+x[5]*t) - (x[6]+x[7]*t)*(x[6]+x[7]*t) );
-        double yc = y[0] - y[1] - y[2]*t + y[3] * sqrt( (y[4]+y[5]*t)*(y[4]+y[5]*t) - (y[6]+y[7]*t)*(y[6]+y[7]*t) );
-        return Point(xc,yc);
+        double discr1 = sq(x[4]+x[5]*t) - sq(x[6]+x[7]*t);
+        double discr2 = sq(y[4]+y[5]*t) - sq(y[6]+y[7]*t);
+        if ( (discr1 >= 0) && (discr2 >= 0) ) {
+            double xc = x[0] - x[1] - x[2]*t + x[3] * sqrt( sq(x[4]+x[5]*t) - sq(x[6]+x[7]*t) );
+            double yc = y[0] - y[1] - y[2]*t + y[3] * sqrt( sq(y[4]+y[5]*t) - sq(y[6]+y[7]*t) );
+            return Point(xc,yc);
+        } else {
+            std::cout << " warning bisector sqrt(-1) !\n";
+            return Point(0,0);
+        }
     }
     double x[8];
     double y[8];
@@ -155,7 +163,8 @@ struct EdgeProps {
             set_pl_parameters(s2,s1);
         else if (s1->isLine() && s2->isLine())     // LL
             set_ll_parameters(s2,s1);
-            
+        else
+            assert(0);
             // AP
             // PA
             // AA
@@ -183,12 +192,13 @@ struct EdgeProps {
 
         y[0]=s1->y();       // yc1
         y[1]=s2->b()*alfa3; // alfa2*alfa3
-        y[2]=-s2->b();      // -alfa2
-        y[3]=s2->a();       // alfa1
+        y[2]=-s2->b();      // -alfa2 = -b2
+        y[3]=s2->a();       // alfa1 = a2
         y[4]=0;             // alfa4 = r1
         y[5]=+1;            // lambda1
         y[6]=alfa3;         // alfa3
         y[7]=-1;            // -1
+        print_params();
     }
     // line(s1)-line(s2) edge
     void set_ll_parameters(Site* s1, Site* s2) {  // Held thesis p96
@@ -214,6 +224,16 @@ struct EdgeProps {
         y[6]=0;
         y[7]=0;
         y[8]=0;
+    }
+    void print_params() const {
+        std::cout << "x-params: ";
+        for (int m=0;m<8;m++)
+            std::cout << x[m] << " ";
+        std::cout << "\n";
+        std::cout << "y-params: ";
+        for (int m=0;m<8;m++)
+            std::cout << y[m] << " ";
+        std::cout << "\n";
     }
     // arc: d=sqrt( sq(xc1-xc2) + sq(yc1-yc2) )
 };

@@ -68,7 +68,7 @@ public:
     virtual ~Site() {}
     /// return closest point on site to given point p
     virtual Point apex_point(const Point& p) = 0;
-    virtual const Point position() const = 0;
+    virtual const Point position() const {assert(0); return Point(0,0);}
     Eqp eqp() {return eq;} 
     bool is_linear() {return isLine(); }
     
@@ -147,10 +147,6 @@ public:
         else {
             return _start + t*(_end-_start);
         }
-    }
-    virtual const Point position() const {
-        assert(0);
-        return _start; // FIXME!!
     }
     virtual std::string str() const {return "LineSite";}
     virtual bool in_region(const Point& p) {

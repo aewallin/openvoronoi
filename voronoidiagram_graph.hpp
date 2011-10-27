@@ -121,7 +121,7 @@ typedef unsigned int HEFace;
  * ellipse (circle/circle)
 */
                             
-enum VoronoiEdgeType {LINE, PARABOLA, ELLIPSE, HYPERBOLA, SEPARATOR};
+enum VoronoiEdgeType {LINE, PARABOLA, ELLIPSE, HYPERBOLA, SEPARATOR, LINESITE};
 
 /// properties of an edge in the voronoi diagram
 /// each edge stores a pointer to the next HEEdge 

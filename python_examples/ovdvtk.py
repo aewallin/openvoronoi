@@ -182,9 +182,16 @@ class VD:
                 actor = Line( p1=( p1.x,p1.y, 0), p2=(p2.x,p2.y, 0), color=ecolor)
                 self.myscreen.addActor(actor)
                 self.edges.append(actor)
+            if (etype == ovd.VoronoiEdgeType.LINESITE):
+                ecolor = yellow
+                p1 = self.scale*epts[0]  
+                p2 = self.scale*epts[1] 
+                actor = Line( p1=( p1.x,p1.y, 0), p2=(p2.x,p2.y, 0), color=ecolor)
+                self.myscreen.addActor(actor)
+                self.edges.append(actor)
             elif (etype == ovd.VoronoiEdgeType.PARABOLA):
                 ecolor = red
-                #print " drawing ", len(epts), " points"
+                print " drawing ", len(epts), " points"
                 for n in range( len(epts)-1 ):
                     p1 = self.scale*epts[n]  
                     p2 = self.scale*epts[n+1] 

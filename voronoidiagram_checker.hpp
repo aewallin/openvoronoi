@@ -55,6 +55,7 @@ public:
     bool inCircle_is_negative(  const Point& p, HEFace f, HEVertex minimalVertex );
     
     bool current_face_equals_next_face( HEEdge e); 
+    bool face_ok(HEFace f);
     VoronoiDiagram* vd;
 };
 

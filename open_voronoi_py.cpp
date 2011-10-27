@@ -74,6 +74,7 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         .value("ELLIPSE", ELLIPSE)
         .value("HYPERBOLA", HYPERBOLA)
         .value("SEPARATOR", SEPARATOR)
+        .value("LINESITE", LINESITE)
     ;
     bp::class_<Point>("Point") 
         .def(bp::init<double, double>())

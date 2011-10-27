@@ -186,7 +186,21 @@ bool VoronoiDiagramChecker::inCircle_is_negative(  const Point& p, HEFace f, HEV
     
     return (minimumH <= 0 );
 }
-    
+
+bool VoronoiDiagramChecker::face_ok(HEFace f) {
+    HEEdge current_edge = vd->g[f].edge;
+    HEEdge start_edge= current_edge;
+    int n=0;
+    do {
+        current_edge = vd->g[current_edge].next;
+        if (!current_face_equals_next_face(current_edge))
+            return false;
+        n++;
+    } while( current_edge != start_edge);
+    std::cout << " face ok, edges=" << n-1 << "\n";
+    return true;
+}
+
 bool VoronoiDiagramChecker::current_face_equals_next_face( HEEdge e) {
     if ( vd->g[e].face !=  vd->g[ vd->g[e].next ].face) {
         std::cout << " VD remove_vertex_set() ERROR.\n";

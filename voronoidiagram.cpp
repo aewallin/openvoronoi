@@ -325,6 +325,13 @@ void VoronoiDiagram::insert_line_site(int idx1, int idx2) {
     g[end].status=OUT; 
     
     LineSite* line_site = new LineSite( g[start].position, g[end].position) ;
+    
+    HEEdge s_e = g.add_edge(start,end);
+    HEEdge e_s = g.add_edge(end,start);
+    g[s_e].type = LINESITE;
+    g[e_s].type = LINESITE;
+    g.twin_edges(s_e,e_s);
+    
     // seed-face is face of start-point
     HEFace start_face = g[start].face; 
     HEFace end_face = g[end].face; 
@@ -337,6 +344,9 @@ void VoronoiDiagram::insert_line_site(int idx1, int idx2) {
     
     add_separator(start_face, line_site, start);
     add_separator(end_face, line_site, end);
+    
+    // add_new_face( line_site );
+    
     //HEFace newface = add_new_face( line_site );
     //remove_vertex_set( newface );
     
@@ -349,6 +359,11 @@ void VoronoiDiagram::insert_line_site(int idx1, int idx2) {
 
 // add separator on the face of the endpoint of s
 void VoronoiDiagram::add_separator(HEFace f, Site* s, HEVertex endp) {
+    EdgeVector out_edges = g.out_edges(endp);
+    assert( out_edges.size() == 1);
+    HEEdge segment_e = out_edges[0];
+    HEEdge segment_tw = g[segment_e].twin;
+    /*
     VertexVector verts = g.face_vertices(f);
     VertexVector new_verts;
     BOOST_FOREACH(HEVertex v, verts) {
@@ -358,12 +373,26 @@ void VoronoiDiagram::add_separator(HEFace f, Site* s, HEVertex endp) {
     assert(new_verts.size()==2);
     HEVertex v1=new_verts[0];
     HEVertex v2=new_verts[1];
+    */
+    HEVertex v1; // this Vertex is found as OUT-NEW-IN
+    HEVertex v2; // this Vertex is found as IN-NEW-OUT
+    HEEdge v2_previous, v1_next;
+    HEEdge v2_next, v1_previous;
+    //Site* f_site = g[f].site;
+    //Site* new_site = g[newface].site;
+                 // in-new    new   new-out
+    boost::tie( v2_previous, v2,   v2_next) = find_new_vertex(f, OUT); // NEW->OUT vertex
+    
+                 // out-new    new   new-in
+    boost::tie( v1_previous, v1, v1_next) = find_new_vertex(f, IN);  // NEW->IN  vertex
+    
     // figure out which one is left and which is right.
     assert( s->in_region( g[v1].position ) );
     assert( s->in_region( g[v2].position ) );
     std::cout << " separator endpoint k3=" << g[v1].k3 << "\n";
     std::cout << " separator endpoint k3=" << g[v2].k3 << "\n";
     assert( g[v1].k3 !=   g[v2].k3 ); // should be on opposite sides
+    /*
     HEVertex vpos,vneg;
     if ( g[v1].k3 == 1 ) {
         assert(g[v2].k3 == -1);
@@ -374,12 +403,38 @@ void VoronoiDiagram::add_separator(HEFace f, Site* s, HEVertex endp) {
         assert(g[v2].k3 == +1);
         vpos = v2;
         vneg = v1;
-    }
+    }*/
     
-    HEEdge spos = g.add_edge( endp, vpos );
-    HEEdge sneg = g.add_edge( endp, vneg );
-    g[spos].type = SEPARATOR;
-    g[sneg].type = SEPARATOR;
+    HEEdge e2 = g.add_edge( endp, v2 );
+    HEEdge e2_tw = g.add_edge( v2, endp );
+    HEEdge e1 = g.add_edge( endp, v1 );
+    HEEdge e1_tw = g.add_edge( v1, endp );
+    g.twin_edges(e1,e1_tw);
+    g.twin_edges(e2,e2_tw);
+    
+    g[e2].type = SEPARATOR;
+    g[e2_tw].type = SEPARATOR;
+    g[e1].type = SEPARATOR;
+    g[e1_tw].type = SEPARATOR;
+    
+    g[e2].face = f;
+    g[e1_tw].face = f;
+    g[f].edge = e2;
+    // next, face, twin, k
+    
+    // next-pointers for endpoint-face
+    g[v1_previous].next = e1_tw;
+    g[e1_tw].next = e2;
+    g[e2].next = v2_next;
+    
+    // next-pointers for segment face(s)
+    g[v2_previous].next = e2_tw;
+    g[e2_tw].next = segment_e;
+    g[segment_tw].next = e1;
+    g[e1].next = v1_next;
+    
+    g[f].status = NONINCIDENT; // face is "done"
+    assert( vd_checker->face_ok( f ) );
 }
 
 // find amount of clearance-disk violation on all face vertices and return vertex with the largest violation

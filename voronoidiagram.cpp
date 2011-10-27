@@ -664,8 +664,9 @@ void VoronoiDiagram::add_new_edge(HEFace newface, HEFace f) {
         std::cout << " Error: g[new_target].k3= " << g[new_target].k3 << " g[new_source].k3 " << g[new_source].k3 << "\n";
         std::cout << " Error: g[new_target].position= " << g[new_target].position << " g[new_source].position " << g[new_source].position << "\n";
     }
-    assert( g[new_target].k3 == g[new_source].k3 );
+    
     */
+    assert( g[new_target].k3 == g[new_source].k3 );
     g[e_twin].k = g[new_source].k3; //g[twin_next].k;
     g[e_twin].face = newface;
     g[twin_previous].next = e_twin;

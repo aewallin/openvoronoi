@@ -186,7 +186,7 @@ struct EdgeProps {
         x[2]=-s2->a();      // -alfa1 = - a2
         x[3]=s2->b();       // alfa2 = b2
         x[4]=0;             // alfa4 = r1 
-        x[5]=+1;            // lambda1
+        x[5]=+1;            // lambda1 (allways positive offset from PointSite?)
         x[6]= alfa3;        // alfa3= a2*xc1+b2*yc1+d2?
         x[7]=-1;            // -1 
 
@@ -195,7 +195,7 @@ struct EdgeProps {
         y[2]=-s2->b();      // -alfa2 = -b2
         y[3]=s2->a();       // alfa1 = a2
         y[4]=0;             // alfa4 = r1
-        y[5]=+1;            // lambda1
+        y[5]=+1;            // lambda1 (allways positive offset from PointSite?)
         y[6]=alfa3;         // alfa3
         y[7]=-1;            // -1
         print_params();

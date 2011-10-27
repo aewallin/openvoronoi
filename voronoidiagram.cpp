@@ -124,8 +124,16 @@ void VoronoiDiagram::initialize() {
     g[e9].next = e7;
     g[g2].face = f3;
     
-    //v0-v2 edge e1(e9) has gen3 and gen2 as neighbors
-
+    // set type. (note that edge-params x[8] and y[8] are not set!
+    g[e1].type = LINE;
+    g[e2].type = LINE; 
+    g[e3].type = LINE;
+    g[e4].type = LINE;
+    g[e5].type = LINE;
+    g[e6].type = LINE;
+    g[e7].type = LINE;
+    g[e8].type = LINE;
+    g[e9].type = LINE;
     
     // twin edges
     g[e1].twin = e9;
@@ -437,7 +445,9 @@ void VoronoiDiagram::add_new_vertices( Site* new_site ) {
 }
 
 void VoronoiDiagram::add_vertex_in_edge( HEVertex v, HEEdge e) {
-    // the vertex v is in the middle of edge e
+    // the vertex v is inserted into the middle of edge e
+    // edge e and its twin are replaced by four new edges: e1,e2 and their twins te2,te1
+    // 
     //                    face
     //                    e1   e2
     // previous-> source  -> v -> target -> next
@@ -470,6 +480,9 @@ void VoronoiDiagram::add_vertex_in_edge( HEVertex v, HEEdge e) {
     // k-vals
     g[e1].k = g[e].k;
     g[e2].k = g[e].k;
+    // type
+    g[e1].type = g[e].type;
+    g[e2].type = g[e].type;
     
     HEEdge te1 = g.add_edge( twin_source, v  ); // these replace twin
     HEEdge te2 = g.add_edge( v, twin_target  );
@@ -489,7 +502,10 @@ void VoronoiDiagram::add_vertex_in_edge( HEVertex v, HEEdge e) {
     // k-vals
     g[te1].k = g[twin].k;
     g[te2].k = g[twin].k;
-        
+    // type
+    g[te1].type = g[twin].type;
+    g[te2].type = g[twin].type;
+    
     // update the faces (required here?)
     g[face].edge = e1;
     g[twin_face].edge = te1;

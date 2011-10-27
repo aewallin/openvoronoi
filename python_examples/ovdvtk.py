@@ -165,11 +165,11 @@ class VD:
         for e in vd.getVoronoiEdges():
             p1 = self.scale*e[0]  
             p2 = self.scale*e[1] 
-            ecolor = self.edgeColor
+            ecolor = pink # self.edgeColor
             etype = e[2]
             print "drawing etype=", etype
             if (etype == ovd.VoronoiEdgeType.LINE):
-                ecolor = pink
+                ecolor = cyan
             elif (etype == ovd.VoronoiEdgeType.PARABOLA):
                 ecolor = red
             actor = Line( p1=( p1.x,p1.y, 0), p2=(p2.x,p2.y, 0), color=ecolor)

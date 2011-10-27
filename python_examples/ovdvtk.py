@@ -163,18 +163,36 @@ class VD:
             self.myscreen.removeActor(e)
         self.edges = []
         for e in vd.getVoronoiEdges():
-            p1 = self.scale*e[0]  
-            p2 = self.scale*e[1] 
+            epts = e[0]
+            etype = e[1]
             ecolor = pink # self.edgeColor
-            etype = e[2]
-            print "drawing etype=", etype
+            #print "drawing etype=", etype
+            actor = 0
             if (etype == ovd.VoronoiEdgeType.LINE):
                 ecolor = cyan
+                p1 = self.scale*epts[0]  
+                p2 = self.scale*epts[1] 
+                actor = Line( p1=( p1.x,p1.y, 0), p2=(p2.x,p2.y, 0), color=ecolor)
+                self.myscreen.addActor(actor)
+                self.edges.append(actor)
+            if (etype == ovd.VoronoiEdgeType.SEPARATOR):
+                ecolor = orange
+                p1 = self.scale*epts[0]  
+                p2 = self.scale*epts[1] 
+                actor = Line( p1=( p1.x,p1.y, 0), p2=(p2.x,p2.y, 0), color=ecolor)
+                self.myscreen.addActor(actor)
+                self.edges.append(actor)
             elif (etype == ovd.VoronoiEdgeType.PARABOLA):
                 ecolor = red
-            actor = Line( p1=( p1.x,p1.y, 0), p2=(p2.x,p2.y, 0), color=ecolor)
-            self.myscreen.addActor(actor)
-            self.edges.append(actor)
+                #print " drawing ", len(epts), " points"
+                for n in range( len(epts)-1 ):
+                    p1 = self.scale*epts[n]  
+                    p2 = self.scale*epts[n+1] 
+                    #print "line ",n," : ",p1," to ",p2
+                    actor = Line( p1=( p1.x,p1.y, 0), p2=(p2.x,p2.y, 0), color=ecolor)
+                    self.myscreen.addActor(actor)
+                    self.edges.append(actor)
+
         self.myscreen.render() 
         
     def setAll(self, vd):

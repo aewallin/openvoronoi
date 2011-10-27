@@ -97,7 +97,7 @@ class VoronoiDiagram {
         HEFace add_new_face(Site* site);
         void   add_new_edge(HEFace new_f, HEFace f);
         void   add_vertex_in_edge(HEVertex v, HEEdge e);
-        
+        void add_separator(HEFace f, Site* s, HEVertex endp);
         void remove_vertex_set( HEFace newface );
         void reset_status();
 

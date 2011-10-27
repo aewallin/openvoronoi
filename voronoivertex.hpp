@@ -157,14 +157,12 @@ public:
         Point s_p = p-_start;
         Point s_e = _end - _start;
         double t = s_p.dot(s_e) / s_e.dot(s_e);
-        
         // rounding... UGLY
         double eps = 1e-11;
         if (fabs(t) < eps) 
             t= 0;
         else if ( fabs(t-1.0) < eps )
             t= 1;
-        
         //std::cout << "in_region t= " << t << "\n";
         return ( (t>=0) && (t<=1) );
     }

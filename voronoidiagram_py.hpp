@@ -143,13 +143,31 @@ class VoronoiDiagram_py : public VoronoiDiagram {
         boost::python::list getVoronoiEdges()  {
             boost::python::list edge_list;
             BOOST_FOREACH( HEEdge edge, g.edges() ) { // loop through each edge
+                    boost::python::list edge_data;
                     boost::python::list point_list; // the endpoints of each edge
                     HEVertex v1 = g.source( edge );
                     HEVertex v2 = g.target( edge );
-                    point_list.append( g[v1].position );
-                    point_list.append( g[v2].position );
-                    point_list.append( g[edge].type );
-                    edge_list.append(point_list);
+                    if ( (g[edge].type == LINE) || (g[edge].type == SEPARATOR) ) {
+                        point_list.append( g[v1].position );
+                        point_list.append( g[v2].position );
+                    } else if ( g[edge].type == PARABOLA ) {
+                        double t_src = g[v1].dist();
+                        double t_trg = g[v2].dist();
+                        double t_min = std::min(t_src,t_trg);
+                        double t_max = std::max(t_src,t_trg);
+                        int Nmax = 20;
+                        double dt = (t_max-t_min)/Nmax;
+                        for (int n=0;n<Nmax;n++) {
+                            double t = t_min + n*dt;
+                            Point pt = g[edge].point(t);
+                            point_list.append(pt);
+                        }
+                    } else {
+                        assert(0);
+                    } 
+                    edge_data.append( point_list );
+                    edge_data.append( g[edge].type );
+                    edge_list.append(edge_data);
             }
             return edge_list;
         }

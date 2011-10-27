@@ -326,23 +326,60 @@ void VoronoiDiagram::insert_line_site(int idx1, int idx2) {
     
     LineSite* line_site = new LineSite( g[start].position, g[end].position) ;
     // seed-face is face of start-point
-    HEFace closest_face = g[start].face; 
+    HEFace start_face = g[start].face; 
+    HEFace end_face = g[end].face; 
     // seed 
-    HEVertex v_seed = find_seed_vertex(closest_face, line_site ) ;
+    HEVertex v_seed = find_seed_vertex(start_face, line_site ) ;
     std::cout << "   seed  = " << v_seed << " " << g[v_seed].position << "\n";
     augment_vertex_set(v_seed, line_site );
     std::cout << "   after augment: v0.size() = " << v0.size() << "\n";
     add_new_vertices( line_site );  
-      
-    HEFace newface = add_new_face( line_site );
-    remove_vertex_set( newface );
+    
+    add_separator(start_face, line_site, start);
+    add_separator(end_face, line_site, end);
+    //HEFace newface = add_new_face( line_site );
+    //remove_vertex_set( newface );
     
     //g[new_vert].face = newface;
     
-    reset_status();
+    //reset_status();
     //assert( vd_checker->isValid() );
     return; // g[new_vert].index;
+}
 
+// add separator on the face of the endpoint of s
+void VoronoiDiagram::add_separator(HEFace f, Site* s, HEVertex endp) {
+    VertexVector verts = g.face_vertices(f);
+    VertexVector new_verts;
+    BOOST_FOREACH(HEVertex v, verts) {
+        if (g[v].status==NEW)
+            new_verts.push_back(v);
+    }
+    assert(new_verts.size()==2);
+    HEVertex v1=new_verts[0];
+    HEVertex v2=new_verts[1];
+    // figure out which one is left and which is right.
+    assert( s->in_region( g[v1].position ) );
+    assert( s->in_region( g[v2].position ) );
+    std::cout << " separator endpoint k3=" << g[v1].k3 << "\n";
+    std::cout << " separator endpoint k3=" << g[v2].k3 << "\n";
+    assert( g[v1].k3 !=   g[v2].k3 ); // should be on opposite sides
+    HEVertex vpos,vneg;
+    if ( g[v1].k3 == 1 ) {
+        assert(g[v2].k3 == -1);
+        vpos = v1;
+        vneg = v2;
+    } else {
+        assert(g[v1].k3 == -1);
+        assert(g[v2].k3 == +1);
+        vpos = v2;
+        vneg = v1;
+    }
+    
+    HEEdge spos = g.add_edge( endp, vpos );
+    HEEdge sneg = g.add_edge( endp, vneg );
+    g[spos].type = SEPARATOR;
+    g[sneg].type = SEPARATOR;
 }
 
 // find amount of clearance-disk violation on all face vertices and return vertex with the largest violation

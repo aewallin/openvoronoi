@@ -47,7 +47,7 @@ class Point {
         Point xyPerp() const;
         /// distance from this to p1-p2 line
         double xyDistanceToLine(const Point &p1, const Point &p2) const;
-        bool isRight(const Point &p1, const Point &p2) const;
+        bool is_right(const Point &p1, const Point &p2) const;
         /// retrun true if Point within line segment p1-p2
         bool isInside(const Point& p1, const Point& p2) const;
         /// assignment

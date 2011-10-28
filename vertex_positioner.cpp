@@ -392,9 +392,9 @@ int VertexPositioner::lll_solver(Site* s1, Site* s2, Site* s3) {
 /// point-point-point vertex positioner based on Sugihara & Iri paper
 Point VertexPositioner::ppp_solver(const Point& p1, const Point& p2, const Point& p3) {
     Point pi(p1),pj(p2),pk(p3);
-    if ( pi.isRight(pj,pk) ) 
+    if ( pi.is_right(pj,pk) ) 
         std::swap(pi,pj);
-    assert( !pi.isRight(pj,pk) );
+    assert( !pi.is_right(pj,pk) );
     // 2) point pk should have the largest angle. largest angle is opposite longest side.
     double longest_side = (pi - pj).norm();
     while (  ((pj - pk).norm() > longest_side) || (((pi - pk).norm() > longest_side)) ) { 
@@ -402,7 +402,7 @@ Point VertexPositioner::ppp_solver(const Point& p1, const Point& p2, const Point
         std::swap(pi,pk);  
         longest_side = (pi - pj).norm();
     }
-    assert( !pi.isRight(pj,pk) );
+    assert( !pi.is_right(pj,pk) );
     assert( (pi - pj).norm() >=  (pj - pk).norm() );
     assert( (pi - pj).norm() >=  (pk - pi).norm() );
     double J2 = (pi.y-pk.y)*( sq(pj.x-pk.x)+sq(pj.y-pk.y) )/2.0 - (pj.y-pk.y)*( sq(pi.x-pk.x)+sq(pi.y-pk.y) )/2.0;

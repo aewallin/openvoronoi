@@ -345,14 +345,10 @@ void VoronoiDiagram::insert_line_site(int idx1, int idx2) {
     add_separator(start_face, line_site, start);
     add_separator(end_face, line_site, end);
     
-    add_new_face( line_site );
-    
-    //HEFace newface = add_new_face( line_site );
-    //remove_vertex_set( newface );
-    
+    HEFace newface = add_new_face( line_site );
+    remove_vertex_set( newface );
     //g[new_vert].face = newface;
-    
-    //reset_status();
+    reset_status();
     //assert( vd_checker->isValid() );
     return; // g[new_vert].index;
 }
@@ -641,37 +637,94 @@ void VoronoiDiagram::add_new_edge(HEFace newface, HEFace f) {
     
     boost::tie( new_previous, new_source, twin_next) = find_new_vertex(f, OUT); // NEW->OUT vertex
     boost::tie( twin_previous, new_target, new_next) = find_new_vertex(f, IN);  // NEW->IN  vertex
+    //                                           f
     // now connect:   new_previous -> new_source -> new_target -> new_next
-    // and:              twin_next <- new_source <- new_target <- twin_previous    
-    HEEdge e_new = g.add_edge( new_source, new_target );
-    g[e_new].set_parameters( f_site, new_site );
-    g[e_new].next = new_next;
-    g[e_new].k = g[new_next].k; // the next edge is on the same face, so has the correct k-value
-    g[e_new].face = f;
-    g[new_previous].next = e_new;
-    g[f].edge = e_new; 
-    // the twin edge that bounds the new face
-    HEEdge e_twin = g.add_edge( new_target, new_source );
+    // and:              twin_next <- new_source <- new_target <- twin_previous 
+    //                                           new_face   
     
-    g[e_twin].set_parameters( new_site, f_site );
-    std::cout << g[e_new].type << "\n";
     
-    g[e_twin].next = twin_next; 
-    
-    // the NEW vertice were generated with vpos, which has set the offset direction k3
-    /*
-    if ( g[new_target].k3 != g[new_source].k3 ) {
-        std::cout << " Error: g[new_target].k3= " << g[new_target].k3 << " g[new_source].k3 " << g[new_source].k3 << "\n";
-        std::cout << " Error: g[new_target].position= " << g[new_target].position << " g[new_source].position " << g[new_source].position << "\n";
+    Point pt1;
+    Point pt2;
+    if (f_site->isPoint()  && new_site->isLine() ) {
+        pt1 = f_site->position();
+        pt2 = new_site->apex_point(pt1);
     }
     
-    */
-    assert( g[new_target].k3 == g[new_source].k3 );
-    g[e_twin].k = g[new_source].k3; //g[twin_next].k;
-    g[e_twin].face = newface;
-    g[twin_previous].next = e_twin;
-    g[newface].edge = e_twin; 
-    g.twin_edges(e_new,e_twin);
+    bool src_sign = g[new_source].position.is_right( pt1, pt2 );
+    bool trg_sign = g[new_target].position.is_right( pt1, pt2 );
+    
+    bool sign=false;
+    if (!src_sign)
+        sign = true;
+        
+    //assert( g[new_source].position.is_right( pt1, pt2 ) == g[new_target].position.is_right( pt1, pt2 ) );
+    if ( src_sign == trg_sign ) {
+        // add a single src-trg edge
+        HEEdge e_new = g.add_edge( new_source, new_target );
+        g[e_new].set_parameters( f_site, new_site, sign ); 
+        g[e_new].next = new_next;
+        g[e_new].k = g[new_next].k; // the next edge is on the same face, so has the correct k-value
+        g[e_new].face = f;
+        g[new_previous].next = e_new;
+        g[f].edge = e_new; 
+        // the twin edge that bounds the new face
+        HEEdge e_twin = g.add_edge( new_target, new_source );
+        g[e_twin].set_parameters( new_site, f_site, sign );
+        //std::cout << g[e_new].type << "\n";
+        g[e_twin].next = twin_next; 
+        
+        // both trg and src should be on same side of new site 
+        assert( g[new_target].k3 == g[new_source].k3 );
+        
+        g[e_twin].k = g[new_source].k3; //g[twin_next].k;
+        g[e_twin].face = newface;
+        g[twin_previous].next = e_twin;
+        g[newface].edge = e_twin; 
+        g.twin_edges(e_new,e_twin);
+    } else {
+        // need to do apex-split
+        //   new_prv -> new_src -- e1 ----> APEX --e2 ---> new_trg -> new_nxt
+        //   twi_nxt <- new_src <- e1_tw -- APEX <-e2_tw-- new_trg <- twn_prv    
+
+        //   
+        std::cout << " apex_split \n";
+        HEVertex apex = g.add_vertex();
+        g[apex].type = APEX;
+        g[apex].status = NEW;
+        HEEdge e1 = g.add_edge( new_source, apex);
+        HEEdge e2 = g.add_edge( apex, new_target);
+        g[e1].set_parameters(f_site,new_site,!src_sign);
+        g[e2].set_parameters(f_site,new_site,!trg_sign);
+        g[new_previous].next = e1;
+        g[e1].next=e2;
+        g[e2].next=new_next;
+        g[e1].face = f;
+        g[e2].face = f;
+        g[e1].k = g[new_next].k;
+        g[e2].k = g[new_next].k;
+    // twin edges
+        HEEdge e1_tw = g.add_edge( apex, new_source );
+        HEEdge e2_tw = g.add_edge( new_target, apex );
+        g[e1_tw].set_parameters(f_site,new_site,!src_sign);
+        g[e2_tw].set_parameters(f_site,new_site,!trg_sign);
+        g[twin_previous].next = e2_tw;
+        g[e2_tw].next = e1_tw;
+        g[e1_tw].next = twin_next;
+        g[e1_tw].face = newface;
+        g[e2_tw].face = newface;
+        g[e1_tw].k = g[twin_next].k;
+        g[e1_tw].k = g[twin_next].k;
+        
+        
+    // position the apex
+        double min_t = g[e1].minimum_t(f_site,new_site);
+        g[apex].position = g[e1].point(min_t);
+        std::cout << " apex = " << g[apex].position << "\n";
+        std::cout << " t: src=" << g[new_source].dist() << " tmin= " << min_t << " trg= " << g[new_target].dist() << "\n";
+        g[apex].init_dist(f_site->apex_point(g[apex].position));
+        modified_vertices.push_back( apex );
+        
+    }
 }
 
 // among the edges of HEFace f, which has had NEW vertices inserted into two (?exactly two?) of its edges,
@@ -712,7 +765,7 @@ void VoronoiDiagram::remove_vertex_set( HEFace newface ) {
         HEVertex current_source = g.source( current_edge );
         BOOST_FOREACH( HEEdge edge, g.out_edges( current_target ) ) { // loop through potential "next" candidates
             HEVertex out_target = g.target( edge );
-            if ( g[out_target].status == NEW ) { // the next vertex along the face should be "NEW"
+            if ( (g[out_target].status == NEW)  ) { // the next vertex along the face should be "NEW"
                 if ( out_target != current_source ) { // but not where we came from
                     g[current_edge].next = edge; // this is the edge we want to take
                     assert( vd_checker->current_face_equals_next_face( current_edge ) );

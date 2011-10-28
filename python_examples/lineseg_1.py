@@ -67,8 +67,7 @@ def circleGenerators(far, Nmax):
         plist.append( ovd.Point(x,y) )
     #random.shuffle(plist)
     return plist
-    
-    
+
 if __name__ == "__main__":  
     #print ocl.revision()
     myscreen = ovdvtk.VTKScreen()

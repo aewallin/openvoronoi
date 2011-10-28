@@ -140,21 +140,57 @@ struct EdgeProps {
     double k; // offset-direction from the adjacent site, either +1 or -1
     VoronoiEdgeType type;
     inline double sq(double x) const {return x*x;}
+    inline double round(double x) const {
+        double eps = 1e-8;
+        if (fabs(x) < eps)
+            return 0.0;
+        else
+            return x;
+    }
     Point point(double t) const {
-        double discr1 = sq(x[4]+x[5]*t) - sq(x[6]+x[7]*t);
-        double discr2 = sq(y[4]+y[5]*t) - sq(y[6]+y[7]*t);
+        double discr1 = round( sq(x[4]+x[5]*t) - sq(x[6]+x[7]*t) );
+        double discr2 = round( sq(y[4]+y[5]*t) - sq(y[6]+y[7]*t) );
         if ( (discr1 >= 0) && (discr2 >= 0) ) {
-            double xc = x[0] - x[1] - x[2]*t + x[3] * sqrt( sq(x[4]+x[5]*t) - sq(x[6]+x[7]*t) );
-            double yc = y[0] - y[1] - y[2]*t + y[3] * sqrt( sq(y[4]+y[5]*t) - sq(y[6]+y[7]*t) );
+            double psig = sign ? +1 : -1;
+            double nsig = sign ? -1 : +1;
+            double xc = x[0] - x[1] - x[2]*t + psig * x[3] * sqrt( discr1 );
+            double yc = y[0] - y[1] - y[2]*t + nsig * y[3] * sqrt( discr2 );
+            if (xc!=xc) { // test for NaN!
+                std::cout << xc << " , " << yc << " t=" << t << "\n";
+                print_params();
+                assert(0);
+            }
             return Point(xc,yc);
         } else {
-            std::cout << " warning bisector sqrt(-1) !\n";
+            std::cout << " warning bisector sqrt(-1) discr1=" << discr1 << " discr2=" << discr2 << "!\n";
+            assert(0);
             return Point(0,0);
         }
     }
     double x[8];
     double y[8];
-    void set_parameters(Site* s1, Site* s2) {
+    bool sign; // choose either +/- in front of sqrt()
+    double minimum_t( Site* s1, Site* s2) {
+        if (s1->isPoint() && s2->isPoint())        // PP
+            return 0;
+        else if (s1->isPoint() && s2->isLine())    // PL
+            return minimum_pl_t(s1,s2);
+        else if (s2->isPoint() && s1->isLine())    // LP
+            return minimum_pl_t(s2,s1);
+        else if (s1->isLine() && s2->isLine())     // LL
+            return 0;
+        else
+            assert(0);
+        
+        return -1;
+    }
+    double minimum_pl_t(Site* s1, Site* s2) {
+        double mint = - x[6]/(2.0*x[7]);
+        assert( mint >=0 );
+        return mint;
+    }
+    void set_parameters(Site* s1, Site* s2, bool sig) {
+        sign = sig;
         if (s1->isPoint() && s2->isPoint())        // PP
             set_pp_parameters(s1,s2);
         else if (s1->isPoint() && s2->isLine())    // PL
@@ -178,28 +214,36 @@ struct EdgeProps {
     }
     // called for point(s1)-line(s2) edges
     void set_pl_parameters(Site* s1, Site* s2) {
-        // x = xc -a2 h -k2 a2 t +/- b2 sqrt( (e1+k1 t)^2 - (alfa3 + k2 t)^2 )
-        std::cout << " set_pl \n";
+        //std::cout << " set_pl sign=" << sign << "\n";
         type = PARABOLA;
         double alfa3 = s2->a()*s1->x() + s2->b()*s1->y() + s2->c();
+        // figure out k, i.e. offset-direction for LineSite
+        double k = 1.0;
+        if (alfa3>0.0) {
+            k = -1.0;
+        } else {
+            sign = !sign;
+        }
+        // figure out sign of bisector (?)
+        
         x[0]=s1->x();       // xc1
         x[1]=s2->a()*alfa3; // alfa1*alfa3
-        x[2]=-s2->a();      // -alfa1 = - a2 * k2?
+        x[2]=s2->a()*k;      // -alfa1 = - a2 * k2?
         x[3]=s2->b();       // alfa2 = b2
         x[4]=0;             // alfa4 = r1 
         x[5]=+1;            // lambda1 (allways positive offset from PointSite?)
-        x[6]= alfa3;        // alfa3= a2*xc1+b2*yc1+d2?
-        x[7]=-1;            // -1 = k2 side of line??
+        x[6]=alfa3;        // alfa3= a2*xc1+b2*yc1+d2?
+        x[7]=k;            // -1 = k2 side of line??
 
         y[0]=s1->y();       // yc1
         y[1]=s2->b()*alfa3; // alfa2*alfa3
-        y[2]=-s2->b();      // -alfa2 = -b2
+        y[2]=s2->b()*k;      // -alfa2 = -b2
         y[3]=s2->a();       // alfa1 = a2
         y[4]=0;             // alfa4 = r1
         y[5]=+1;            // lambda1 (allways positive offset from PointSite?)
         y[6]=alfa3;         // alfa3
-        y[7]=-1;            // -1 = k2 side of line??
-        print_params();
+        y[7]=k;            // -1 = k2 side of line??
+        //print_params();
     }
     // line(s1)-line(s2) edge
     void set_ll_parameters(Site* s1, Site* s2) {  // Held thesis p96

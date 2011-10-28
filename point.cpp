@@ -23,15 +23,7 @@
 
 #include "point.hpp"
 
-
-namespace ovd
-{
-
-/*
-Point::Point(const Point &p) {
-    x=p.x;
-    y=p.y;
-}*/
+namespace ovd {
 
 double Point::norm() const {
     return sqrt( x*x + y*y  );
@@ -75,7 +67,7 @@ double Point::xyDistanceToLine(const Point &p1, const Point &p2) const {
 }
 
 
-bool Point::isRight(const Point &p1, const Point &p2) const {
+bool Point::is_right(const Point &p1, const Point &p2) const {
     // is Point right of line through points p1 and p2 ?, in the XY plane.
     // this is an ugly way of doing a determinant
     // should be prettyfied sometime...

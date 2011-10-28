@@ -116,7 +116,7 @@ class VoronoiDiagram_py : public VoronoiDiagram {
         boost::python::list getVoronoiVertices()  {
             boost::python::list plist;
             BOOST_FOREACH( HEVertex v, g.vertices() ) {
-                if ( g[v].type == NORMAL ) {
+                if ( g[v].type == NORMAL  || g[v].type == APEX ) {
                     boost::python::list pd;
                     pd.append( g[v].position );
                     pd.append( g[v].dist() );
@@ -156,7 +156,7 @@ class VoronoiDiagram_py : public VoronoiDiagram {
                         double t_min = std::min(t_src,t_trg);
                         double t_max = std::max(t_src,t_trg);
                         int Nmax = 20;
-                        double dt = (t_max-t_min)/Nmax;
+                        double dt = (t_max-t_min)/(Nmax-1);
                         for (int n=0;n<Nmax;n++) {
                             double t = t_min + n*dt;
                             Point pt = g[edge].point(t);

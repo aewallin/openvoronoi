@@ -125,8 +125,9 @@ class VD:
                 cir_actor = Circle( center=(p.x,p.y,0), radius=pt[1]*self.scale, color=self.vertexColor )
                 self.verts.append(cir_actor)
                 self.myscreen.addActor(cir_actor)
-            
         self.myscreen.render() 
+    
+    
         
     def setEdgesPolydata(self, vd):
         self.edges = []
@@ -191,7 +192,7 @@ class VD:
                 self.edges.append(actor)
             elif (etype == ovd.VoronoiEdgeType.PARABOLA):
                 ecolor = red
-                print " drawing ", len(epts), " points"
+                #print " drawing ", len(epts), " points"
                 for n in range( len(epts)-1 ):
                     p1 = self.scale*epts[n]  
                     p2 = self.scale*epts[n+1] 

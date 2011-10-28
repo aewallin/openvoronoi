@@ -88,7 +88,7 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         .def("norm", &Point::norm)
         .def("normalize", &Point::normalize)
         .def("dot", &Point::dot)
-        .def("isRight", &Point::isRight)
+        .def("is_ight", &Point::is_right)
         .def("__str__", &Point::str)
         .def_readwrite("x", &Point::x)
         .def_readwrite("y", &Point::y)

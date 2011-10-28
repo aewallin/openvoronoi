@@ -69,9 +69,9 @@ class VoronoiDiagram {
         int insert_point_site(const Point& p);
         /// insert a line-segment site into the diagram
         void insert_line_site(int idx1, int idx2);
-        void insert_line_site1(int idx1, int idx2);
-        void insert_line_site2(int idx1, int idx2);
-        void insert_line_site3(int idx1, int idx2);
+        //void insert_line_site1(int idx1, int idx2);
+        //void insert_line_site2(int idx1, int idx2);
+        //void insert_line_site3(int idx1, int idx2);
         /// string repr
         std::string print() const;
         /// return the far radius
@@ -87,7 +87,6 @@ class VoronoiDiagram {
         HEVertex find_seed_vertex(HEFace f, Site* site) const;
         EdgeVector find_in_out_edges(); 
         boost::tuple<HEEdge, HEVertex, HEEdge> find_new_vertex(HEFace f, VoronoiVertexStatus s1);
-        
         void augment_vertex_set(HEVertex& v_seed, Site* site);        
         bool predicate_c4(HEVertex v);
         bool predicate_c5(HEVertex v);
@@ -95,10 +94,11 @@ class VoronoiDiagram {
         void mark_vertex(HEVertex& v,  Site* site); 
         void   add_new_vertices( Site* site);
         HEFace add_new_face(Site* site);
-        void   add_new_edge(HEFace new_f, HEFace f);
+        void   add_new_edge(HEFace new_f1, HEFace f, HEFace new_f2 = 0);
         void   add_vertex_in_edge(HEVertex v, HEEdge e);
-        void add_separator(HEFace f, Site* s, HEVertex endp);
-        void remove_vertex_set( HEFace newface );
+        void   add_separator(HEFace f, HEVertex endp, Site* s1, Site* s2);
+        void repair_face( HEFace f );
+        void remove_vertex_set();
         void reset_status();
 
     // PRINT ETC

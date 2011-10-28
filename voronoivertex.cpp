@@ -32,9 +32,11 @@ int VoronoiVertex::count = 0;
 
 // the expected degree of a vertex. checked by topology-checker
 VertexDegreeMap VoronoiVertex::expected_degree = boost::assign::map_list_of 
-    (OUTER,4) 
-    (NORMAL,6) 
-    (VERTEXGEN,0) ;
+    (OUTER,4)   // special outer vertices
+    (NORMAL,6)  // normal vertex in the graph
+    (VERTEXGEN,0) // point site
+    (ENDPOINT,6)  // end-point of line or arc
+    (APEX,4) ; // apex point on quadratic bisector
 
 VoronoiVertex::VoronoiVertex() {
     init();

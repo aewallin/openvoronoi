@@ -39,9 +39,9 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         .def(bp::init<double, unsigned int>())
         .def("addVertexSite",  &VoronoiDiagram_py::insert_point_site)
         .def("addLineSite",  &VoronoiDiagram_py::insert_line_site)
-        .def("addLineSite1",  &VoronoiDiagram_py::insert_line_site1) // only find seed vertex
-        .def("addLineSite2",  &VoronoiDiagram_py::insert_line_site2) // find seed, augment tree
-        .def("addLineSite3",  &VoronoiDiagram_py::insert_line_site3) // find seed, augment tree
+        //.def("addLineSite1",  &VoronoiDiagram_py::insert_line_site1) // only find seed vertex
+        //.def("addLineSite2",  &VoronoiDiagram_py::insert_line_site2) // find seed, augment tree
+        //.def("addLineSite3",  &VoronoiDiagram_py::insert_line_site3) // find seed, augment tree
         .def("getGenerators",  &VoronoiDiagram_py::getGenerators)
         .def("getEdgesGenerators",  &VoronoiDiagram_py::getEdgesGenerators)
         .def("getVoronoiVertices",  &VoronoiDiagram_py::getVoronoiVertices)

@@ -66,8 +66,13 @@ bool VoronoiDiagramChecker::vertex_degree_ok() {
     // the outermost init() vertices have special degree, all others == 6
     BOOST_FOREACH(HEVertex v, vd->g.vertices() ) {
         
-        if ( vd->g.degree(v) != VoronoiVertex::expected_degree[ vd->g[v].type ] )
+        if ( vd->g.degree(v) != VoronoiVertex::expected_degree[ vd->g[v].type ] ) {
+            std::cout << " vertex_degree_ok() ERROR\n";
+            std::cout << " vertex type = " << vd->g[v].type << "\n";
+            std::cout << " vertex degree = " << vd->g.degree(v) << "\n";
+            std::cout << " expected degree = " << VoronoiVertex::expected_degree[ vd->g[v].type ]  << "\n";
             return false;
+        }
             
        /* 
         if ( vd->g[v].type == NORMAL ) {
@@ -178,7 +183,7 @@ bool VoronoiDiagramChecker::inCircle_is_negative(  const Point& p, HEFace f, HEV
     double minimumH = vd->g[minimalVertex].in_circle(p);
     
     if (!(minimumH <= 0) ) {
-        std::cout << " VD find_seed_vertex() WARNING\n";
+        std::cout << " inCircle_is_negative() WARNING\n";
         std::cout << " WARNING: searching for seed when inserting " << p << " \n";
     //    std::cout << " WARNING: closest face is " << f << " with generator " << vd->g[f].generator << " \n";
         std::cout << " WARNING: minimal vd-vertex " << vd->g[minimalVertex].index << " has inCircle= " << minimumH  << "\n";
@@ -193,9 +198,12 @@ bool VoronoiDiagramChecker::face_ok(HEFace f) {
     int n=0;
     do {
         current_edge = vd->g[current_edge].next;
-        if (!current_face_equals_next_face(current_edge))
+        if (!current_face_equals_next_face(current_edge)) {
+            std::cout << " face_ok() ERROR \n";
             return false;
+        }
         n++;
+        assert( n < 100 ); // reasonable max
     } while( current_edge != start_edge);
     std::cout << " face ok, edges=" << n-1 << "\n";
     return true;
@@ -203,15 +211,15 @@ bool VoronoiDiagramChecker::face_ok(HEFace f) {
 
 bool VoronoiDiagramChecker::current_face_equals_next_face( HEEdge e) {
     if ( vd->g[e].face !=  vd->g[ vd->g[e].next ].face) {
-        std::cout << " VD remove_vertex_set() ERROR.\n";
-        std::cout << "current.face = " << vd->g[e].face << " IS NOT next_face = " << vd->g[ vd->g[e].next ].face << std::endl;
+        std::cout << " current_face_equals_next_face() ERROR.\n";
+        std::cout << "   current.face = " << vd->g[e].face << " IS NOT next_face = " << vd->g[ vd->g[e].next ].face << std::endl;
         HEVertex c_trg = vd->g.target( e );
         HEVertex c_src = vd->g.source( e );
         HEVertex n_trg = vd->g.target( vd->g[e].next );
         HEVertex n_src = vd->g.source( vd->g[e].next );
         
-        std::cout << "current_edge = " << vd->g[c_src].index << " - " << vd->g[c_trg].index << "\n";
-        std::cout << "next_edge = " << vd->g[n_src].index << " - " << vd->g[n_trg].index << "\n";
+        std::cout << "   current_edge = " << vd->g[c_src].index << " - " << vd->g[c_trg].index << " type=" << vd->g[e].type << " face=" << vd->g[e].face  <<"\n";
+        std::cout << "   next_edge = " << vd->g[n_src].index << " - " << vd->g[n_trg].index << " type=" << vd->g[ vd->g[e].next ].type << " face="<< vd->g[ vd->g[e].next ].face << "\n";
         
         vd->print_face( vd->g[e].face );
         vd->print_face( vd->g[ vd->g[e].next ].face );

@@ -8,8 +8,7 @@ import random
 import os
 
 
-def drawFarCircle(myscreen, r, circleColor):
-    myscreen.addActor( ovdvtk.Circle( center=(0,0,0), radius=r, color=circleColor ) )
+
 
 def drawLine(myscreen, p1, p2):
     myscreen.addActor( ovdvtk.Line( p1 = (p1.x,p1.y,0), p2=(p2.x,p2.y,0), color = ovdvtk.yellow ) )
@@ -84,16 +83,18 @@ if __name__ == "__main__":
     myscreen.render()
     random.seed(42)
     far = 1
-    
     camPos = far
     zmult = 5
     myscreen.camera.SetPosition(camPos/float(1000), camPos/float(1000), zmult*camPos) 
     myscreen.camera.SetClippingRange(-(zmult+1)*camPos,(zmult+1)*camPos)
     myscreen.camera.SetFocalPoint(0.0, 0, 0)
+    
     vd = ovd.VoronoiDiagram(far,120)
     print vd.version()
+    
+    # for vtk visualization
     vod = ovdvtk.VD(myscreen,vd,float(scale))
-    drawFarCircle(myscreen, vd.getFarRadius(), ovdvtk.orange)
+    vod.drawFarCircle()
     
     Nmax = 4
     
@@ -123,17 +124,15 @@ if __name__ == "__main__":
     id4 = id_list[3]
     print "add segment ",id1, " to ", id2
     vd.addLineSite( id1, id2 )
-    #drawLine(myscreen, plist[0], plist[1] )
     
     #vd.addLineSite3( id3, id4 )
-    #drawLine(myscreen, plist[2], plist[3] )
     t_after = time.time()
     calctime = t_after-t_before
     if Nmax==0:
         Nmax=1
     print " VD done in ", calctime," s, ", calctime/Nmax," s per generator"
     
-    vod.setAll(vd)
+    vod.setAll()
     myscreen.render()
             
 

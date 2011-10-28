@@ -30,12 +30,15 @@ grass = ( float(182)/255,float(248)/255,float(71)/255)
 blue= (0,0,1)
 lblue= ( float(125)/255,float(191)/255,float(255)/255 )
 cyan=  (0,1,1)
-mag = ( float(153)/255 , float(42)/255 , float(165)/255  )
+magenta = ( float(153)/255 , float(42)/255 , float(165)/255  )
 
 
 class VD:
     def __init__(self, myscreen, vd, scale=1):
         self.myscreen = myscreen
+        self.vd=vd
+        self.scale=scale
+        
         self.gen_pts=[ovd.Point(0,0)]
         self.generators = PointCloud(pointlist=self.gen_pts)
         self.verts=[]
@@ -52,12 +55,15 @@ class VD:
         self.Ngen = 0
         self.vdtext_text = ""
         self.setVDText(vd)
-        self.scale=scale
         self.clearance_disk = 0
         myscreen.addActor(self.vdtext)
     def setVertexRadius(self, r):
         self.vertexRadius=r
-        
+    
+    def drawFarCircle(self, circleColor=magenta):
+        r=self.vd.getFarRadius()
+        self.myscreen.addActor( Circle( center=(0,0,0), radius=r, color=circleColor ) )
+    
     def setVDText(self, vd):
         self.Ngen = len( vd.getGenerators() )-3
         self.vdtext_text = "VD with " + str(self.Ngen) + " generators.\n"
@@ -68,11 +74,11 @@ class VD:
         self.vdtext.SetText( self.vdtext_text )
         
         
-    def setGenerators(self, vd):
+    def setGenerators(self):
         for p in self.gens:
             self.myscreen.removeActor(p)
         self.gens = []
-        for pt in vd.getGenerators():
+        for pt in self.vd.getGenerators():
             p = self.scale*pt
             actor = Sphere( center=(p.x,p.y, 0), radius=self.vertexRadius, color=self.generatorColor )
             self.gens.append(actor)
@@ -101,11 +107,11 @@ class VD:
             
         self.myscreen.render() 
     
-    def setVertices(self, vd):
+    def setVertices(self):
         for p in self.verts:
-            self.myscreen.removeActor(p)
+            self.myscreen.removeActor(p) # remove old actors
         self.verts = []
-        for pt in vd.getVoronoiVertices():
+        for pt in self.vd.getVoronoiVertices(): # create new actors
             p = self.scale*pt[0]
             vcolor = cyan
             status = pt[2]
@@ -118,7 +124,6 @@ class VD:
             actor = Sphere( center=(p.x,p.y, 0), radius=self.vertexRadius, color=vcolor )
             self.verts.append(actor)
             self.myscreen.addActor( actor )
-            
             
             if self.clearance_disk:
                 #draw clearance-disk
@@ -159,11 +164,11 @@ class VD:
         self.myscreen.addActor( self.edge_actor )
         self.myscreen.render() 
 
-    def setEdges(self, vd):
+    def setEdges(self):
         for e in self.edges:
             self.myscreen.removeActor(e)
         self.edges = []
-        for e in vd.getVoronoiEdges():
+        for e in self.vd.getVoronoiEdges():
             epts = e[0]
             etype = e[1]
             ecolor = pink # self.edgeColor
@@ -203,12 +208,12 @@ class VD:
 
         self.myscreen.render() 
         
-    def setAll(self, vd):
-        self.setGenerators(vd)
+    def setAll(self):
+        self.setGenerators()
         #self.setFar(vd)
-        self.setVertices(vd)
+        self.setVertices()
         #self.setEdgesPolydata(vd)
-        self.setEdges(vd)
+        self.setEdges()
         
 
 def drawOCLtext(myscreen):

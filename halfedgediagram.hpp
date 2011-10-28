@@ -203,11 +203,14 @@ VertexVector face_vertices(Face face_idx) const {
     Vertex start_target = boost::target( startedge, g); 
     verts.push_back(start_target);
     Edge current = g[startedge].next;
+    int count=0;
     do {
         Vertex current_target = boost::target( current, g); 
         //assert( current_target != start_target );
         verts.push_back(current_target);
         current = g[current].next;
+        count++;
+        assert( count < 100 ); // stop at some max limit
     } while ( current != startedge );
     return verts;
 }

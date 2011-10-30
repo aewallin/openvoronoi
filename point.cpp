@@ -44,7 +44,14 @@ void Point::normalize() {
 }
 
 Point Point::xyPerp() const {
-        return Point(-y, x);
+    return Point(-y, x);
+    // 2D rotation matrix:
+    //   cos   -sin
+    //   sin   cos
+    // for theta = 90
+    //   0   -1   ( x )
+    //   1    0   ( y )  = ( -y  x )
+    
 }
 
 double Point::xyDistanceToLine(const Point &p1, const Point &p2) const {

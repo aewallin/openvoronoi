@@ -66,7 +66,8 @@ class VD:
     
     def setVDText(self, vd):
         self.Ngen = len( vd.getGenerators() )-3
-        #self.vdtext_text = "VD with " + str(self.Ngen) + " generators.\n"
+        #self.vdtext_text = " "
+        self.vdtext_text = "VD with " + str(self.Ngen) + " generators.\n"
         #self.vdtext_text += "YELLOW = New point-generator/site\n"
         #self.vdtext_text += "PINK = Seed vertex\n"
         #self.vdtext_text += "RED = Delete vertices/edges\n"

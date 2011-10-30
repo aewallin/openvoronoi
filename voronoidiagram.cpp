@@ -190,11 +190,11 @@ int VoronoiDiagram::insert_point_site(const Point& p) {
     BOOST_FOREACH( HEFace f, incident_faces ) {
             add_new_edge(newface, f);
     }
-    
     repair_face( newface );
-    assert( vd_checker->face_ok( newface ) );
     remove_vertex_set();
     reset_status();
+    
+    assert( vd_checker->face_ok( newface ) );
     assert( vd_checker->isValid() );
     return g[new_vert].index;
 }
@@ -204,6 +204,7 @@ void VoronoiDiagram::insert_line_site(int idx1, int idx2) {
     HEVertex start, end;
     bool start_found=false;
     bool end_found=false;
+    // FIXME: search for vertex-descriptor from an index/descriptor table ( O(1) ?)
     BOOST_FOREACH( HEVertex v, g.vertices() ) {
         if ( g[v].index == idx1 ) {
             start = v;
@@ -224,8 +225,8 @@ void VoronoiDiagram::insert_line_site(int idx1, int idx2) {
     g[end].type=ENDPOINT; 
     g[end].status=OUT; 
     
-    LineSite* line_site_se = new LineSite( g[start].position, g[end].position ) ;
-    LineSite* line_site_es = new LineSite( g[end].position, g[start].position ) ;
+    LineSite* line_site_se = new LineSite( g[start].position, g[end  ].position ) ;
+    LineSite* line_site_es = new LineSite( g[end  ].position, g[start].position ) ;
     
     HEEdge s_e = g.add_edge(start,end);
     HEEdge e_s = g.add_edge(end,start);
@@ -236,42 +237,71 @@ void VoronoiDiagram::insert_line_site(int idx1, int idx2) {
     // seed-face is face of start-point
     HEFace start_face = g[start].site->face; 
     HEFace   end_face = g[end  ].site->face;
-     
+    
     // seed 
     HEVertex v_seed = find_seed_vertex(start_face, line_site_se ) ;
     std::cout << "   seed  = " << v_seed << " " << g[v_seed].position << "\n";
     augment_vertex_set(v_seed, line_site_se );
+
+    // check that end_face is INCIDENT?
+    // check that tree includes end_face_seed ?
+    
     std::cout << "   after augment: v0.size() = " << v0.size() << "\n";
     add_new_vertices( line_site_se );  
     
     HEFace face_se = add_new_face( line_site_se ); //  this face to the left of start->end edge    
     HEFace face_es = add_new_face( line_site_es ); //  this face is to the left of end->start edge
-    
     g[face_se].edge = s_e;
     g[face_es].edge = e_s;
     g[s_e].face = face_se;
     g[e_s].face = face_es;
     
-    add_separator(start_face, start, line_site_se, line_site_es);
-    add_separator(end_face  , end,   line_site_se, line_site_es); 
+    // create a point which is left of src->trg
+    // determine k (offset-dir) for this point
+    // the we know which site/face is the k==+1 and which is k==-1
+    Point src_se = line_site_se->start();
+    Point trg_se = line_site_se->end();
+    Point left = 0.5*(src_se+trg_se) + (trg_se-src_se).xyPerp();
+    LineSite* pos_site;
+    LineSite* neg_site;
+    bool se_sign = left.is_right(src_se,trg_se);
+    
+    Point src_es = line_site_es->start();
+    Point trg_es = line_site_es->end();
+    //Point left_es = 0.5*(src_es+trg_es) + (trg_es-src_es).xyPerp();
+    bool es_sign = left.is_right(src_es,trg_es);
+    
+    assert( es_sign != se_sign );
+    
+    if ( es_sign ) {
+        pos_site = line_site_se;
+        neg_site = line_site_es;
+    } else {
+        pos_site = line_site_es;
+        neg_site = line_site_se;
+    }
+    
+    add_separator(start_face, start, pos_site, neg_site); //line_site_se, line_site_es);
+    add_separator(end_face  , end  , pos_site, neg_site); //line_site_se, line_site_es); 
     
     BOOST_FOREACH( HEFace f, incident_faces ) {
         if ( g[f].status == INCIDENT )  {// end-point faces already dealt with in add_separator()
             // find out left/right??
-            add_new_edge(face_se, f, face_es); // each INCIDENT face is split into two parts: newface and f
+            add_new_edge(pos_site->face, f, neg_site->face); // each INCIDENT face is split into two parts: newface and f
         }
     }
     std::cout << " new edges added \n";
-    //repair_face( face_se );
-    //repair_face( face_es );
+    repair_face( face_se );
+    repair_face( face_es );
+    
     std::cout << " faces repaired \n";
     
     remove_vertex_set();    
-    //assert( vd_checker->face_ok( face_se ) );
-    //assert( vd_checker->face_ok( face_es ) );
     reset_status();
     std::cout << " insert_line_site() done.\n";
-    //assert( vd_checker->isValid() );
+    assert( vd_checker->face_ok( face_se ) );
+    assert( vd_checker->face_ok( face_es ) );
+    assert( vd_checker->isValid() );
     return; 
 }
 
@@ -297,8 +327,8 @@ void VoronoiDiagram::add_separator(HEFace f, HEVertex endp, Site* s1, Site* s2) 
     assert( s2->in_region( g[v1].position ) );
     assert( s2->in_region( g[v1].position ) );
 
-    std::cout << " separator endpoint k3=" << g[v1].k3 << "\n";
-    std::cout << " separator endpoint k3=" << g[v2].k3 << "\n";
+    //std::cout << " separator endpoint k3=" << g[v1].k3 << "\n";
+    //std::cout << " separator endpoint k3=" << g[v2].k3 << "\n";
     assert( g[v1].k3 !=  g[v2].k3 ); // should be on opposite sides
     
     HEEdge e2 = g.add_edge( endp, v2 );
@@ -321,7 +351,7 @@ void VoronoiDiagram::add_separator(HEFace f, HEVertex endp, Site* s1, Site* s2) 
     g[e1_tw].face = f;
     g[f].edge = e2;
         
-    // k
+    // k, offset direction
     g[e2].k    = g[v2].k3;
     g[e2_tw].k = g[v2].k3;
     g[e1].k    = g[v1].k3;
@@ -329,11 +359,11 @@ void VoronoiDiagram::add_separator(HEFace f, HEVertex endp, Site* s1, Site* s2) 
     
     // new faces:
     if (g[e1].k == 1) {
-        g[e1].face = s2->face;
-        g[e2_tw].face = s1->face;
-    } else {
-        g[e1].face = s1->face;
+        g[e1].face = s1->face; // s1 is the k==1 face
         g[e2_tw].face = s2->face;
+    } else {
+        g[e1].face = s2->face; // s2 is the k==-1 face
+        g[e2_tw].face = s1->face;
     }
     
     // next-pointers for endpoint-face
@@ -546,50 +576,56 @@ void VoronoiDiagram::add_new_edge(HEFace newface, HEFace f, HEFace newface2) {
     // now connect:   new_previous -> new_source -> new_target -> new_next
     // and:              twin_next <- new_source <- new_target <- twin_previous 
     //                                           new_face   
-    Point pt1;
-    Point pt2;
+
+    // if adding a quadratic edge, check for potential apex-split
+    bool src_sign=true, trg_sign=true;
     if (f_site->isPoint()  && new_site->isLine() ) {
-        pt1 = f_site->position();
-        pt2 = new_site->apex_point(pt1);
-    }    
-    bool src_sign = g[new_source].position.is_right( pt1, pt2 );
-    bool trg_sign = g[new_target].position.is_right( pt1, pt2 );
+        Point pt1 = f_site->position();
+        Point pt2 = new_site->apex_point(pt1);
+        src_sign = g[new_source].position.is_right( pt1, pt2 );
+        trg_sign = g[new_target].position.is_right( pt1, pt2 );
+    } 
+    // sign of quadratic branch
     bool sign=false;
     if (!src_sign)
         sign = true;
-        
+    
+    // both src and trg are on the same side of the new site.
+    // so no apex-split is required, just add a single edge.
     if ( src_sign == trg_sign ) {  // add a single src-trg edge
         HEEdge e_new = g.add_edge( new_source, new_target );
         g[e_new].set_parameters( f_site, new_site, sign ); 
         g[e_new].next = new_next;
         g[e_new].k = g[new_next].k; // the next edge is on the same face, so has the correct k-value
-        g[e_new].face = f;
+        g[e_new].face = f; // src-trg edge has f on its left
         g[new_previous].next = e_new;
         g[f].edge = e_new; 
         // the twin edge that bounds the new face
         HEEdge e_twin = g.add_edge( new_target, new_source );
         g[e_twin].set_parameters( new_site, f_site, sign );
+        g[twin_previous].next = e_twin;
         g[e_twin].next = twin_next; 
         
         // both trg and src should be on same side of new site 
-        assert( g[new_target].k3 == g[new_source].k3 );
-        
+        assert( g[new_target].k3 == g[new_source].k3 );        
         g[e_twin].k = g[new_source].k3; 
+        
         if (g[e_twin].k == 1) {
-            g[e_twin].face = newface;
+            g[e_twin].face = newface; // assumes newface is k==+1 face!
             g[newface].edge = e_twin;
         } else {
-            g[e_twin].face = newface2;
+            g[e_twin].face = newface2; // assumes newface2 is k==-1 face
             g[newface2].edge = e_twin;
         }
-        g[twin_previous].next = e_twin;
         g.twin_edges(e_new,e_twin);
         
     } else {
         // need to do apex-split
+        //                         f               f  
         //   new_prv -> new_src -- e1 ----> APEX --e2 ---> new_trg -> new_nxt
         //   twi_nxt <- new_src <- e1_tw -- APEX <-e2_tw-- new_trg <- twn_prv    
-
+        //                       new1/new2         new1/new2
+        
         //   
         std::cout << " apex_split \n";
         HEVertex apex = g.add_vertex();
@@ -619,7 +655,7 @@ void VoronoiDiagram::add_new_edge(HEFace newface, HEFace f, HEFace newface2) {
         g[e1_tw].k = g[twin_next].k;
         g[e1_tw].k = g[twin_next].k;
         
-        if (g[e1_tw].k == -1) {
+        if (g[e1_tw].k == 1) {
             g[e1_tw].face = newface;
             g[e2_tw].face = newface;
             g[newface].edge = e1_tw;
@@ -629,11 +665,10 @@ void VoronoiDiagram::add_new_edge(HEFace newface, HEFace f, HEFace newface2) {
             g[e2_tw].face = newface2;
             g[newface2].edge = e1_tw;
             g[newface2].edge = e1_tw;
-        }
-        
+        }        
         g.twin_edges(e1,e1_tw);
         g.twin_edges(e2,e2_tw);
-        
+
     // position the apex
         double min_t = g[e1].minimum_t(f_site,new_site);
         g[apex].position = g[e1].point(min_t);

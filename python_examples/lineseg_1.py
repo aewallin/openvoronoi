@@ -96,7 +96,7 @@ if __name__ == "__main__":
     vod = ovdvtk.VD(myscreen,vd,float(scale))
     vod.drawFarCircle()
     
-    Nmax = 5
+    Nmax = 3
     
     plist = randomGenerators(far, Nmax)
     #plist = regularGridGenerators(far, Nmax)
@@ -121,7 +121,7 @@ if __name__ == "__main__":
     id1 = id_list[0]
     id2 = id_list[1]
     id3 = id_list[2]
-    id4 = id_list[3]
+    #id4 = id_list[3]
     print "add segment ",id1, " to ", id2
     vd.addLineSite( id1, id2 )
     

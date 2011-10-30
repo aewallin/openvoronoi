@@ -284,6 +284,11 @@ void VoronoiDiagram::insert_line_site(int idx1, int idx2) {
     add_separator(start_face, start, pos_site, neg_site); //line_site_se, line_site_es);
     add_separator(end_face  , end  , pos_site, neg_site); //line_site_se, line_site_es); 
     
+    assert( vd_checker->face_ok( start_face ) );
+    assert( vd_checker->face_ok( end_face ) );
+    print_face(start_face);
+    print_face(end_face);
+
     BOOST_FOREACH( HEFace f, incident_faces ) {
         if ( g[f].status == INCIDENT )  {// end-point faces already dealt with in add_separator()
             // find out left/right??
@@ -291,17 +296,17 @@ void VoronoiDiagram::insert_line_site(int idx1, int idx2) {
         }
     }
     std::cout << " new edges added \n";
-    repair_face( face_se );
-    repair_face( face_es );
+    //repair_face( face_se );
+    //repair_face( face_es );
     
     std::cout << " faces repaired \n";
     
-    remove_vertex_set();    
-    reset_status();
+    //remove_vertex_set();    
+    //reset_status();
     std::cout << " insert_line_site() done.\n";
-    assert( vd_checker->face_ok( face_se ) );
-    assert( vd_checker->face_ok( face_es ) );
-    assert( vd_checker->isValid() );
+    //assert( vd_checker->face_ok( face_se ) );
+    //assert( vd_checker->face_ok( face_es ) );
+    //assert( vd_checker->isValid() );
     return; 
 }
 

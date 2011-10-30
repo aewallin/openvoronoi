@@ -106,8 +106,12 @@ class VoronoiDiagram_py : public VoronoiDiagram {
         boost::python::list getGenerators()  {
             boost::python::list plist;
             for ( HEFace f=0;f< g.num_faces();++f ) {
-                if ( g[f].site->isPoint() )
-                    plist.append( g[f].site->position()  );
+                if ( g[f].site->isPoint() ) {
+                    boost::python::list p_data;
+                    p_data.append( g[f].site->position()  ); // Point
+                    p_data.append( g[f].site->face  ); // face-descriptor
+                    plist.append( p_data );
+                }
             }
             return plist;
         }
@@ -121,6 +125,7 @@ class VoronoiDiagram_py : public VoronoiDiagram {
                     pd.append( g[v].position );
                     pd.append( g[v].dist() );
                     pd.append( g[v].status );
+                    pd.append( g[v].index );
                     plist.append(pd);
                 }
             }

@@ -56,6 +56,7 @@ class VD:
         self.vdtext_text = ""
         self.setVDText(vd)
         self.clearance_disk = 0
+        self.textScale = 0.06
         myscreen.addActor(self.vdtext)
     def setVertexRadius(self, r):
         self.vertexRadius=r
@@ -79,23 +80,20 @@ class VD:
         for p in self.gens:
             self.myscreen.removeActor(p)
         self.gens = []
-        for pt in self.vd.getGenerators():
+        for pt_data in self.vd.getGenerators():
+            pt = pt_data[0]
+            idx = pt_data[1]
+            
             p = self.scale*pt
             actor = Sphere( center=(p.x,p.y, 0), radius=self.vertexRadius, color=self.generatorColor )
+            id_text = str(idx)
+            factor = FollowerText( text=id_text,center=(p.x,p.y,0), scale = self.textScale, color=self.generatorColor)
+            
             self.gens.append(actor)
             self.myscreen.addActor( actor )
-        """
-        if len(self.gen_pts)>0:
-            myscreen.removeActor( self.generators ) 
-        #self.generators=[]
-        self.gen_pts = []
-        for p in vd.getGenerators():
-            self.gen_pts.append(self.scale*p)
-        self.generators= ovdvtk.PointCloud(pointlist=self.gen_pts) 
-        self.generators.SetPoints()
-        myscreen.addActor(self.generators)
-        self.setVDText(vd)
-        """
+            self.gens.append(factor)
+            self.myscreen.addActor( factor )
+
         self.myscreen.render() 
     
     def setFar(self, vd):
@@ -113,18 +111,29 @@ class VD:
             self.myscreen.removeActor(p) # remove old actors
         self.verts = []
         for pt in self.vd.getVoronoiVertices(): # create new actors
+            # [ position, dist, status, index ]
             p = self.scale*pt[0]
             vcolor = cyan
             status = pt[2]
+            idx = pt[3]
+            
             if status == ovd.VoronoiVertexStatus.IN:
                 vcolor = red
             elif status == ovd.VoronoiVertexStatus.NEW:
                 vcolor = green
             elif status == ovd.VoronoiVertexStatus.OUT:
                 vcolor = blue
+                
             actor = Sphere( center=(p.x,p.y, 0), radius=self.vertexRadius, color=vcolor )
+            
+            id_text = str(idx)
+            factor = FollowerText( text=id_text,center=(p.x,p.y,0), scale = self.textScale, color=vcolor)
+            
             self.verts.append(actor)
             self.myscreen.addActor( actor )
+            
+            self.verts.append(factor)
+            self.myscreen.addActor( factor )
             
             if self.clearance_disk:
                 #draw clearance-disk
@@ -413,13 +422,48 @@ class CamvtkActor(vtk.vtkActor):
     def SetPhong(self):
         """ set phong shading"""
         self.GetProperty().SetInterpolationToPhong()
-    
+
     # possible TODOs
     # specular
     # diffuse
     # ambient
-    
 
+
+
+class FollowerText(vtk.vtkFollower):
+    """ 3D text """
+    def __init__(self,text="test",color=cyan,center=(0,0,0),scale=1):
+        self.textSource = vtk.vtkVectorText()
+        self.textSource.SetText( text )
+        self.scale = scale
+
+        self.transform = vtk.vtkTransform()
+        
+        self.transform.Translate(center[0], center[1], center[2] )
+        self.transform.Scale(self.scale, self.scale, self.scale)
+        self.transformFilter=vtk.vtkTransformPolyDataFilter()
+        self.transformFilter.SetTransform(self.transform)
+        self.transformFilter.SetInputConnection(self.textSource.GetOutputPort())
+        self.transformFilter.Update()
+        
+        self.mapper = vtk.vtkPolyDataMapper()
+        self.mapper.SetInputConnection( self.transformFilter.GetOutputPort() )
+        self.SetMapper(self.mapper)
+        self.SetColor(color)
+        
+    def SetScale(self, scale):
+        self.scale = scale
+        self.transform.Scale(self.scale, self.scale, self.scale)
+        self.transformFilter.Update()
+        
+    def SetText(self,text):
+        self.textSource.SetText( text )
+        
+    def SetColor(self, color):
+        """ set color of actor"""
+        self.GetProperty().SetColor(color)
+        
+        
 class Cone(CamvtkActor):
     """ a cone"""
     def __init__(self,  center=(-2,0,0), radius = 1, angle=45, height=0.4, color=(1,1,0) , resolution=60):

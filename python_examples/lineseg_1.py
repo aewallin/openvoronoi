@@ -85,7 +85,8 @@ if __name__ == "__main__":
     far = 1
     camPos = far
     zmult = 5
-    myscreen.camera.SetPosition(camPos/float(1000), camPos/float(1000), zmult*camPos) 
+    # camPos/float(1000)
+    myscreen.camera.SetPosition(0, -camPos/float(1000), zmult*camPos) 
     myscreen.camera.SetClippingRange(-(zmult+1)*camPos,(zmult+1)*camPos)
     myscreen.camera.SetFocalPoint(0.0, 0, 0)
     

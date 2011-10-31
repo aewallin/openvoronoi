@@ -281,8 +281,6 @@ void VoronoiDiagram::insert_line_site(int idx1, int idx2) {
     g[pos_edge].face = pos_face;
     g[neg_edge].face = neg_face;
     
-
-    
     add_separator(start_face, start, pos_site, neg_site);
     add_separator(end_face  , end  , pos_site, neg_site); 
     
@@ -302,7 +300,7 @@ void VoronoiDiagram::insert_line_site(int idx1, int idx2) {
     }
     
     std::cout << " new edges added \n";
-    remove_vertex_set();
+    //remove_vertex_set();
     std::cout << " k=+1 face is " << pos_site->face << "\n";
     std::cout << " k=-1 face is " << neg_site->face << "\n";
     

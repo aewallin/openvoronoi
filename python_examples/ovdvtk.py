@@ -34,7 +34,7 @@ magenta = ( float(153)/255 , float(42)/255 , float(165)/255  )
 
 
 class VD:
-    def __init__(self, myscreen, vd, scale=1):
+    def __init__(self, myscreen, vd, scale=1, textscale=0.06, vertexradius=0.04):
         self.myscreen = myscreen
         self.vd=vd
         self.scale=scale
@@ -50,13 +50,13 @@ class VD:
         self.seedColor = pink
         self.edgeColor = cyan
         self.vdtext  = Text()
-        self.vertexRadius = scale/50
+        self.vertexRadius = vertexradius
         self.vdtext.SetPos( (50, myscreen.height-150) )
         self.Ngen = 0
         self.vdtext_text = ""
         self.setVDText(vd)
         self.clearance_disk = 0
-        self.textScale = 0.06
+        self.textScale = textscale
         myscreen.addActor(self.vdtext)
     def setVertexRadius(self, r):
         self.vertexRadius=r

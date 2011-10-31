@@ -94,10 +94,11 @@ if __name__ == "__main__":
     print vd.version()
     
     # for vtk visualization
-    vod = ovdvtk.VD(myscreen,vd,float(scale))
+    vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
     vod.drawFarCircle()
     
-    Nmax = 3
+    
+    Nmax = 30
     
     plist = randomGenerators(far, Nmax)
     #plist = regularGridGenerators(far, Nmax)

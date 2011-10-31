@@ -217,8 +217,8 @@ void VoronoiDiagram::insert_line_site(int idx1, int idx2) {
     }
     assert(start_found);
     assert(end_found);
-    std::cout << " found startvert = " << start << " " << g[start].position <<"\n";
-    std::cout << "   found endvert = " << end << " " << g[end].position << "\n";
+    std::cout << " found startvert = " << g[start].index << " " << g[start].position <<"\n";
+    std::cout << "   found endvert = " << g[end].index << " " << g[end].position << "\n";
     
     g[start].type=ENDPOINT; 
     g[start].status=OUT; 
@@ -265,13 +265,14 @@ void VoronoiDiagram::insert_line_site(int idx1, int idx2) {
     
     // seed 
     HEVertex v_seed = find_seed_vertex(start_face, pos_site ) ;
-    std::cout << "   seed  = " << v_seed << " " << g[v_seed].position << "\n";
+    std::cout << "   seed  = " << g[v_seed].index << " " << g[v_seed].position << "\n";
     augment_vertex_set(v_seed, pos_site ); // should not matter if we use pos_site or neg_site here
 
     // check that end_face is INCIDENT?
     // check that tree includes end_face_seed ?
     
     std::cout << "   after augment: v0.size() = " << v0.size() << "\n";
+    std::cout << "   delete-set is: "; print_vertices(v0);    
     add_new_vertices( pos_site );  
     
     HEFace pos_face = add_new_face( pos_site ); //  this face to the left of start->end edge    
@@ -299,10 +300,10 @@ void VoronoiDiagram::insert_line_site(int idx1, int idx2) {
         }
     }
     
-    std::cout << " new edges added \n";
-    //remove_vertex_set();
-    std::cout << " k=+1 face is " << pos_site->face << "\n";
-    std::cout << " k=-1 face is " << neg_site->face << "\n";
+    std::cout << "new edges added \n";
+    remove_vertex_set();
+    //std::cout << " k=+1 face is " << pos_site->face << "\n";
+    //std::cout << " k=-1 face is " << neg_site->face << "\n";
     
     repair_face( pos_face );
     std::cout << " pos face: ";
@@ -311,14 +312,14 @@ void VoronoiDiagram::insert_line_site(int idx1, int idx2) {
     std::cout << " neg face: ";
     print_face( neg_face );
     
-    std::cout << " faces repaired \n";
+    std::cout << "faces repaired \n";
     
         
     //reset_status();
-    std::cout << " insert_line_site() done.\n";
-    //assert( vd_checker->face_ok( face_se ) );
-    //assert( vd_checker->face_ok( face_es ) );
-    //assert( vd_checker->isValid() );
+    std::cout << "insert_line_site() done.\n";
+    assert( vd_checker->face_ok( pos_face ) );
+    assert( vd_checker->face_ok( neg_face ) );
+    assert( vd_checker->isValid() );
     return; 
 }
 
@@ -635,8 +636,9 @@ void VoronoiDiagram::add_new_edge(HEFace newface, HEFace f, HEFace newface2) {
             g[newface2].edge = e_twin;
         }
         g.twin_edges(e_new,e_twin);
-        std::cout << " added edge << " << g[new_target].index << " - " << g[new_source].index << " f=" << g[e_twin].face << " twin_f= " <<  g[e_new].face << " \n";
-        std::cout << " k3 target-source: "<<  g[new_target].k3 << " - " << g[new_source].k3 << "\n";
+        std::cout << " added edge " << g[new_target].index << "-" << g[new_source].index << " f=" << g[e_twin].face;
+        std::cout << " type=" << g[e_twin].type << " twin_f= " <<  g[e_new].face << " \n";
+        //std::cout << " k3 target-source: "<<  g[new_target].k3 << " - " << g[new_source].k3 << "\n";
     } else {
         // need to do apex-split
         //                         f               f  
@@ -645,8 +647,9 @@ void VoronoiDiagram::add_new_edge(HEFace newface, HEFace f, HEFace newface2) {
         //                       new1/new2         new1/new2
         
         //   
-        std::cout << " apex_split \n";
+        
         HEVertex apex = g.add_vertex();
+        std::cout << " apex_split apex=" << g[apex].index << "\n";
         g[apex].type = APEX;
         g[apex].status = NEW;
         HEEdge e1 = g.add_edge( new_source, apex);
@@ -690,13 +693,13 @@ void VoronoiDiagram::add_new_edge(HEFace newface, HEFace f, HEFace newface2) {
     // position the apex
         double min_t = g[e1].minimum_t(f_site,new_site);
         g[apex].position = g[e1].point(min_t);
-        std::cout << " apex = " << g[apex].position << "\n";
+        std::cout << " apex = " << g[apex].position ; // << "\n";
         std::cout << " t: src=" << g[new_source].dist() << " tmin= " << min_t << " trg= " << g[new_target].dist() << "\n";
         
-        std::cout << " added edge << " << g[new_target].index << " - " << g[apex].index << " f=" << g[e1_tw].face << " twin_f= " <<  g[e1].face << " \n";
-        std::cout << " added edge << " << g[apex].index << " - " << g[new_source].index << " f=" << g[e2_tw].face << "\n";
+        std::cout << " added edge " << g[new_target].index << "-" << g[apex].index << " f=" << g[e1_tw].face << " twin_f= " <<  g[e1].face << " \n";
+        std::cout << " added edge " << g[apex].index << "-" << g[new_source].index << " f=" << g[e2_tw].face << "\n";
         
-        std::cout << " k3 target-source: "<<  g[new_target].k3 << " - " << g[new_source].k3 << "\n";
+        //std::cout << " k3 target-source: "<<  g[new_target].k3 << " - " << g[new_source].k3 << "\n";
 
         
         g[apex].init_dist(f_site->apex_point(g[apex].position));

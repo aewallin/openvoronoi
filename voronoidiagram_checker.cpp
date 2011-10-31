@@ -68,7 +68,7 @@ bool VoronoiDiagramChecker::vertex_degree_ok() {
         
         if ( vd->g.degree(v) != VoronoiVertex::expected_degree[ vd->g[v].type ] ) {
             std::cout << " vertex_degree_ok() ERROR\n";
-            std::cout << " vertex type = " << vd->g[v].type << "\n";
+            std::cout << " vertex " << vd->g[v].index << " type = " << vd->g[v].type << "\n";
             std::cout << " vertex degree = " << vd->g.degree(v) << "\n";
             std::cout << " expected degree = " << VoronoiVertex::expected_degree[ vd->g[v].type ]  << "\n";
             return false;
@@ -205,7 +205,7 @@ bool VoronoiDiagramChecker::face_ok(HEFace f) {
         n++;
         assert( n < 100 ); // reasonable max
     } while( current_edge != start_edge);
-    std::cout << " face ok, edges=" << n-1 << "\n";
+    //std::cout << " face ok, edges=" << n-1 << "\n";
     return true;
 }
 

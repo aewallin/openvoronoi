@@ -135,7 +135,7 @@ struct EdgeProps {
     }
     // called for point(s1)-point(s2) edges
     void set_pp_parameters(Site* s1, Site* s2) {
-        std::cout << " set_pp \n";
+        //std::cout << " set_pp \n";
         type = LINE;
     }
     // called for point(s1)-line(s2) edges

@@ -32,7 +32,7 @@ VoronoiDiagram::VoronoiDiagram(double far, unsigned int n_bins) {
     vd_checker = new VoronoiDiagramChecker(this); // helper-class that checks topology/geometry
     vpos = new VertexPositioner(this); // helper-class that positions vertices
     far_radius=far;
-    gen_count=3;
+    num_psites=3;
     initialize();
 }
 
@@ -173,6 +173,7 @@ void VoronoiDiagram::initialize() {
 // 6) remove IN-IN edges and IN-NEW edges
 // 7) reset vertex/face status to be ready for next incremental operation
 int VoronoiDiagram::insert_point_site(const Point& p) {
+    num_psites++;
     assert( p.norm() < far_radius );     // only add vertices within the far_radius circle
     
     HEVertex new_vert = g.add_vertex();
@@ -180,7 +181,7 @@ int VoronoiDiagram::insert_point_site(const Point& p) {
     g[new_vert].type=VERTEXGEN; 
     g[new_vert].status=OUT; 
     g[new_vert].site = new PointSite(p);
-    gen_count++;
+    
     HEFace closest_face = fgrid->grid_find_closest_face( p ); 
     HEVertex v_seed = find_seed_vertex(closest_face, g[new_vert].site ) ;
     augment_vertex_set(v_seed, g[new_vert].site );
@@ -200,6 +201,7 @@ int VoronoiDiagram::insert_point_site(const Point& p) {
 }
 
 void VoronoiDiagram::insert_line_site(int idx1, int idx2) {
+    num_lsites++;
     // find the vertices corresponding to idx1 and idx2
     HEVertex start, end;
     bool start_found=false;
@@ -492,6 +494,7 @@ void VoronoiDiagram::add_new_vertices( Site* new_site ) {
         HEVertex q = g.add_vertex();
         g[q].status = NEW;
         modified_vertices.push_back(q);
+        std::cout << "position new vertex " << g[q].index << "\n";
         g[q].position = vpos->position( q_edges[m], new_site ); // set position
         g[q].k3 = vpos->get_k3();
         g[q].init_dist( new_site->apex_point( g[q].position ) ); // set initial clearance-disk

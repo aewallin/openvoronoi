@@ -48,6 +48,8 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         .def("getFarVoronoiVertices",  &VoronoiDiagram_py::getFarVoronoiVertices)
         .def("getFarRadius",  &VoronoiDiagram_py::get_far_radius)
         .def("getVoronoiEdges",  &VoronoiDiagram_py::getVoronoiEdges)
+        .def("numPointSites", &VoronoiDiagram_py::num_point_sites)
+        .def("numLineSites", &VoronoiDiagram_py::num_line_sites)
         //.def("getClosestFaceGenerator",  &VoronoiDiagram_py::getClosestFaceGenerator)
         //.def("getSeedVertex",  &VoronoiDiagram_py::getSeedVertex) 
         //.def("getSeedVertexLine",  &VoronoiDiagram_py::getSeedVertexLine) 

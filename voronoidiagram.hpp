@@ -79,6 +79,8 @@ class VoronoiDiagram {
         
         friend class VoronoiDiagramChecker;
         friend class VertexPositioner;
+        int num_point_sites() const {return num_psites-3;} // the three initial vertices don't count
+        int num_line_sites() const {return num_lsites;}
 
         std::string version() const { return VERSION_STRING; }
     protected:
@@ -120,7 +122,8 @@ class VoronoiDiagram {
         /// special initial/outer vertices
         HEVertex out_verts[3];
         /// the number of generators
-        int gen_count;
+        int num_psites;
+        int num_lsites;
         /// temporary variable for incident faces, will be reset to NONINCIDENT after a site has been inserted
         FaceVector incident_faces;
         /// temporary variable for in-vertices, out-vertices that need to be reset

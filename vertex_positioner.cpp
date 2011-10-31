@@ -39,12 +39,11 @@ namespace ovd {
 // - site to the right of HEEdge e
 // - given new Site s
 Point VertexPositioner::position(HEEdge e, Site* s) {
+    edge = e;
     HEFace face = vd->g[e].face;     assert(  vd->g[face].status == INCIDENT);
     HEEdge twin = vd->g[e].twin;
     HEFace twin_face = vd->g[twin].face;      assert( vd->g[twin_face].status == INCIDENT);
     
-    std::cout << " position: " <<  vd->g[face].site->str() << " " << vd->g[twin_face].site->str() << " " << s->str() << "\n";
-    std::cout << " k-vals: e.k = " <<  vd->g[e].k << " twin.k = " << vd->g[twin].k  << "\n";
 
     HEVertex src = vd->g.source(e);
     HEVertex trg = vd->g.target(e);
@@ -52,6 +51,11 @@ Point VertexPositioner::position(HEEdge e, Site* s) {
     double t_trg = vd->g[trg].dist();
     t_min = std::min( t_src, t_trg );
     t_max = std::max( t_src, t_trg );
+
+    std::cout << "position new vertex on " <<  vd->g[src].index << "-" << vd->g[trg].index << " edge\n";
+    std::cout << "   adjacent sites: " << vd->g[face].site->str() << " " << vd->g[twin_face].site->str() << " " << s->str() << "\n";
+    std::cout << "   k-vals: e.k = " <<  vd->g[e].k << " twin.k = " << vd->g[twin].k  << "\n";
+
     //std::cout << " t-vals t_min= " << t_min << " t_max= " << t_max << "\n";
     //if ( s->isPoint() )
         t_min = 0;
@@ -59,7 +63,7 @@ Point VertexPositioner::position(HEEdge e, Site* s) {
     //std::cout << " clipped t-vals t_min= " << t_min << " t_max= " << t_max << "\n";
     
     Point p = position( vd->g[face].site  , vd->g[e].k, vd->g[twin_face].site  , vd->g[twin].k, s );
-    
+    std::cout << " new vertex positioned at " << p << "\n";
     //check_far_circle(p);
     /*
     if ( !check_in_edge(e, p, v) ) {
@@ -91,7 +95,9 @@ Point VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Site*
     }
     //std::cout << count << " solutions found by solver \n";
     
-    // restrict to positive t-values below t_max
+    // restrict to:
+    // - positive t-values below t_max
+    // - points that are in_region of the new site    
     std::vector<Point> pts;
     std::vector<double> k3s;
     std::vector<double> ts;
@@ -116,19 +122,49 @@ Point VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Site*
         }
     }
     
-    std::cout << "solutions: pts.size() = " << pts.size() << " count1=" << count1 << " count2=" << count2 << "\n";
+    std::cout << "    solutions: pts.size() = " << pts.size() << " count1=" << count1 << " count2=" << count2 << "\n";
     // further filtering here
     if ( pts.size() == 1) {
         //std::cout << " returning k3= " << k3s[0] << " pt= " << pts[0] << " t=" << ts[0] << "\n";
         k3 = k3s[0];
         return pts[0];
     } else if (pts.size()>1) {
+        // two or more points remain so we must further filter here!
+        std::vector<Point> pts2;
+        std::vector<double> k3s2;
+        std::vector<double> ts2;
         for (unsigned int m=0;m<pts.size();m++)  {
-            //std::cout << m << " : " << pts[m] << " in_region= " << s3->in_region(pts[m]) << "\n";
+            
+            // project onto src-target edge and check t-value.
+            HEVertex src = vd->g.source(edge);
+            HEVertex trg = vd->g.target(edge);
+            Point src_p = vd->g[src].position;
+            Point trg_p = vd->g[trg].position;
+            Point s_p = pts[m] - src_p;
+            Point s_e = trg_p - src_p; // line: src + t*(trg-src)
+            double t = s_p.dot(s_e) / s_e.dot(s_e);
+            // rounding... UGLY
+            double eps = 1e-11;
+            if (fabs(t) < eps) 
+                t= 0;
+            else if ( fabs(t-1.0) < eps )
+                t= 1;
+
+            std::cout << m << " : k3=" << k3s[m] << " p=" << pts[m] << " t=" << ts[m] << " in_region= " << s3->in_region(pts[m]) ;
+            std::cout << " edge_t= " << t << "\n";
+            //std::cout << "in_region t= " << t << "\n";
+            if ( (t>=0) && (t<=1) ) {
+                pts2.push_back( pts[m]  );
+                k3s2.push_back( k3s[m]  );
+                ts2.push_back( ts[m] );
+            }
+            
+            
         }
-        //std::cout << " returning k3= " << k3s[0] << " pt= " << pts[0] << " t=" << ts[0] << "\n";
-        k3 = k3s[0];
-        return pts[0];
+        assert( pts2.size() == 1);
+        std::cout << " returning k3= " << k3s2[0] << " pt= " << pts2[0] << " t=" << ts2[0] << "\n";
+        k3 = k3s2[0];
+        return pts2[0];
     } 
     
     

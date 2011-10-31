@@ -69,7 +69,7 @@ def circleGenerators(far, Nmax):
 
 if __name__ == "__main__":  
     #print ocl.revision()
-    myscreen = ovdvtk.VTKScreen()
+    myscreen = ovdvtk.VTKScreen(width=1920, height=1080)
     ovdvtk.drawOCLtext(myscreen)
     
     w2if = vtk.vtkWindowToImageFilter()
@@ -84,7 +84,7 @@ if __name__ == "__main__":
     random.seed(42)
     far = 1
     camPos = far
-    zmult = 5
+    zmult = 4
     # camPos/float(1000)
     myscreen.camera.SetPosition(0, -camPos/float(1000), zmult*camPos) 
     myscreen.camera.SetClippingRange(-(zmult+1)*camPos,(zmult+1)*camPos)
@@ -98,7 +98,7 @@ if __name__ == "__main__":
     vod.drawFarCircle()
     
     
-    Nmax = 30
+    Nmax = 2
     
     plist = randomGenerators(far, Nmax)
     #plist = regularGridGenerators(far, Nmax)
@@ -122,7 +122,7 @@ if __name__ == "__main__":
         n=n+1
     id1 = id_list[0]
     id2 = id_list[1]
-    id3 = id_list[2]
+    #id3 = id_list[2]
     #id4 = id_list[3]
     print "add segment ",id1, " to ", id2
     vd.addLineSite( id1, id2 )

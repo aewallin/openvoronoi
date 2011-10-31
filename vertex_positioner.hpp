@@ -77,6 +77,7 @@ private:
     double t_min;
     double t_max;
     double k3; // the offset-direction to the new site
+    HEEdge edge;
 };
 
 

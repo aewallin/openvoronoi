@@ -52,12 +52,15 @@ class VD:
         self.vdtext  = Text()
         self.vertexRadius = vertexradius
         self.vdtext.SetPos( (50, myscreen.height-150) )
-        self.Ngen = 0
+        self.N_pointgen = 0
+        self.N_linegen = 0
         self.vdtext_text = ""
-        self.setVDText(vd)
+        self.setVDText()
         self.clearance_disk = 0
         self.textScale = textscale
         myscreen.addActor(self.vdtext)
+
+
     def setVertexRadius(self, r):
         self.vertexRadius=r
     
@@ -65,10 +68,14 @@ class VD:
         r=self.vd.getFarRadius()
         self.myscreen.addActor( Circle( center=(0,0,0), radius=r, color=circleColor ) )
     
-    def setVDText(self, vd):
-        self.Ngen = len( vd.getGenerators() )-3
+    def setVDText(self):
+        self.N_pointgen = self.vd.numPointSites()
+        self.N_linegen = self.vd.numLineSites()
+
         #self.vdtext_text = " "
-        self.vdtext_text = "VD with " + str(self.Ngen) + " generators.\n"
+        self.vdtext_text = "VD with :\n"
+        self.vdtext_text += str(self.N_pointgen) + " point-sites.\n"
+        self.vdtext_text += str(self.N_linegen) + " line-sites.\n"
         #self.vdtext_text += "YELLOW = New point-generator/site\n"
         #self.vdtext_text += "PINK = Seed vertex\n"
         #self.vdtext_text += "RED = Delete vertices/edges\n"
@@ -219,6 +226,7 @@ class VD:
         self.myscreen.render() 
         
     def setAll(self):
+        self.setVDText()
         self.setGenerators()
         #self.setFar(vd)
         self.setVertices()
@@ -323,7 +331,7 @@ class VTKScreen():
     """
     a vtk render window for displaying geometry
     """
-    def __init__(self, width=1280, height=720):
+    def __init__(self, width=1280, height=720): # 1080p:  1920x1080
         """ create a screen """
         self.width=width
         self.height=height

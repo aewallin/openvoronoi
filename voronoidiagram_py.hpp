@@ -172,7 +172,7 @@ class VoronoiDiagram_py : public VoronoiDiagram {
                     } 
                     edge_data.append( point_list );
                     edge_data.append( g[edge].type );
-                    edge_list.append(edge_data);
+                    edge_list.append( edge_data );
             }
             return edge_list;
         }

@@ -683,8 +683,6 @@ void VoronoiDiagram::add_new_edge(HEFace newface, HEFace f, HEFace newface2) {
         g[twin_previous].next = e2_tw;
         g[e2_tw].next = e1_tw;
         g[e1_tw].next = twin_next;
-        //g[e1_tw].face = newface;
-        //g[e2_tw].face = newface;
         g[e1_tw].k = g[new_source].k3;
         g[e2_tw].k = g[new_source].k3;
         
@@ -692,12 +690,10 @@ void VoronoiDiagram::add_new_edge(HEFace newface, HEFace f, HEFace newface2) {
             g[e1_tw].face = newface;
             g[e2_tw].face = newface;
             g[newface].edge = e1_tw;
-            //g[newface].edge = e1_tw;
         } else {
             g[e1_tw].face = newface2;
             g[e2_tw].face = newface2;
             g[newface2].edge = e1_tw;
-            //g[newface2].edge = e1_tw;
         }        
         g.twin_edges(e1,e1_tw);
         g.twin_edges(e2,e2_tw);

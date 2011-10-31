@@ -58,7 +58,7 @@ private:
 
     Point position(Site* p1, double k1, Site* p2, double k2, Site* p3);
     double chop(double val) {
-        double _epsilon = 1e-11;
+        double _epsilon = 1e-10;
         if (fabs(val) < _epsilon) 
             return 0;
         else

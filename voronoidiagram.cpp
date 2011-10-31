@@ -34,6 +34,8 @@ VoronoiDiagram::VoronoiDiagram(double far, unsigned int n_bins) {
     far_radius=far;
     num_psites=3;
     initialize();
+    num_psites=0;
+    num_lsites=0;
 }
 
 VoronoiDiagram::~VoronoiDiagram() { 
@@ -197,6 +199,7 @@ int VoronoiDiagram::insert_point_site(const Point& p) {
     
     assert( vd_checker->face_ok( newface ) );
     assert( vd_checker->isValid() );
+    print_faces();
     return g[new_vert].index;
 }
 
@@ -267,7 +270,7 @@ void VoronoiDiagram::insert_line_site(int idx1, int idx2) {
     
     // seed 
     HEVertex v_seed = find_seed_vertex(start_face, pos_site ) ;
-    std::cout << "   seed  = " << g[v_seed].index << " " << g[v_seed].position << "\n";
+    std::cout << " start face seed  = " << g[v_seed].index << " " << g[v_seed].position << "\n";
     augment_vertex_set(v_seed, pos_site ); // should not matter if we use pos_site or neg_site here
 
     // check that end_face is INCIDENT?
@@ -304,24 +307,24 @@ void VoronoiDiagram::insert_line_site(int idx1, int idx2) {
     
     std::cout << "new edges added \n";
     remove_vertex_set();
-    //std::cout << " k=+1 face is " << pos_site->face << "\n";
-    //std::cout << " k=-1 face is " << neg_site->face << "\n";
+    std::cout << " k=+1 face is " << pos_site->face << "\n";
+    std::cout << " k=-1 face is " << neg_site->face << "\n";
     
     repair_face( pos_face );
-    std::cout << " pos face: ";
-    print_face( pos_face );
     repair_face( neg_face );
-    std::cout << " neg face: ";
-    print_face( neg_face );
     
-    std::cout << "faces repaired \n";
+    std::cout << " pos face: "; print_face( pos_face );
+    std::cout << " neg face: "; print_face( neg_face );
+    
+    std::cout << "faces " << start_face << " " << end_face << " " << pos_face << " " << neg_face << " repaired \n";
     
         
-    //reset_status();
-    std::cout << "insert_line_site() done.\n";
+    reset_status();
+    std::cout << "insert_line_site(" << g[start].index << "-"<< g[end].index << ") done.\n";
     assert( vd_checker->face_ok( pos_face ) );
     assert( vd_checker->face_ok( neg_face ) );
     assert( vd_checker->isValid() );
+    print_faces();
     return; 
 }
 
@@ -410,7 +413,7 @@ HEVertex VoronoiDiagram::find_seed_vertex(HEFace f, Site* site) const { //const 
     HEVertex minimalVertex =  HEVertex() ;
     bool first = true;
     BOOST_FOREACH( HEVertex q, face_verts) { // go thorugh all the vertices and find the one with smallest detH
-        if ( g[q].status != OUT ) {
+        if ( (g[q].status != OUT) && (g[q].type == NORMAL) ) {
             double h = g[q].in_circle( site->apex_point( g[q].position ) ); 
             if ( first || ( (h<minPred) && (site->in_region(g[q].position) ) ) ) {
                 minPred = h;
@@ -477,7 +480,12 @@ void VoronoiDiagram::mark_vertex(HEVertex& v,  Site* site) {
 void VoronoiDiagram::mark_adjacent_faces( HEVertex v) {
     assert( g[v].status == IN );
     FaceVector new_adjacent_faces = g.adjacent_faces( v ); 
-    assert( new_adjacent_faces.size()==3 );
+    
+    if (g[v].type == APEX)
+        assert( new_adjacent_faces.size()==2 );
+    else
+        assert( new_adjacent_faces.size()==3 );
+    
     BOOST_FOREACH( HEFace adj_face, new_adjacent_faces ) {
         if ( g[adj_face].status  != INCIDENT ) {
             g[adj_face].status = INCIDENT; 
@@ -664,6 +672,7 @@ void VoronoiDiagram::add_new_edge(HEFace newface, HEFace f, HEFace newface2) {
         g[e2].next=new_next;
         g[e1].face = f;
         g[e2].face = f;
+        g[f].edge = e1;
         g[e1].k = g[new_next].k;
         g[e2].k = g[new_next].k;
     // twin edges
@@ -683,12 +692,12 @@ void VoronoiDiagram::add_new_edge(HEFace newface, HEFace f, HEFace newface2) {
             g[e1_tw].face = newface;
             g[e2_tw].face = newface;
             g[newface].edge = e1_tw;
-            g[newface].edge = e1_tw;
+            //g[newface].edge = e1_tw;
         } else {
             g[e1_tw].face = newface2;
             g[e2_tw].face = newface2;
             g[newface2].edge = e1_tw;
-            g[newface2].edge = e1_tw;
+            //g[newface2].edge = e1_tw;
         }        
         g.twin_edges(e1,e1_tw);
         g.twin_edges(e2,e2_tw);
@@ -766,8 +775,8 @@ void VoronoiDiagram::repair_face( HEFace f ) {
         assert(found_next_edge); // must find a next-edge!
         current_edge = g[current_edge].next; // jump to the next edge
     } while (g[current_edge].next != start_edge);
-    std::cout << " repair done:\n";
-    print_face(f);
+    //std::cout << " repair done:\n";
+    //print_face(f);
 }
 
 void VoronoiDiagram::remove_vertex_set() {
@@ -825,8 +834,21 @@ bool VoronoiDiagram::predicate_c4(HEVertex v) {
 // do any of the three faces that are adjacent to the given IN-vertex v have an IN-vertex ?
 // predicate C5 i.e. "connectedness"  from Sugihara&Iri 1992 "one million" paper
 bool VoronoiDiagram::predicate_c5(HEVertex v) {
+    
+    if (g[v].type == APEX) {
+        return true;
+    }
+    
     FaceVector adj_faces = g.adjacent_faces(v);   
+    
+    if (adj_faces.size() != 3 ) {
+        std::cout << " ERROR adj_faces.size()= " << adj_faces.size() << "\n";
+        std::cout << g[v].index << " adjacent to : ";
+        for (unsigned int m=0;m<adj_faces.size();m++)
+            std::cout << adj_faces[m] << " ";
+    }
     assert( adj_faces.size() == 3 );
+    
     FaceVector adjacent_incident_faces; // find the ajacent incident faces
     BOOST_FOREACH( HEFace f, adj_faces ) {
         if ( g[f].status == INCIDENT )

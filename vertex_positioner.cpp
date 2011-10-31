@@ -144,7 +144,7 @@ Point VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Site*
             Point s_e = trg_p - src_p; // line: src + t*(trg-src)
             double t = s_p.dot(s_e) / s_e.dot(s_e);
             // rounding... UGLY
-            double eps = 1e-11;
+            double eps = 2e-11;
             if (fabs(t) < eps) 
                 t= 0;
             else if ( fabs(t-1.0) < eps )
@@ -161,6 +161,8 @@ Point VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Site*
             
             
         }
+        
+        // after filtering only one point should remain
         assert( pts2.size() == 1);
         std::cout << " returning k3= " << k3s2[0] << " pt= " << pts2[0] << " t=" << ts2[0] << "\n";
         k3 = k3s2[0];

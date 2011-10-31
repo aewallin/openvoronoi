@@ -98,7 +98,7 @@ if __name__ == "__main__":
     vod.drawFarCircle()
     
     
-    Nmax = 4
+    Nmax = 7
     
     plist = randomGenerators(far, Nmax)
     #plist = regularGridGenerators(far, Nmax)
@@ -120,14 +120,23 @@ if __name__ == "__main__":
         print n," adding ",p
         id_list.append( vd.addVertexSite( p ) )
         n=n+1
-    id1 = id_list[0]
-    id2 = id_list[1]
+        
+    Nsegs = 2
+    
+    ids=[]
+    for n in range(Nsegs*2):
+        ids.append( id_list[n] )
+    #id1 = id_list[0]
+    #id2 = id_list[1]
     #id3 = id_list[2]
     #id4 = id_list[3]
-    print "add segment ",id1, " to ", id2
-    vd.addLineSite( id1, id2 )
+    for n in range(0, len(ids)-1, 2 ):
+        id1= ids[n]
+        id2= ids[n+1]
+        print "add segment ",id1, " to ", id2
+        vd.addLineSite( id1, id2 )
+    #vd.addLineSite( id3, id4 )
     
-    #vd.addLineSite3( id3, id4 )
     t_after = time.time()
     calctime = t_after-t_before
     if Nmax==0:

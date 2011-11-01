@@ -80,36 +80,35 @@ template <class TOutEdgeList,
           class TEdgeList 
           >
 class HEDIGraph {
-    public:
-        typedef unsigned int Face; 
-        typedef typename boost::adjacency_list< TOutEdgeList,            
-                                                TVertexList,            
-                                                TDirected,   
-                                                TVertexProperties,             
-                                                TEdgeProperties,                
-                                                TGraphProperties,
-                                                TEdgeList
-                                                > BGLGraph;
-        typedef typename boost::graph_traits< BGLGraph >::edge_descriptor Edge;
-        typedef typename boost::graph_traits< BGLGraph >::vertex_descriptor Vertex;
-        typedef std::vector<Vertex> VertexVector;
-        typedef std::vector<Face> FaceVector;
-        typedef std::vector<Edge> EdgeVector;  
+public:
+    typedef unsigned int Face; 
+    typedef typename boost::adjacency_list< TOutEdgeList,            
+                                            TVertexList,            
+                                            TDirected,   
+                                            TVertexProperties,             
+                                            TEdgeProperties,                
+                                            TGraphProperties,
+                                            TEdgeList
+                                            > BGLGraph;
+    typedef typename boost::graph_traits< BGLGraph >::edge_descriptor Edge;
+    typedef typename boost::graph_traits< BGLGraph >::vertex_descriptor Vertex;
+    typedef std::vector<Vertex> VertexVector;
+    typedef std::vector<Face> FaceVector;
+    typedef std::vector<Edge> EdgeVector;  
 
-        inline TFaceProperties& operator[](Face f)  { return faces[f];  }
-        inline const TFaceProperties& operator[](Face f) const  { return faces[f]; } 
-        
-        
-        inline TEdgeProperties& operator[](Edge e)  { return g[e];  }
-        inline const TEdgeProperties& operator[](Edge e) const  { return g[e];  }
-        
-        
-        inline TVertexProperties& operator[](Vertex v)  { return g[v];  }
-        inline const TVertexProperties& operator[](Vertex v) const  { return g[v];  }
-        
+    inline TFaceProperties& operator[](Face f)  { return faces[f];  }
+    inline const TFaceProperties& operator[](Face f) const  { return faces[f]; } 
+    
+    
+    inline TEdgeProperties& operator[](Edge e)  { return g[e];  }
+    inline const TEdgeProperties& operator[](Edge e) const  { return g[e];  }
+    
+    inline TVertexProperties& operator[](Vertex v)  { return g[v];  }
+    inline const TVertexProperties& operator[](Vertex v) const  { return g[v];  }
+    
 //DATA
-        std::vector< TFaceProperties > faces;
-        BGLGraph g;
+    std::vector< TFaceProperties > faces;
+    BGLGraph g;
 
 /// add a blank vertex and return its descriptor
 Vertex add_vertex() { 
@@ -151,7 +150,6 @@ void twin_edges( Edge e1, Edge e2 ) {
     g[e2].twin = e1;
 }
 
-
 /// add a face 
 Face add_face() {
     TFaceProperties f_prop;
@@ -160,7 +158,6 @@ Face add_face() {
     faces[index].idx = index;
     return index;    
 }
-        
 
 /// return the target vertex of the given edge
 Vertex target( Edge e ) { 
@@ -196,7 +193,6 @@ VertexVector adjacent_vertices(  Vertex v) {
 }
 
 /// return all vertices of given face
-
 VertexVector face_vertices(Face face_idx) const {
     VertexVector verts;
     Edge startedge = faces[face_idx].edge; // the edge where we start
@@ -227,8 +223,6 @@ VertexVector face_vertices(Face face_idx) const {
     return verts;
 }
 
-
-
 /// return degree of given vertex
 unsigned int degree( Vertex v)  { 
     return boost::degree( v, g); 
@@ -252,7 +246,7 @@ EdgeVector out_edges( Vertex v) {
 }
 
 /// return all edges
-EdgeVector  edges() {
+EdgeVector edges() {
     typedef typename boost::graph_traits< BGLGraph >::edge_iterator      HEEdgeItr; 
     EdgeVector ev;
     HEEdgeItr it, it_end;
@@ -469,9 +463,7 @@ void remove_edge( Edge e) {
 
 }; // end class definition
 
-
 } // end hedi namespace
-
 
 #endif
 // end halfedgediagram.hpp

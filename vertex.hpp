@@ -28,7 +28,6 @@
 
 namespace ovd {
 
-
 /// As we incrementally construct the diagram voronoi-vertices can have one of these four different states. 
 /// The status is updated as follows:
 /// OUT-vertices will not be deleted
@@ -39,18 +38,18 @@ enum VoronoiVertexStatus {OUT, IN, UNDECIDED, NEW };
 
 /// This is the permanent type of a vertex in the diagram. 
 /// OUTER vertices are special vertices added in init(), should have degree==4
-/// VERTEXGEN are vertex generators, should have degree==0
+/// POINTSITE are point sites, should have degree==0
 /// NORMAL are normal voronoi-vertices, should have degree==6  (degree 3 graph with double-edges)
-enum VoronoiVertexType {OUTER, NORMAL, VERTEXGEN, ENDPOINT, APEX};
+/// ENDPOINT vertices are end-points of line-segments or arc-segments
+/// APEX vertices split quadratic edges at their apex(closest point to site)
+enum VoronoiVertexType {OUTER, NORMAL, POINTSITE, ENDPOINT, APEX};
 
 /// a map of this type is used by topology-checker to check that all vertices
 /// have the expected (correct) degree (i.e. number of edges)
 typedef std::map<VoronoiVertexType, unsigned int> VertexDegreeMap;
 
 
-
-
-/// properties of a vertex in the voronoi diagram
+/// A vertex in the voronoi diagram
 /// an object of this type is held in the BGL-graph for each vertex.
 class VoronoiVertex {
 public:
@@ -60,6 +59,7 @@ public:
     /// vertex with given position, status, and type
     VoronoiVertex( Point p, VoronoiVertexStatus st, VoronoiVertexType t);
     void init();
+    /// reset status
     void reset();
     /// index of vertex
     int index;
@@ -72,19 +72,13 @@ public:
     Point position;
     
     typedef unsigned int HEFace; 
-    //HEFace face; // the face associated with this vertex, if type==VERTEXGEN
+
     friend class VoronoiDiagramChecker;
     
     /// initialize clerance-disk
     void init_dist(const Point& p) {
         r = dist(p);
     }
-    /// update clearance-disk
-    //void update_dist(const Point& p) {
-    //    double d = dist(p);
-    //    if (d<r)
-    //        r=d;
-    //}
     /// return distance to a point from this vertex
     double dist(const Point& p) const { return (position-p).norm(); }
     /// return clearance-disk radius
@@ -93,7 +87,7 @@ public:
     double in_circle(const Point& p) const { return dist(p) - r; }
     /// if this vertex is a PointSite, then we store a pointer to the site here.
     Site* site;
-    double k3; // the offset-direction to the newly inserted site..
+    double k3; // the offset-direction to the newly inserted site.
 protected:
     /// global vertex count
     static int count;
@@ -101,9 +95,7 @@ protected:
     static VertexDegreeMap expected_degree;
     /// clearance-disk radius, i.e. the closest site is at this distance
     double r;
-    
 };
-
 
 } // end ocl namespace
 #endif

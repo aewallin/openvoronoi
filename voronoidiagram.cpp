@@ -70,9 +70,9 @@ void VoronoiDiagram::initialize() {
     HEVertex g1 = g.add_vertex();
     HEVertex g2 = g.add_vertex();
     HEVertex g3 = g.add_vertex();
-    g[g1] = VoronoiVertex( gen1 , OUT, VERTEXGEN);
-    g[g2] = VoronoiVertex( gen2 , OUT, VERTEXGEN);
-    g[g3] = VoronoiVertex( gen3 , OUT, VERTEXGEN);
+    g[g1] = VoronoiVertex( gen1 , OUT, POINTSITE);
+    g[g2] = VoronoiVertex( gen2 , OUT, POINTSITE);
+    g[g3] = VoronoiVertex( gen3 , OUT, POINTSITE);
     // add face 1: v0-v1-v2 which encloses gen3
     HEEdge e1 =  g.add_edge( v0 , v01 );   
     HEEdge e2 =  g.add_edge( v01, v02 );
@@ -82,7 +82,6 @@ void VoronoiDiagram::initialize() {
     g[f1].site = new PointSite(gen3,f1);
     g[f1].status = NONINCIDENT;
     
-    
     fgrid->add_face( g[f1] );
     g[e1].face = f1;
     g[e2].face = f1;
@@ -90,8 +89,6 @@ void VoronoiDiagram::initialize() {
     g[e1].next = e2;
     g[e2].next = e3;
     g[e3].next = e1;
-    
-    //g[g3].face = f1;
 
     // add face 2: v0-v02-v03 which encloses gen1
     HEEdge e4 = g.add_edge( v0, v02   );   
@@ -109,7 +106,6 @@ void VoronoiDiagram::initialize() {
     g[e4].next = e5;
     g[e5].next = e6;
     g[e6].next = e4;
-    //g[g1].face = f2;
     
     // add face 3: v0-v3-v1 which encloses gen2
     HEEdge e7 = g.add_edge( v0 , v03 );   
@@ -126,7 +122,6 @@ void VoronoiDiagram::initialize() {
     g[e7].next = e8;
     g[e8].next = e9;
     g[e9].next = e7;
-    //g[g2].face = f3;
     
     // set type. (note that edge-params x[8] and y[8] are not set!
     g[e1].type = LINE;
@@ -161,7 +156,7 @@ void VoronoiDiagram::initialize() {
     g[e8].k = 1.0;
     g[e9].k = 1.0;
     
-    assert( vd_checker->isValid() );
+    assert( vd_checker->is_valid() );
 }
 
 // comments relate to Sugihara-Iri 1994 paper
@@ -180,7 +175,7 @@ int VoronoiDiagram::insert_point_site(const Point& p) {
     
     HEVertex new_vert = g.add_vertex();
     g[new_vert].position=p; 
-    g[new_vert].type=VERTEXGEN; 
+    g[new_vert].type=POINTSITE; 
     g[new_vert].status=OUT; 
     g[new_vert].site = new PointSite(p);
     
@@ -198,7 +193,7 @@ int VoronoiDiagram::insert_point_site(const Point& p) {
     reset_status();
     
     assert( vd_checker->face_ok( newface ) );
-    assert( vd_checker->isValid() );
+    assert( vd_checker->is_valid() );
     print_faces();
     return g[new_vert].index;
 }
@@ -323,7 +318,7 @@ void VoronoiDiagram::insert_line_site(int idx1, int idx2) {
     std::cout << "insert_line_site(" << g[start].index << "-"<< g[end].index << ") done.\n";
     assert( vd_checker->face_ok( pos_face ) );
     assert( vd_checker->face_ok( neg_face ) );
-    assert( vd_checker->isValid() );
+    assert( vd_checker->is_valid() );
     print_faces();
     return; 
 }

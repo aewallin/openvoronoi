@@ -24,12 +24,12 @@ namespace ovd {
 
     
 /// sanity-check for the diagram, calls other sanity-check functions
-bool VoronoiDiagramChecker::isValid() {
-    if (!vertex_degree_ok() )
-        return false;
-    if (!face_count_equals_generator_count())
-        return false;
-    return true;
+bool VoronoiDiagramChecker::is_valid() {
+    return  (   all_faces_ok() && 
+                vertex_degree_ok() &&
+                face_count_equals_generator_count()
+            );
+
 }
     
     
@@ -108,7 +108,7 @@ bool VoronoiDiagramChecker::vertex_degree_ok() {
     
     
     /// check that all vertices in the input vector are of type IN
-    bool VoronoiDiagramChecker::allIn( const VertexVector& q) {
+    bool VoronoiDiagramChecker::all_in( const VertexVector& q) {
         BOOST_FOREACH( HEVertex v, q) {
             if ( vd->g[v].status != IN )
                 return false;
@@ -190,6 +190,15 @@ bool VoronoiDiagramChecker::inCircle_is_negative(  const Point& p, HEFace f, HEV
     }
     
     return (minimumH <= 0 );
+}
+
+// check that all faces are ok
+bool VoronoiDiagramChecker::all_faces_ok() {
+    for(HEFace f=0;f< vd->g.num_faces() ; f++ ) {
+        if (!face_ok(f))
+            return false;    
+    }
+    return true;
 }
 
 bool VoronoiDiagramChecker::face_ok(HEFace f) {

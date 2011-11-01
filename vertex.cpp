@@ -34,7 +34,7 @@ int VoronoiVertex::count = 0;
 VertexDegreeMap VoronoiVertex::expected_degree = boost::assign::map_list_of 
     (OUTER,4)   // special outer vertices
     (NORMAL,6)  // normal vertex in the graph
-    (VERTEXGEN,0) // point site
+    (POINTSITE,0) // point site
     (ENDPOINT,6)  // end-point of line or arc
     (APEX,4) ; // apex point on quadratic bisector
 

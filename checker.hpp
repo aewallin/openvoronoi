@@ -32,7 +32,7 @@ public:
     ~VoronoiDiagramChecker() {}
     
     /// sanity-check for the diagram, calls other sanity-check functions
-    bool isValid();
+    bool is_valid();
     
     /// check that number of faces equals the number of generators
     bool face_count_equals_generator_count();
@@ -44,18 +44,18 @@ public:
     bool allIncidentFacesOK();
     
     /// check that all vertices in the input vector are of type IN
-    bool allIn( const VertexVector& q);
+    bool all_in( const VertexVector& q);
 
     /// check that no undecided vertices remain in the face
     bool  noUndecidedInFace(  HEFace f );
   
     bool faceVerticesConnected( HEFace f, VoronoiVertexStatus Vtype );
     bool incidentFaceVerticesConnected(  VoronoiVertexStatus Vtype );
-    
     bool inCircle_is_negative(  const Point& p, HEFace f, HEVertex minimalVertex );
-    
     bool current_face_equals_next_face( HEEdge e); 
     bool face_ok(HEFace f);
+    bool all_faces_ok();
+private:
     VoronoiDiagram* vd;
 };
 

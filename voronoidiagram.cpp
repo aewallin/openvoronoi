@@ -23,7 +23,7 @@
 
 #include "voronoidiagram.hpp"
 #include "facegrid.hpp"
-#include "voronoidiagram_checker.hpp"
+#include "checker.hpp"
 
 namespace ovd {
 
@@ -187,11 +187,11 @@ int VoronoiDiagram::insert_point_site(const Point& p) {
     HEFace closest_face = fgrid->grid_find_closest_face( p ); 
     HEVertex v_seed = find_seed_vertex(closest_face, g[new_vert].site ) ;
     augment_vertex_set(v_seed, g[new_vert].site );
-    add_new_vertices( g[new_vert].site );    
-    HEFace newface = add_new_face( g[new_vert].site );
+    add_vertices( g[new_vert].site );    
+    HEFace newface = add_face( g[new_vert].site );
       
     BOOST_FOREACH( HEFace f, incident_faces ) {
-            add_new_edge(newface, f);
+            add_edge(newface, f);
     }
     repair_face( newface );
     remove_vertex_set();
@@ -278,10 +278,10 @@ void VoronoiDiagram::insert_line_site(int idx1, int idx2) {
     
     std::cout << "   after augment: v0.size() = " << v0.size() << "\n";
     std::cout << "   delete-set is: "; print_vertices(v0);    
-    add_new_vertices( pos_site );  
+    add_vertices( pos_site );  
     
-    HEFace pos_face = add_new_face( pos_site ); //  this face to the left of start->end edge    
-    HEFace neg_face = add_new_face( neg_site ); //  this face is to the left of end->start edge
+    HEFace pos_face = add_face( pos_site ); //  this face to the left of start->end edge    
+    HEFace neg_face = add_face( neg_site ); //  this face is to the left of end->start edge
     g[pos_face].edge = pos_edge;
     g[neg_face].edge = neg_edge;
     g[pos_edge].face = pos_face;
@@ -301,7 +301,7 @@ void VoronoiDiagram::insert_line_site(int idx1, int idx2) {
     BOOST_FOREACH( HEFace f, incident_faces ) {
         if ( g[f].status == INCIDENT )  {// end-point faces already dealt with in add_separator()
             // find out left/right??
-            add_new_edge(pos_site->face, f, neg_site->face); // each INCIDENT face is split into two parts: newface and f
+            add_edge(pos_site->face, f, neg_site->face); // each INCIDENT face is split into two parts: newface and f
         }
     }
     
@@ -495,7 +495,7 @@ void VoronoiDiagram::mark_adjacent_faces( HEVertex v) {
 }
 
 // generate new voronoi-vertices on all IN-OUT edges 
-void VoronoiDiagram::add_new_vertices( Site* new_site ) {
+void VoronoiDiagram::add_vertices( Site* new_site ) {
     assert( !v0.empty() );
     EdgeVector q_edges = find_in_out_edges();       // new vertices generated on these IN-OUT edges
     for( unsigned int m=0; m<q_edges.size(); ++m )  {   
@@ -583,7 +583,7 @@ void VoronoiDiagram::add_vertex_in_edge( HEVertex v, HEEdge e) {
 
 // add a new face corresponding to the new Site
 // call add_new_edge() on all the incident_faces that should be split
-HEFace VoronoiDiagram::add_new_face(Site* s) { 
+HEFace VoronoiDiagram::add_face(Site* s) { 
     HEFace newface =  g.add_face(); 
     g[newface].site = s;
     g[newface].status = NONINCIDENT;
@@ -594,7 +594,7 @@ HEFace VoronoiDiagram::add_new_face(Site* s) {
 }
 
 // by adding a NEW-NEW edge, split the face f into one part which is newface, and the other part is the old f
-void VoronoiDiagram::add_new_edge(HEFace newface, HEFace f, HEFace newface2) {
+void VoronoiDiagram::add_edge(HEFace newface, HEFace f, HEFace newface2) {
     HEVertex new_source, new_target; 
     HEEdge new_previous, new_next, twin_next, twin_previous;
     Site* f_site = g[f].site;

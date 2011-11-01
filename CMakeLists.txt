@@ -106,8 +106,8 @@ set_source_files_properties(
 # this defines the source-files
 set(OVD_SRC
     ${OpenVoronoi_SOURCE_DIR}/voronoidiagram.cpp
-    ${OpenVoronoi_SOURCE_DIR}/voronoivertex.cpp
-    ${OpenVoronoi_SOURCE_DIR}/voronoidiagram_checker.cpp
+    ${OpenVoronoi_SOURCE_DIR}/vertex.cpp
+    ${OpenVoronoi_SOURCE_DIR}/checker.cpp
     ${OpenVoronoi_SOURCE_DIR}/facegrid.cpp
     ${OpenVoronoi_SOURCE_DIR}/point.cpp
     ${OpenVoronoi_SOURCE_DIR}/vertex_positioner.cpp
@@ -116,10 +116,10 @@ set(OVD_SRC
 set( OVD_INCLUDE_FILES  
     ${OpenVoronoi_SOURCE_DIR}/point.hpp
     ${OpenVoronoi_SOURCE_DIR}/halfedgediagram.hpp
-    ${OpenVoronoi_SOURCE_DIR}/voronoidiagram_graph.hpp
+    ${OpenVoronoi_SOURCE_DIR}/graph.hpp
     ${OpenVoronoi_SOURCE_DIR}/voronoidiagram.hpp
-    ${OpenVoronoi_SOURCE_DIR}/voronoivertex.hpp
-    ${OpenVoronoi_SOURCE_DIR}/voronoidiagram_checker.hpp
+    ${OpenVoronoi_SOURCE_DIR}/vertex.hpp
+    ${OpenVoronoi_SOURCE_DIR}/checker.hpp
     ${OpenVoronoi_SOURCE_DIR}/vertex_positioner.hpp
     ${OpenVoronoi_SOURCE_DIR}/facegrid.hpp
     ${CMAKE_CURRENT_BINARY_DIR}/version_string.hpp

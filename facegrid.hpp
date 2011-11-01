@@ -25,7 +25,7 @@
 
 #include <boost/multi_array.hpp> 
 
-#include "voronoidiagram_graph.hpp"
+#include "graph.hpp"
 #include "point.hpp"
 
 namespace ovd

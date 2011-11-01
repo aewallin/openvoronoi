@@ -17,7 +17,7 @@
  *  along with OpenCAMlib.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "voronoidiagram_checker.hpp"
+#include "checker.hpp"
 #include "voronoidiagram.hpp"
 
 namespace ovd {

@@ -22,7 +22,7 @@
 
 #include <boost/assign.hpp>
 
-#include "voronoivertex.hpp"
+#include "vertex.hpp"
 
 namespace ovd {
 

@@ -26,7 +26,7 @@
 #include "vertex_positioner.hpp"
 #include "voronoidiagram.hpp"
 
-#include "voronoivertex.hpp"
+
 
 namespace ovd {
 

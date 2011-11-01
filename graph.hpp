@@ -26,7 +26,7 @@
 
 #include "point.hpp"
 #include "halfedgediagram.hpp"
-#include "voronoivertex.hpp"
+#include "vertex.hpp"
 #include "site.hpp"
 #include "edge.hpp"
 

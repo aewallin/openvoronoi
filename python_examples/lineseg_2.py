@@ -111,8 +111,8 @@ def drawFrame(N=2,nframe=1):
     
     vod.setAll()
     myscreen.render()
-    writeFrame( w2if, lwr, nframe )
-    #w2if.Modified()
+    #writeFrame( w2if, lwr, nframe )
+    
     print "PYTHON All DONE."
 
 if __name__ == "__main__":  

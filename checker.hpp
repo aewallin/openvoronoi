@@ -19,10 +19,10 @@
 #ifndef VODI_CHECK_H
 #define VODI_CHECK_H
 
-#include "voronoidiagram_graph.hpp"
+#include "graph.hpp"
 
-namespace ovd
-{
+namespace ovd {
+
 class VoronoiDiagram;
 
 /// this class provides sanity-checks for the VoronoiDiagram class

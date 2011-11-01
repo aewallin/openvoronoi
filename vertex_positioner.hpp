@@ -22,8 +22,8 @@
 
 #include <boost/tuple/tuple.hpp>
 
-#include "voronoidiagram_graph.hpp"
-#include "voronoivertex.hpp"
+#include "graph.hpp"
+#include "vertex.hpp"
 
 namespace ovd {
 

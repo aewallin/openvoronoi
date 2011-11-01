@@ -60,7 +60,9 @@ public:
     virtual std::string str() const {assert(0); return "Site";}
     virtual bool isPoint() const { return false;}
     virtual bool isLine() const {  return false;}
-    virtual bool in_region(const Point& p) {return false;}
+    virtual bool in_region(const Point& p) const {return false;}
+    virtual double in_region_t(const Point& p) const {return 0;} 
+    
     typedef unsigned int HEFace;    
     HEFace face;
 protected:
@@ -88,7 +90,9 @@ public:
     virtual double k() const {return 0;}
     virtual bool isPoint() const {return true;}
     virtual std::string str() const {return "PointSite";}
-    virtual bool in_region(const Point& p) {return true;}
+    virtual bool in_region(const Point& p) const {return true;}
+    
+
 private:
     PointSite() {} // don't use!
     Point _p;
@@ -127,7 +131,23 @@ public:
         }
     }
     virtual std::string str() const {return "LineSite";}
-    virtual bool in_region(const Point& p) {
+    virtual bool in_region(const Point& p) const{
+        /*
+        Point s_p = p-_start;
+        Point s_e = _end - _start;
+        double t = s_p.dot(s_e) / s_e.dot(s_e);
+        // rounding... UGLY
+        double eps = 1e-11;
+        if (fabs(t) < eps) 
+            t= 0;
+        else if ( fabs(t-1.0) < eps )
+            t= 1;
+            */
+        double t = in_region_t(p);
+        //std::cout << "in_region t= " << t << "\n";
+        return ( (t>=0) && (t<=1) );
+    }
+    virtual double in_region_t(const Point& p) const {
         Point s_p = p-_start;
         Point s_e = _end - _start;
         double t = s_p.dot(s_e) / s_e.dot(s_e);
@@ -138,7 +158,7 @@ public:
         else if ( fabs(t-1.0) < eps )
             t= 1;
         //std::cout << "in_region t= " << t << "\n";
-        return ( (t>=0) && (t<=1) );
+        return t;
     }
     virtual bool isLine() const {return true;}
     virtual double a() const { return eq.a; }

@@ -172,8 +172,10 @@ Point VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Site*
     
     std::cout << " NO solutions found!\n";
     for (int m=0;m<count1;m++) {
-        //Point pt(solns1[m][0], solns1[m][1] ) ;
-        std::cout << "+1 sln: " << m << " :  ( " << solns1[m][0] << " , " << solns1[m][1] << " , " << solns1[m][2] << " )\n";
+        Point pt(solns1[m][0], solns1[m][1] ) ;
+        std::cout << "+1 sln: " << m << " :  ( " << pt << " , t=";
+        std::cout << solns1[m][2] << " in_region=" << s3->in_region(pt); // << ")\n";
+        std::cout << " in_r_t=" << s3->in_region_t(pt) << ")\n";
         //if ( (solns1[m][2] >= t_min) && (solns1[m][2] <= t_max) && s3->in_region(pt) )  { // t-value
             //std::cout << "+1 new: " << m << " :  ( " << solns1[m][0] << " , " << solns1[m][1] << " , " << solns1[m][2] << " )\n";
         //    pts.push_back( Point(solns1[m][0], solns1[m][1] ) );
@@ -182,8 +184,10 @@ Point VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Site*
        // }
     }
     for (int m=0;m<count2;m++) {
-        //Point pt(solns2[m][0], solns2[m][1] ) ;
-        std::cout << "-1 sln: " << m << " :  ( " << solns2[m][0] << " , " << solns2[m][1] << " , " << solns2[m][2] <<  " )\n";
+        Point pt(solns2[m][0], solns2[m][1] ) ;
+        std::cout << "+1 sln: " << m << " :  ( " << pt << " , t=";
+        std::cout << solns2[m][2] << " in_region=" << s3->in_region(pt);
+        std::cout << " in_r_t=" << s3->in_region_t(pt) << ")\n";
         //if ( (solns2[m][2] >= t_min) && (solns2[m][2] <= t_max) && s3->in_region(pt) )  { // t-value
             //std::cout << "-1 new: " << m << " :  ( " << solns2[m][0] << " , " << solns2[m][1] << " , " << solns2[m][2] << " in_region=" << s3->in_region(pt) << " )\n";
         //    pts.push_back( pt );
@@ -271,19 +275,20 @@ int VertexPositioner::solver(Site* s1, double k1, Site* s2, double k2, Site* s3,
     std::cout << "\n";
     */
     
-    // now subtract one quadratic from another to obtain a system
-    // of one quadratic and two linear eqns
-    int v0 = quadratic[0]; // the one we subtract from the others
-    // Subtract one quadratic equation from all the others,
-    // making new linear equations.
-    for(int i=1; i<quadratic_count; i++) {
-        int vi = quadratic[i]; // the one to do subtraction on
-        for(int j=0; j<4; j++) // four parameters: a,b,k,c
-            vectors[vi][j] -= vectors[v0][j];
-        linear[linear_count++] = vi; // now we have a new linear eqn
+    if (linear_count != 2 ) { // 3 caught above. 2 can skip this. 1 needs this code
+        // now subtract one quadratic from another to obtain a system
+        // of one quadratic and two linear eqns
+        int v0 = quadratic[0]; // the one we subtract from the others
+        // Subtract one quadratic equation from all the others,
+        // making new linear equations.
+        for(int i=1; i<quadratic_count; i++) {
+            int vi = quadratic[i]; // the one to do subtraction on
+            for(int j=0; j<4; j++) // four parameters: a,b,k,c
+                vectors[vi][j] -= vectors[v0][j];
+            linear[linear_count++] = vi; // now we have a new linear eqn
+        }
+        assert(linear_count == 2); // At this point, we should have exactly two linear equations.
     }
-    assert(linear_count == 2); // At this point, we should have exactly two linear equations.
-
     /*
     std::cout << " AFTER SUBTRACT linear_count = " << linear_count << " : ";
     for (int m=0;m<linear_count;m++)

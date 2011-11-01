@@ -88,8 +88,8 @@ class VD:
             self.myscreen.removeActor(p)
         self.gens = []
         for pt_data in self.vd.getGenerators():
-            pt = pt_data[0]
-            idx = pt_data[1]
+            pt = pt_data[0] # [ point, dist, status, index ]
+            idx = pt_data[3] # index
             
             p = self.scale*pt
             actor = Sphere( center=(p.x,p.y, 0), radius=self.vertexRadius, color=self.generatorColor )

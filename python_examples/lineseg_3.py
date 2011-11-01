@@ -101,6 +101,7 @@ if __name__ == "__main__":
     Nmax = 8
     
     plist = randomGenerators(far, Nmax)
+        
     #plist = regularGridGenerators(far, Nmax)
     #plist = circleGenerators(far, Nmax)
     
@@ -123,16 +124,18 @@ if __name__ == "__main__":
         
     Nsegs = 2
     
-    ids=[]
-    for n in range(Nsegs*2):
-        ids.append( id_list[n] )
+    segs=[]
+    #for n in range(Nsegs*2):
+    #    ids.append( id_list[n] )
+    segs.append( [17,13] )
+    segs.append( [26,44] )
     #id1 = id_list[0]
     #id2 = id_list[1]
     #id3 = id_list[2]
     #id4 = id_list[3]
-    for n in range(0, len(ids)-1, 2 ):
-        id1= ids[n]
-        id2= ids[n+1]
+    for seg in segs:
+        id1= seg[0]
+        id2= seg[1]
         print "add segment ",id1, " to ", id2
         vd.addLineSite( id1, id2 )
     #vd.addLineSite( id3, id4 )

@@ -171,6 +171,26 @@ Point VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Site*
     
     
     std::cout << " NO solutions found!\n";
+    for (int m=0;m<count1;m++) {
+        //Point pt(solns1[m][0], solns1[m][1] ) ;
+        std::cout << "+1 sln: " << m << " :  ( " << solns1[m][0] << " , " << solns1[m][1] << " , " << solns1[m][2] << " )\n";
+        //if ( (solns1[m][2] >= t_min) && (solns1[m][2] <= t_max) && s3->in_region(pt) )  { // t-value
+            //std::cout << "+1 new: " << m << " :  ( " << solns1[m][0] << " , " << solns1[m][1] << " , " << solns1[m][2] << " )\n";
+        //    pts.push_back( Point(solns1[m][0], solns1[m][1] ) );
+        //    k3s.push_back( +1 );
+        //    ts.push_back( solns1[m][2] );
+       // }
+    }
+    for (int m=0;m<count2;m++) {
+        //Point pt(solns2[m][0], solns2[m][1] ) ;
+        std::cout << "-1 sln: " << m << " :  ( " << solns2[m][0] << " , " << solns2[m][1] << " , " << solns2[m][2] <<  " )\n";
+        //if ( (solns2[m][2] >= t_min) && (solns2[m][2] <= t_max) && s3->in_region(pt) )  { // t-value
+            //std::cout << "-1 new: " << m << " :  ( " << solns2[m][0] << " , " << solns2[m][1] << " , " << solns2[m][2] << " in_region=" << s3->in_region(pt) << " )\n";
+        //    pts.push_back( pt );
+        //    k3s.push_back( -1  );
+        //    ts.push_back( solns2[m][2] );
+        //}
+    }
     assert(0);
     return Point(0,0);
 }

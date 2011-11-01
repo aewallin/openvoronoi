@@ -70,15 +70,11 @@ public:
     bool in_queue;
     /// the position of the vertex
     Point position;
-    
-    typedef unsigned int HEFace; 
 
     friend class VoronoiDiagramChecker;
     
     /// initialize clerance-disk
-    void init_dist(const Point& p) {
-        r = dist(p);
-    }
+    void init_dist(const Point& p) { r = dist(p); }
     /// return distance to a point from this vertex
     double dist(const Point& p) const { return (position-p).norm(); }
     /// return clearance-disk radius

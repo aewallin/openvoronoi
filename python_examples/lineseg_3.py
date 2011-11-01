@@ -98,7 +98,7 @@ if __name__ == "__main__":
     vod.drawFarCircle()
     
     
-    Nmax = 20
+    Nmax = 8
     
     plist = randomGenerators(far, Nmax)
     #plist = regularGridGenerators(far, Nmax)

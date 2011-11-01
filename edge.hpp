@@ -115,6 +115,7 @@ struct EdgeProps {
         assert( mint >=0 );
         return mint;
     }
+    // sign is the branch of the quadratic!
     void set_parameters(Site* s1, Site* s2, bool sig) {
         sign = sig;
         if (s1->isPoint() && s2->isPoint())        // PP

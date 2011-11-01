@@ -505,6 +505,8 @@ void VoronoiDiagram::add_vertices( Site* new_site ) {
     }
 }
 
+/// when a new vertex has been added and positioned it is inserted
+/// into the edge where it belongs here.
 void VoronoiDiagram::add_vertex_in_edge( HEVertex v, HEEdge e) {
     // the vertex v is inserted into the middle of edge e
     // edge e and its twin are replaced by four new edges: e1,e2 and their twins te2,te1
@@ -515,11 +517,12 @@ void VoronoiDiagram::add_vertex_in_edge( HEVertex v, HEEdge e) {
     //            tw_trg  <- v <- tw_src <- tw_previous
     //                    te2  te1
     //                    twin_face
+    //
     HEEdge twin = g[e].twin;
-    HEVertex source = g.source(e); //boost::source( e , g );
-    HEVertex target = g.target(e); //boost::target( e , g);
-    HEVertex twin_source = g.source(twin); //boost::source( twin , g);
-    HEVertex twin_target = g.target(twin); //boost::target( twin , g );
+    HEVertex source = g.source(e); 
+    HEVertex target = g.target(e); 
+    HEVertex twin_source = g.source(twin); 
+    HEVertex twin_target = g.target(twin); 
     assert( source == twin_target );    
     assert( target == twin_source );
     HEFace face = g[e].face;
@@ -529,7 +532,7 @@ void VoronoiDiagram::add_vertex_in_edge( HEVertex v, HEEdge e) {
     HEEdge twin_previous = g.previous_edge(twin);
     assert( g[twin_previous].face == g[twin].face );
     
-    HEEdge e1 = g.add_edge( source, v ); // these replace e
+    HEEdge e1 = g.add_edge( source, v ); // e1 and e1 replace e
     HEEdge e2 = g.add_edge( v, target );    
     // preserve the left/right face link
     g[e1].face = face;
@@ -538,14 +541,17 @@ void VoronoiDiagram::add_vertex_in_edge( HEVertex v, HEEdge e) {
     g[previous].next = e1;
     g[e1].next = e2;
     g[e2].next = g[e].next;
-    // k-vals
+    // k-values
     g[e1].k = g[e].k;
     g[e2].k = g[e].k;
     // type
     g[e1].type = g[e].type;
     g[e2].type = g[e].type;
-    
-    HEEdge te1 = g.add_edge( twin_source, v  ); // these replace twin
+    // edge-parameters
+    g[e1].set_parameters(g[face].site, g[twin_face].site, !g[e].sign );
+    g[e2].set_parameters(g[face].site, g[twin_face].site, !g[e].sign );
+
+    HEEdge te1 = g.add_edge( twin_source, v  ); // te1 and te2 replace twin
     HEEdge te2 = g.add_edge( v, twin_target  );
     
     g[te1].face = twin_face;
@@ -566,7 +572,10 @@ void VoronoiDiagram::add_vertex_in_edge( HEVertex v, HEEdge e) {
     // type
     g[te1].type = g[twin].type;
     g[te2].type = g[twin].type;
-    
+    // edge parameters
+    g[te1].set_parameters(g[face].site, g[twin_face].site, !g[twin].sign );
+    g[te2].set_parameters(g[face].site, g[twin_face].site, !g[twin].sign );
+
     // update the faces (required here?)
     g[face].edge = e1;
     g[twin_face].edge = te1;
@@ -643,7 +652,7 @@ void VoronoiDiagram::add_edge(HEFace newface, HEFace f, HEFace newface2) {
         }
         g.twin_edges(e_new,e_twin);
         std::cout << " added edge " << g[new_target].index << "-" << g[new_source].index << " f=" << g[e_twin].face;
-        std::cout << " type=" << g[e_twin].type << " twin_f= " <<  g[e_new].face << " \n";
+        std::cout << " type=" << g[e_twin].type << " k= " << g[e_twin].k << " twin_f= " <<  g[e_new].face << " \n";
         //std::cout << " k3 target-source: "<<  g[new_target].k3 << " - " << g[new_source].k3 << "\n";
     } else {
         // need to do apex-split
@@ -655,7 +664,7 @@ void VoronoiDiagram::add_edge(HEFace newface, HEFace f, HEFace newface2) {
         //   
         
         HEVertex apex = g.add_vertex();
-        std::cout << " apex_split apex=" << g[apex].index << "\n";
+        //std::cout << " apex_split apex=" << g[apex].index << "\n";
         g[apex].type = APEX;
         g[apex].status = NEW;
         HEEdge e1 = g.add_edge( new_source, apex);
@@ -696,11 +705,11 @@ void VoronoiDiagram::add_edge(HEFace newface, HEFace f, HEFace newface2) {
     // position the apex
         double min_t = g[e1].minimum_t(f_site,new_site);
         g[apex].position = g[e1].point(min_t);
-        std::cout << " apex = " << g[apex].position ; // << "\n";
+        std::cout << "   apex= " << g[apex].index ; // << "\n";
         std::cout << " t: src=" << g[new_source].dist() << " tmin= " << min_t << " trg= " << g[new_target].dist() << "\n";
         
-        std::cout << " added edge " << g[new_target].index << "-" << g[apex].index << " f=" << g[e1_tw].face << " twin_f= " <<  g[e1].face << " \n";
-        std::cout << " added edge " << g[apex].index << "-" << g[new_source].index << " f=" << g[e2_tw].face << "\n";
+        std::cout << " added edge " << g[new_target].index << "-" << g[apex].index << " f=" << g[e1_tw].face << " k= " << g[e1_tw].k << " twin_f= " <<  g[e1].face << " \n";
+        std::cout << " added edge " << g[apex].index << "-" << g[new_source].index << " f=" << g[e2_tw].face << " k= " << g[e2_tw].k << "\n";
         
         //std::cout << " k3 target-source: "<<  g[new_target].k3 << " - " << g[new_source].k3 << "\n";
 
@@ -737,9 +746,7 @@ boost::tuple<HEEdge, HEVertex, HEEdge> VoronoiDiagram::find_new_vertex(HEFace f,
     return boost::tuple<HEEdge, HEVertex, HEEdge>( prev, v, twin_next );
 }
 
-// start on g[newface].egdge, walk around the face and repair the next-pointers
-// 1) repair the next-pointers for newface that are broken.
-// 2) remove IN vertices in the set v0
+// start on g[newface].edge, walk around the face and repair the next-pointers
 void VoronoiDiagram::repair_face( HEFace f ) {
     //std::cout << "repair_face( " << f << " )\n";
     HEEdge current_edge = g[f].edge; 
@@ -825,21 +832,10 @@ bool VoronoiDiagram::predicate_c4(HEVertex v) {
 // do any of the three faces that are adjacent to the given IN-vertex v have an IN-vertex ?
 // predicate C5 i.e. "connectedness"  from Sugihara&Iri 1992 "one million" paper
 bool VoronoiDiagram::predicate_c5(HEVertex v) {
-    
-    if (g[v].type == APEX) {
-        return true;
-    }
+    if (g[v].type == APEX) { return true; } // ?
     
     FaceVector adj_faces = g.adjacent_faces(v);   
-    
-    if (adj_faces.size() != 3 ) {
-        std::cout << " ERROR adj_faces.size()= " << adj_faces.size() << "\n";
-        std::cout << g[v].index << " adjacent to : ";
-        for (unsigned int m=0;m<adj_faces.size();m++)
-            std::cout << adj_faces[m] << " ";
-    }
-    assert( adj_faces.size() == 3 );
-    
+    assert( adj_faces.size() == 3 );    
     FaceVector adjacent_incident_faces; // find the ajacent incident faces
     BOOST_FOREACH( HEFace f, adj_faces ) {
         if ( g[f].status == INCIDENT )

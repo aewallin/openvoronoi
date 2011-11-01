@@ -548,9 +548,11 @@ void VoronoiDiagram::add_vertex_in_edge( HEVertex v, HEEdge e) {
     g[e1].type = g[e].type;
     g[e2].type = g[e].type;
     // edge-parameters
-    g[e1].set_parameters(g[face].site, g[twin_face].site, !g[e].sign );
-    g[e2].set_parameters(g[face].site, g[twin_face].site, !g[e].sign );
-
+    if (g[e].type != SEPARATOR ) {
+        g[e1].set_parameters(g[face].site, g[twin_face].site, !g[e].sign );
+        g[e2].set_parameters(g[face].site, g[twin_face].site, !g[e].sign );
+    }
+    
     HEEdge te1 = g.add_edge( twin_source, v  ); // te1 and te2 replace twin
     HEEdge te2 = g.add_edge( v, twin_target  );
     
@@ -573,9 +575,10 @@ void VoronoiDiagram::add_vertex_in_edge( HEVertex v, HEEdge e) {
     g[te1].type = g[twin].type;
     g[te2].type = g[twin].type;
     // edge parameters
-    g[te1].set_parameters(g[face].site, g[twin_face].site, !g[twin].sign );
-    g[te2].set_parameters(g[face].site, g[twin_face].site, !g[twin].sign );
-
+    if (g[twin].type != SEPARATOR ) {
+        g[te1].set_parameters(g[face].site, g[twin_face].site, !g[twin].sign );
+        g[te2].set_parameters(g[face].site, g[twin_face].site, !g[twin].sign );
+    }
     // update the faces (required here?)
     g[face].edge = e1;
     g[twin_face].edge = te1;

@@ -122,14 +122,14 @@ if __name__ == "__main__":
         id_list.append( vd.addVertexSite( p ) )
         n=n+1
         
-    Nsegs = 2
+    Nsegs = 0
     
     segs=[]
     #for n in range(Nsegs*2):
     #    ids.append( id_list[n] )
     segs.append( [17,13] )
-    #segs.append( [26,44] )
-    segs.append( [26,44] ) 
+    segs.append( [21,34] )
+    #segs.append( [26,44] ) 
     #id1 = id_list[0]
     #id2 = id_list[1]
     #id3 = id_list[2]

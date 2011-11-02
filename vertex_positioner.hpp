@@ -32,6 +32,13 @@ class VoronoiDiagram;
 
 typedef boost::tuple<Point, double> PointDoubleTuple;
 
+struct Solution {
+    Solution(Point pt, double tv, double k) : p(pt), t(tv), k3(k) {}
+    Point p;
+    double t;
+    double k3;
+};
+
 /// Calculates the (x,y) position of vertices in a voronoi diagram
 class VertexPositioner {
 public:
@@ -46,8 +53,8 @@ private:
     Point ppp_solver(const Point& p1, const Point& p2, const Point& p3);
     
     int lll_solver(Site* s1, Site* s2, Site* s3); // linear 3x3 system
-    int solver(Site* s1, double k1, Site* s2, double k2, Site* s3, double k3, double solns[][3] ); 
-    int qqq_solver( double l0[], double l1[], int xi, int yi, int ti, double xk, double yk, double kk, double rk, double solns[][3]);
+    int solver(Site* s1, double k1, Site* s2, double k2, Site* s3, double k3, std::vector<Solution>& slns ); 
+    int qqq_solver( double l0[], double l1[], int xi, int yi, int ti, double xk, double yk, double kk, double rk, double k3, std::vector<Solution>& slns );
     int qll_solve( double a0, double b0, double c0, double d0, 
                       double e0, double f0, double g0, 
                       double a1, double b1, 

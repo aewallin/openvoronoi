@@ -70,7 +70,7 @@ def circleGenerators(far, Nmax):
 if __name__ == "__main__":  
     #print ocl.revision()
     myscreen = ovdvtk.VTKScreen(width=1024, height=720) #(width=1920, height=1080)
-    ovdvtk.drawOCLtext(myscreen)
+    ovdvtk.drawOCLtext(myscreen, rev_text=ovd.revision() )
     
     w2if = vtk.vtkWindowToImageFilter()
     w2if.SetInput(myscreen.renWin)
@@ -98,7 +98,7 @@ if __name__ == "__main__":
     vod.drawFarCircle()
     
     
-    Nmax = 8
+    Nmax = 20
     
     plist = randomGenerators(far, Nmax)
         
@@ -121,24 +121,30 @@ if __name__ == "__main__":
         print n," adding ",p
         id_list.append( vd.addVertexSite( p ) )
         n=n+1
-        
+
     Nsegs = 0
     
-    segs=[]
+    vd.addLineSite(17,13,20)
+    vd.addLineSite(21,34,2)
+
+
+    #segs=[]
+    
+    
     #for n in range(Nsegs*2):
     #    ids.append( id_list[n] )
-    segs.append( [17,13] )
-    segs.append( [21,34] )
+    #segs.append( [17,13] )
+    #segs.append( [21,34] )
     #segs.append( [26,44] ) 
     #id1 = id_list[0]
     #id2 = id_list[1]
     #id3 = id_list[2]
     #id4 = id_list[3]
-    for seg in segs:
-        id1= seg[0]
-        id2= seg[1]
-        print "add segment ",id1, " to ", id2
-        vd.addLineSite( id1, id2 )
+    #for seg in segs:
+    #    id1= seg[0]
+    #    id2= seg[1]
+    #    print "add segment ",id1, " to ", id2
+    #    vd.addLineSite( id1, id2 , 20)
     #vd.addLineSite( id3, id4 )
     
     t_after = time.time()

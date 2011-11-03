@@ -141,7 +141,9 @@ struct EdgeProps {
     }
     // called for point(s1)-line(s2) edges
     void set_pl_parameters(Site* s1, Site* s2) {
-        //std::cout << " set_pl sign=" << sign << "\n";
+        assert( s1->isPoint() );
+        assert( s2->isLine() );
+        
         type = PARABOLA;
         double alfa3 = s2->a()*s1->x() + s2->b()*s1->y() + s2->c();
         // figure out k, i.e. offset-direction for LineSite

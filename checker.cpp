@@ -204,8 +204,14 @@ bool VoronoiDiagramChecker::all_faces_ok() {
 bool VoronoiDiagramChecker::face_ok(HEFace f) {
     HEEdge current_edge = vd->g[f].edge;
     HEEdge start_edge= current_edge;
+    double k = vd->g[current_edge].k;
+    assert( (k==1) || (k==-1) );
+    if ( vd->g[f].site->isPoint() ) {
+        assert( k==1 );
+    }
     int n=0;
     do {
+        assert( vd->g[current_edge].k == k );
         current_edge = vd->g[current_edge].next;
         if (!current_face_equals_next_face(current_edge)) {
             std::cout << " face_ok() ERROR \n";

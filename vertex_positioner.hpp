@@ -20,7 +20,7 @@
 #ifndef VERTEX_POSITIONER_HPP
 #define VERTEX_POSITIONER_HPP
 
-#include <boost/tuple/tuple.hpp>
+#include <qd/qd_real.h> // http://crd.lbl.gov/~dhbailey/mpdist/
 
 #include "graph.hpp"
 #include "vertex.hpp"
@@ -28,9 +28,6 @@
 namespace ovd {
 
 class VoronoiDiagram;
-
-
-typedef boost::tuple<Point, double> PointDoubleTuple;
 
 struct Solution {
     Solution(Point pt, double tv, double k) : p(pt), t(tv), k3(k) {}
@@ -48,22 +45,27 @@ public:
     Point position( HEEdge e, Site* s);
     double get_k3() const {return k3;}
 private:
-    inline double sq(double x) {return x*x;}
+    Point position(Site* p1, double k1, Site* p2, double k2, Site* p3);
+    
     /// point-point-point positioner
     Point ppp_solver(const Point& p1, const Point& p2, const Point& p3);
     
-    int lll_solver(Site* s1, Site* s2, Site* s3); // linear 3x3 system
     int solver(Site* s1, double k1, Site* s2, double k2, Site* s3, double k3, std::vector<Solution>& slns ); 
-    int qqq_solver( double l0[], double l1[], int xi, int yi, int ti, double xk, double yk, double kk, double rk, double k3, std::vector<Solution>& slns );
-    int qll_solve( double a0, double b0, double c0, double d0, 
-                      double e0, double f0, double g0, 
-                      double a1, double b1, 
-                      double a2, double b2, 
-                      double soln[][3]);
-    int quadratic_roots(double a, double b, double c, double roots[]);
+    
+    int lll_solver(Site* s1, Site* s2, Site* s3); // linear 3x3 system
+    
+    int qqq_solver( qd_real l0[], qd_real l1[], int xi, int yi, int ti, 
+                    qd_real xk, qd_real yk, qd_real kk, qd_real rk, qd_real k3, std::vector<Solution>& slns );
+    
+    int qll_solve( qd_real a0, qd_real b0, qd_real c0, qd_real d0, 
+                      qd_real e0, qd_real f0, qd_real g0, 
+                      qd_real a1, qd_real b1, 
+                      qd_real a2, qd_real b2, 
+                      qd_real soln[][3]);
+    int quadratic_roots(qd_real a, qd_real b, qd_real c, qd_real roots[]);
 
-
-    Point position(Site* p1, double k1, Site* p2, double k2, Site* p3);
+    double edge_t(HEEdge e, Point p );
+    
     double chop(double val) {
         double _epsilon = 1e-10;
         if (fabs(val) < _epsilon) 
@@ -71,7 +73,15 @@ private:
         else
             return val;
     }
-    
+    qd_real chop(qd_real val) {
+        qd_real _epsilon = 1e-10;
+        if (fabs(val) < _epsilon) 
+            return qd_real(0);
+        else
+            return val;
+    }
+    inline double sq(double x) {return x*x;}
+
 // geometry-checks
     bool check_on_edge(HEEdge e, const Point& p);
     bool check_in_edge(HEEdge e, const Point& p, HEVertex v);

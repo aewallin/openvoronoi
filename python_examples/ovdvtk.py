@@ -49,16 +49,25 @@ class VD:
         self.vertexColor = blue
         self.seedColor = pink
         self.edgeColor = cyan
-        self.vdtext  = Text()
         self.vertexRadius = vertexradius
-        self.vdtext.SetPos( (50, myscreen.height-150) )
+        
+        self.vdtext  = Text()
+        self.vdtext.SetPos( (50, myscreen.height-70) )
+        myscreen.addActor(self.vdtext)
+        
+        self.gittext  = Text()
+        self.gittext.SetPos( (50, 30) )
+        self.gittext_text = "github.com/aewallin"
+        self.gittext.SetText( self.gittext_text )
+        myscreen.addActor(self.gittext)
+        
         self.N_pointgen = 0
         self.N_linegen = 0
         self.vdtext_text = ""
         self.setVDText()
         self.clearance_disk = 0
         self.textScale = textscale
-        myscreen.addActor(self.vdtext)
+        
 
 
     def setVertexRadius(self, r):
@@ -234,11 +243,11 @@ class VD:
         self.setEdges()
         
 
-def drawOCLtext(myscreen):
+def drawOCLtext(myscreen, rev_text=" "):
     t = Text()
-    t.SetPos( (myscreen.width-200, myscreen.height-50) )
+    t.SetPos( (myscreen.width-200, myscreen.height-70) )
     date_text = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    t.SetText( "OpenCAMLib\n" + date_text )
+    t.SetText( "OpenVoronoi\n" + rev_text + "\n" + date_text )
     myscreen.addActor(t)
 
 def drawBB( myscreen, vol ):

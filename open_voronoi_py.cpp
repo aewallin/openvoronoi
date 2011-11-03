@@ -30,9 +30,13 @@ using namespace ovd;
 
 namespace bp = boost::python;
 
+std::string ovd_revision() {
+    return VERSION_STRING;
+}
 
 BOOST_PYTHON_MODULE(openvoronoi) {
-
+    bp::def("revision", ovd_revision);
+    
     bp::class_<VoronoiDiagram >("VoronoiDiagram_base")
     ;
     bp::class_< VoronoiDiagram_py, bp::bases<VoronoiDiagram> >("VoronoiDiagram")

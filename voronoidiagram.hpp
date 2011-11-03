@@ -68,7 +68,7 @@ class VoronoiDiagram {
         /// returns an integer handle to the inserted point. use this integer when inserting lines/arcs
         int insert_point_site(const Point& p);
         /// insert a line-segment site into the diagram
-        void insert_line_site(int idx1, int idx2);
+        void insert_line_site(int idx1, int idx2, int steps=10);
         /// return the far radius
         double get_far_radius() const {return far_radius;}
         /// return number of point sites in diagram

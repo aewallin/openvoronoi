@@ -79,6 +79,12 @@ if(Boost_FOUND)
     MESSAGE(STATUS "Boost_LIBRARIES is: " ${Boost_LIBRARIES})    
 endif()
 
+set( CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR} ) # Findqd.cmake is in this dir
+# find the qd library
+find_package( qd REQUIRED )
+include_directories(${QD_INCLUDE_DIR})
+
+
 ################ create version_string.hpp, http://stackoverflow.com/questions/3780667
 # include the output directory, where the version_string.hpp file is generated
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
@@ -146,8 +152,8 @@ add_library(
     MODULE
     open_voronoi_py.cpp
 )
-MESSAGE(STATUS "linking python binary with boost: " ${Boost_PYTHON_LIBRARY})
-target_link_libraries(openvoronoi libopenvoronoi ${Boost_LIBRARIES} ) #${Boost_PYTHON_LIBRARY})
+# MESSAGE(STATUS "linking python binary with boost: " ${Boost_PYTHON_LIBRARY})
+target_link_libraries(openvoronoi libopenvoronoi ${Boost_LIBRARIES} ${QD_LIBRARY}) #${Boost_PYTHON_LIBRARY})
 set_target_properties(openvoronoi PROPERTIES PREFIX "") 
 
 

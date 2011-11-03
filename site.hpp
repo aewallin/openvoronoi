@@ -81,9 +81,7 @@ public:
     }
     ~PointSite() {}
     virtual Point apex_point(const Point& p) { return _p; }
-    virtual const Point position() const {
-        return _p;
-    }
+    virtual const Point position() const { return _p; }
     virtual double x() const {return _p.x;}
     virtual double y() const {return _p.y;}
     virtual double r() const {return 0;}
@@ -91,8 +89,6 @@ public:
     virtual bool isPoint() const {return true;}
     virtual std::string str() const {return "PointSite";}
     virtual bool in_region(const Point& p) const {return true;}
-    
-
 private:
     PointSite() {} // don't use!
     Point _p;

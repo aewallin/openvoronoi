@@ -198,7 +198,7 @@ int VoronoiDiagram::insert_point_site(const Point& p) {
     return g[new_vert].index;
 }
 
-void VoronoiDiagram::insert_line_site(int idx1, int idx2, int steps) {
+bool VoronoiDiagram::insert_line_site_step(int idx1, int idx2, int step) {
     num_lsites++;
     // find the vertices corresponding to idx1 and idx2
     HEVertex start, end;
@@ -270,20 +270,36 @@ void VoronoiDiagram::insert_line_site(int idx1, int idx2, int steps) {
     std::cout << " start face seed  = " << g[v_seed].index << " " << g[v_seed].position << "\n";
     g[v_seed].status = IN;
     
-    if (steps==1) return;
-    
+    if (step==1) return false;
+        
     augment_vertex_set(v_seed, pos_site ); // should not matter if we use pos_site or neg_site here
     std::cout << "   after augment: v0.size() = " << v0.size() << "\n";
     std::cout << "   delete-set is: "; print_vertices(v0);    
     
-    if (steps==2) return;
+    if (step==2) return false;
 
     // check that end_face is INCIDENT?
     // check that tree includes end_face_seed ?
     
-    add_vertices( pos_site );  
+    int n_verts=0;
+    assert( !v0.empty() );
+    EdgeVector q_edges = find_in_out_edges();       // new vertices generated on these IN-OUT edges
+    for( unsigned int m=0; m<q_edges.size(); ++m )  {   
+        HEVertex q = g.add_vertex();
+        g[q].status = NEW;
+        modified_vertices.push_back(q);
+        //std::cout << "position new vertex " << g[q].index << " on \n";
+        std::cout << "position new vertex " << g[q].index << " on " <<  g[ g.source(q_edges[m])].index << "-" << g[ g.target(q_edges[m])].index << " edge, type=" << g[q_edges[m]].type << "\n";
+
+        g[q].position = vpos->position( q_edges[m], pos_site ); // set position
+        g[q].k3 = vpos->get_k3();
+        g[q].init_dist( pos_site->apex_point( g[q].position ) ); // set initial clearance-disk
+        add_vertex_in_edge(q, q_edges[m] );
+        n_verts++;
+        if (step == (2+n_verts)) return false;
+    }
+    //add_vertices( pos_site );  
     
-    if (steps==3) return;
     
     HEFace pos_face = add_face( pos_site ); //  this face to the left of start->end edge    
     HEFace neg_face = add_face( neg_site ); //  this face is to the left of end->start edge
@@ -293,10 +309,8 @@ void VoronoiDiagram::insert_line_site(int idx1, int idx2, int steps) {
     g[neg_edge].face = neg_face;
     
     add_separator(start_face, start, pos_site, neg_site);
-    if (steps==4) return;
     add_separator(end_face  , end  , pos_site, neg_site); 
-    if (steps==5) return;
-
+    if (step == (2+n_verts+1)) return false;
 
     assert( vd_checker->face_ok( start_face ) );
     assert( vd_checker->face_ok( end_face ) );
@@ -308,11 +322,9 @@ void VoronoiDiagram::insert_line_site(int idx1, int idx2, int steps) {
 
     BOOST_FOREACH( HEFace f, incident_faces ) {
         if ( g[f].status == INCIDENT )  {// end-point faces already dealt with in add_separator()
-            // find out left/right??
             add_edge(pos_site->face, f, neg_site->face); // each INCIDENT face is split into two parts: newface and f
         }
     }
-    if (steps==6) return;
 
     std::cout << "new edges added \n";
     remove_vertex_set();
@@ -325,7 +337,133 @@ void VoronoiDiagram::insert_line_site(int idx1, int idx2, int steps) {
     std::cout << " pos face: "; print_face( pos_face );
     std::cout << " neg face: "; print_face( neg_face );
     std::cout << "faces " << start_face << " " << end_face << " " << pos_face << " " << neg_face << " repaired \n";
-    if (steps==7) return;
+
+    reset_status();
+    std::cout << "insert_line_site(" << g[start].index << "-"<< g[end].index << ") done.\n";
+    assert( vd_checker->face_ok( pos_face ) );
+    assert( vd_checker->face_ok( neg_face ) );
+    assert( vd_checker->is_valid() );
+    print_faces();
+    return true;
+}
+    
+void VoronoiDiagram::insert_line_site(int idx1, int idx2) {
+    num_lsites++;
+    // find the vertices corresponding to idx1 and idx2
+    HEVertex start, end;
+    bool start_found=false;
+    bool end_found=false;
+    // FIXME: search for vertex-descriptor from an index/descriptor table ( O(1) ?)
+    BOOST_FOREACH( HEVertex v, g.vertices() ) {
+        if ( g[v].index == idx1 ) {
+            start = v;
+            start_found = true;
+        }
+        if (g[v].index == idx2) {
+            end = v;
+            end_found = true;
+        }
+    }
+    assert(start_found);
+    assert(end_found);
+    std::cout << " found startvert = " << g[start].index << " " << g[start].position <<"\n";
+    std::cout << "   found endvert = " << g[end].index << " " << g[end].position << "\n";
+    
+    g[start].type=ENDPOINT; 
+    g[start].status=OUT; 
+    g[end].type=ENDPOINT; 
+    g[end].status=OUT; 
+    
+    // create a point which is left of src->trg
+    // determine k (offset-dir) for this point
+    // the we know which site/face is the k==+1 and which is k==-1
+    Point src_se = g[start].position;
+    Point trg_se = g[end  ].position;
+    Point left = 0.5*(src_se+trg_se) + (trg_se-src_se).xyPerp();
+    LineSite* pos_site;
+    LineSite* neg_site;
+    bool se_sign = left.is_right(src_se,trg_se);
+    //Point src_es = line_site_es->start();
+    //Point trg_es = line_site_es->end();
+    //Point left_es = 0.5*(src_es+trg_es) + (trg_es-src_es).xyPerp();
+    //bool es_sign = left.is_right(src_es,trg_es);
+    //assert( es_sign != se_sign );
+    HEEdge pos_edge, neg_edge;
+    if ( se_sign ) {
+        pos_site = new LineSite( g[start].position, g[end  ].position );
+        neg_site = new LineSite( g[end  ].position, g[start].position );
+        pos_edge = g.add_edge(start,end);
+        neg_edge = g.add_edge(end,start);
+    } else {
+        pos_site = new LineSite( g[end  ].position, g[start].position );
+        neg_site = new LineSite( g[start].position, g[end  ].position );
+        pos_edge = g.add_edge(end,start);
+        neg_edge = g.add_edge(start,end);
+    }
+    //LineSite* line_site_se = new LineSite( g[start].position, g[end  ].position ) ;
+    //LineSite* line_site_es = new LineSite( g[end  ].position, g[start].position ) ;
+    //HEEdge 
+    //HEEdge e_s = g.add_edge(end,start);
+    g[pos_edge].type = LINESITE;
+    g[neg_edge].type = LINESITE;
+    g[pos_edge].k = +1;
+    g[neg_edge].k = -1;
+    g.twin_edges(pos_edge,neg_edge);
+    
+    // seed-face is face of start-point
+    HEFace start_face = g[start].site->face; 
+    HEFace   end_face = g[end  ].site->face;
+    
+    // seed 
+    HEVertex v_seed = find_seed_vertex(start_face, pos_site ) ;
+    std::cout << " start face seed  = " << g[v_seed].index << " " << g[v_seed].position << "\n";
+    g[v_seed].status = IN;
+        
+    augment_vertex_set(v_seed, pos_site ); // should not matter if we use pos_site or neg_site here
+    std::cout << "   after augment: v0.size() = " << v0.size() << "\n";
+    std::cout << "   delete-set is: "; print_vertices(v0);    
+    
+    // check that end_face is INCIDENT?
+    // check that tree includes end_face_seed ?
+    
+    add_vertices( pos_site );  
+    
+    
+    HEFace pos_face = add_face( pos_site ); //  this face to the left of start->end edge    
+    HEFace neg_face = add_face( neg_site ); //  this face is to the left of end->start edge
+    g[pos_face].edge = pos_edge;
+    g[neg_face].edge = neg_edge;
+    g[pos_edge].face = pos_face;
+    g[neg_edge].face = neg_face;
+    
+    add_separator(start_face, start, pos_site, neg_site);
+    add_separator(end_face  , end  , pos_site, neg_site); 
+
+    assert( vd_checker->face_ok( start_face ) );
+    assert( vd_checker->face_ok( end_face ) );
+    //print_faces();
+    std::cout << "start face: ";
+    print_face(start_face);
+    std::cout << "end face: ";
+    print_face(end_face);
+
+    BOOST_FOREACH( HEFace f, incident_faces ) {
+        if ( g[f].status == INCIDENT )  {// end-point faces already dealt with in add_separator()
+            add_edge(pos_site->face, f, neg_site->face); // each INCIDENT face is split into two parts: newface and f
+        }
+    }
+
+    std::cout << "new edges added \n";
+    remove_vertex_set();
+    std::cout << " k=+1 face is " << pos_site->face << "\n";
+    std::cout << " k=-1 face is " << neg_site->face << "\n";
+    
+    repair_face( pos_face );
+    repair_face( neg_face );
+    
+    std::cout << " pos face: "; print_face( pos_face );
+    std::cout << " neg face: "; print_face( neg_face );
+    std::cout << "faces " << start_face << " " << end_face << " " << pos_face << " " << neg_face << " repaired \n";
 
     reset_status();
     std::cout << "insert_line_site(" << g[start].index << "-"<< g[end].index << ") done.\n";
@@ -637,7 +775,11 @@ void VoronoiDiagram::add_edge(HEFace newface, HEFace f, HEFace newface2) {
         Point pt2 = new_site->apex_point(pt1);
         src_sign = g[new_source].position.is_right( pt1, pt2 );
         trg_sign = g[new_target].position.is_right( pt1, pt2 );
-    } 
+    } else if (f_site->isPoint() && new_site->isPoint() ) {
+        src_sign = g[new_source].position.is_right( f_site->position(), new_site->position() );
+        trg_sign = g[new_target].position.is_right( f_site->position(), new_site->position() );
+    }
+    
     // sign of quadratic branch
     bool sign=false;
     if (!src_sign)

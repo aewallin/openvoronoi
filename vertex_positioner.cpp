@@ -52,7 +52,6 @@ Point VertexPositioner::position(HEEdge e, Site* s) {
     t_min = std::min( t_src, t_trg );
     t_max = std::max( t_src, t_trg );
 
-    std::cout << "position new vertex on " <<  vd->g[src].index << "-" << vd->g[trg].index << " edge, type=" << vd->g[e].type << "\n";
     std::cout << "   adjacent sites: " << vd->g[face].site->str() << " " << vd->g[twin_face].site->str() << " " << s->str() << "\n";
     std::cout << "   k-vals: e.k = " <<  vd->g[e].k << " twin.k = " << vd->g[twin].k  << "\n";
     std::cout << " t-vals t_min= " << t_min << " t_max= " << t_max << "\n";

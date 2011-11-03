@@ -124,9 +124,9 @@ if __name__ == "__main__":
 
     Nsegs = 0
     
-    vd.addLineSite(17,13,20)
-    vd.addLineSite(21,34,2)
-
+    vd.addLineSite(42,13)
+    vd.addLineSite(83,35)
+    vd.addLineSiteStep(153,63,8)
 
     #segs=[]
     

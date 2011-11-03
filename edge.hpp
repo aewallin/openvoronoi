@@ -23,16 +23,6 @@
 
 namespace ovd {
 
-/*
- * bisector formulas
- * x = x1 - x2 - x3*t +/- x4 * sqrt( square(x5+x6*t) - square(x7+x8*t) )
- * (same formula for y-coordinate)
- * line (line/line)
- * parabola (circle/line)
- * hyperbola (circle/circle)
- * ellipse (circle/circle)
-*/
-
 #define OUT_EDGE_CONTAINER boost::vecS 
 
 // note: cannot use vecS since remove_vertex invalidates iterators/edge_descriptors (?)
@@ -73,6 +63,16 @@ struct EdgeProps {
         else
             return x;
     }
+    
+    /*
+     * bisector formulas
+     * x = x1 - x2 - x3*t +/- x4 * sqrt( square(x5+x6*t) - square(x7+x8*t) )
+     * (same formula for y-coordinate)
+     * line (line/line)
+     * parabola (circle/line)
+     * hyperbola (circle/circle)
+     * ellipse (circle/circle)
+    */
     Point point(double t) const {
         double discr1 = round( sq(x[4]+x[5]*t) - sq(x[6]+x[7]*t) );
         double discr2 = round( sq(y[4]+y[5]*t) - sq(y[6]+y[7]*t) );
@@ -98,7 +98,7 @@ struct EdgeProps {
     bool sign; // choose either +/- in front of sqrt()
     double minimum_t( Site* s1, Site* s2) {
         if (s1->isPoint() && s2->isPoint())        // PP
-            return 0;
+            return minimum_pp_t(s1,s2);
         else if (s1->isPoint() && s2->isLine())    // PL
             return minimum_pl_t(s1,s2);
         else if (s2->isPoint() && s1->isLine())    // LP
@@ -110,11 +110,17 @@ struct EdgeProps {
         
         return -1;
     }
+    double minimum_pp_t(Site* s1, Site* s2) {
+        double p1p2 = (s1->position() - s2->position()).norm() ;
+        assert( p1p2 >=0 );
+        return p1p2/2;
+    }
     double minimum_pl_t(Site* s1, Site* s2) {
         double mint = - x[6]/(2.0*x[7]);
         assert( mint >=0 );
         return mint;
     }
+
     // sign is the branch of the quadratic!
     void set_parameters(Site* s1, Site* s2, bool sig) {
         sign = sig;
@@ -136,8 +142,31 @@ struct EdgeProps {
     }
     // called for point(s1)-point(s2) edges
     void set_pp_parameters(Site* s1, Site* s2) {
-        //std::cout << " set_pp \n";
+        assert( s1->isPoint() );
+        assert( s2->isPoint() );
+        double d = (s1->position() - s2->position()).norm(); //sqrt( sq(xc1-xc2) + sq(yc1-yc2) )
+        double alfa1 = (s2->x() - s1->x()) / d;
+        double alfa2 = (s2->y() - s1->y()) / d;
+        double alfa3 = -d/2;
+        double alfa4 = 0;
         type = LINE;
+        x[0]=s1->x();       
+        x[1]=alfa1*alfa3; 
+        x[2]=alfa1*alfa4; 
+        x[3]=alfa2;       
+        x[4]=0;             
+        x[5]=+1;          
+        x[6]=alfa3;       
+        x[7]=0;           
+
+        y[0]=s1->y();     
+        y[1]=alfa2*alfa3; 
+        y[2]=alfa2*alfa4; 
+        y[3]=alfa1;       
+        y[4]=0;           
+        y[5]=+1;          
+        y[6]=alfa3;       
+        y[7]=0;
     }
     // called for point(s1)-line(s2) edges
     void set_pl_parameters(Site* s1, Site* s2) {

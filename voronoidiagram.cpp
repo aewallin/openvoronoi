@@ -273,14 +273,14 @@ void VoronoiDiagram::insert_line_site(int idx1, int idx2, int steps) {
     if (steps==1) return;
     
     augment_vertex_set(v_seed, pos_site ); // should not matter if we use pos_site or neg_site here
+    std::cout << "   after augment: v0.size() = " << v0.size() << "\n";
+    std::cout << "   delete-set is: "; print_vertices(v0);    
     
     if (steps==2) return;
 
     // check that end_face is INCIDENT?
     // check that tree includes end_face_seed ?
     
-    std::cout << "   after augment: v0.size() = " << v0.size() << "\n";
-    std::cout << "   delete-set is: "; print_vertices(v0);    
     add_vertices( pos_site );  
     
     if (steps==3) return;

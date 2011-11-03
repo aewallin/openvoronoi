@@ -55,6 +55,10 @@ struct EdgeProps {
     HEFace face; // each face corresponds to an input Site/generator
     double k; // offset-direction from the adjacent site, either +1 or -1
     VoronoiEdgeType type;
+    double x[8];
+    double y[8];
+    bool sign; // choose either +/- in front of sqrt()
+    
     inline double sq(double x) const {return x*x;}
     inline double round(double x) const {
         double eps = 1e-8;
@@ -93,9 +97,7 @@ struct EdgeProps {
             return Point(0,0);
         }
     }
-    double x[8];
-    double y[8];
-    bool sign; // choose either +/- in front of sqrt()
+
     double minimum_t( Site* s1, Site* s2) {
         if (s1->isPoint() && s2->isPoint())        // PP
             return minimum_pp_t(s1,s2);
@@ -120,7 +122,12 @@ struct EdgeProps {
         assert( mint >=0 );
         return mint;
     }
-
+	void set_sign(bool sig) {
+		if (k==1)
+			sign = sig;
+		else
+			sign = !sig;
+	}
     // sign is the branch of the quadratic!
     void set_parameters(Site* s1, Site* s2, bool sig) {
         sign = sig;
@@ -179,10 +186,12 @@ struct EdgeProps {
         double k = 1.0;
         if (alfa3>0.0) {
             k = -1.0;
+            //sign = false;
         } else {
+			//sign = true;
             sign = !sign;
         }
-        // figure out sign of bisector (?)
+
         
         x[0]=s1->x();       // xc1
         x[1]=s2->a()*alfa3; // alfa1*alfa3

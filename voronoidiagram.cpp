@@ -241,13 +241,13 @@ bool VoronoiDiagram::insert_line_site_step(int idx1, int idx2, int step) {
     //assert( es_sign != se_sign );
     HEEdge pos_edge, neg_edge;
     if ( se_sign ) {
-        pos_site = new LineSite( g[start].position, g[end  ].position );
-        neg_site = new LineSite( g[end  ].position, g[start].position );
+        pos_site = new LineSite( g[start].position, g[end  ].position, +1 );
+        neg_site = new LineSite( g[end  ].position, g[start].position, -1 );
         pos_edge = g.add_edge(start,end);
         neg_edge = g.add_edge(end,start);
     } else {
-        pos_site = new LineSite( g[end  ].position, g[start].position );
-        neg_site = new LineSite( g[start].position, g[end  ].position );
+        pos_site = new LineSite( g[end  ].position, g[start].position, +1 );
+        neg_site = new LineSite( g[start].position, g[end  ].position, -1 );
         pos_edge = g.add_edge(end,start);
         neg_edge = g.add_edge(start,end);
     }
@@ -390,13 +390,13 @@ void VoronoiDiagram::insert_line_site(int idx1, int idx2) {
     //assert( es_sign != se_sign );
     HEEdge pos_edge, neg_edge;
     if ( se_sign ) {
-        pos_site = new LineSite( g[start].position, g[end  ].position );
-        neg_site = new LineSite( g[end  ].position, g[start].position );
+        pos_site = new LineSite( g[start].position, g[end  ].position , +1);
+        neg_site = new LineSite( g[end  ].position, g[start].position , -1);
         pos_edge = g.add_edge(start,end);
         neg_edge = g.add_edge(end,start);
     } else {
-        pos_site = new LineSite( g[end  ].position, g[start].position );
-        neg_site = new LineSite( g[start].position, g[end  ].position );
+        pos_site = new LineSite( g[end  ].position, g[start].position , +1);
+        neg_site = new LineSite( g[start].position, g[end  ].position , -1);
         pos_edge = g.add_edge(end,start);
         neg_edge = g.add_edge(start,end);
     }
@@ -698,11 +698,15 @@ void VoronoiDiagram::add_vertex_in_edge( HEVertex v, HEEdge e) {
     // type
     g[e1].type = g[e].type;
     g[e2].type = g[e].type;
+    
     // edge-parameters
     if (g[e].type != SEPARATOR ) {
-        g[e1].set_parameters(g[face].site, g[twin_face].site, !g[e].sign );
-        g[e2].set_parameters(g[face].site, g[twin_face].site, !g[e].sign );
-    }
+        g[e1].set_parameters(g[face].site, g[twin_face].site, g[e].sign );
+        g[e2].set_parameters(g[face].site, g[twin_face].site, g[e].sign );
+    } 
+	//g[e1].sign = g[e].sign;
+	//g[e2].sign = g[e].sign;
+	
     
     HEEdge te1 = g.add_edge( twin_source, v  ); // te1 and te2 replace twin
     HEEdge te2 = g.add_edge( v, twin_target  );
@@ -727,9 +731,12 @@ void VoronoiDiagram::add_vertex_in_edge( HEVertex v, HEEdge e) {
     g[te2].type = g[twin].type;
     // edge parameters
     if (g[twin].type != SEPARATOR ) {
-        g[te1].set_parameters(g[face].site, g[twin_face].site, !g[twin].sign );
-        g[te2].set_parameters(g[face].site, g[twin_face].site, !g[twin].sign );
-    }
+        g[te1].set_parameters(g[face].site, g[twin_face].site, g[twin].sign );
+        g[te2].set_parameters(g[face].site, g[twin_face].site, g[twin].sign );
+    } 
+	//g[te1].sign = g[twin].sign;
+	//g[te2].sign = g[twin].sign;
+	
     // update the faces (required here?)
     g[face].edge = e1;
     g[twin_face].edge = te1;
@@ -789,19 +796,21 @@ void VoronoiDiagram::add_edge(HEFace newface, HEFace f, HEFace newface2) {
     // so no apex-split is required, just add a single edge.
     if ( src_sign == trg_sign ) {  // add a single src-trg edge
         HEEdge e_new = g.add_edge( new_source, new_target );
-        g[e_new].set_parameters( f_site, new_site, sign ); 
+        
         g[e_new].next = new_next;
         assert( g[new_next].k == g[new_previous].k );
         g[e_new].k = g[new_next].k; // the next edge is on the same face, so has the correct k-value
         g[e_new].face = f; // src-trg edge has f on its left
         g[new_previous].next = e_new;
         g[f].edge = e_new; 
+        g[e_new].set_parameters( f_site, new_site, sign ); 
         // the twin edge that bounds the new face
         HEEdge e_twin = g.add_edge( new_target, new_source );
-        g[e_twin].set_parameters( new_site, f_site, sign );
+        
         g[twin_previous].next = e_twin;
         g[e_twin].next = twin_next;         
         g[e_twin].k = g[new_source].k3; 
+        g[e_twin].set_parameters( new_site, f_site, sign );
         if (g[e_twin].k == 1) {
             g[e_twin].face = newface; // assumes newface is k==+1 face!
             g[newface].edge = e_twin;

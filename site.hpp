@@ -98,11 +98,11 @@ private:
 class LineSite : public Site {
 public:
     /// create line-site between start and end Point.
-    LineSite( const Point& s, const Point& e, HEFace f = 0): _start(s), _end(e) {
+    LineSite( const Point& s, const Point& e, double koff, HEFace f = 0): _start(s), _end(e) {
         face = f;
         eq.a = _end.y - _start.y;
         eq.b = _start.x - _end.x;
-        eq.k = 1; // ??
+        eq.k = koff; // ??
         eq.c = _end.x*_start.y - _start.x*_end.y;
         // now normalize
         double d = sqrt( eq.a*eq.a + eq.b*eq.b );

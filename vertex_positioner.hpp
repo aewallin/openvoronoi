@@ -45,7 +45,7 @@ public:
     Point position( HEEdge e, Site* s);
     double get_k3() const {return k3;}
 private:
-    Point position(Site* p1, double k1, Site* p2, double k2, Site* p3);
+    Solution position(Site* p1, double k1, Site* p2, double k2, Site* p3);
     
     /// point-point-point positioner
     Point ppp_solver(const Point& p1, const Point& p2, const Point& p3);

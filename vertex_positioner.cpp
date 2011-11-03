@@ -61,20 +61,20 @@ Point VertexPositioner::position(HEEdge e, Site* s) {
         //t_max = 1000000;
     //std::cout << " clipped t-vals t_min= " << t_min << " t_max= " << t_max << "\n";
     
-    Point p = position( vd->g[face].site  , vd->g[e].k, vd->g[twin_face].site  , vd->g[twin].k, s );
-    std::cout << " new vertex positioned at " << p << "\n";
-    check_far_circle(p);
+    Solution sl = position( vd->g[face].site  , vd->g[e].k, vd->g[twin_face].site  , vd->g[twin].k, s );
+    std::cout << " new vertex positioned at " << sl.p << " t=" << sl.t << " k3=" << sl.k3 << "\n";
+    check_far_circle(sl.p);
 
     
     //check_on_edge(e, p);
     //check_dist(e, p, v);
-    return p;
+    return sl.p;
 }
 
 // find vertex that is equidistant from s1, s2, s3
 // should lie on the k1 side of s1, k2 side of s2
 // we try both k3=-1 and k3=+1 for s3
-Point VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Site* s3) {
+Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Site* s3) {
     assert( (k1==1) || (k1 == -1) );
     assert( (k2==1) || (k2 == -1) );
     std::vector<Solution> solutions;
@@ -99,7 +99,7 @@ Point VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Site*
     // further filtering here
     if ( pos_slns.size() == 1) {
         k3 = pos_slns[0].k3; // k3s[0];
-        return pos_slns[0].p; //pts[0];
+        return pos_slns[0]; //pts[0];
     } else if (pos_slns.size()>1) {
         // two or more points remain so we must further filter here!
         std::vector<Solution> sln2;
@@ -116,7 +116,7 @@ Point VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Site*
         if ( sln2.size() == 1) {
             std::cout << " returning k3= " << sln2[0].k3 << " pt= " << sln2[0].p << " t=" << sln2[0].t << "\n";
             k3 = sln2[0].k3;
-            return sln2[0].p;
+            return sln2[0];
         }
     } 
     
@@ -127,7 +127,7 @@ Point VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Site*
     }
     std::cout << " edge: " << vd->g[ vd->g.source(edge) ].position << " - " << vd->g[ vd->g.target(edge) ].position << "\n";
     assert(0);
-    return Point(0,0);
+    return Solution( Point(0,0), -1, 1 );
 }
 
 double VertexPositioner::edge_t(HEEdge e, Point p ) {
@@ -225,7 +225,7 @@ int VertexPositioner::solver(Site* s1, double k1, Site* s2, double k2, Site* s3,
     std::cout << "\n";
     */
     
-    if (linear_count != 2 ) { // 3 caught above. 2 can skip this. 1 needs this code
+    //if (linear_count != 2 ) { // 3 caught above. 2 can skip this. 1 needs this code
         // now subtract one quadratic from another to obtain a system
         // of one quadratic and two linear eqns
         int v0 = quadratic[0]; // the one we subtract from the others
@@ -238,7 +238,7 @@ int VertexPositioner::solver(Site* s1, double k1, Site* s2, double k2, Site* s3,
             linear[linear_count++] = vi; // now we have a new linear eqn
         }
         assert(linear_count == 2); // At this point, we should have exactly two linear equations.
-    }
+    //}
     
     /*
     std::cout << " AFTER SUBTRACT linear_count = " << linear_count << " : ";
@@ -260,9 +260,9 @@ int VertexPositioner::solver(Site* s1, double k1, Site* s2, double k2, Site* s3,
     // y and t in terms of x
     // t and x in terms of y    
     int scount = qqq_solver(vectors[linear[0]], vectors[linear[1]], 0, 1, 2, xk, yk, kk, rk, k3, solns);
-    if (scount < 0) { // negative scoung when discriminant is zero, so shuffle around coord-indexes:
+    if (scount <= 0) { // negative scount when discriminant is zero, so shuffle around coord-indexes:
         scount = qqq_solver(vectors[linear[0]], vectors[linear[1]], 2, 0, 1, xk, yk, kk, rk, k3, solns);
-        if (scount < 0) {
+        if (scount <= 0) {
             scount = qqq_solver(vectors[linear[0]], vectors[linear[1]], 1, 2, 0, xk, yk, kk, rk, k3, solns);
         }
     }
@@ -318,7 +318,7 @@ int VertexPositioner::qqq_solver( qd_real l0[], qd_real l1[], int xi, int yi, in
         tsolns[i][ti] = to_double(isolns[i][2]);       // t       t  chop!
         solns.push_back( Solution( Point( tsolns[i][0], tsolns[i][1] ), tsolns[i][2], to_double(k3) ) );
     }
-    //std::cout << "  qqq_solve found " << scount << " roots\n";
+    std::cout << " k3="<<k3<<" qqq_solve found " << scount << " roots\n";
     return scount;
 }
 
@@ -332,7 +332,7 @@ int VertexPositioner::qqq_solver( qd_real l0[], qd_real l1[], int xi, int yi, in
 int VertexPositioner::qll_solve( qd_real a0, qd_real b0, qd_real c0, qd_real d0, 
                       qd_real e0, qd_real f0, qd_real g0, 
                       qd_real a1, qd_real b1, 
-                      qd_real a2,qd_real b2, 
+                      qd_real a2, qd_real b2, 
                       qd_real soln[][3])
 {
     qd_real roots[2];

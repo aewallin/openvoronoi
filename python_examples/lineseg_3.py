@@ -126,7 +126,7 @@ if __name__ == "__main__":
     
     vd.addLineSite(42,13)
     vd.addLineSite(83,35)
-    vd.addLineSiteStep(153,63,8)
+    vd.addLineSiteStep(63,153,7)
 
     #segs=[]
     

@@ -32,9 +32,8 @@ VoronoiDiagram::VoronoiDiagram(double far, unsigned int n_bins) {
     vd_checker = new VoronoiDiagramChecker(this); // helper-class that checks topology/geometry
     vpos = new VertexPositioner(this); // helper-class that positions vertices
     far_radius=far;
-    num_psites=3;
     initialize();
-    num_psites=0;
+    num_psites=3;
     num_lsites=0;
 }
 

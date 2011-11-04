@@ -37,6 +37,9 @@ class Point {
         virtual ~Point() {}        
         /// dot product
         double dot(const Point &p) const;
+        /// 2D cross-product
+        double cross(const Point& p) const;
+
         /// norm of vector, or distance from (0,0,0) to *this
         double norm() const; 
         /// squared norm (avoiding sqrt() might be faster in some cases)

@@ -38,6 +38,10 @@ double Point::dot(const Point &p) const {
     return x * p.x + y * p.y ; 
 }
 
+double Point::cross(const Point &p) const {
+    return x * p.y - y * p.x ; 
+}
+
 void Point::normalize() {
     if (this->norm() != 0.0)
         *this *=(1/this->norm());

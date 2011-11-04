@@ -52,7 +52,7 @@ private:
     
     int solver(Site* s1, double k1, Site* s2, double k2, Site* s3, double k3, std::vector<Solution>& slns ); 
     
-    int lll_solver(Site* s1, Site* s2, Site* s3); // linear 3x3 system
+    int lll_solver(qd_real vectors[][4], double k3, std::vector<Solution>& slns ); // linear 3x3 system
     
     int qqq_solver( qd_real l0[], qd_real l1[], int xi, int yi, int ti, 
                     qd_real xk, qd_real yk, qd_real kk, qd_real rk, qd_real k3, std::vector<Solution>& slns );

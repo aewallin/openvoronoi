@@ -5,21 +5,20 @@
  *  Andy Payone, andy "at" payne "dot" org, November, 2010
  *  see: http://www.payne.org/index.php/Calculating_Voronoi_Nodes
  * 
- * 
  *  This file is part of OpenVoronoi.
  *
- *  OpenCAMlib is free software: you can redistribute it and/or modify
+ *  OpenVoronoi is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  OpenCAMlib is distributed in the hope that it will be useful,
+ *  OpenVoronoi is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with OpenCAMlib.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with OpenVoronoi.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 
@@ -81,13 +80,14 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     
     int count1=0,count2=0;
     
-    if ( s1->is_linear() && s2->is_linear() && s3->is_linear() )
-        count1 =  lll_solver(s1,s2,s3);
-    else {
+    //if ( s1->is_linear() && s2->is_linear() && s3->is_linear() ) {
+    //    count1 =  lll_solver(s1,k1,s2,k2,s3,+1, solutions);
+    //    count1 =  lll_solver(s1,k1,s2,k2,s3,+1, solutions);
+    //} else {
         count1 = solver(s1,k1,s2,k2,s3,+1, solutions);
         if (!s3->isPoint()) // for points k3=+1 allways
             count2 = solver(s1,k1,s2,k2,s3,-1, solutions); // for lineSite or ArcSite we may try k3=-1 also
-    }
+    //}
     
     std::vector<Solution> pos_slns;
     BOOST_FOREACH(Solution s, solutions) {
@@ -206,8 +206,7 @@ int VertexPositioner::solver(Site* s1, double k1, Site* s2, double k2, Site* s3,
 
     }
         
-    assert( linear_count < 3 ); // ==3 should be caught above by lll_solve()
-    assert( quadratic_count > 0); // we should have one or more quadratic
+   
     
     /*
     for(int m=0;m<3;m++) {
@@ -224,6 +223,11 @@ int VertexPositioner::solver(Site* s1, double k1, Site* s2, double k2, Site* s3,
         std::cout << " " << quadratic[m] ;
     std::cout << "\n";
     */
+    if (linear_count == 3)
+        return lll_solver(vectors, k3, solns);
+    
+    assert( linear_count < 3 ); // ==3 should be caught above by lll_solve()
+    assert( quadratic_count > 0); // we should have one or more quadratic
     
     //if (linear_count != 2 ) { // 3 caught above. 2 can skip this. 1 needs this code
         // now subtract one quadratic from another to obtain a system
@@ -254,7 +258,8 @@ int VertexPositioner::solver(Site* s1, double k1, Site* s2, double k2, Site* s3,
     }
     */
     // TODO:  pick the solution appraoch with the best numerical stability.
-    
+
+
     // index shuffling determines if we solve:
     // x and y in terms of t
     // y and t in terms of x
@@ -397,10 +402,39 @@ int VertexPositioner::quadratic_roots(qd_real a, qd_real b, qd_real c, qd_real r
     return 0;
 }
 
-int VertexPositioner::lll_solver(Site* s1, Site* s2, Site* s3) {
+int VertexPositioner::lll_solver(qd_real vectors[][4], double k3, std::vector<Solution>& slns ) {
     std::cout << " lll_solver() \n";
-    assert(0); // NOT implemented yet!
-    return 0;
+    qd_real d, t, x, y;
+    qd_real ai, bi, ki, ci;
+    qd_real aj, bj, kj, cj;
+    qd_real ak, bk, kk, ck;
+    ai = vectors[0][0];
+    bi = vectors[0][1];
+    ki = vectors[0][2];
+    ci = vectors[0][3];
+    aj = vectors[1][0];
+    bj = vectors[1][1];
+    kj = vectors[1][2];
+    cj = vectors[1][3];
+    ak = vectors[2][0];
+    bk = vectors[2][1];
+    kk = vectors[2][2];
+    ck = vectors[2][3];
+    // determinant
+    d = (ai*bj-aj*bi)*kk + (-ai*bk + ak*bi)*kj + (aj*bk-ak*bj)*ki;
+    d = chop(d); // rounds small values to zero
+    if (d != 0) {
+        t = ((-ai*bj + aj*bi)*ck + (ai*bk - ak*bi)*cj  + (-aj*bk + ak*bj)*ci)/d;
+        if (t >= 0) {
+            qd_real sol_x = ((bi*cj - bj*ci)*kk + (-bi*ck + bk*ci)*kj + (bj*ck-bk*cj)*ki)/d;
+            qd_real sol_y = ((-ai*cj + aj*ci)*kk + (ai*ck-ak*ci)*kj + (-aj*ck +ak*cj)*ki)/d;
+            //qd_real sol_t = t;
+            slns.push_back( Solution( Point( to_double(sol_x), to_double(sol_y) ), to_double(t), k3 ) );
+            return 1;
+        }
+    }
+    return 0; // no solution if determinant zero, or t-value negative
+    //return 0;
 }
 
 /// point-point-point vertex positioner based on Sugihara & Iri paper

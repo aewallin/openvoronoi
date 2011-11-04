@@ -476,6 +476,7 @@ void VoronoiDiagram::insert_line_site(int idx1, int idx2) {
 // add separator on the face f, which contains the endpoint
 // 
 void VoronoiDiagram::add_separator(HEFace f, HEVertex endp, Site* s1, Site* s2) {
+    std::cout << "add_separator()\n";
     EdgeVector out_edges = g.out_edges(endp);
     assert( out_edges.size() == 1);
     HEEdge segment_e = out_edges[0];
@@ -489,6 +490,10 @@ void VoronoiDiagram::add_separator(HEFace f, HEVertex endp, Site* s1, Site* s2) 
     
                  // out-new    new   new-in
     boost::tie( v1_previous, v1, v1_next) = find_new_vertex(f, OUT);  // OUT->NEW  vertex
+    if (g[v1].k3 ==  g[v2].k3) {
+        std::cout << " g[ " << g[v1].index << " ].k3=" << g[v1].k3 << "  !=  g[" << g[v2].index << "].k3=" << g[v2].k3 << "\n";
+        
+    }
     assert( g[v1].k3 !=  g[v2].k3 ); // v1 and v2 should be on opposite sides
     
     assert( s1->in_region( g[v1].position ) ); // v1 and v2 should be in the region of the line-site
@@ -588,19 +593,22 @@ void VoronoiDiagram::augment_vertex_set( HEVertex& v_seed, Site* site ) {
         boost::tie( v, h ) = vertexQueue.top();      assert( g.g[v].status == UNDECIDED );
         vertexQueue.pop(); 
         if ( h < 0.0 ) { // mark IN if detH<0 and passes (C4) and (C5) tests and in_region(). otherwise mark OUT
-            if ( predicate_c4(v) || !predicate_c5(v) || !site->in_region(g[v].position) ) 
+            if ( predicate_c4(v) || !predicate_c5(v) || !site->in_region(g[v].position) ) {
                 g[v].status = OUT; // C4 or C5 violated, so mark OUT
-            else {
+                std::cout << g[v].index << " marked OUT (topo): c4="<< predicate_c4(v) << " c5=" << !predicate_c5(v) << " r=" << !site->in_region(g[v].position) << " h=" << h << "\n";
+            } else {
                 mark_vertex( v,  site); // h<0 and no violations, so mark IN. push adjacent UNDECIDED vertices onto Q.
+                std::cout << g[v].index << " marked IN (in_circle)\n";
             }
         } else { 
             g[v].status = OUT; // detH was positive (or zero), so mark OUT
+            std::cout << g[v].index << " marked OUT (in_circle)\n";
         }
         modified_vertices.push_back( v );
     }
     // sanity-check: for all incident_faces the IN-vertices should be connected
-    assert( vd_checker->incidentFaceVerticesConnected(  IN ) );
-    assert( vd_checker->incidentFaceVerticesConnected(  OUT ) );
+    //assert( vd_checker->incidentFaceVerticesConnected(  IN ) );
+    //assert( vd_checker->incidentFaceVerticesConnected(  OUT ) );
 }
 
 // mark vertex IN. mark adjacent faces INCIDENT
@@ -776,6 +784,8 @@ void VoronoiDiagram::add_edge(HEFace newface, HEFace f, HEFace newface2) {
     boost::tie( new_previous, new_source, twin_next) = find_new_vertex(f, OUT); // OUT->NEW vertex
     boost::tie( twin_previous, new_target, new_next) = find_new_vertex(f, IN);  // IN->NEW  vertex
     // both trg and src should be on same side of new site 
+    if (g[new_target].k3 != g[new_source].k3)
+        std::cout << " g[" << g[new_target].index << "].k3=" << g[new_target].k3 << " != g[" << g[new_source].index << "].k3=" << g[new_source].k3<< "\n";
     assert( g[new_target].k3 == g[new_source].k3 );
 
     //                                           f
@@ -1002,7 +1012,7 @@ bool VoronoiDiagram::predicate_c4(HEVertex v) {
         if ( g[w].status == IN )
             in_count++;
     }
-    return (in_count >= 2);
+    return (in_count >= 2); // two or more adjacent IN-vertices might create a loop
 }
 
 // do any of the three faces that are adjacent to the given IN-vertex v have an IN-vertex ?
@@ -1025,11 +1035,13 @@ bool VoronoiDiagram::predicate_c5(HEVertex v) {
         BOOST_FOREACH( HEVertex w, g.face_vertices(f) ) { 
             if ( w != v && g[w].status == IN && g.has_edge(w,v) )  // v should be adjacent to an IN vertex on the face
                 face_ok = true;
+            else if ( w!=v && g[w].type == APEX )
+                face_ok=true;
         }
         if (!face_ok)
             all_found=false;
     }
-    return all_found;
+    return all_found; // if this returns false, we mark a vertex OUT, on topology grounds.
 }
 
 void VoronoiDiagram::print_faces() {

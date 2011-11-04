@@ -101,7 +101,7 @@ class VoronoiDiagram {
         void repair_face( HEFace f );
         void remove_vertex_set();
         void reset_status();
-
+        
     // PRINT ETC
         void print_faces();
         void print_face(HEFace f);

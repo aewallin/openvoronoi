@@ -62,6 +62,7 @@ Point VertexPositioner::position(HEEdge e, Site* s) {
     check_far_circle(sl.p);
     //check_on_edge(e, p);
     //check_dist(e, p, v);
+    k3 = sl.k3;
     return sl.p;
 }
 
@@ -107,25 +108,46 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
             }
         }
         
-        // after filtering only one point should remain
+        // if after edge_t filtering only one point remains, return that
         if ( sln2.size() == 1) {
             std::cout << " returning k3= " << sln2[0].k3 << " pt= " << sln2[0].p << " t=" << sln2[0].t << "\n";
             k3 = sln2[0].k3;
             return sln2[0];
+        } else {
+            // filter further using edge_error
+            double min_error=100;
+            Solution min_solution(Point(0,0),0,0);
+            std::cout << " edge_error filter: \n";
+            BOOST_FOREACH(Solution s, sln2) {
+                double err = edge_error(edge,s);
+                if ( err < min_error) {
+                    min_solution = s;
+                    min_error = err;
+                    std::cout << s.p << " err=" << err << "\n";
+                }
+            }
+            assert( min_error < 1e-6 );
+            return min_solution;
         }
+        
     } 
     
     // either 0, or >= 2 solutions found. error.
     std::cout << " None, or too many solutions found! candidates are:\n";
     BOOST_FOREACH(Solution s, solutions ) {
-        std::cout << s.p << " t=" << s.t << " k3=" << s.k3 << " tr=" << s3->in_region(s.p) << " te=" << edge_t(edge, s.p) << "\n";
+        std::cout << s.p << " t=" << s.t << " k3=" << s.k3 << " tr=" << s3->in_region(s.p) << " te=" << edge_t(edge, s.p) << " e_err=" << edge_error(edge,s) <<"\n";
     }
     std::cout << " edge: " << vd->g[ vd->g.source(edge) ].position << " - " << vd->g[ vd->g.target(edge) ].position << "\n";
     assert(0);
     return Solution( Point(0,0), -1, 1 );
 }
 
-double VertexPositioner::edge_t(HEEdge e, Point p ) {
+double VertexPositioner::edge_error(HEEdge e, Solution& s) {
+    Point ep = vd->g[e].point( s.t );
+    return (ep-s.p).norm();
+}
+
+double VertexPositioner::edge_t(HEEdge e, const Point& p ) {
     // project onto src-target edge and check t-value.
     HEVertex src = vd->g.source(edge);
     HEVertex trg = vd->g.target(edge);
@@ -205,7 +227,7 @@ int VertexPositioner::solver(Site* s1, double k1, Site* s2, double k2, Site* s3,
     assert( linear_count < 3 ); // ==3 should be caught above by lll_solve()
     assert( quadratic_count > 0); // we should have one or more quadratic
     
-    //if (linear_count != 2 ) { // 3 caught above. 2 can skip this. 1 needs this code
+    if (linear_count != 2 ) { // 3 caught above. 2 can skip this. 1 needs this code
         // now subtract one quadratic from another to obtain a system
         // of one quadratic and two linear eqns
         int v0 = quadratic[0]; // the one we subtract from the others
@@ -218,7 +240,7 @@ int VertexPositioner::solver(Site* s1, double k1, Site* s2, double k2, Site* s3,
             linear[linear_count++] = vi; // now we have a new linear eqn
         }
         assert(linear_count == 2); // At this point, we should have exactly two linear equations.
-    //}
+    }
     
     /*
     std::cout << " AFTER SUBTRACT linear_count = " << linear_count << " : ";

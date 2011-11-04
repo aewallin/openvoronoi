@@ -64,8 +64,10 @@ private:
                       qd_real soln[][3]);
     int quadratic_roots(qd_real a, qd_real b, qd_real c, qd_real roots[]);
 
-    double edge_t(HEEdge e, Point p );
-    
+    double edge_t(HEEdge e, const Point& p );
+    double edge_error(HEEdge e, Solution& s );
+
+
     double chop(double val) {
         double _epsilon = 1e-10;
         if (fabs(val) < _epsilon) 

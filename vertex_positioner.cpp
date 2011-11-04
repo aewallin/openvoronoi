@@ -21,18 +21,14 @@
  *  along with OpenVoronoi.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 #include "vertex_positioner.hpp"
 #include "voronoidiagram.hpp"
 
-
-
 namespace ovd {
 
-
-// calculate the position of a new vertex on the given edge s
+// calculate the position of a new vertex on the given edge e
 // the edge e holds information about which face it belongs to.
-// each face holds information about which site/generator created it
+// each face holds information about which site created it
 // so the three sites defining the position of the vertex are:
 // - site to the left of HEEdge e
 // - site to the right of HEEdge e
@@ -62,9 +58,8 @@ Point VertexPositioner::position(HEEdge e, Site* s) {
     
     Solution sl = position( vd->g[face].site  , vd->g[e].k, vd->g[twin_face].site  , vd->g[twin].k, s );
     std::cout << " new vertex positioned at " << sl.p << " t=" << sl.t << " k3=" << sl.k3 << "\n";
-    check_far_circle(sl.p);
 
-    
+    check_far_circle(sl.p);
     //check_on_edge(e, p);
     //check_dist(e, p, v);
     return sl.p;
@@ -186,7 +181,6 @@ int VertexPositioner::solver(Site* s1, double k1, Site* s2, double k2, Site* s3,
         kk = s2->k()*k2;
         if (s2->isPoint())
             kk=k2;
-
     }
     
     vectors[2][0] = s3->eqp().a;
@@ -203,26 +197,8 @@ int VertexPositioner::solver(Site* s1, double k1, Site* s2, double k2, Site* s3,
         kk = s3->k()*k3;
         if (s3->isPoint())
             kk=k3;
-
-    }
-        
-   
-    
-    /*
-    for(int m=0;m<3;m++) {
-        std::cout << m << " : " << vectors[m][0] << "  "  << vectors[m][1] << "  "  << vectors[m][2] << "  "  << vectors[m][3]  << "\n"; 
     }
     
-    
-    std::cout << " linear_count = " << linear_count << " : ";
-    for (int m=0;m<linear_count;m++)
-        std::cout << " " << linear[m] ;
-    std::cout << "\n";
-    std::cout << " quadratic_count = " << quadratic_count << " : ";
-    for (int m=0;m<quadratic_count;m++)
-        std::cout << " " << quadratic[m] ;
-    std::cout << "\n";
-    */
     if (linear_count == 3)
         return lll_solver(vectors, k3, solns);
     
@@ -259,7 +235,6 @@ int VertexPositioner::solver(Site* s1, double k1, Site* s2, double k2, Site* s3,
     */
     // TODO:  pick the solution appraoch with the best numerical stability.
 
-
     // index shuffling determines if we solve:
     // x and y in terms of t
     // y and t in terms of x
@@ -282,7 +257,7 @@ int VertexPositioner::solver(Site* s1, double k1, Site* s2, double k2, Site* s3,
 // solns = output solution triplets (x,y,t) or (u,v,t)
 // returns number of solutions found
 int VertexPositioner::qqq_solver( qd_real l0[], qd_real l1[], int xi, int yi, int ti, 
-      qd_real xk, qd_real yk, qd_real kk, qd_real rk , qd_real k3, std::vector<Solution>& solns) { // double solns[][3] ) {
+      qd_real xk, qd_real yk, qd_real kk, qd_real rk , qd_real k3, std::vector<Solution>& solns) { 
     qd_real aargs[3][2];
     qd_real ai = l0[xi]; // first linear 
     qd_real bi = l0[yi];
@@ -342,8 +317,8 @@ int VertexPositioner::qll_solve( qd_real a0, qd_real b0, qd_real c0, qd_real d0,
 {
     qd_real roots[2];
     // TODO:  optimize using abs(a0) == abs(c0) == abs(d0) == 1
-    qd_real a = chop( (a0*(a1*a1) + c0*(a2*a2) + e0) ); // chop
-    qd_real b = chop( (2*a0*a1*b1 + 2*a2*b2*c0 + a1*b0 + a2*d0 + f0) ); // chop
+    qd_real a = chop( (a0*(a1*a1) + c0*(a2*a2) + e0) ); 
+    qd_real b = chop( (2*a0*a1*b1 + 2*a2*b2*c0 + a1*b0 + a2*d0 + f0) ); 
     qd_real c = a0*(b1*b1) + c0*(b2*b2) + b0*b1 + b2*d0 + g0;
     int rcount = quadratic_roots(a, b, c, roots); // solves a*w^2 + b*w + c = 0
     if (rcount == 0) { // No roots, no solutions

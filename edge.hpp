@@ -122,12 +122,32 @@ struct EdgeProps {
         assert( mint >=0 );
         return mint;
     }
+    /*
 	void set_sign(bool sig) {
 		if (k==1)
 			sign = sig;
 		else
 			sign = !sig;
-	}
+	}*/
+    void copy_parameters(EdgeProps& other) {
+        sign = other.sign;
+        x[0] = other.x[0];
+        x[1] = other.x[1];
+        x[2] = other.x[2];
+        x[3] = other.x[3];
+        x[4] = other.x[4];
+        x[5] = other.x[5];
+        x[6] = other.x[6];        
+        x[7] = other.x[7];
+        y[0] = other.y[0];
+        y[1] = other.y[1];
+        y[2] = other.y[2];
+        y[3] = other.y[3];
+        y[4] = other.y[4];
+        y[5] = other.y[5];
+        y[6] = other.y[6];        
+        y[7] = other.y[7];
+    }   
     // sign is the branch of the quadratic!
     void set_parameters(Site* s1, Site* s2, bool sig) {
         sign = sig;

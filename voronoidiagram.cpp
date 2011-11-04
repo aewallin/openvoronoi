@@ -700,10 +700,14 @@ void VoronoiDiagram::add_vertex_in_edge( HEVertex v, HEEdge e) {
     g[e2].type = g[e].type;
     
     // edge-parameters
+    /*
     if (g[e].type != SEPARATOR ) {
         g[e1].set_parameters(g[face].site, g[twin_face].site, g[e].sign );
         g[e2].set_parameters(g[face].site, g[twin_face].site, g[e].sign );
-    } 
+    } */
+    g[e1].copy_parameters( g[e] );
+    g[e2].copy_parameters( g[e] );
+
 	//g[e1].sign = g[e].sign;
 	//g[e2].sign = g[e].sign;
 	
@@ -730,10 +734,15 @@ void VoronoiDiagram::add_vertex_in_edge( HEVertex v, HEEdge e) {
     g[te1].type = g[twin].type;
     g[te2].type = g[twin].type;
     // edge parameters
+    
+    /*    
     if (g[twin].type != SEPARATOR ) {
         g[te1].set_parameters(g[face].site, g[twin_face].site, g[twin].sign );
         g[te2].set_parameters(g[face].site, g[twin_face].site, g[twin].sign );
-    } 
+    } */
+    g[te1].copy_parameters( g[twin] );
+    g[te2].copy_parameters( g[twin] );
+
 	//g[te1].sign = g[twin].sign;
 	//g[te2].sign = g[twin].sign;
 	

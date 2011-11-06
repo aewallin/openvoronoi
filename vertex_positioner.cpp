@@ -98,7 +98,10 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
         return pos_slns[0]; //pts[0];
     } else if (pos_slns.size()>1) {
         // two or more points remain so we must further filter here!
-        std::vector<Solution> sln2;
+        std::vector<Solution> sln2 = pos_slns;
+        
+        // filter with t-edge value (??)
+        /*
         for (unsigned int m=0;m<pos_slns.size();m++)  {
             double t = edge_t(edge, pos_slns[m].p );
             std::cout << m << " : k3=" << pos_slns[m].k3 << " p=" << pos_slns[m].p << " t=" << pos_slns[m].t << " in_region= " << s3->in_region( pos_slns[m].p ) ;
@@ -106,7 +109,7 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
             if ( (t>=0) && (t<=1) ) {
                 sln2.push_back( pos_slns[m]  );
             }
-        }
+        }*/
         
         // if after edge_t filtering only one point remains, return that
         if ( sln2.size() == 1) {
@@ -123,8 +126,14 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
                 if ( err < min_error) {
                     min_solution = s;
                     min_error = err;
-                    std::cout << s.p << " err=" << err << "\n";
+                    std::cout << s.p << " t=" <<  s.t << " err=" << err << "\n";
                 }
+            }
+            if (min_error >= 1e-6) {
+                std::cout << " sln=" << min_solution.p << " err=" << min_error << "\n";
+                std::cout << " edge: " << vd->g[ vd->g.source(edge) ].position << " - " << vd->g[ vd->g.target(edge) ].position;
+                std::cout << " edge-point(t="<<min_solution.t << ")= " << vd->g[edge].point(min_solution.t) << "\n";
+
             }
             assert( min_error < 1e-6 );
             return min_solution;
@@ -400,7 +409,7 @@ int VertexPositioner::quadratic_roots(qd_real a, qd_real b, qd_real c, qd_real r
 }
 
 int VertexPositioner::lll_solver(qd_real vectors[][4], double k3, std::vector<Solution>& slns ) {
-    std::cout << " lll_solver() \n";
+    std::cout << " lll_solver() k3= " << k3 << "\n";
     qd_real d, t, x, y;
     qd_real ai, bi, ki, ci;
     qd_real aj, bj, kj, cj;

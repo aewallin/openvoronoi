@@ -233,11 +233,6 @@ bool VoronoiDiagram::insert_line_site_step(int idx1, int idx2, int step) {
     LineSite* pos_site;
     LineSite* neg_site;
     bool se_sign = left.is_right(src_se,trg_se);
-    //Point src_es = line_site_es->start();
-    //Point trg_es = line_site_es->end();
-    //Point left_es = 0.5*(src_es+trg_es) + (trg_es-src_es).xyPerp();
-    //bool es_sign = left.is_right(src_es,trg_es);
-    //assert( es_sign != se_sign );
     HEEdge pos_edge, neg_edge;
     if ( se_sign ) {
         pos_site = new LineSite( g[start].position, g[end  ].position, +1 );
@@ -250,10 +245,6 @@ bool VoronoiDiagram::insert_line_site_step(int idx1, int idx2, int step) {
         pos_edge = g.add_edge(end,start);
         neg_edge = g.add_edge(start,end);
     }
-    //LineSite* line_site_se = new LineSite( g[start].position, g[end  ].position ) ;
-    //LineSite* line_site_es = new LineSite( g[end  ].position, g[start].position ) ;
-    //HEEdge 
-    //HEEdge e_s = g.add_edge(end,start);
     g[pos_edge].type = LINESITE;
     g[neg_edge].type = LINESITE;
     g[pos_edge].k = +1;
@@ -288,7 +279,8 @@ bool VoronoiDiagram::insert_line_site_step(int idx1, int idx2, int step) {
         g[q].status = NEW;
         modified_vertices.push_back(q);
         //std::cout << "position new vertex " << g[q].index << " on \n";
-        std::cout << "position new vertex " << g[q].index << " on " <<  g[ g.source(q_edges[m])].index << "-" << g[ g.target(q_edges[m])].index << " edge, type=" << g[q_edges[m]].type << "\n";
+        std::cout << "position new vertex " << g[q].index << " on " <<  g[ g.source(q_edges[m])].index << "(t=" << g[ g.source(q_edges[m])].dist() << ")-"; 
+        std::cout << g[ g.target(q_edges[m])].index << "(t=" << g[ g.target(q_edges[m])].dist() <<  " edge, type=" << g[q_edges[m]].type << "\n";
 
         g[q].position = vpos->position( q_edges[m], pos_site ); // set position
         g[q].k3 = vpos->get_k3();
@@ -382,11 +374,6 @@ void VoronoiDiagram::insert_line_site(int idx1, int idx2) {
     LineSite* pos_site;
     LineSite* neg_site;
     bool se_sign = left.is_right(src_se,trg_se);
-    //Point src_es = line_site_es->start();
-    //Point trg_es = line_site_es->end();
-    //Point left_es = 0.5*(src_es+trg_es) + (trg_es-src_es).xyPerp();
-    //bool es_sign = left.is_right(src_es,trg_es);
-    //assert( es_sign != se_sign );
     HEEdge pos_edge, neg_edge;
     if ( se_sign ) {
         pos_site = new LineSite( g[start].position, g[end  ].position , +1);
@@ -399,10 +386,6 @@ void VoronoiDiagram::insert_line_site(int idx1, int idx2) {
         pos_edge = g.add_edge(end,start);
         neg_edge = g.add_edge(start,end);
     }
-    //LineSite* line_site_se = new LineSite( g[start].position, g[end  ].position ) ;
-    //LineSite* line_site_es = new LineSite( g[end  ].position, g[start].position ) ;
-    //HEEdge 
-    //HEEdge e_s = g.add_edge(end,start);
     g[pos_edge].type = LINESITE;
     g[neg_edge].type = LINESITE;
     g[pos_edge].k = +1;
@@ -481,18 +464,17 @@ void VoronoiDiagram::add_separator(HEFace f, HEVertex endp, Site* s1, Site* s2) 
     assert( out_edges.size() == 1);
     HEEdge segment_e = out_edges[0];
     HEEdge segment_tw = g[segment_e].twin;
-    HEVertex v1; // this Vertex is found as OUT->NEW->IN
-    HEVertex v2; // this Vertex is found as IN->NEW->OUT
-    HEEdge v2_previous, v1_next;
-    HEEdge v2_next, v1_previous;
-                 // in-new    new   new-out
-    boost::tie( v2_previous, v2,   v2_next) = find_new_vertex(f, IN); // IN->NEW vertex
     
-                 // out-new    new   new-in
-    boost::tie( v1_previous, v1, v1_next) = find_new_vertex(f, OUT);  // OUT->NEW  vertex
+    EdgeData ed = find_edge_data(f);
+    HEVertex v1 = ed.v1; // this Vertex is found as OUT->NEW->IN
+    HEVertex v2 = ed.v2; // this Vertex is found as IN->NEW->OUT
+    HEEdge v2_previous = ed.v2_prv;
+    HEEdge v1_next = ed.v1_nxt;
+    HEEdge v2_next = ed.v2_nxt;
+    HEEdge v1_previous = ed.v1_prv;
+    
     if (g[v1].k3 ==  g[v2].k3) {
         std::cout << " g[ " << g[v1].index << " ].k3=" << g[v1].k3 << "  !=  g[" << g[v2].index << "].k3=" << g[v2].k3 << "\n";
-        
     }
     assert( g[v1].k3 !=  g[v2].k3 ); // v1 and v2 should be on opposite sides
     
@@ -707,17 +689,8 @@ void VoronoiDiagram::add_vertex_in_edge( HEVertex v, HEEdge e) {
     g[e2].type = g[e].type;
     
     // edge-parameters
-    /*
-    if (g[e].type != SEPARATOR ) {
-        g[e1].set_parameters(g[face].site, g[twin_face].site, g[e].sign );
-        g[e2].set_parameters(g[face].site, g[twin_face].site, g[e].sign );
-    } */
     g[e1].copy_parameters( g[e] );
     g[e2].copy_parameters( g[e] );
-
-	//g[e1].sign = g[e].sign;
-	//g[e2].sign = g[e].sign;
-	
     
     HEEdge te1 = g.add_edge( twin_source, v  ); // te1 and te2 replace twin
     HEEdge te2 = g.add_edge( v, twin_target  );
@@ -740,19 +713,11 @@ void VoronoiDiagram::add_vertex_in_edge( HEVertex v, HEEdge e) {
     // type
     g[te1].type = g[twin].type;
     g[te2].type = g[twin].type;
-    // edge parameters
     
-    /*    
-    if (g[twin].type != SEPARATOR ) {
-        g[te1].set_parameters(g[face].site, g[twin_face].site, g[twin].sign );
-        g[te2].set_parameters(g[face].site, g[twin_face].site, g[twin].sign );
-    } */
+    // edge parameters
     g[te1].copy_parameters( g[twin] );
     g[te2].copy_parameters( g[twin] );
 
-	//g[te1].sign = g[twin].sign;
-	//g[te2].sign = g[twin].sign;
-	
     // update the faces (required here?)
     g[face].edge = e1;
     g[twin_face].edge = te1;
@@ -777,50 +742,33 @@ HEFace VoronoiDiagram::add_face(Site* s) {
 // by adding a NEW-NEW edge, split the face f into one part which is newface, and the other part is the old f
 // for linesegment or arc sites we pass in both the k=+1 face newface and the k=-1 face newface2
 void VoronoiDiagram::add_edge(HEFace newface, HEFace f, HEFace newface2) {
-    HEVertex new_source, new_target; 
-    HEEdge new_previous, new_next, twin_next, twin_previous;
+    if (new_vertex_count(f) == 2) {        // add one new edge src-target to fix the face
+        EdgeData ed = find_edge_data(f);
+        add_edge(ed, newface, newface2);
+    } else if ( new_vertex_count(f) == 4 ) {        // need to add TWO new edges to fix the face
+        std::cout << " 4 NEW case!!\n";
+        EdgeData ed = find_edge_data(f);
+        EdgeData ed2 = find_edge_data(f,ed.v1);
+        std::cout << "1st edge is " << g[ed.v1].index << " - " << g[ed.v2].index << "\n";
+        std::cout << "2nd edge is " << g[ed2.v1].index << " - " << g[ed2.v2].index << "\n";
+        add_edge(ed, newface, newface2);
+        add_edge(ed2, newface, newface2);
+    } else { 
+        assert(0); // unhandled case! panic.
+    }
+}
+
+void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
+    HEEdge new_previous = ed.v1_prv;
+    HEVertex new_source = ed.v1;
+    HEEdge twin_next = ed.v1_nxt;
+    HEEdge twin_previous = ed.v2_prv;
+    HEVertex new_target = ed.v2;
+    HEEdge new_next = ed.v2_nxt;
+    HEFace f = ed.f;
     Site* f_site = g[f].site;
     Site* new_site = g[newface].site;
     
-//  return type is boost::tuple<HEEdge, HEVertex, HEEdge>
-    if (new_vertex_count(f) == 2) {
-        // add one new edge src-target to fix the face
-        //boost::tie( new_previous, new_source, twin_next) = find_new_vertex(f, OUT); // OUT->NEW vertex
-        //boost::tie( twin_previous, new_target, new_next) = find_new_vertex(f, IN);  // IN->NEW  vertex
-
-        EdgeData ed = find_edge_data(f);
-        new_previous = ed.v1_prv;
-        new_source = ed.v1;
-        twin_next = ed.v1_nxt;
-        twin_previous = ed.v2_prv;
-        new_target = ed.v2;
-        new_next = ed.v2_nxt;
-
-    } else if ( new_vertex_count(f) == 4 ) {
-        // need to add TWO new edges to fix the face
-        std::cout << " 4 NEW case!!\n";
-        
-        //HEVertex new_source2, new_target2; 
-        //HEEdge new_previous2, new_next2, twin_next2, twin_previous2;
-        EdgeData ed = find_edge_data(f);
-        EdgeData ed2 = find_edge_data(f,ed.v1);
-
-//        boost::tie( new_previous, new_source, twin_next) = find_new_vertex(f, OUT,+1); // OUT->NEW vertex
-//        boost::tie( twin_previous, new_target, new_next) = find_new_vertex(f, IN ,+1);  // IN->NEW  vertex
-//        std::cout << "k=+1 edge is " << g[new_source].index << " - " << g[new_target].index << "\n";            
-        
-
-//        boost::tie( new_previous2, new_source2, twin_next2) = find_new_vertex(f, OUT,-1); // OUT->NEW vertex
-//        boost::tie( twin_previous2, new_target2, new_next2) = find_new_vertex(f, IN ,-1);  // IN->NEW  vertex
-        
-        std::cout << "1st edge is " << g[ed.v1].index << " - " << g[ed.v2].index << "\n";
-        std::cout << "2nd edge is " << g[ed2.v1].index << " - " << g[ed2.v2].index << "\n";
-        assert(0);
-        
-    } else {
-        assert(0);
-    }
-
     // both trg and src should be on same side of new site 
     if (g[new_target].k3 != g[new_source].k3)
         std::cout << " g[" << g[new_target].index << "].k3=" << g[new_target].k3 << " != g[" << g[new_source].index << "].k3=" << g[new_source].k3<< "\n";
@@ -944,6 +892,7 @@ void VoronoiDiagram::add_edge(HEFace newface, HEFace f, HEFace newface2) {
     }
 }
 
+// count number of NEW vertices on the given face
 int VoronoiDiagram::new_vertex_count(HEFace f) {
     VertexVector face_verts = g.face_vertices(f);
     int count=0;
@@ -954,57 +903,12 @@ int VoronoiDiagram::new_vertex_count(HEFace f) {
     return count;
 }
 
-// among the edges of HEFace f, which has had NEW vertices inserted into two (?exactly two?) of its edges,
-// find the NEW vertex with status-signature NEW->s.
-// return a tuple with the previous_edge, found_vertex, and the twin_next edge
-
-// called from add_separator and from add_edge
-boost::tuple<HEEdge, HEVertex, HEEdge> VoronoiDiagram::find_new_vertex(HEFace f, VoronoiVertexStatus s, double k3) {
-    HEVertex v;
-    HEEdge prev;
-    HEEdge twin_next;
-    HEEdge current_edge = g[f].edge;
-    bool found = false;
-    int count=0;                             
-    while (!found) {
-        HEVertex current_vertex = g.target( current_edge );
-        HEEdge next_edge = g[current_edge].next;
-        HEVertex next_vertex = g.target( next_edge );
-        if ( g[current_vertex].status == s ) {
-            if ( g[next_vertex].status == NEW) {
-                if ( k3 != 0.0 ) {// do k3 check if k3 set to +1 or -1
-                    if (g[v].k3 == k3) {
-                        v = next_vertex;
-                        prev = next_edge;
-                        twin_next = g[next_edge].next;
-                        found = true;
-                    }
-                } else {
-                    assert( k3==0);
-            
-                    v = next_vertex;
-                    prev = next_edge;
-                    twin_next = g[next_edge].next;
-                    found = true;                 
-                }
-            }
-        }
-        current_edge = g[current_edge].next;   
-        count++;
-
-        assert(count<100); // some reasonable max number of edges in face, to avoid infinite loop
-    }
-    return boost::tuple<HEEdge, HEVertex, HEEdge>( prev, v, twin_next );
-}
-
 // on a face which has IN and OUT-vertices, find the sequence
 // OUT-OUT-OUT-..-OUT-NEW(v1)-IN-...-IN-NEW(v2)-OUT-OUT
 // and return v1/v2 together with their previous and next edges
 EdgeData VoronoiDiagram::find_edge_data(HEFace f, HEVertex v)  {
     EdgeData ed;
-    //HEVertex v1;
-    //HEEdge prev;
-    //HEEdge next;
+    ed.f = f;
     HEEdge current_edge = g[f].edge; // start on some edge of the face
     bool found = false;
     int count=0;                             
@@ -1042,12 +946,11 @@ EdgeData VoronoiDiagram::find_edge_data(HEFace f, HEVertex v)  {
         count++;
         assert(count<100); // some reasonable max number of edges in face, to avoid infinite loop
     }
-    
-
     return ed;
 }
 
 // start on g[newface].edge, walk around the face and repair the next-pointers
+// this is called on the newly created face after all NEW-NEW edges have been added
 void VoronoiDiagram::repair_face( HEFace f ) {
     //std::cout << "repair_face( " << f << " )\n";
     HEEdge current_edge = g[f].edge; 
@@ -1067,9 +970,7 @@ void VoronoiDiagram::repair_face( HEFace f ) {
                     found_next_edge = true;
                     assert( vd_checker->current_face_equals_next_face( current_edge ) );
                 }
-            } else {
-                //std::cout << " not valid.\n";
-            }
+            } 
         }
         assert(found_next_edge); // must find a next-edge!
         current_edge = g[current_edge].next; // jump to the next edge

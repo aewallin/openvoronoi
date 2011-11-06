@@ -53,6 +53,7 @@ struct EdgeData {
     HEEdge v2_prv;
     HEVertex v2;
     HEEdge v2_nxt;
+    HEFace f;
 };
 
 /// \brief Voronoi diagram.
@@ -96,9 +97,6 @@ class VoronoiDiagram {
         void initialize();
         HEVertex find_seed_vertex(HEFace f, Site* site) const;
         EdgeVector find_in_out_edges(); 
-        boost::tuple<HEEdge, HEVertex, HEEdge> find_new_vertex(HEFace f, VoronoiVertexStatus s1, double k3=0.0);
-
-
         EdgeData find_edge_data(HEFace f, HEVertex v=HEVertex());
         
         void augment_vertex_set(HEVertex& v_seed, Site* site);        
@@ -109,6 +107,7 @@ class VoronoiDiagram {
         void   add_vertices( Site* site );
         HEFace add_face(Site* site);
         void   add_edge(HEFace new_f1, HEFace f, HEFace new_f2 = 0);
+        void add_edge(EdgeData ed, HEFace new1, HEFace new2=0);
         void   add_vertex_in_edge(HEVertex v, HEEdge e);
         void   add_separator(HEFace f, HEVertex endp, Site* s1, Site* s2);
         void repair_face( HEFace f );

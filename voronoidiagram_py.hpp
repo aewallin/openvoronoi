@@ -166,10 +166,10 @@ class VoronoiDiagram_py : public VoronoiDiagram {
                     boost::python::list point_list; // the endpoints of each edge
                     HEVertex v1 = g.source( edge );
                     HEVertex v2 = g.target( edge );
-                    if ( (g[edge].type == LINE) || (g[edge].type == SEPARATOR) || (g[edge].type == LINESITE) ) {
+                    if ( (g[edge].type == SEPARATOR) || (g[edge].type == LINESITE) ) {
                         point_list.append( g[v1].position );
                         point_list.append( g[v2].position );
-                    } else if ( g[edge].type == PARABOLA ) {
+                    } else if ( g[edge].type == PARABOLA || (g[edge].type == LINE) ) {
                         double t_src = g[v1].dist();
                         double t_trg = g[v2].dist();
                         double t_min = std::min(t_src,t_trg);

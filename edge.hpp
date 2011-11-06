@@ -93,6 +93,7 @@ struct EdgeProps {
             return Point(xc,yc);
         } else {
             std::cout << " warning bisector sqrt(-1) discr1=" << discr1 << " discr2=" << discr2 << "!\n";
+            std::cout << " t= " << t << "\n";
             assert(0);
             return Point(0,0);
         }
@@ -163,25 +164,28 @@ struct EdgeProps {
     }
     // called for point(s1)-point(s2) edges
     void set_pp_parameters(Site* s1, Site* s2) {
+        // x = x1 - x2 - x3*t +/- x4 * sqrt( square(x5+x6*t) - square(x7+x8*t) )
         assert( s1->isPoint() && s2->isPoint() );
         double d = (s1->position() - s2->position()).norm(); //sqrt( sq(xc1-xc2) + sq(yc1-yc2) )
         double alfa1 = (s2->x() - s1->x()) / d;
         double alfa2 = (s2->y() - s1->y()) / d;
         double alfa3 = -d/2;
-        double alfa4 = 0;
+        //double alfa4 = 0;
         type = LINE;
         x[0]=s1->x();       
-        x[1]=alfa1*alfa3; 
-        x[2]=alfa1*alfa4; 
+        x[1]=alfa1*alfa3; // 
+        x[2]=0; //alfa1*alfa4; 
         x[3]=alfa2;       
         x[4]=0;             
         x[5]=+1;          
         x[6]=alfa3;       
-        x[7]=0;           
-
+        x[7]=0;           // sqrt(  (0+t)^2 - (d/2 +0*t)^2 )
+        // sqrt( r1^2 - h^2 )
+        // sqrt( (r1+k1*t)^2 - [ (r2(t)^2 - r1(t)^2 - d^2)/2d ]^2 )
+        // sqrt( (t^2) - [  ( (t)^2 - (t)^2 -d^2  ) / 2d ]^2 )
         y[0]=s1->y();     
         y[1]=alfa2*alfa3; 
-        y[2]=alfa2*alfa4; 
+        y[2]=0; //alfa2*alfa4; // *t
         y[3]=alfa1;       
         y[4]=0;           
         y[5]=+1;          
@@ -229,7 +233,7 @@ struct EdgeProps {
         assert( delta != 0 );
         x[0]= ( (s1->b() * s2->c()) - (s2->b() * s1->c()) ) / delta;  // alfa1 = (b1*d2-b2*d1) / delta
         x[1]=0;
-        x[2]= -(s1->k()*s2->b()-s2->k()*s1->b()); // -alfa3 = -( b2-b1 )
+        x[2]= -(s1->k()*s2->b()-s2->k()*s1->b())/delta; // -alfa3 = -( b2-b1 )
         x[3]=0;  //should be: -(k2*b1-k1*b2) ??
         x[4]=0;
         x[5]=0;
@@ -238,7 +242,7 @@ struct EdgeProps {
         
         y[0]= ( (s2->a()*s1->c()) - (s1->a()*s2->c()) ) / delta;  // alfa2 = (a2*d1-a1*d2) / delta
         y[1]= 0;
-        y[2]= -(s2->k()*s1->a()-s1->k()*s2->a());  // -alfa4 = -( a1-a2 )
+        y[2]= -(s2->k()*s1->a()-s1->k()*s2->a())/delta;  // -alfa4 = -( a1-a2 )
         y[3]=0; //should be: -(k1*a2-k2*a1) ??
         y[4]=0;
         y[5]=0;

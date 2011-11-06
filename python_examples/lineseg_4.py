@@ -87,7 +87,7 @@ if __name__ == "__main__":
     
     t_before = time.time()
     
-    Nmax = 5
+    Nmax = 3
 
     segs = []
     id_list = []
@@ -104,14 +104,14 @@ if __name__ == "__main__":
 
     #exit()
     
-    nsegs = 4
+    nsegs = 2
     n=1
     for s in id_list:
         if n<= nsegs:
             vd.addLineSite(s[0],s[1])
         n=n+1
-    s = id_list[4]
-    vd.addLineSiteStep( s[1], s[0], 11) 
+    s = id_list[2]
+    vd.addLineSiteStep( s[1], s[0], 5) 
     t_after = time.time()
     calctime = t_after-t_before
     if Nmax==0:

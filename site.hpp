@@ -160,6 +160,7 @@ public:
     virtual double a() const { return eq.a; }
     virtual double b() const { return eq.b; }
     virtual double c() const { return eq.c; }
+    virtual double k() const {return eq.k;}
     Point start() const {return _start;}
     Point end() const {return _end;}
 

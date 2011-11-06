@@ -98,7 +98,7 @@ if __name__ == "__main__":
     vod.drawFarCircle()
     
     
-    Nmax = 20
+    Nmax = 2
     
     plist = randomGenerators(far, Nmax)
         
@@ -124,6 +124,7 @@ if __name__ == "__main__":
 
     Nsegs = 0
     
+    """
     vd.addLineSite(42,13)
     vd.addLineSite(83,35)
     vd.addLineSite(63,153)
@@ -131,6 +132,7 @@ if __name__ == "__main__":
     vd.addLineSite(74,143)
     vd.addLineSite(125,173)
     vd.addLineSite(165,91)
+    """
     #segs=[]
     
     

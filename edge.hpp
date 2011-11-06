@@ -113,6 +113,7 @@ struct EdgeProps {
         return -1;
     }
     double minimum_pp_t(Site* s1, Site* s2) {
+        assert( s1->isPoint() && s2->isPoint() );
         double p1p2 = (s1->position() - s2->position()).norm() ;
         assert( p1p2 >=0 );
         return p1p2/2;
@@ -122,13 +123,6 @@ struct EdgeProps {
         assert( mint >=0 );
         return mint;
     }
-    /*
-	void set_sign(bool sig) {
-		if (k==1)
-			sign = sig;
-		else
-			sign = !sig;
-	}*/
     void copy_parameters(EdgeProps& other) {
         sign = other.sign;
         x[0] = other.x[0];
@@ -169,8 +163,7 @@ struct EdgeProps {
     }
     // called for point(s1)-point(s2) edges
     void set_pp_parameters(Site* s1, Site* s2) {
-        assert( s1->isPoint() );
-        assert( s2->isPoint() );
+        assert( s1->isPoint() && s2->isPoint() );
         double d = (s1->position() - s2->position()).norm(); //sqrt( sq(xc1-xc2) + sq(yc1-yc2) )
         double alfa1 = (s2->x() - s1->x()) / d;
         double alfa2 = (s2->y() - s1->y()) / d;
@@ -197,51 +190,47 @@ struct EdgeProps {
     }
     // called for point(s1)-line(s2) edges
     void set_pl_parameters(Site* s1, Site* s2) {
-        assert( s1->isPoint() );
-        assert( s2->isLine() );
+        assert( s1->isPoint() && s2->isLine() );
         
         type = PARABOLA;
         double alfa3 = s2->a()*s1->x() + s2->b()*s1->y() + s2->c();
         // figure out k, i.e. offset-direction for LineSite
-        double k = 1.0;
+        double kk = 1.0;
         if (alfa3>0.0) {
-            k = -1.0;
-            //sign = false;
+            kk = -1.0;
         } else {
-			//sign = true;
             sign = !sign;
         }
-
         
         x[0]=s1->x();       // xc1
         x[1]=s2->a()*alfa3; // alfa1*alfa3
-        x[2]=s2->a()*k;      // -alfa1 = - a2 * k2?
+        x[2]=s2->a()*kk;      // -alfa1 = - a2 * k2?
         x[3]=s2->b();       // alfa2 = b2
         x[4]=0;             // alfa4 = r1 
         x[5]=+1;            // lambda1 (allways positive offset from PointSite?)
         x[6]=alfa3;        // alfa3= a2*xc1+b2*yc1+d2?
-        x[7]=k;            // -1 = k2 side of line??
+        x[7]=kk;            // -1 = k2 side of line??
 
         y[0]=s1->y();       // yc1
         y[1]=s2->b()*alfa3; // alfa2*alfa3
-        y[2]=s2->b()*k;      // -alfa2 = -b2
+        y[2]=s2->b()*kk;      // -alfa2 = -b2
         y[3]=s2->a();       // alfa1 = a2
         y[4]=0;             // alfa4 = r1
         y[5]=+1;            // lambda1 (allways positive offset from PointSite?)
         y[6]=alfa3;         // alfa3
-        y[7]=k;            // -1 = k2 side of line??
-        //print_params();
+        y[7]=kk;            // -1 = k2 side of line??
     }
     // line(s1)-line(s2) edge
     void set_ll_parameters(Site* s1, Site* s2) {  // Held thesis p96
         std::cout << " set_ll \n";
         type = LINE;
+        sign = true; //sign does not matter because there is no sqrt()!        
         double delta = s1->a()*s2->b() - s1->b()*s2->a();
         assert( delta != 0 );
         x[0]= ( (s1->b() * s2->c()) - (s2->b() * s1->c()) ) / delta;  // alfa1 = (b1*d2-b2*d1) / delta
         x[1]=0;
-        x[2]= -(s2->b()-s1->b()); // -alfa3 = -( b2-b1 )
-        x[3]=0;
+        x[2]= -(s1->k()*s2->b()-s2->k()*s1->b()); // -alfa3 = -( b2-b1 )
+        x[3]=0;  //should be: -(k2*b1-k1*b2) ??
         x[4]=0;
         x[5]=0;
         x[6]=0;
@@ -249,13 +238,12 @@ struct EdgeProps {
         
         y[0]= ( (s2->a()*s1->c()) - (s1->a()*s2->c()) ) / delta;  // alfa2 = (a2*d1-a1*d2) / delta
         y[1]= 0;
-        y[2]= -(s1->a()-s2->a());  // -alfa4 = -( a1-a2 )
-        y[3]=0;
+        y[2]= -(s2->k()*s1->a()-s1->k()*s2->a());  // -alfa4 = -( a1-a2 )
+        y[3]=0; //should be: -(k1*a2-k2*a1) ??
         y[4]=0;
         y[5]=0;
         y[6]=0;
         y[7]=0;
-        y[8]=0;
     }
     void print_params() const {
         std::cout << "x-params: ";

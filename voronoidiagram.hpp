@@ -46,6 +46,15 @@ public:
 // sorted by decreasing fabs() of in_circle-predicate, so that the vertices whose IN/OUT status we are 'most certain' about are processed first
 typedef std::priority_queue< VertexDetPair , std::vector<VertexDetPair>, abs_comparison > VertexQueue;
 
+struct EdgeData {
+    HEEdge v1_prv;
+    HEVertex v1;
+    HEEdge v1_nxt;
+    HEEdge v2_prv;
+    HEVertex v2;
+    HEEdge v2_nxt;
+};
+
 /// \brief Voronoi diagram.
 ///
 /// see http://en.wikipedia.org/wiki/Voronoi_diagram
@@ -87,7 +96,11 @@ class VoronoiDiagram {
         void initialize();
         HEVertex find_seed_vertex(HEFace f, Site* site) const;
         EdgeVector find_in_out_edges(); 
-        boost::tuple<HEEdge, HEVertex, HEEdge> find_new_vertex(HEFace f, VoronoiVertexStatus s1);
+        boost::tuple<HEEdge, HEVertex, HEEdge> find_new_vertex(HEFace f, VoronoiVertexStatus s1, double k3=0.0);
+
+
+        EdgeData find_edge_data(HEFace f, HEVertex v=HEVertex());
+        
         void augment_vertex_set(HEVertex& v_seed, Site* site);        
         bool predicate_c4(HEVertex v);
         bool predicate_c5(HEVertex v);
@@ -101,7 +114,7 @@ class VoronoiDiagram {
         void repair_face( HEFace f );
         void remove_vertex_set();
         void reset_status();
-        
+        int new_vertex_count(HEFace f);
     // PRINT ETC
         void print_faces();
         void print_face(HEFace f);

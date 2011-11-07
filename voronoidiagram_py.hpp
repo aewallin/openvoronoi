@@ -169,7 +169,7 @@ class VoronoiDiagram_py : public VoronoiDiagram {
                     if ( (g[edge].type == SEPARATOR) || (g[edge].type == LINESITE) || (g[edge].type == OUTEDGE) ) {
                         point_list.append( g[v1].position );
                         point_list.append( g[v2].position );
-                    } else if ( g[edge].type == PARABOLA || (g[edge].type == LINE) ) {
+                    } else if ( g[edge].type == PARABOLA || (g[edge].type == LINE) || (g[edge].type == LINELINE) ) {
                         double t_src = g[v1].dist();
                         double t_trg = g[v2].dist();
                         double t_min = std::min(t_src,t_trg);

@@ -58,7 +58,7 @@ Point VertexPositioner::position(HEEdge e, Site* s) {
     
     Solution sl = position( vd->g[face].site  , vd->g[e].k, vd->g[twin_face].site  , vd->g[twin].k, s );
     std::cout << " new vertex positioned at " << sl.p << " t=" << sl.t << " k3=" << sl.k3 << "\n";
-
+    //assert( solution_on_edge(sl) );
     check_far_circle(sl.p);
     //check_on_edge(e, p);
     //check_dist(e, p, v);
@@ -97,7 +97,7 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     // further filtering here
     if ( pos_slns.size() == 1) {
         k3 = pos_slns[0].k3; // k3s[0];
-        assert( solution_on_edge(pos_slns[0]) );
+        //assert( solution_on_edge(pos_slns[0]) );
         return pos_slns[0]; //pts[0];
     } else if (pos_slns.size()>1) {
         // two or more points remain so we must further filter here!
@@ -118,7 +118,7 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
         if ( sln2.size() == 1) {
             std::cout << " returning k3= " << sln2[0].k3 << " pt= " << sln2[0].p << " t=" << sln2[0].t << "\n";
             k3 = sln2[0].k3;
-            assert( solution_on_edge(sln2[0]) );
+            //assert( solution_on_edge(sln2[0]) );
             return sln2[0];
         } else {
             // filter further using edge_error
@@ -139,8 +139,8 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
                 std::cout << " edge-point(t="<<min_solution.t << ")= " << vd->g[edge].point(min_solution.t) << "\n";
 
             }
-            assert( min_error < 1e-6 );
-            assert( solution_on_edge(min_solution) );
+            //assert( min_error < 1e-6 );
+            //assert( solution_on_edge(min_solution) );
             return min_solution;
         }
         
@@ -450,7 +450,6 @@ int VertexPositioner::lll_solver(qd_real vectors[][4], double k3, std::vector<So
         }
     }
     return 0; // no solution if determinant zero, or t-value negative
-    //return 0;
 }
 
 /// point-point-point vertex positioner based on Sugihara & Iri paper

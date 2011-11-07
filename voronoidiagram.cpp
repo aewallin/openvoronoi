@@ -336,7 +336,6 @@ bool VoronoiDiagram::insert_line_site_step(int idx1, int idx2, int step) {
         HEVertex q = g.add_vertex();
         g[q].status = NEW;
         modified_vertices.push_back(q);
-        //std::cout << "position new vertex " << g[q].index << " on \n";
         std::cout << "position new vertex " << g[q].index << " on " <<  g[ g.source(q_edges[m])].index << "(t=" << g[ g.source(q_edges[m])].dist() << ")-"; 
         std::cout << g[ g.target(q_edges[m])].index << "(t=" << g[ g.target(q_edges[m])].dist() <<  " edge, type=" << g[q_edges[m]].type << "\n";
 
@@ -374,6 +373,7 @@ bool VoronoiDiagram::insert_line_site_step(int idx1, int idx2, int step) {
             add_edge(pos_site->face, f, neg_site->face); // each INCIDENT face is split into two parts: newface and f
         }
     }
+    if (step == (2+n_verts+2)) return false;
 
     std::cout << "new edges added \n";
     remove_vertex_set();
@@ -849,7 +849,13 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
     } else if (f_site->isPoint() && new_site->isPoint() ) {
         src_sign = g[new_source].position.is_right( f_site->position(), new_site->position() );
         trg_sign = g[new_target].position.is_right( f_site->position(), new_site->position() );
+    } else if (f_site->isLine() && new_site->isLine() )  {
+        // figure out the signs for a line-line bisector
+        // or is (true,true) ok?
+    } else {
+        assert(0);
     }
+
     
     // sign of quadratic branch
     //bool sign=false;
@@ -870,11 +876,10 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
         g[e_new].set_parameters( f_site, new_site, !src_sign ); 
         // the twin edge that bounds the new face
         HEEdge e_twin = g.add_edge( new_target, new_source );
-        
         g[twin_previous].next = e_twin;
         g[e_twin].next = twin_next;         
         g[e_twin].k = g[new_source].k3; 
-        g[e_twin].set_parameters( f_site, new_site,  !src_sign );
+        g[e_twin].set_parameters( new_site, f_site, src_sign );
 
         if (g[e_twin].k == 1) {
             g[e_twin].face = newface; // assumes newface is k==+1 face!
@@ -915,8 +920,8 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
     // twin edges
         HEEdge e1_tw = g.add_edge( apex, new_source );
         HEEdge e2_tw = g.add_edge( new_target, apex );
-        g[e1_tw].set_parameters(f_site,new_site,!src_sign);
-        g[e2_tw].set_parameters(f_site,new_site,!trg_sign);
+        g[e1_tw].set_parameters(new_site, f_site, src_sign);
+        g[e2_tw].set_parameters(new_site, f_site, trg_sign);
         g[twin_previous].next = e2_tw;
         g[e2_tw].next = e1_tw;
         g[e1_tw].next = twin_next;

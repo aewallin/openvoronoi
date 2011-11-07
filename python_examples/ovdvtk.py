@@ -200,6 +200,15 @@ class VD:
             ecolor = pink # self.edgeColor
             #print "drawing etype=", etype
             actor = 0
+            if (etype == ovd.VoronoiEdgeType.LINELINE):
+                ecolor = lblue
+                for n in range( len(epts)-1 ):
+                    p1 = self.scale*epts[n]  
+                    p2 = self.scale*epts[n+1] 
+                    #print "line ",n," : ",p1," to ",p2
+                    actor = Line( p1=( p1.x,p1.y, 0), p2=(p2.x,p2.y, 0), color=ecolor)
+                    self.myscreen.addActor(actor)
+                    self.edges.append(actor)
             if (etype == ovd.VoronoiEdgeType.LINE):
                 ecolor = cyan
                 for n in range( len(epts)-1 ):

@@ -37,7 +37,7 @@ typedef boost::adjacency_list_traits<OUT_EDGE_CONTAINER,
                                      
 typedef unsigned int HEFace;
 
-enum VoronoiEdgeType {LINE, OUTEDGE, PARABOLA, ELLIPSE, HYPERBOLA, SEPARATOR, LINESITE};
+enum VoronoiEdgeType {LINE, LINELINE, OUTEDGE, PARABOLA, ELLIPSE, HYPERBOLA, SEPARATOR, LINESITE};
 
 /// properties of an edge in the voronoi diagram
 /// each edge stores a pointer to the next HEEdge 
@@ -167,9 +167,10 @@ struct EdgeProps {
             set_pp_parameters(s1,s2);
         else if (s1->isPoint() && s2->isLine())    // PL
             set_pl_parameters(s1,s2);
-        else if (s2->isPoint() && s1->isLine())    // LP
+        else if (s2->isPoint() && s1->isLine())  {  // LP
             set_pl_parameters(s2,s1);
-        else if (s1->isLine() && s2->isLine())     // LL
+            sign = !sign;
+        } else if (s1->isLine() && s2->isLine())     // LL
             set_ll_parameters(s2,s1);
         else
             assert(0);
@@ -181,34 +182,26 @@ struct EdgeProps {
     }
     // called for point(s1)-point(s2) edges
     void set_pp_parameters(Site* s1, Site* s2) {
-        std::cout << "set_pp_parameters()\n";
+        //std::cout << "set_pp_parameters()\n";
         // x = x1 - x2 - x3*t +/- x4 * sqrt( square(x5+x6*t) - square(x7+x8*t) )
         assert( s1->isPoint() && s2->isPoint() );
         double d = (s1->position() - s2->position()).norm(); //sqrt( sq(xc1-xc2) + sq(yc1-yc2) )
         double alfa1 = (s2->x() - s1->x()) / d;
         double alfa2 = (s2->y() - s1->y()) / d;
         double alfa3 = -d/2;
-        //double alfa4 = 0;
-        
-	    //double kk=-1.0; // figure out direction of bisector here! and set sign-bit
-        //if (sign)
-        //    kk = +1.0;
         
         type = LINE;
         x[0]=s1->x();       
         x[1]=alfa1*alfa3; // 
-        x[2]=0; //alfa1*alfa4; 
+        x[2]=0;  
         x[3]=-alfa2;       
         x[4]=0;             
         x[5]=+1;          
         x[6]=alfa3;       
         x[7]=0;           // sqrt(  (0+t)^2 - (d/2 +0*t)^2 )
-        // sqrt( r1^2 - h^2 )
-        // sqrt( (r1+k1*t)^2 - [ (r2(t)^2 - r1(t)^2 - d^2)/2d ]^2 )
-        // sqrt( (t^2) - [  ( (t)^2 - (t)^2 -d^2  ) / 2d ]^2 )
         y[0]=s1->y();     
         y[1]=alfa2*alfa3; 
-        y[2]=0; //alfa2*alfa4; // *t
+        y[2]=0; 
         y[3]=-alfa1;       
         y[4]=0;           
         y[5]=+1;          
@@ -249,24 +242,33 @@ struct EdgeProps {
     }
     // line(s1)-line(s2) edge
     void set_ll_parameters(Site* s1, Site* s2) {  // Held thesis p96
+        assert( s1->isLine() && s2->isLine() );
         std::cout << " set_ll \n";
-        type = LINE;
-        sign = true; //sign does not matter because there is no sqrt()!        
-        double delta = s1->a()*s2->b() - s1->b()*s2->a();
+        type = LINELINE;
+        //sign = true; //sign does not matter because there is no sqrt()?        
+        
+
+        double delta =  s1->a()*s2->b() - s1->b()*s2->a() ;
+        double kk=+1.0;
+        //if (sign)
+        //    kk=-1.0;
+
         assert( delta != 0 );
         x[0]= ( (s1->b() * s2->c()) - (s2->b() * s1->c()) ) / delta;  // alfa1 = (b1*d2-b2*d1) / delta
         x[1]=0;
-        x[2]= -(s1->k()*s2->b()-s2->k()*s1->b())/delta; // -alfa3 = -( b2-b1 )
-        x[3]=0;  //should be: -(k2*b1-k1*b2) ??
+        x[2]= kk*(s2->b()-s1->b())/delta; // -alfa3 = -( b2-b1 )
+        //x[2]= kk*(s1->k()*s2->b()-s2->k()*s1->b())/delta; // -alfa3 = -( b2-b1 )
+        y[0]= ( (s2->a()*s1->c()) - (s1->a()*s2->c()) ) / delta;  // alfa2 = (a2*d1-a1*d2) / delta
+        y[1]= 0;
+        //y[2]= kk*(s2->k()*s1->a()-s1->k()*s2->a())/delta;  // -alfa4 = -( a1-a2 )
+        y[2]= kk*(s1->a()-s2->a())/delta;  // -alfa4 = -( a1-a2 )
+        
+        x[3]=0;  
         x[4]=0;
         x[5]=0;
         x[6]=0;
         x[7]=0;
-        
-        y[0]= ( (s2->a()*s1->c()) - (s1->a()*s2->c()) ) / delta;  // alfa2 = (a2*d1-a1*d2) / delta
-        y[1]= 0;
-        y[2]= -(s2->k()*s1->a()-s1->k()*s2->a())/delta;  // -alfa4 = -( a1-a2 )
-        y[3]=0; //should be: -(k1*a2-k2*a1) ??
+        y[3]=0; 
         y[4]=0;
         y[5]=0;
         y[6]=0;

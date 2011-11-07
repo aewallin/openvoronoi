@@ -249,19 +249,21 @@ struct EdgeProps {
         
 
         double delta =  s1->a()*s2->b() - s1->b()*s2->a() ;
-        double kk=+1.0;
-        //if (sign)
-        //    kk=-1.0;
-
         assert( delta != 0 );
+
+        //double kk=-1.0;
+        //if (delta>0)
+        //    kk=+1.0;
+
         x[0]= ( (s1->b() * s2->c()) - (s2->b() * s1->c()) ) / delta;  // alfa1 = (b1*d2-b2*d1) / delta
         x[1]=0;
-        x[2]= kk*(s2->b()-s1->b())/delta; // -alfa3 = -( b2-b1 )
-        //x[2]= kk*(s1->k()*s2->b()-s2->k()*s1->b())/delta; // -alfa3 = -( b2-b1 )
+        //x[2]= kk*(s2->b()-s1->b())/delta; // -alfa3 = -( b2-b1 )
+        x[2]= -(s1->k()*s2->b()-s2->k()*s1->b())/delta; // -alfa3 = -( b2-b1 )
+
         y[0]= ( (s2->a()*s1->c()) - (s1->a()*s2->c()) ) / delta;  // alfa2 = (a2*d1-a1*d2) / delta
         y[1]= 0;
-        //y[2]= kk*(s2->k()*s1->a()-s1->k()*s2->a())/delta;  // -alfa4 = -( a1-a2 )
-        y[2]= kk*(s1->a()-s2->a())/delta;  // -alfa4 = -( a1-a2 )
+        y[2]= -(s2->k()*s1->a()-s1->k()*s2->a())/delta;  // -alfa4 = -( a1-a2 )
+        //y[2]= kk*(s1->a()-s2->a())/delta;  // -alfa4 = -( a1-a2 )
         
         x[3]=0;  
         x[4]=0;

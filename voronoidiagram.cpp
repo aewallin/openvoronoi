@@ -50,7 +50,7 @@ void VoronoiDiagram::initialize() {
     HEVertex v01 = g.add_vertex();
     HEVertex v02 = g.add_vertex();
     HEVertex v03 = g.add_vertex();
-    double far_multiplier = 1;
+    double far_multiplier = 6;
     g[v01] = VoronoiVertex(Point(             0                 , -3.0*far_radius*far_multiplier    )               , OUT, OUTER);
     g[v02] = VoronoiVertex(Point(  +3.0*sqrt(3.0)*far_radius*far_multiplier/2.0, +3.0*far_radius*far_multiplier/2.0), OUT, OUTER);
     g[v03] = VoronoiVertex(Point(  -3.0*sqrt(3.0)*far_radius*far_multiplier/2.0, +3.0*far_radius*far_multiplier/2.0), OUT, OUTER);
@@ -72,89 +72,147 @@ void VoronoiDiagram::initialize() {
     g[g1] = VoronoiVertex( gen1 , OUT, POINTSITE);
     g[g2] = VoronoiVertex( gen2 , OUT, POINTSITE);
     g[g3] = VoronoiVertex( gen3 , OUT, POINTSITE);
+
+    // APEX 1
+    Point apex1 = 0.5*(gen2+gen3);
+    HEVertex a1 = g.add_vertex();
+    g[a1] = VoronoiVertex( apex1, OUT, APEX );
+    g[a1].init_dist(gen2);
+    
+    // APEX 2
+    Point apex2 = 0.5*(gen1+gen3);
+    HEVertex a2 = g.add_vertex();
+    g[a2] = VoronoiVertex( apex2, OUT, APEX );
+    g[a2].init_dist(gen3);   
+    
+    // APEX 3
+    Point apex3 = 0.5*(gen1+gen2);
+    HEVertex a3 = g.add_vertex();
+    g[a3] = VoronoiVertex( apex3, OUT, APEX );
+    g[a3].init_dist(gen1);   
+
     // add face 1: v0-v1-v2 which encloses gen3
-    HEEdge e1 =  g.add_edge( v0 , v01 );   
+    HEEdge e1_1 =  g.add_edge( v0 , a1 ); //v01 );   
+    HEEdge e1_2 =  g.add_edge( a1 , v01); //v01 );  
     HEEdge e2 =  g.add_edge( v01, v02 );
-    HEEdge e3 =  g.add_edge( v02, v0  ); 
-    HEFace f1 =  g.add_face( ); 
+    HEEdge e3_1 =  g.add_edge( v02, a2 ); 
+    HEEdge e3_2 =  g.add_edge( a2 , v0 ); 
+    HEFace f1 =  g.add_face();
     g[f1].edge = e2;
     g[f1].site = new PointSite(gen3,f1);
     g[f1].status = NONINCIDENT;
     
     fgrid->add_face( g[f1] );
-    g[e1].face = f1;
+    g[e1_1].face = f1;
+    g[e1_2].face = f1;
     g[e2].face = f1;
-    g[e3].face = f1;
-    g[e1].next = e2;
-    g[e2].next = e3;
-    g[e3].next = e1;
+    g[e3_1].face = f1;
+    g[e3_2].face = f1;
+    g[e1_1].next = e1_2;
+    g[e1_2].next = e2;
+    g[e2].next = e3_1;
+    g[e3_1].next = e3_2;
+    g[e3_2].next = e1_1;
 
     // add face 2: v0-v02-v03 which encloses gen1
-    HEEdge e4 = g.add_edge( v0, v02   );   
+    HEEdge e4_1 = g.add_edge( v0, a2  );
+    HEEdge e4_2 = g.add_edge( a2, v02 );
+
     HEEdge e5 = g.add_edge( v02, v03  );
-    HEEdge e6 = g.add_edge( v03, v0   ); 
+    HEEdge e6_1 = g.add_edge( v03, a3 );
+    HEEdge e6_2 = g.add_edge( a3, v0 ); 
     HEFace f2 =  g.add_face();
     g[f2].edge = e5;
     g[f2].site = new PointSite(gen1,f2);
     g[f2].status = NONINCIDENT;
     
     fgrid->add_face( g[f2] );
-    g[e4].face = f2;
+    g[e4_1].face = f2;
+    g[e4_2].face = f2;
     g[e5].face = f2;
-    g[e6].face = f2;
-    g[e4].next = e5;
-    g[e5].next = e6;
-    g[e6].next = e4;
+    g[e6_1].face = f2;
+    g[e6_2].face = f2;
+    g[e4_1].next = e4_2;
+    g[e4_2].next = e5;
+    g[e5].next = e6_1;
+    g[e6_1].next = e6_2;
+    g[e6_2].next = e4_1;
     
     // add face 3: v0-v3-v1 which encloses gen2
-    HEEdge e7 = g.add_edge( v0 , v03 );   
+    HEEdge e7_1 = g.add_edge( v0 , a3 );  
+    HEEdge e7_2 = g.add_edge( a3 , v03 );   
     HEEdge e8 = g.add_edge( v03, v01 );
-    HEEdge e9 = g.add_edge( v01, v0  ); 
+    HEEdge e9_1 = g.add_edge( v01, a1  ); 
+    HEEdge e9_2 = g.add_edge( a1 , v0  ); 
+
     HEFace f3 =  g.add_face();
     g[f3].edge = e8;
     g[f3].site = new PointSite(gen2,f3);
     g[f3].status = NONINCIDENT;
     fgrid->add_face( g[f3] );
-    g[e7].face = f3;
+    g[e7_1].face = f3;
+    g[e7_2].face = f3;
     g[e8].face = f3;
-    g[e9].face = f3;
-    g[e7].next = e8;
-    g[e8].next = e9;
-    g[e9].next = e7;
-    
+    g[e9_1].face = f3;
+    g[e9_2].face = f3;
+    g[e7_1].next = e7_2;
+    g[e7_2].next = e8;
+    g[e8].next = e9_1;
+    g[e9_1].next = e9_2;
+    g[e9_2].next = e7_1;
+
     // set type. (note that edge-params x[8] and y[8] are not set!
-    g[e1].type = LINE;
-    g[e2].type = LINE; 
-    g[e3].type = LINE;
-    g[e4].type = LINE;
-    g[e5].type = LINE;
-    g[e6].type = LINE;
-    g[e7].type = LINE;
-    g[e8].type = LINE;
-    g[e9].type = LINE;
+    g[e1_1].type = LINE;  g[e1_1].set_parameters(g[f1].site, g[f3].site, false);
+    g[e1_2].type = LINE;  g[e1_2].set_parameters(g[f1].site, g[f3].site, true);
+    g[e2].type = OUTEDGE; 
+    g[e3_1].type = LINE; g[e3_1].set_parameters(g[f2].site, g[f1].site, true);
+    g[e3_2].type = LINE; g[e3_2].set_parameters(g[f2].site, g[f1].site, false);
+    g[e4_1].type = LINE; g[e4_1].set_parameters(g[f2].site, g[f1].site, false);
+    g[e4_2].type = LINE; g[e4_2].set_parameters(g[f2].site, g[f1].site, true);
+    g[e5].type = OUTEDGE;
+    g[e6_1].type = LINE; g[e6_1].set_parameters(g[f2].site, g[f3].site, false);
+    g[e6_2].type = LINE; g[e6_2].set_parameters(g[f2].site, g[f3].site, true);
+    g[e7_1].type = LINE; g[e7_1].set_parameters(g[f2].site, g[f3].site, true);
+    g[e7_2].type = LINE; g[e7_2].set_parameters(g[f2].site, g[f3].site, false);
+    g[e8].type = OUTEDGE;
+    g[e9_1].type = LINE; g[e9_1].set_parameters(g[f1].site, g[f3].site, true);
+    g[e9_2].type = LINE; g[e9_2].set_parameters(g[f1].site, g[f3].site, false);
     
     // twin edges
-    g[e1].twin = e9;
-    g[e9].twin = e1;
+    g[e1_1].twin = e9_2;
+    g[e1_2].twin = e9_1;
+    g[e9_1].twin = e1_2;
+    g[e9_2].twin = e1_1;
+
     g[e2].twin = HEEdge(); // the outermost edges have invalid twins
     g[e5].twin = HEEdge();
     g[e8].twin = HEEdge();
-    g[e3].twin = e4;
-    g[e4].twin = e3;
-    g[e6].twin = e7;
-    g[e7].twin = e6;
-    
+    g[e3_1].twin = e4_2;
+    g[e3_2].twin = e4_1;
+    g[e4_1].twin = e3_2;
+    g[e4_2].twin = e3_1;
+    g[e6_1].twin = e7_2;
+    g[e6_2].twin = e7_1;
+    g[e7_1].twin = e6_2;
+    g[e7_2].twin = e6_1;
+
     // k-values all positive for PointSite generators
-    g[e1].k = 1.0;
+    g[e1_1].k = 1.0;
+    g[e1_2].k = 1.0;
     g[e2].k = 1.0;
-    g[e3].k = 1.0;
-    g[e4].k = 1.0;
+    g[e3_1].k = 1.0;
+    g[e3_2].k = 1.0;
+    g[e4_1].k = 1.0;
+    g[e4_2].k = 1.0;
     g[e5].k = 1.0;
-    g[e6].k = 1.0;
-    g[e7].k = 1.0;
+    g[e6_1].k = 1.0;
+    g[e6_2].k = 1.0;
+    g[e7_1].k = 1.0;
+    g[e7_2].k = 1.0;
     g[e8].k = 1.0;
-    g[e9].k = 1.0;
-    
+    g[e9_1].k = 1.0;
+    g[e9_2].k = 1.0;
+
     assert( vd_checker->is_valid() );
 }
 

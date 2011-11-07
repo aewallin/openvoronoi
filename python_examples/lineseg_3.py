@@ -99,7 +99,8 @@ if __name__ == "__main__":
     
     vod.clearance_disk=1
     vod.vertexRadius = 0.1
-    Nmax = 1
+    vod.textScale = 0.5
+    Nmax = 0
     
     plist = randomGenerators(far, Nmax)
         

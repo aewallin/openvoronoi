@@ -166,7 +166,7 @@ class VoronoiDiagram_py : public VoronoiDiagram {
                     boost::python::list point_list; // the endpoints of each edge
                     HEVertex v1 = g.source( edge );
                     HEVertex v2 = g.target( edge );
-                    if ( (g[edge].type == SEPARATOR) || (g[edge].type == LINESITE) ) {
+                    if ( (g[edge].type == SEPARATOR) || (g[edge].type == LINESITE) || (g[edge].type == OUTEDGE) ) {
                         point_list.append( g[v1].position );
                         point_list.append( g[v2].position );
                     } else if ( g[edge].type == PARABOLA || (g[edge].type == LINE) ) {
@@ -174,11 +174,13 @@ class VoronoiDiagram_py : public VoronoiDiagram {
                         double t_trg = g[v2].dist();
                         double t_min = std::min(t_src,t_trg);
                         double t_max = std::max(t_src,t_trg);
+                        std::cout << g[v1].index << " t=" << g[v1].dist() << " - " << g[v2].index << " t=" << g[v2].dist() << "\n";
                         int Nmax = 20;
                         double dt = (t_max-t_min)/(Nmax-1);
                         for (int n=0;n<Nmax;n++) {
                             double t = t_min + n*dt;
                             Point pt = g[edge].point(t);
+                            std::cout << t << " " << pt << "\n";
                             point_list.append(pt);
                         }
                     } else {

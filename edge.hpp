@@ -37,13 +37,30 @@ typedef boost::adjacency_list_traits<OUT_EDGE_CONTAINER,
                                      
 typedef unsigned int HEFace;
 
-enum VoronoiEdgeType {LINE, PARABOLA, ELLIPSE, HYPERBOLA, SEPARATOR, LINESITE};
+enum VoronoiEdgeType {LINE, OUTEDGE, PARABOLA, ELLIPSE, HYPERBOLA, SEPARATOR, LINESITE};
 
 /// properties of an edge in the voronoi diagram
 /// each edge stores a pointer to the next HEEdge 
 /// and the HEFace to which this HEEdge belongs
 struct EdgeProps {
-    EdgeProps() {}
+    EdgeProps() {
+        x[0] = 0;
+        x[1] = 0;
+        x[2] = 0;
+        x[3] = 0;
+        x[4] = 0;
+        x[5] = 0;
+        x[6] = 0;        
+        x[7] = 0;
+        y[0] = 0;
+        y[1] = 0;
+        y[2] = 0;
+        y[3] = 0;
+        y[4] = 0;
+        y[5] = 0;
+        y[6] = 0;        
+        y[7] = 0;
+    }
     EdgeProps(HEEdge n, HEFace f): next(n), face(f) {}
     /// create edge with given next, twin, and face
     EdgeProps(HEEdge n, HEEdge t, HEFace f): next(n), twin(t), face(f) {}
@@ -164,6 +181,7 @@ struct EdgeProps {
     }
     // called for point(s1)-point(s2) edges
     void set_pp_parameters(Site* s1, Site* s2) {
+        std::cout << "set_pp_parameters()\n";
         // x = x1 - x2 - x3*t +/- x4 * sqrt( square(x5+x6*t) - square(x7+x8*t) )
         assert( s1->isPoint() && s2->isPoint() );
         double d = (s1->position() - s2->position()).norm(); //sqrt( sq(xc1-xc2) + sq(yc1-yc2) )
@@ -171,13 +189,16 @@ struct EdgeProps {
         double alfa2 = (s2->y() - s1->y()) / d;
         double alfa3 = -d/2;
         //double alfa4 = 0;
-
-	// double kk=1.0; // figure out direction of bisector here! and set sign-bit
+        
+	    //double kk=-1.0; // figure out direction of bisector here! and set sign-bit
+        //if (sign)
+        //    kk = +1.0;
+        
         type = LINE;
         x[0]=s1->x();       
         x[1]=alfa1*alfa3; // 
         x[2]=0; //alfa1*alfa4; 
-        x[3]=alfa2;       
+        x[3]=-alfa2;       
         x[4]=0;             
         x[5]=+1;          
         x[6]=alfa3;       
@@ -188,7 +209,7 @@ struct EdgeProps {
         y[0]=s1->y();     
         y[1]=alfa2*alfa3; 
         y[2]=0; //alfa2*alfa4; // *t
-        y[3]=alfa1;       
+        y[3]=-alfa1;       
         y[4]=0;           
         y[5]=+1;          
         y[6]=alfa3;       

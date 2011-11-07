@@ -67,6 +67,7 @@ private:
     double edge_t(HEEdge e, const Point& p );
     double edge_error(HEEdge e, Solution& s );
 
+    bool solution_on_edge(Solution& s);
 
     double chop(double val) {
         double _epsilon = 1e-10;

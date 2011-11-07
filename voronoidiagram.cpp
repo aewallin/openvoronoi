@@ -76,19 +76,19 @@ void VoronoiDiagram::initialize() {
     // APEX 1
     Point apex1 = 0.5*(gen2+gen3);
     HEVertex a1 = g.add_vertex();
-    g[a1] = VoronoiVertex( apex1, OUT, APEX );
+    g[a1] = VoronoiVertex( apex1, UNDECIDED, APEX );
     g[a1].init_dist(gen2);
     
     // APEX 2
     Point apex2 = 0.5*(gen1+gen3);
     HEVertex a2 = g.add_vertex();
-    g[a2] = VoronoiVertex( apex2, OUT, APEX );
+    g[a2] = VoronoiVertex( apex2, UNDECIDED, APEX );
     g[a2].init_dist(gen3);   
     
     // APEX 3
     Point apex3 = 0.5*(gen1+gen2);
     HEVertex a3 = g.add_vertex();
-    g[a3] = VoronoiVertex( apex3, OUT, APEX );
+    g[a3] = VoronoiVertex( apex3, UNDECIDED, APEX );
     g[a3].init_dist(gen1);   
 
     // add face 1: v0-v1-v2 which encloses gen3
@@ -828,8 +828,10 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
     Site* new_site = g[newface].site;
     
     // both trg and src should be on same side of new site 
-    if (g[new_target].k3 != g[new_source].k3)
-        std::cout << " g[" << g[new_target].index << "].k3=" << g[new_target].k3 << " != g[" << g[new_source].index << "].k3=" << g[new_source].k3<< "\n";
+    if (g[new_target].k3 != g[new_source].k3) {
+        std::cout << " g[" << g[new_target].index << "].k3=" << g[new_target].k3 << " != ";
+        std::cout << "g[" << g[new_source].index << "].k3=" << g[new_source].k3<< "\n";
+    }
     assert( g[new_target].k3 == g[new_source].k3 );
 
     //                                           f
@@ -837,7 +839,7 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
     // and:              twin_next <- new_source <- new_target <- twin_previous 
     //                                           new_face   
 
-    // if adding a quadratic edge, check for potential apex-split
+    // check for potential apex-split
     bool src_sign=true, trg_sign=true;
     if (f_site->isPoint()  && new_site->isLine() ) {
         Point pt1 = f_site->position();
@@ -850,9 +852,9 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
     }
     
     // sign of quadratic branch
-    bool sign=false;
-    if (!src_sign)
-        sign = true;
+    //bool sign=false;
+    //if (!src_sign)
+    //    sign = true;
     
     // both src and trg are on the same side of the new site.
     // so no apex-split is required, just add a single edge.
@@ -865,14 +867,15 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
         g[e_new].face = f; // src-trg edge has f on its left
         g[new_previous].next = e_new;
         g[f].edge = e_new; 
-        g[e_new].set_parameters( f_site, new_site, sign ); 
+        g[e_new].set_parameters( f_site, new_site, !src_sign ); 
         // the twin edge that bounds the new face
         HEEdge e_twin = g.add_edge( new_target, new_source );
         
         g[twin_previous].next = e_twin;
         g[e_twin].next = twin_next;         
         g[e_twin].k = g[new_source].k3; 
-        g[e_twin].set_parameters( new_site, f_site, sign );
+        g[e_twin].set_parameters( f_site, new_site,  !src_sign );
+
         if (g[e_twin].k == 1) {
             g[e_twin].face = newface; // assumes newface is k==+1 face!
             g[newface].edge = e_twin;

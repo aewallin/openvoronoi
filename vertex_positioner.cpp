@@ -85,6 +85,8 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
             count2 = solver(s1,k1,s2,k2,s3,-1, solutions); // for lineSite or ArcSite we may try k3=-1 also
     //}
     
+
+    // choose only t>0 solutions
     std::vector<Solution> pos_slns;
     BOOST_FOREACH(Solution s, solutions) {
         if (s.t>0 && s3->in_region(s.p) ) // require in_region() and positive t-value
@@ -95,6 +97,7 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     // further filtering here
     if ( pos_slns.size() == 1) {
         k3 = pos_slns[0].k3; // k3s[0];
+        assert( solution_on_edge(pos_slns[0]) );
         return pos_slns[0]; //pts[0];
     } else if (pos_slns.size()>1) {
         // two or more points remain so we must further filter here!
@@ -115,6 +118,7 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
         if ( sln2.size() == 1) {
             std::cout << " returning k3= " << sln2[0].k3 << " pt= " << sln2[0].p << " t=" << sln2[0].t << "\n";
             k3 = sln2[0].k3;
+            assert( solution_on_edge(sln2[0]) );
             return sln2[0];
         } else {
             // filter further using edge_error
@@ -136,6 +140,7 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
 
             }
             assert( min_error < 1e-6 );
+            assert( solution_on_edge(min_solution) );
             return min_solution;
         }
         
@@ -149,6 +154,11 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     std::cout << " edge: " << vd->g[ vd->g.source(edge) ].position << " - " << vd->g[ vd->g.target(edge) ].position << "\n";
     assert(0);
     return Solution( Point(0,0), -1, 1 );
+}
+
+bool VertexPositioner::solution_on_edge(Solution& s) {
+    double err = edge_error(edge,s);
+    return (err<1E-6);
 }
 
 double VertexPositioner::edge_error(HEEdge e, Solution& s) {

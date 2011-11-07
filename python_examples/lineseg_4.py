@@ -104,7 +104,7 @@ if __name__ == "__main__":
 
     #exit()
     
-    nsegs = 2
+    nsegs = 1
     n=1
     for s in id_list:
         if n<= nsegs:

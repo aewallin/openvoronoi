@@ -97,8 +97,9 @@ if __name__ == "__main__":
     vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
     vod.drawFarCircle()
     
-    
-    Nmax = 2
+    vod.clearance_disk=1
+    vod.vertexRadius = 0.1
+    Nmax = 1
     
     plist = randomGenerators(far, Nmax)
         

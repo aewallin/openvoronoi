@@ -134,7 +134,7 @@ class VoronoiDiagram_py : public VoronoiDiagram {
         boost::python::list getVoronoiVertices()  {
             boost::python::list plist;
             BOOST_FOREACH( HEVertex v, g.vertices() ) {
-                if ( g[v].type == NORMAL  || g[v].type == APEX ) {
+                if ( g[v].type == NORMAL  || g[v].type == APEX || g[v].type == OUTER) {
                     boost::python::list pd;
                     pd.append( g[v].position );
                     pd.append( g[v].dist() );

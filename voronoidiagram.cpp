@@ -50,7 +50,7 @@ void VoronoiDiagram::initialize() {
     HEVertex v01 = g.add_vertex();
     HEVertex v02 = g.add_vertex();
     HEVertex v03 = g.add_vertex();
-    double far_multiplier = 6;
+    double far_multiplier = 1;
     g[v01] = VoronoiVertex(Point(             0                 , -3.0*far_radius*far_multiplier    )               , OUT, OUTER);
     g[v02] = VoronoiVertex(Point(  +3.0*sqrt(3.0)*far_radius*far_multiplier/2.0, +3.0*far_radius*far_multiplier/2.0), OUT, OUTER);
     g[v03] = VoronoiVertex(Point(  -3.0*sqrt(3.0)*far_radius*far_multiplier/2.0, +3.0*far_radius*far_multiplier/2.0), OUT, OUTER);

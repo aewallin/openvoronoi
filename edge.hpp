@@ -171,6 +171,8 @@ struct EdgeProps {
         double alfa2 = (s2->y() - s1->y()) / d;
         double alfa3 = -d/2;
         //double alfa4 = 0;
+
+	// double kk=1.0; // figure out direction of bisector here! and set sign-bit
         type = LINE;
         x[0]=s1->x();       
         x[1]=alfa1*alfa3; // 

@@ -202,11 +202,20 @@ class VD:
             actor = 0
             if (etype == ovd.VoronoiEdgeType.LINE):
                 ecolor = cyan
+		for n in range( len(epts)-1 ):
+                    p1 = self.scale*epts[n]  
+                    p2 = self.scale*epts[n+1] 
+                    #print "line ",n," : ",p1," to ",p2
+                    actor = Line( p1=( p1.x,p1.y, 0), p2=(p2.x,p2.y, 0), color=ecolor)
+                    self.myscreen.addActor(actor)
+                    self.edges.append(actor)
+		"""
                 p1 = self.scale*epts[0]  
                 p2 = self.scale*epts[1] 
                 actor = Line( p1=( p1.x,p1.y, 0), p2=(p2.x,p2.y, 0), color=ecolor)
                 self.myscreen.addActor(actor)
                 self.edges.append(actor)
+		"""
             if (etype == ovd.VoronoiEdgeType.SEPARATOR):
                 ecolor = orange
                 p1 = self.scale*epts[0]  

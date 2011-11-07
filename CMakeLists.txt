@@ -113,6 +113,7 @@ set_source_files_properties(
 set(OVD_SRC
     ${OpenVoronoi_SOURCE_DIR}/voronoidiagram.cpp
     ${OpenVoronoi_SOURCE_DIR}/vertex.cpp
+    ${OpenVoronoi_SOURCE_DIR}/edge.cpp
     ${OpenVoronoi_SOURCE_DIR}/checker.cpp
     ${OpenVoronoi_SOURCE_DIR}/facegrid.cpp
     ${OpenVoronoi_SOURCE_DIR}/point.cpp
@@ -125,6 +126,7 @@ set( OVD_INCLUDE_FILES
     ${OpenVoronoi_SOURCE_DIR}/graph.hpp
     ${OpenVoronoi_SOURCE_DIR}/voronoidiagram.hpp
     ${OpenVoronoi_SOURCE_DIR}/vertex.hpp
+    ${OpenVoronoi_SOURCE_DIR}/edge.hpp
     ${OpenVoronoi_SOURCE_DIR}/checker.hpp
     ${OpenVoronoi_SOURCE_DIR}/vertex_positioner.hpp
     ${OpenVoronoi_SOURCE_DIR}/facegrid.hpp

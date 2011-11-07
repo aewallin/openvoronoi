@@ -852,6 +852,22 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
     } else if (f_site->isLine() && new_site->isLine() )  {
         // figure out the signs for a line-line bisector
         // or is (true,true) ok?
+        bool b1 = (f_site->k() == 1);
+        bool b2 = (new_site->k() == 1);
+        if (b1 && b2)
+            src_sign = true;
+        else if (!b1 && b2)
+            src_sign = false;
+        else if (b1 && !b2)
+            src_sign = false;
+        else if (!b1 && !b2)
+            src_sign = false;
+        else
+            assert(0);
+
+        //if (f_site->k()
+        //src_sign = (f_site->k()==1) ? false : true ; //in_region( g[new_source].position() );
+        trg_sign = src_sign; // f_site.k ? true : false ;
     } else {
         assert(0);
     }

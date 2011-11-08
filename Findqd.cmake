@@ -3,21 +3,14 @@
 #
 #  QD_FOUND - system has QD
 #  QD_INCLUDE_DIR - the QGLViewer include directory
-#  QD_LIBRARIES - Link these to use QD
-#  QD_DEFINITIONS - Compiler switches required for using QGLViewer
+#  QD_LIBRARY - Link these to use QD
 #
 
 find_path(QD_INCLUDE_DIR
     NAMES qd/qd_real.h qd_real.h
     PATHS /usr/include
     /usr/local/include
-    # ENV QDROOT
-    MESSAGE(STATUS "Found QD: ${QD_INCLUDE_DIR}")
 )
-
-IF(QD_INCLUDE_DIR)
-    MESSAGE(STATUS "Found QD include dir: ${QD_INCLUDE_DIR}")
-ENDIF(QD_INCLUDE_DIR)
 
 find_library(QD_LIBRARY
     NAMES libqd qd
@@ -26,7 +19,6 @@ find_library(QD_LIBRARY
    ENV QDROOT
    ENV LD_LIBRARY_PATH
    ENV LIBRARY_PATH
-   # PATH_SUFFIXES QGLViewer QGLViewer/release
 )
 
     
@@ -41,9 +33,8 @@ IF(QD_INCLUDE_DIR AND QD_LIBRARY)
 ENDIF(QD_INCLUDE_DIR AND QD_LIBRARY)
 
 IF(QD_FOUND)
-    MESSAGE(STATUS "Found QD: ${QD_LIBRARY}")
+    MESSAGE(STATUS "QD_INCLUDE_DIR is: ${QD_INCLUDE_DIR}")
+    MESSAGE(STATUS "QD_LIBRARY is: ${QD_LIBRARY}")
 ELSE(QD_FOUND)
-#    IF(QD_FIND_REQUIRED)
     MESSAGE(FATAL_ERROR "Could not find QD")
-#    ENDIF(QD_FIND_REQUIRED)
 ENDIF(QD_FOUND)

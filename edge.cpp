@@ -184,12 +184,14 @@ void EdgeProps::set_ll_parameters(Site* s1, Site* s2) {  // Held thesis p96
     double delta =  s1->a()*s2->b() - s1->b()*s2->a() ;
     assert( delta != 0 );
     std::cout << " set_ll delta = " << delta << " sign= " << sign << "\n";
-    /*    
+       
     double kk = +1;
-    //if (delta < 0 )
-    //    kk = -1;
-
-
+    if (delta > 0 )
+        kk = -1;
+    
+    //if (!sign)
+    //    kk=-kk;
+/*
     if (delta<0 && sign ) {
         kk = +1.0;
     } else if ( delta<0 && !sign ) {
@@ -208,19 +210,19 @@ void EdgeProps::set_ll_parameters(Site* s1, Site* s2) {  // Held thesis p96
       + 0    - 1
   */    
     //if (!sign) {
-        //kk = -kk;
+    //    kk = -kk;
     //}
     //double kk=-1.0;
     //if (delta>0)
     //    kk=+1.0;
 
-    x[0]= ( (s1->b() * s2->c()) - (s2->b() * s1->c()) ) / delta;  // alfa1 = (b1*d2-b2*d1) / delta
-    //x[2]= (s1->k()*s2->b()-s2->k()*s1->b())/delta; // -alfa3 = -( b2-b1 )
-    x[2]= (s2->b()-s1->b())/delta; // -alfa3 = -( b2-b1 )
+    x[0]= ( (s1->b() * s2->c()) - (s2->b() * s1->c()) ) / (delta);  // alfa1 = (b1*d2-b2*d1) / delta
+    x[2]= kk*(s1->k()*s2->b()-s2->k()*s1->b())/ fabs(delta); // -alfa3 = -( b2-b1 )
+    //x[2]= (s2->b()-s1->b())/delta; // -alfa3 = -( b2-b1 )
 
-    y[0]= ( (s2->a()*s1->c()) - (s1->a()*s2->c()) ) / delta;  // alfa2 = (a2*d1-a1*d2) / delta        
-    //y[2]= (s2->k()*s1->a()-s1->k()*s2->a())/delta;  // -alfa4 = -( a1-a2 )
-    y[2]= (s1->a()-s2->a())/delta;  // -alfa4 = -( a1-a2 )
+    y[0]= ( (s2->a()*s1->c()) - (s1->a()*s2->c()) ) / (delta);  // alfa2 = (a2*d1-a1*d2) / delta        
+    y[2]= kk*(s2->k()*s1->a()-s1->k()*s2->a()) / fabs(delta);  // -alfa4 = -( a1-a2 )
+    //y[2]= (s1->a()-s2->a())/delta;  // -alfa4 = -( a1-a2 )
     std::cout << x[0] << "  " << x[2] << "\n";
     std::cout << y[0] << "  " << y[2] << "\n";
 

@@ -109,6 +109,7 @@ public:
         eq.a /= d;
         eq.b /= d;
         eq.c /= d;
+        assert( fabs( eq.a*eq.a + eq.b*eq.b -1.0 ) < 1e-5);
     }
     ~LineSite() {}
     /// closest point on start-end segment to given point.

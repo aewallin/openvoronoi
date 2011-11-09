@@ -211,12 +211,10 @@ bool VoronoiDiagramChecker::face_ok(HEFace f) {
     }
     int n=0;
     do {
-        assert( vd->g[current_edge].k == k );
-        current_edge = vd->g[current_edge].next;
-        if (!current_face_equals_next_face(current_edge)) {
-            std::cout << " face_ok() ERROR \n";
-            return false;
-        }
+        assert( vd->g[current_edge].k == k ); // all edges should have the same k-value
+        assert( current_face_equals_next_face(current_edge) ); // all edges should have the same face
+        
+        current_edge = vd->g[current_edge].next; 
         n++;
         assert( n < 100 ); // reasonable max
     } while( current_edge != start_edge);

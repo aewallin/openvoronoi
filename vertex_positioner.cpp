@@ -89,7 +89,7 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     // choose only t>0 solutions
     std::vector<Solution> pos_slns;
     BOOST_FOREACH(Solution s, solutions) {
-        if (s.t>0 && s3->in_region(s.p) ) // require in_region() and positive t-value
+        if (s.t>0 && s.t<= t_max && s3->in_region(s.p) ) // require in_region() and positive t-value
             pos_slns.push_back(s);
     }
     
@@ -127,10 +127,11 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
             std::cout << " edge_error filter: \n";
             BOOST_FOREACH(Solution s, sln2) {
                 double err = edge_error(edge,s);
+                std::cout << s.p << " t=" <<  s.t << " err=" << err << "\n";
                 if ( err < min_error) {
                     min_solution = s;
                     min_error = err;
-                    std::cout << s.p << " t=" <<  s.t << " err=" << err << "\n";
+                    //std::cout << s.p << " t=" <<  s.t << " err=" << err << "\n";
                 }
             }
             if (min_error >= 1e-6) {

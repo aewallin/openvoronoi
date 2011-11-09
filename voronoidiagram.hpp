@@ -102,7 +102,7 @@ class VoronoiDiagram {
         void augment_vertex_set(HEVertex& v_seed, Site* site);        
         bool predicate_c4(HEVertex v);
         bool predicate_c5(HEVertex v);
-        void mark_adjacent_faces(HEVertex v);
+        void mark_adjacent_faces(HEVertex v, Site* site);
         void mark_vertex(HEVertex& v,  Site* site); 
         void   add_vertices( Site* site );
         HEFace add_face(Site* site);
@@ -113,6 +113,8 @@ class VoronoiDiagram {
 
         void   add_vertex_in_edge(HEVertex v, HEEdge e);
         void   add_separator(HEFace f, HEVertex endp, Site* s1, Site* s2);
+        void add_split_vertex(HEFace f, Site* s);
+        
         void repair_face( HEFace f );
         void remove_vertex_set();
         void reset_status();
@@ -121,6 +123,7 @@ class VoronoiDiagram {
         void print_faces();
         void print_face(HEFace f);
         void print_vertices(VertexVector& q);
+        void print_edges(EdgeVector& q);
     // HELPER-CLASSES
         /// sanity-checks on the diagram are done by this helper class
         VoronoiDiagramChecker* vd_checker;

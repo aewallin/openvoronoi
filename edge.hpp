@@ -74,35 +74,12 @@ struct EdgeProps {
             return x;
     }
     
-
     Point point(double t) const; 
 
+    double minimum_t( Site* s1, Site* s2);
+    double minimum_pp_t(Site* s1, Site* s2);
+    double minimum_pl_t(Site* s1, Site* s2);
 
-    double minimum_t( Site* s1, Site* s2) {
-        if (s1->isPoint() && s2->isPoint())        // PP
-            return minimum_pp_t(s1,s2);
-        else if (s1->isPoint() && s2->isLine())    // PL
-            return minimum_pl_t(s1,s2);
-        else if (s2->isPoint() && s1->isLine())    // LP
-            return minimum_pl_t(s2,s1);
-        else if (s1->isLine() && s2->isLine())     // LL
-            return 0;
-        else
-            assert(0);
-        
-        return -1;
-    }
-    double minimum_pp_t(Site* s1, Site* s2) {
-        assert( s1->isPoint() && s2->isPoint() );
-        double p1p2 = (s1->position() - s2->position()).norm() ;
-        assert( p1p2 >=0 );
-        return p1p2/2;
-    }
-    double minimum_pl_t(Site* s1, Site* s2) {
-        double mint = - x[6]/(2.0*x[7]);
-        assert( mint >=0 );
-        return mint;
-    }
     void copy_parameters(EdgeProps& other);   
     void set_parameters(Site* s1, Site* s2, bool sig);
     void set_pp_parameters(Site* s1, Site* s2);

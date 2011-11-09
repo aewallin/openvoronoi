@@ -217,6 +217,34 @@ void EdgeProps::set_ll_parameters(Site* s1, Site* s2) {  // Held thesis p96
     y[7]=0;
 }
 
+double EdgeProps::minimum_t( Site* s1, Site* s2) {
+    if (s1->isPoint() && s2->isPoint())        // PP
+        return minimum_pp_t(s1,s2);
+    else if (s1->isPoint() && s2->isLine())    // PL
+        return minimum_pl_t(s1,s2);
+    else if (s2->isPoint() && s1->isLine())    // LP
+        return minimum_pl_t(s2,s1);
+    else if (s1->isLine() && s2->isLine())     // LL
+        return 0;
+    else
+        assert(0);
+    
+    return -1;
+}
+
+double EdgeProps::minimum_pp_t(Site* s1, Site* s2) {
+    assert( s1->isPoint() && s2->isPoint() );
+    double p1p2 = (s1->position() - s2->position()).norm() ;
+    assert( p1p2 >=0 );
+    return p1p2/2; // this splits point-point edges at APEX
+}
+
+double EdgeProps::minimum_pl_t(Site* s1, Site* s2) {
+    double mint = - x[6]/(2.0*x[7]);
+    assert( mint >=0 );
+    return mint;
+}
+
 void EdgeProps::print_params() const {
     std::cout << "x-params: ";
     for (int m=0;m<8;m++)

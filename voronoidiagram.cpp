@@ -622,7 +622,8 @@ HEVertex VoronoiDiagram::find_seed_vertex(HEFace f, Site* site) const { //const 
 // (C5) for an incident face containing v: v is adjacent to an IN vertex on this face
 // C4 and C5 refer to the Sugihara&Iri 1992 "one million" paper 
 //  we process UNDECIDED vertices adjacent to known IN-vertices in a "weighted breadth-first-search" manner
-//  where vertices with a large fabs(detH) are processed first, since we assume the detH to be more reliable the larger fabs(detH) is.
+//  where vertices with a large fabs(detH) are processed first, since we assume the in-circle predicate
+//  to be more reliable the larger fabs(in_circle()) is.
 void VoronoiDiagram::augment_vertex_set( HEVertex& v_seed, Site* site ) {
     mark_vertex( v_seed, site );
     modified_vertices.push_back( v_seed );
@@ -637,11 +638,11 @@ void VoronoiDiagram::augment_vertex_set( HEVertex& v_seed, Site* site ) {
                 std::cout << g[v].index << " marked OUT (topo): c4="<< predicate_c4(v) << " c5=" << !predicate_c5(v) << " r=" << !site->in_region(g[v].position) << " h=" << h << "\n";
             } else {
                 mark_vertex( v,  site); // h<0 and no violations, so mark IN. push adjacent UNDECIDED vertices onto Q.
-                std::cout << g[v].index << " marked IN (in_circle)\n";
+                std::cout << g[v].index << " marked IN (in_circle) ( " << h << " )\n";
             }
         } else { 
             g[v].status = OUT; // detH was positive (or zero), so mark OUT
-            std::cout << g[v].index << " marked OUT (in_circle)\n";
+            std::cout << g[v].index << " marked OUT (in_circle) ( " << h << " )\n";
         }
         modified_vertices.push_back( v );
     }

@@ -45,6 +45,8 @@ public:
     /// return closest point on site to given point p
     virtual Point apex_point(const Point& p) = 0;
     virtual const Point position() const {assert(0); return Point(0,0);}
+    virtual const Point start() const {assert(0); return Point(0,0);}
+    virtual const Point end() const {assert(0); return Point(0,0);}
     Eqp eqp() {return eq;} 
     bool is_linear() {return isLine(); }
     
@@ -129,28 +131,15 @@ public:
     }
     virtual std::string str() const {return "LineSite";}
     virtual bool in_region(const Point& p) const{
-        /*
-        Point s_p = p-_start;
-        Point s_e = _end - _start;
-        double t = s_p.dot(s_e) / s_e.dot(s_e);
-        // rounding... UGLY
-        double eps = 1e-11;
-        if (fabs(t) < eps) 
-            t= 0;
-        else if ( fabs(t-1.0) < eps )
-            t= 1;
-            */
         double t = in_region_t(p);
-        //std::cout << "in_region t= " << t << "\n";
         return ( (t>=0) && (t<=1) );
     }
     virtual double in_region_t(const Point& p) const {
         Point s_p = p-_start;
         Point s_e = _end - _start;
         double t = s_p.dot(s_e) / s_e.dot(s_e);
-        // rounding... UGLY
         double eps = 1e-11;
-        if (fabs(t) < eps) 
+        if (fabs(t) < eps)  // rounding... UGLY
             t= 0;
         else if ( fabs(t-1.0) < eps )
             t= 1;
@@ -161,10 +150,12 @@ public:
     virtual double a() const { return eq.a; }
     virtual double b() const { return eq.b; }
     virtual double c() const { return eq.c; }
-    virtual double k() const {return eq.k;}
-    Point start() const {return _start;}
-    Point end() const {return _end;}
-
+    virtual double k() const {
+        assert( eq.k==1 || eq.k==-1 );
+        return eq.k;
+    }
+    virtual const Point start() const {return _start;}
+    virtual const Point end() const {return _end;}
 private:
     LineSite() {} // don't use!
     Point _start;

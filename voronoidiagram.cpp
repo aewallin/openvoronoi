@@ -243,7 +243,7 @@ int VoronoiDiagram::insert_point_site(const Point& p) {
     HEFace newface = add_face( g[new_vert].site );
       
     BOOST_FOREACH( HEFace f, incident_faces ) {
-        add_edge(newface, f);
+        add_edge(newface, f); // no newface2 parameter given!
     }
     repair_face( newface );
     remove_vertex_set();
@@ -467,7 +467,6 @@ void VoronoiDiagram::insert_line_site(int idx1, int idx2) {
     // check that tree includes end_face_seed ?
     
     add_vertices( pos_site );  
-    
     
     HEFace pos_face = add_face( pos_site ); //  this face to the left of start->end edge    
     HEFace neg_face = add_face( neg_site ); //  this face is to the left of end->start edge
@@ -816,6 +815,8 @@ void VoronoiDiagram::add_edge(HEFace newface, HEFace f, HEFace newface2) {
     }
 }
 
+// newface = the k=+1 positive offset face
+// newface2 = the k=-1 negative offset face
 void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
     HEEdge new_previous = ed.v1_prv;
     HEVertex new_source = ed.v1;
@@ -850,8 +851,37 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
         src_sign = g[new_source].position.is_right( f_site->position(), new_site->position() );
         trg_sign = g[new_target].position.is_right( f_site->position(), new_site->position() );
     } else if (f_site->isLine() && new_site->isLine() )  {
-        // figure out the signs for a line-line bisector
-        // or is (true,true) ok?
+        //  a line-line bisector, sign should not matter because there is no sqrt()
+        
+        std::cout << " LL-edge " << g[new_source].index << " - " << g[new_target].index ;
+        std::cout << " f_site->k()= " << f_site->k() << " new_site->k()= "<< new_site->k() << "\n";
+        std::cout << " f_site <-> src("<< g[new_source].index << ") = " << g[new_source].position.is_right( f_site->start(), f_site->end() ) << "\n";
+        std::cout << " f_site <-> trg("<< g[new_target].index << ") = " << g[new_target].position.is_right( f_site->start(), f_site->end() ) << "\n";
+        std::cout << " n_site <-> src("<< g[new_source].index << ") = " << g[new_source].position.is_right( new_site->start(), new_site->end() ) << "\n";
+        std::cout << " n_site <-> trg("<< g[new_target].index << ") = " << g[new_target].position.is_right( new_site->start(), new_site->end() ) << "\n";
+
+// this is essentially an in-region test (?)
+
+        assert( !g[new_source].position.is_right( f_site->start(), f_site->end() ) );
+        assert( !g[new_target].position.is_right( f_site->start(), f_site->end() ) );
+        
+// find out if newface or newface2 should be used
+        if ( g[new_source].k3 == 1 )
+            new_site = g[newface].site; 
+        else
+            new_site = g[newface2].site; 
+
+        assert( !g[new_source].position.is_right( new_site->start(), new_site->end() ) );
+        assert( !g[new_target].position.is_right( new_site->start(), new_site->end() ) );
+
+/*
+        if ( !g[new_source].position.is_right( f_site->start(), f_site->end() ) )
+            assert( f_site->k() == +1 );
+        else
+            assert( f_site->k() == -1 );
+*/
+
+/*
         bool b1 = (f_site->k() == 1);
         bool b2 = (new_site->k() == 1);
         if (b1 && b2)
@@ -868,6 +898,7 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
         //if (f_site->k()
         //src_sign = (f_site->k()==1) ? false : true ; //in_region( g[new_source].position() );
         trg_sign = src_sign; // f_site.k ? true : false ;
+*/
     } else {
         assert(0);
     }
@@ -905,8 +936,11 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
             g[newface2].edge = e_twin;
         }
         g.twin_edges(e_new,e_twin);
-        std::cout << " added edge " << g[new_target].index << "-" << g[new_source].index << " f=" << g[e_twin].face;
-        std::cout << " type=" << g[e_twin].type << " k= " << g[e_twin].k << " twin_f= " <<  g[e_new].face << " \n";
+        std::cout << " added edge " << g[new_target].index << "(" << g[new_target].dist() <<") ";
+        std::cout << "-" << g[new_source].index << "(" << g[new_source].dist() << ") ";
+        std::cout << " f=" << g[e_new].face << " k= " << g[e_twin].k;
+        std::cout << " twf=" << g[e_twin].face << " twk= " << g[e_new].k;
+        std::cout << " type=" << g[e_twin].type <<   " \n";
         //std::cout << " k3 target-source: "<<  g[new_target].k3 << " - " << g[new_source].k3 << "\n";
     } else {
         // need to do apex-split

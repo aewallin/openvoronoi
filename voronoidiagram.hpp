@@ -106,8 +106,11 @@ class VoronoiDiagram {
         void mark_vertex(HEVertex& v,  Site* site); 
         void   add_vertices( Site* site );
         HEFace add_face(Site* site);
+                       // positive,    old-face      negative 
         void   add_edge(HEFace new_f1, HEFace f, HEFace new_f2 = 0);
-        void add_edge(EdgeData ed, HEFace new1, HEFace new2=0);
+                       //  data           positive    negative
+        void   add_edge(EdgeData ed, HEFace new1, HEFace new2=0);
+
         void   add_vertex_in_edge(HEVertex v, HEEdge e);
         void   add_separator(HEFace f, HEVertex endp, Site* s1, Site* s2);
         void repair_face( HEFace f );

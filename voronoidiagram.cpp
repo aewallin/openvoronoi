@@ -22,7 +22,7 @@
 #include <boost/foreach.hpp>
 #include <boost/math/tools/roots.hpp> // for toms748
 
-#include "line_intersection.hpp"
+
 
 #include "voronoidiagram.hpp"
 #include "facegrid.hpp"

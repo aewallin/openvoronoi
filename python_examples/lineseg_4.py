@@ -112,7 +112,7 @@ if __name__ == "__main__":
             vd.addLineSite(s[0],s[1])
         n=n+1
     s = id_list[18]
-    vd.addLineSiteStep( s[1], s[0], 13) 
+    vd.addLineSiteStep( s[1], s[0], 12) 
     t_after = time.time()
     calctime = t_after-t_before
     if Nmax==0:

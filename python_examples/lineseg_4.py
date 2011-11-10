@@ -83,12 +83,12 @@ if __name__ == "__main__":
     # for vtk visualization
     vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
     vod.drawFarCircle()
-    #vod.textScale = 0.003
-    #vod.vertexRadius = 0.001
+    vod.textScale = 0.02
+    vod.vertexRadius = 0.001
     
     t_before = time.time()
     
-    Nmax = 15
+    Nmax = 19
 
     segs = []
     id_list = []
@@ -105,14 +105,14 @@ if __name__ == "__main__":
 
     #exit()
     
-    nsegs =  3 #Nmax
+    nsegs = 18 #Nmax
     n=1
     for s in id_list:
         if n<= nsegs:
             vd.addLineSite(s[0],s[1])
         n=n+1
-    #s = id_list[14]
-    #vd.addLineSiteStep( s[1], s[0], 1) 
+    s = id_list[18]
+    vd.addLineSiteStep( s[1], s[0], 12) 
     t_after = time.time()
     calctime = t_after-t_before
     if Nmax==0:

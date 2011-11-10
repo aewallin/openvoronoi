@@ -360,9 +360,13 @@ bool VoronoiDiagram::insert_line_site_step(int idx1, int idx2, int step) {
     g[pos_edge].face = pos_face;
     g[neg_edge].face = neg_face;
     
+    std::cout << " add_separator(" << g[start].index << ") \n";
     add_separator(start_face, start, pos_site, neg_site);
-    add_separator(end_face  , end  , pos_site, neg_site); 
     if (step == (2+n_verts+1)) return false;
+    
+    std::cout << " add_separator(" << g[end].index << ") \n";
+    add_separator(end_face  , end  , pos_site, neg_site); 
+    if (step == (2+n_verts+2)) return false;
 
     assert( vd_checker->face_ok( start_face ) );
     assert( vd_checker->face_ok( end_face ) );
@@ -377,7 +381,7 @@ bool VoronoiDiagram::insert_line_site_step(int idx1, int idx2, int step) {
             add_edge(pos_site->face, f, neg_site->face); // each INCIDENT face is split into two parts: newface and f
         }
     }
-    if (step == (2+n_verts+2)) return false;
+    if (step == (2+n_verts+3)) return false;
 
     std::cout << "new edges added \n";
     remove_vertex_set();
@@ -519,7 +523,7 @@ void VoronoiDiagram::insert_line_site(int idx1, int idx2) {
 // add separator on the face f, which contains the endpoint
 // 
 void VoronoiDiagram::add_separator(HEFace f, HEVertex endp, Site* s1, Site* s2) {
-    std::cout << "add_separator()\n";
+    //std::cout << "add_separator()\n";
     EdgeVector out_edges = g.out_edges(endp);
     assert( out_edges.size() == 1);
     HEEdge segment_e = out_edges[0];
@@ -534,7 +538,11 @@ void VoronoiDiagram::add_separator(HEFace f, HEVertex endp, Site* s1, Site* s2) 
     HEEdge v1_previous = ed.v1_prv;
     
     if (g[v1].k3 ==  g[v2].k3) {
-        std::cout << " g[ " << g[v1].index << " ].k3=" << g[v1].k3 << "  !=  g[" << g[v2].index << "].k3=" << g[v2].k3 << "\n";
+        std::cout << " g[" << g[v1].index << "].k3=" << g[v1].k3 << "  !=  g[" << g[v2].index << "].k3=" << g[v2].k3 << "\n";
+        std::cout << "ERROR in add_separator(): NEW-vertices should be on opposite sides of new site!\n";
+        std::cout << " g[" << g[v1].index << "] " << g[v1].position << "\n";
+        std::cout << " g[" << g[v2].index << "] " << g[v2].position << "\n";
+        std::cout << " identical? " << (g[v1].position==g[v2].position) << "\n";
     }
     assert( g[v1].k3 !=  g[v2].k3 ); // v1 and v2 should be on opposite sides
     
@@ -694,6 +702,45 @@ void VoronoiDiagram::mark_adjacent_faces( HEVertex v, Site* site) {
     }
 }
 
+// walk around the face f
+// return edges whose endpoints are on separate sides of pt1-pt2 line
+EdgeVector VoronoiDiagram::find_split_edges(HEFace f, Point pt1, Point pt2) {
+    EdgeVector out;
+    //HEVertex split_src, split_trg;
+    HEEdge current_edge = g[f].edge;
+    HEEdge start_edge = current_edge;
+    //HEEdge split_edge;
+    bool done = false;
+    int count=0;                             
+    while (!done) { // FIND ALL! not just one.
+        HEVertex trg = g.target( current_edge );
+        HEVertex src = g.source( current_edge );
+        bool src_sign = g[src].position.is_right(pt1,pt2);
+        bool trg_sign = g[trg].position.is_right(pt1,pt2);
+        //std::cout << g[src].index << ":" << src_sign << " " << g[trg].index << ":" << trg_sign << "\n";
+        if ( g[src].type == NORMAL || g[src].type == APEX ) {
+            if ( src_sign != trg_sign ) {
+                    //split_src = src;
+                    //split_trg = trg;
+                    //found = true;
+                    //split_edge = current_edge;    
+                    out.push_back(current_edge);             
+            }
+        }
+        current_edge = g[current_edge].next;   
+        count++;
+        assert(count<100); // some reasonable max number of edges in face, to avoid infinite loop
+        if ( current_edge == start_edge )
+            done = true;
+    }
+    return out;
+}
+
+// add one or many split-vertices to the edges of the give face
+//
+// these are projections/mirrors of the site of f with the new Site s acting as the mirror
+//
+// split edges are inserted to avoid deleting loops during augment_vertex_set
 void VoronoiDiagram::add_split_vertex(HEFace f, Site* s) {
     if (s->isPoint())
         return; // no split-vertices when inserting point-sites
@@ -707,19 +754,22 @@ void VoronoiDiagram::add_split_vertex(HEFace f, Site* s) {
     
     
     if ( fs->isPoint() && s->isLine() && s->in_region( fs->position() ) ) {
-        // project point-site onto the appropriate edge on the face
+        
         // 1) find the correct edge
         Point pt1 = fs->position();
         Point pt2 = s->apex_point(pt1);       
         assert( (pt1-pt2).norm() > 0 ); 
+        
+        EdgeVector split_edges = find_split_edges(f, pt1, pt2);
         // the sought edge should have src on one side of pt1-pt2
         // and trg on the other side of pt1-pt2
+        /*
         HEVertex split_src, split_trg;
         HEEdge current_edge = g[f].edge;
         HEEdge split_edge;
         bool found = false;
         int count=0;                             
-        while (!found) {
+        while (!found) { // FIND ALL! not just one.
             HEVertex trg = g.target( current_edge );
             HEVertex src = g.source( current_edge );
             bool src_sign = g[src].position.is_right(pt1,pt2);
@@ -736,71 +786,44 @@ void VoronoiDiagram::add_split_vertex(HEFace f, Site* s) {
             current_edge = g[current_edge].next;   
             count++;
             assert(count<100); // some reasonable max number of edges in face, to avoid infinite loop
-        }
-        
-        if ( (g[split_edge].type = SEPARATOR) || (g[split_edge].type = LINESITE) )
-            return; // don't place split points on linesites or separators(?)
-        
-        std::cout << " split src=" << g[split_src].index << "("<< g[split_src].dist() << ")";
-        std::cout << " trg=" << g[split_trg].index << "("<< g[split_trg].dist() << ") \n";
-         std::cout << "is_right src=" << g[split_src].position.is_right(pt1,pt2) << "  trg="<< g[split_trg].position.is_right(pt1,pt2) << "\n";
-        // find a point = src + u*(trg-src)
-        // with min_t < u < max_t
-        // and minimum distance to the pt1-pt2 line
-        
-        SplitPointError errFunctr(this, split_edge, pt1, pt2); // error functor
-        typedef std::pair<double, double> Result;
-        boost::uintmax_t max_iter=500;
-        boost::math::tools::eps_tolerance<double> tol(30); // bits of tolerance?
-        double min_t = std::min( g[split_src].dist() , g[split_trg].dist() );
-        double max_t = std::max( g[split_src].dist() , g[split_trg].dist() );
-        
-        std::cout << " min_t err=" << errFunctr(min_t) << " ";
-        std::cout << " max_t err=" << errFunctr(max_t) << "\n";
-        Result r1 = boost::math::tools::toms748_solve(errFunctr, min_t, max_t, tol, max_iter);
-        
-        Point split_pt = g[split_edge].point( r1.first ); //position + r1.first*(g[split_trg].position - g[split_src].position);
-        HEVertex v = g.add_vertex();
-        g[v].type = APEX;
-        g[v].status = UNDECIDED;
-        g[v].position = split_pt;
-        g[v].init_dist( fs->position() );
-        std::cout << " new split-vertex " << g[v].index << " t=" << r1.first;
-        std::cout << " inserted into edge " << g[split_src].index << "-" << g[split_trg].index  << "\n";
-        // 3) insert new SPLIT vertex into the edge
-        add_vertex_in_edge(v, split_edge);
-                
-        // check the edge-type so we know how to project.. (or use binary-search iterations??)
-        /*
-        if ( g[split_edge].type == LINE ) {
-            std::cout << " split_edge is LINE\n";
-            
-            // 2) on the edge, find the position
-            // edge pt = src + u*(trg-src)
-            // proj pt = pt2 + v*(pt1-pt2)
-            double u,v;
-            if  ( xy_line_line_intersection( g[split_src].position , g[split_trg].position, u,
-                                                          pt2, pt1, v) ) {
-                assert( (u<=1.0) && (u>=0.0) );
-                Point split_pt = g[split_src].position + u*(g[split_trg].position - g[split_src].position);
-                HEVertex v = g.add_vertex();
-                g[v].type = APEX;
-                g[v].status = UNDECIDED;
-                g[v].position = split_pt;
-                g[v].init_dist( fs->position() );
-                // 3) insert new SPLIT vertex into the edge
-                add_vertex_in_edge(v, split_edge);
-                
-            } else {
-                assert(0); // no intersection found
-            }
-        } else {
-            std::cout << " cannot position split vertex on type=" << g[split_edge].type << " edge!\n";
-            assert(0);
         }*/
         
         
-        
+        BOOST_FOREACH(HEEdge split_edge, split_edges) {
+            if ( (g[split_edge].type == SEPARATOR) || (g[split_edge].type == LINESITE) )
+                return; // don't place split points on linesites or separators(?)
+            HEVertex split_src = g.source(split_edge);
+            HEVertex split_trg = g.target(split_edge);
+            
+            std::cout << " split src=" << g[split_src].index << "("<< g[split_src].dist() << ")";
+            std::cout << " trg=" << g[split_trg].index << "("<< g[split_trg].dist() << ") \n";
+            std::cout << "is_right src=" << g[split_src].position.is_right(pt1,pt2) << "  trg="<< g[split_trg].position.is_right(pt1,pt2) << "\n";
+            // find a point = src + u*(trg-src)
+            // with min_t < u < max_t
+            // and minimum distance to the pt1-pt2 line
+            
+            SplitPointError errFunctr(this, split_edge, pt1, pt2); // error functor
+            typedef std::pair<double, double> Result;
+            boost::uintmax_t max_iter=500;
+            boost::math::tools::eps_tolerance<double> tol(30); // bits of tolerance?
+            double min_t = std::min( g[split_src].dist() , g[split_trg].dist() );
+            double max_t = std::max( g[split_src].dist() , g[split_trg].dist() );
+            
+            std::cout << " min_t err=" << errFunctr(min_t) << " ";
+            std::cout << " max_t err=" << errFunctr(max_t) << "\n";
+            Result r1 = boost::math::tools::toms748_solve(errFunctr, min_t, max_t, tol, max_iter);
+            
+            Point split_pt = g[split_edge].point( r1.first ); //position + r1.first*(g[split_trg].position - g[split_src].position);
+            HEVertex v = g.add_vertex();
+            g[v].type = APEX;
+            g[v].status = UNDECIDED;
+            g[v].position = split_pt;
+            g[v].init_dist( fs->position() );
+            std::cout << " new split-vertex " << g[v].index << " t=" << r1.first;
+            std::cout << " inserted into edge " << g[split_src].index << "-" << g[split_trg].index  << "\n";
+            // 3) insert new SPLIT vertex into the edge
+            add_vertex_in_edge(v, split_edge);
+        }
     }
 }
 

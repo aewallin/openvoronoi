@@ -29,6 +29,7 @@ grass = ( float(182)/255,float(248)/255,float(71)/255)
 
 blue= (0,0,1)
 lblue= ( float(125)/255,float(191)/255,float(255)/255 )
+blue2= ( float(0)/255,float(188)/255,float(255)/255 )
 cyan=  (0,1,1)
 magenta = ( float(153)/255 , float(42)/255 , float(165)/255  )
 
@@ -247,7 +248,7 @@ class VD:
                 self.myscreen.addActor(actor)
                 self.edges.append(actor)
             elif (etype == ovd.VoronoiEdgeType.PARABOLA):
-                ecolor = red
+                ecolor = blue2
                 #print " drawing ", len(epts), " points"
                 for n in range( len(epts)-1 ):
                     p1 = self.scale*epts[n]  

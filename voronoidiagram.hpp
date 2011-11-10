@@ -56,6 +56,8 @@ struct EdgeData {
     HEFace f;
 };
 
+
+
 /// \brief Voronoi diagram.
 ///
 /// see http://en.wikipedia.org/wiki/Voronoi_diagram
@@ -92,6 +94,7 @@ class VoronoiDiagram {
         std::string version() const { return VERSION_STRING; }
         friend class VoronoiDiagramChecker;
         friend class VertexPositioner;
+        friend class SplitPointError;
     protected:
         /// initialize the diagram with three generators
         void initialize();
@@ -153,6 +156,36 @@ class VoronoiDiagram {
 
 };
 
+class SplitPointError {
+public:
+    SplitPointError(VoronoiDiagram* v, HEEdge split_edge,Point pt1, Point pt2) :
+    vd(v), edge(split_edge), p1(pt1), p2(pt2)
+    {}
+    
+    // find point on edge at t-value
+    // compute a signed distance to the pt1-pt2 line
+    double operator()(const double t) {
+        Point p = vd->g[edge].point(t);
+        // line: pt1 + u*(pt2-pt1) = p
+        //   (p-pt1) dot (pt2-pt1) = u* (pt2-pt1) dot (pt2-pt1)
+        
+        double u = (p-p1).dot(p2-p1) / ( (p2-p1).dot(p2-p1) );
+        Point proj = p1 + u*(p2-p1);
+        double dist = (proj-p).norm();
+        double sign;
+        if ( p.is_right(p1,p2) )
+            sign = +1;
+        else
+            sign = -1;
+            
+        return sign*dist;
+    }
+private:
+    VoronoiDiagram* vd;
+    HEEdge edge;
+    Point p1;
+    Point p2;
+};
 
 } // end namespace
 #endif

@@ -51,9 +51,8 @@ def segmentIntersects(segs, s):
     for sg in segs:
         if intersects(sg,s):
             return 1
-
-    # no intersections found
-    return 0
+    
+    return 0 # no intersections found
     
 if __name__ == "__main__":  
     #print ocl.revision()
@@ -84,10 +83,12 @@ if __name__ == "__main__":
     # for vtk visualization
     vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
     vod.drawFarCircle()
+    #vod.textScale = 0.003
+    #vod.vertexRadius = 0.001
     
     t_before = time.time()
     
-    Nmax = 18
+    Nmax = 15
 
     segs = []
     id_list = []
@@ -104,14 +105,14 @@ if __name__ == "__main__":
 
     #exit()
     
-    nsegs = Nmax
+    nsegs =  3 #Nmax
     n=1
     for s in id_list:
         if n<= nsegs:
             vd.addLineSite(s[0],s[1])
         n=n+1
-    #s = id_list[2]
-    #vd.addLineSiteStep( s[1], s[0], 20) 
+    #s = id_list[14]
+    #vd.addLineSiteStep( s[1], s[0], 1) 
     t_after = time.time()
     calctime = t_after-t_before
     if Nmax==0:

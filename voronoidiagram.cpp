@@ -771,31 +771,6 @@ void VoronoiDiagram::add_split_vertex(HEFace f, Site* s) {
         EdgeVector split_edges = find_split_edges(f, pt1, pt2);
         // the sought edge should have src on one side of pt1-pt2
         // and trg on the other side of pt1-pt2
-        /*
-        HEVertex split_src, split_trg;
-        HEEdge current_edge = g[f].edge;
-        HEEdge split_edge;
-        bool found = false;
-        int count=0;                             
-        while (!found) { // FIND ALL! not just one.
-            HEVertex trg = g.target( current_edge );
-            HEVertex src = g.source( current_edge );
-            bool src_sign = g[src].position.is_right(pt1,pt2);
-            bool trg_sign = g[trg].position.is_right(pt1,pt2);
-            //std::cout << g[src].index << ":" << src_sign << " " << g[trg].index << ":" << trg_sign << "\n";
-            if ( g[src].type == NORMAL || g[src].type == APEX ) {
-                if ( src_sign != trg_sign ) {
-                        split_src = src;
-                        split_trg = trg;
-                        found = true;
-                        split_edge = current_edge;                 
-                }
-            }
-            current_edge = g[current_edge].next;   
-            count++;
-            assert(count<100); // some reasonable max number of edges in face, to avoid infinite loop
-        }*/
-        
         
         BOOST_FOREACH(HEEdge split_edge, split_edges) {
             if ( (g[split_edge].type == SEPARATOR) || (g[split_edge].type == LINESITE) )
@@ -821,7 +796,7 @@ void VoronoiDiagram::add_split_vertex(HEFace f, Site* s) {
             std::cout << " max_t err=" << errFunctr(max_t) << "\n";
             Result r1 = boost::math::tools::toms748_solve(errFunctr, min_t, max_t, tol, max_iter);
             
-            Point split_pt = g[split_edge].point( r1.first ); //position + r1.first*(g[split_trg].position - g[split_src].position);
+            Point split_pt = g[split_edge].point( r1.first ); 
             HEVertex v = g.add_vertex();
             g[v].type = APEX;
             g[v].status = UNDECIDED;
@@ -1022,41 +997,9 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
 
         assert( !g[new_source].position.is_right( new_site->start(), new_site->end() ) );
         assert( !g[new_target].position.is_right( new_site->start(), new_site->end() ) );
-
-/*
-        if ( !g[new_source].position.is_right( f_site->start(), f_site->end() ) )
-            assert( f_site->k() == +1 );
-        else
-            assert( f_site->k() == -1 );
-*/
-
-/*
-        bool b1 = (f_site->k() == 1);
-        bool b2 = (new_site->k() == 1);
-        if (b1 && b2)
-            src_sign = true;
-        else if (!b1 && b2)
-            src_sign = false;
-        else if (b1 && !b2)
-            src_sign = false;
-        else if (!b1 && !b2)
-            src_sign = false;
-        else
-            assert(0);
-
-        //if (f_site->k()
-        //src_sign = (f_site->k()==1) ? false : true ; //in_region( g[new_source].position() );
-        trg_sign = src_sign; // f_site.k ? true : false ;
-*/
     } else {
         assert(0);
     }
-
-    
-    // sign of quadratic branch
-    //bool sign=false;
-    //if (!src_sign)
-    //    sign = true;
     
     // both src and trg are on the same side of the new site.
     // so no apex-split is required, just add a single edge.

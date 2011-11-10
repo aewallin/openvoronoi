@@ -51,25 +51,25 @@ EdgeProps::EdgeProps() {
 * ellipse (circle/circle)
 */
 Point EdgeProps::point(double t) const {
-	double discr1 = round( sq(x[4]+x[5]*t) - sq(x[6]+x[7]*t) );
-	double discr2 = round( sq(y[4]+y[5]*t) - sq(y[6]+y[7]*t) );
-	if ( (discr1 >= 0) && (discr2 >= 0) ) {
-	    double psig = sign ? +1 : -1;
-	    double nsig = sign ? -1 : +1;
-	    double xc = x[0] - x[1] - x[2]*t + psig * x[3] * sqrt( discr1 );
-	    double yc = y[0] - y[1] - y[2]*t + nsig * y[3] * sqrt( discr2 );
-	    if (xc!=xc) { // test for NaN!
-		std::cout << xc << " , " << yc << " t=" << t << "\n";
-		print_params();
-		assert(0);
-	    }
-	    return Point(xc,yc);
-	} else {
-	    std::cout << " warning bisector sqrt(-1) discr1=" << discr1 << " discr2=" << discr2 << "!\n";
-	    std::cout << " t= " << t << "\n";
-	    assert(0);
-	    return Point(0,0);
-	}
+    double discr1 = round( sq(x[4]+x[5]*t) - sq(x[6]+x[7]*t) );
+    double discr2 = round( sq(y[4]+y[5]*t) - sq(y[6]+y[7]*t) );
+    if ( (discr1 >= 0) && (discr2 >= 0) ) {
+        double psig = sign ? +1 : -1;
+        double nsig = sign ? -1 : +1;
+        double xc = x[0] - x[1] - x[2]*t + psig * x[3] * sqrt( discr1 );
+        double yc = y[0] - y[1] - y[2]*t + nsig * y[3] * sqrt( discr2 );
+        if (xc!=xc) { // test for NaN!
+        std::cout << xc << " , " << yc << " t=" << t << "\n";
+        print_params();
+        assert(0);
+        }
+        return Point(xc,yc);
+    } else {
+        std::cout << " warning bisector sqrt(-1) discr1=" << discr1 << " discr2=" << discr2 << "!\n";
+        std::cout << " t= " << t << "\n";
+        assert(0);
+        return Point(0,0);
+    }
 }
 
 void EdgeProps::set_parameters(Site* s1, Site* s2, bool sig) {
@@ -183,25 +183,15 @@ void EdgeProps::set_ll_parameters(Site* s1, Site* s2) {  // Held thesis p96
     
     double delta =  s1->a()*s2->b() - s1->b()*s2->a() ;
     assert( delta != 0 );
-    std::cout << " set_ll delta = " << delta << " sign= " << sign << "\n";
        
     double alfa1 = ( s1->b()*s2->c()-s2->b()*s1->c() ) / delta;
     double alfa2 = ( s2->a()*s1->c()-s1->a()*s2->c() ) / delta;
-    //double alfa3 = ( s1->k()*s2->b()-s2->k()*s1->b() ) / delta;
-    //double alfa4 = ( s2->k()*s1->a()-s1->k()*s2->a() ) / delta;
-
     double alfa3 = -( s2->b()-s1->b() ) / delta;
     double alfa4 = -( s1->a()-s2->a() ) / delta;
-
     x[0]= alfa1;  
     x[2]= -alfa3; 
-
-
     y[0]= alfa2;         
     y[2]= -alfa4;  
-
-    std::cout << x[0] << "  " << x[2] << "\n";
-    std::cout << y[0] << "  " << y[2] << "\n";
 
     x[1]=0;
     x[3]=0;  

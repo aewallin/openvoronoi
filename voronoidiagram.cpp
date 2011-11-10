@@ -539,10 +539,18 @@ void VoronoiDiagram::add_separator(HEFace f, HEVertex endp, Site* s1, Site* s2) 
     
     if (g[v1].k3 ==  g[v2].k3) {
         std::cout << " g[" << g[v1].index << "].k3=" << g[v1].k3 << "  !=  g[" << g[v2].index << "].k3=" << g[v2].k3 << "\n";
-        std::cout << "ERROR in add_separator(): NEW-vertices should be on opposite sides of new site!\n";
+        std::cout << "WARNING in add_separator(): NEW-vertices should be on opposite sides of new site!\n";
         std::cout << " g[" << g[v1].index << "] " << g[v1].position << "\n";
         std::cout << " g[" << g[v2].index << "] " << g[v2].position << "\n";
         std::cout << " identical? " << (g[v1].position==g[v2].position) << "\n";
+        
+        // since the vertices are positioned at the same position, force a k3 value.
+        if ( (g[v1].position==g[v2].position) ) {
+            g[v1].k3 = +1;
+            g[v2].k3 = -1; // FIXME, check k-value of vertex adjacent to v1/v2
+        } else {
+            assert(0);
+        }
     }
     assert( g[v1].k3 !=  g[v2].k3 ); // v1 and v2 should be on opposite sides
     
@@ -1077,10 +1085,10 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
             g[newface2].edge = e_twin;
         }
         g.twin_edges(e_new,e_twin);
-        std::cout << " added edge " << g[new_target].index << "(" << g[new_target].dist() <<") ";
-        std::cout << "-" << g[new_source].index << "(" << g[new_source].dist() << ") ";
-        std::cout << " f=" << g[e_new].face << " k= " << g[e_twin].k;
-        std::cout << " twf=" << g[e_twin].face << " twk= " << g[e_new].k;
+        std::cout << " added edge " << g[new_target].index << "(" << g[new_target].dist() <<")";
+        std::cout << " - " << g[new_source].index << "(" << g[new_source].dist() << ")";
+        std::cout << " f=" << g[e_new].face << " k=" << g[e_twin].k;
+        std::cout << " twf=" << g[e_twin].face << " twk=" << g[e_new].k;
         std::cout << " type=" << g[e_twin].type <<   " \n";
         //std::cout << " k3 target-source: "<<  g[new_target].k3 << " - " << g[new_source].k3 << "\n";
     } else {

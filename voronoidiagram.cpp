@@ -546,8 +546,8 @@ void VoronoiDiagram::add_separator(HEFace f, HEVertex endp, Site* s1, Site* s2) 
         
         // since the vertices are positioned at the same position, force a k3 value.
         if ( (g[v1].position==g[v2].position) ) {
-            g[v1].k3 = +1;
-            g[v2].k3 = -1; // FIXME, check k-value of vertex adjacent to v1/v2
+            g[v1].k3 = -1;
+            g[v2].k3 = +1; // FIXME, check k-value of vertex adjacent to v1/v2
         } else {
             assert(0);
         }
@@ -977,26 +977,34 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
     } else if (f_site->isLine() && new_site->isLine() )  {
         //  a line-line bisector, sign should not matter because there is no sqrt()
         
-        std::cout << " LL-edge " << g[new_source].index << " - " << g[new_target].index ;
+        std::cout << "add_edge() LL-edge " << g[new_source].index << " - " << g[new_target].index ;
         std::cout << " f_site->k()= " << f_site->k() << " new_site->k()= "<< new_site->k() << "\n";
-        std::cout << " f_site <-> src("<< g[new_source].index << ") = " << g[new_source].position.is_right( f_site->start(), f_site->end() ) << "\n";
-        std::cout << " f_site <-> trg("<< g[new_target].index << ") = " << g[new_target].position.is_right( f_site->start(), f_site->end() ) << "\n";
+        std::cout << " f_site <-> src("<< g[new_source].index << ") = " << g[new_source].position.is_right( f_site->start(), f_site->end() ) << " " << g[new_source].position << "\n";
+        std::cout << " f_site <-> trg("<< g[new_target].index << ") = " << g[new_target].position.is_right( f_site->start(), f_site->end() ) << " " << g[new_target].position <<  "\n";
         std::cout << " n_site <-> src("<< g[new_source].index << ") = " << g[new_source].position.is_right( new_site->start(), new_site->end() ) << "\n";
         std::cout << " n_site <-> trg("<< g[new_target].index << ") = " << g[new_target].position.is_right( new_site->start(), new_site->end() ) << "\n";
 
-// this is essentially an in-region test (?)
-
-        assert( !g[new_source].position.is_right( f_site->start(), f_site->end() ) );
-        assert( !g[new_target].position.is_right( f_site->start(), f_site->end() ) );
-        
 // find out if newface or newface2 should be used
         if ( g[new_source].k3 == 1 )
             new_site = g[newface].site; 
         else
             new_site = g[newface2].site; 
+            
+// this is essentially an in-region test 
+        if ( (g[new_source].position != g[new_target].position) && // src and trg are different
+              ( g[new_source].position != f_site->start() ) &&  // src/trg is not start or end
+              ( g[new_source].position != f_site->end() ) &&
+              ( g[new_target].position != f_site->start() ) &&
+              ( g[new_target].position != f_site->end() ) &&
+              ( (g[new_source].position -f_site->apex_point( g[new_source].position ) ).norm() > 1e-3 ) && // require some distance, 
+              ( (g[new_target].position -f_site->apex_point( g[new_target].position ) ).norm() > 1e-3 )  // so that the is_right predicate is accurate
+            ) {
+                assert( !g[new_source].position.is_right( f_site->start(), f_site->end() ) );
+                assert( !g[new_target].position.is_right( f_site->start(), f_site->end() ) );
+                assert( !g[new_source].position.is_right( new_site->start(), new_site->end() ) );
+                assert( !g[new_target].position.is_right( new_site->start(), new_site->end() ) );
+        }
 
-        assert( !g[new_source].position.is_right( new_site->start(), new_site->end() ) );
-        assert( !g[new_target].position.is_right( new_site->start(), new_site->end() ) );
     } else {
         assert(0);
     }

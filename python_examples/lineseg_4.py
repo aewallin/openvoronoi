@@ -105,7 +105,7 @@ if __name__ == "__main__":
 
     #exit()
     
-    nsegs =18 # Nmax
+    nsegs = 18 #Nmax
     n=1
     for s in id_list:
         if n<= nsegs:

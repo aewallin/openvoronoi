@@ -127,7 +127,7 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
             std::cout << " edge_error filter: \n";
             BOOST_FOREACH(Solution s, sln2) {
                 double err = edge_error(edge,s);
-                std::cout << s.p << " t=" <<  s.t << " err=" << err << "\n";
+                std::cout << s.p << " k3=" << s.k3 << " t=" <<  s.t << " err=" << err << "\n";
                 if ( err < min_error) {
                     min_solution = s;
                     min_error = err;
@@ -539,7 +539,7 @@ bool VertexPositioner::check_on_edge(HEEdge e, const Point& p) {
     Point trgP = vd->g[trg].position;
     Point srcP = vd->g[src].position;
     Point newP = p;
-    double dtl = p.xyDistanceToLine(srcP, trgP);
+    double dtl = p.distance_to_line(srcP, trgP);
     if (dtl > 1e-3* ( trgP - srcP ).norm() ) {
         std::cout << "WARNING!! check_vertex_on_edge()  dtl= " << dtl << "\n";
         std::cout << "    edge= " << vd->g[src].index << " - " << vd->g[trg].index << "\n";

@@ -58,7 +58,7 @@ Point Point::xyPerp() const {
     
 }
 
-double Point::xyDistanceToLine(const Point &p1, const Point &p2) const {
+double Point::distance_to_line(const Point &p1, const Point &p2) const {
     // see for example
     // http://mathworld.wolfram.com/Point-LineDistance2-Dimensional.html
     if ((p1.x == p2.x) && (p1.y == p2.y)) {// no line in xy plane

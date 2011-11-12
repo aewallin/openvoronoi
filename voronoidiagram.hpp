@@ -94,6 +94,7 @@ class VoronoiDiagram {
         friend class VoronoiDiagramChecker;
         friend class VertexPositioner;
         friend class SplitPointError;
+        static void reset_vertex_count() { VoronoiVertex::reset_count(); }
     protected:
         /// initialize the diagram with three generators
         void initialize();

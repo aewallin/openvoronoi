@@ -84,6 +84,9 @@ public:
     /// if this vertex is a PointSite, then we store a pointer to the site here.
     Site* site;
     double k3; // the offset-direction to the newly inserted site.
+    static void reset_count() {
+		count = 0;
+	}
 protected:
     /// global vertex count
     static int count;

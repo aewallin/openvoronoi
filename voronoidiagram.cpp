@@ -324,8 +324,7 @@ bool VoronoiDiagram::insert_line_site_step(int idx1, int idx2, int step) {
     if (step==1) return false;
         
     augment_vertex_set(v_seed, pos_site ); // should not matter if we use pos_site or neg_site here
-    std::cout << "   after augment: v0.size() = " << v0.size() << "\n";
-    std::cout << "   delete-set is: "; print_vertices(v0);    
+    std::cout << "   delete-set is("<< v0.size() <<"): "; print_vertices(v0);  
     
     if (step==2) return false;
 
@@ -546,8 +545,8 @@ void VoronoiDiagram::add_separator(HEFace f, HEVertex endp, Site* s1, Site* s2) 
         
         // since the vertices are positioned at the same position, force a k3 value.
         if ( (g[v1].position==g[v2].position) ) {
-            g[v1].k3 = -1;
-            g[v2].k3 = +1; // FIXME, check k-value of vertex adjacent to v1/v2
+            g[v1].k3 = +1;
+            g[v2].k3 = -1; // FIXME, check k-value of vertex adjacent to v1/v2
         } else {
             assert(0);
         }
@@ -818,7 +817,10 @@ void VoronoiDiagram::add_vertices( Site* new_site ) {
         HEVertex q = g.add_vertex();
         g[q].status = NEW;
         modified_vertices.push_back(q);
-        std::cout << "position new vertex " << g[q].index << "\n";
+        std::cout << "position new vertex " << g[q].index << " on ";
+        std::cout <<  g[ g.source(q_edges[m])].index << "(t=" << g[ g.source(q_edges[m])].dist() << ")-"; 
+        std::cout << g[ g.target(q_edges[m])].index << "(t=" << g[ g.target(q_edges[m])].dist();
+        std::cout <<  " edge, type=" << g[q_edges[m]].type << "\n";
         g[q].position = vpos->position( q_edges[m], new_site ); // set position
         g[q].k3 = vpos->get_k3();
         g[q].init_dist( new_site->apex_point( g[q].position ) ); // set initial clearance-disk
@@ -1125,6 +1127,8 @@ int VoronoiDiagram::new_vertex_count(HEFace f) {
 EdgeData VoronoiDiagram::find_edge_data(HEFace f, HEVertex v)  {
     EdgeData ed;
     ed.f = f;
+    std::cout << " find_edge_data, ";
+    print_face(f);
     HEEdge current_edge = g[f].edge; // start on some edge of the face
     bool found = false;
     int count=0;                             
@@ -1162,6 +1166,7 @@ EdgeData VoronoiDiagram::find_edge_data(HEFace f, HEVertex v)  {
         count++;
         assert(count<100); // some reasonable max number of edges in face, to avoid infinite loop
     }
+    std::cout << "find_edge_data() NEW-NEW vertex pair: " << g[ed.v1].index << " - " << g[ed.v2].index << "\n";
     return ed;
 }
 
@@ -1281,6 +1286,7 @@ void VoronoiDiagram::print_faces() {
         print_face(f);
     }
 }
+
 void VoronoiDiagram::print_face(HEFace f) {
     std::cout << " Face " << f << ": vert_id(status) ";
     VertexVector face_verts = g.face_vertices(f);    

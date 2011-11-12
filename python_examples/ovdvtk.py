@@ -47,6 +47,7 @@ class VD:
         self.far=[]
         self.edges =[]
         self.gens =[]
+        self.actors=[]
         self.generatorColor = yellow
         self.vertexColor = blue
         self.seedColor = pink
@@ -56,6 +57,7 @@ class VD:
         self.vdtext  = Text()
         self.vdtext.SetPos( (50, myscreen.height-70) )
         myscreen.addActor(self.vdtext)
+        self.actors.append( self.vdtext )
         
         self.gittext  = Text()
         self.gittext.SetPos( (50, 30) )
@@ -71,7 +73,25 @@ class VD:
         self.textScale = textscale
         
 
-
+    def getActors(self):
+        acts=[]
+        for a in self.verts:
+            acts.append(a)
+        for a in self.far:
+            acts.append(a)
+        for a in self.edges:
+            acts.append(a)
+        for a in self.gens:
+            acts.append(a)
+        for a in self.actors:
+            acts.append(a)
+            
+        return acts
+        #self.verts=[]
+        #self.far=[]
+        #self.edges =[]
+        #self.gens =[]
+        
     def setVertexRadius(self, r):
         self.vertexRadius=r
     

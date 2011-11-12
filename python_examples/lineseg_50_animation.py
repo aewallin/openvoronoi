@@ -143,22 +143,21 @@ def drawLinesegFrame(Nmax, myscreen, vd, vod, framenr, anim, step):
     myscreen.render()    
 
 if __name__ == "__main__":
-    Nmax = 3
+    Nmax = 50
     nframe=0 
+    w=1920
+    h=1080
+    #w=1024
+    #h=720
+    myscreen = ovdvtk.VTKScreen(width=w, height=h) 
+    ovdvtk.drawOCLtext(myscreen, rev_text=ovd.revision() )
+    w2if = vtk.vtkWindowToImageFilter()
+    w2if.SetInput(myscreen.renWin)
+    lwr = vtk.vtkPNGWriter()
+    lwr.SetInput( w2if.GetOutput() )
+    
     for npt in range(Nmax*2): # animate insertion of point-sites
         for step in [x+1 for x in range(6)]:
-            w=1920
-            h=1080
-            #w=1024
-            #h=720
-            myscreen = ovdvtk.VTKScreen(width=w, height=h) 
-            ovdvtk.drawOCLtext(myscreen, rev_text=ovd.revision() )
-            
-            w2if = vtk.vtkWindowToImageFilter()
-            w2if.SetInput(myscreen.renWin)
-            lwr = vtk.vtkPNGWriter()
-            lwr.SetInput( w2if.GetOutput() )
-            
             scale=1
             myscreen.render()
             random.seed(42)
@@ -181,22 +180,14 @@ if __name__ == "__main__":
             vd.reset_vertex_count()
             gc.collect()
             nframe = nframe+1
-            
+            # remove all actors
+            acts = vod.getActors()
+            for a in acts:
+                myscreen.removeActor(a)
+                
     # now animate insertion of line-segments
     for npt in range(Nmax): 
         for step in [x+1 for x in range(10)]:
-            w=1920
-            h=1080
-            #w=1024
-            #h=720
-            myscreen = ovdvtk.VTKScreen(width=w, height=h) 
-            ovdvtk.drawOCLtext(myscreen, rev_text=ovd.revision() )
-            
-            w2if = vtk.vtkWindowToImageFilter()
-            w2if.SetInput(myscreen.renWin)
-            lwr = vtk.vtkPNGWriter()
-            lwr.SetInput( w2if.GetOutput() )
-            
             scale=1
             myscreen.render()
             random.seed(42)
@@ -219,4 +210,7 @@ if __name__ == "__main__":
             vd.reset_vertex_count()
             gc.collect()
             nframe = nframe+1
-
+            # remove all actors
+            acts = vod.getActors()
+            for a in acts:
+                myscreen.removeActor(a)

@@ -92,7 +92,7 @@ if __name__ == "__main__":
     
     t_before = time.time()
     
-    Nmax = 50
+    Nmax = 10
 
     segs = []
     id_list = []

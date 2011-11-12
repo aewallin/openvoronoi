@@ -41,12 +41,10 @@ BOOST_PYTHON_MODULE(openvoronoi) {
     ;
     bp::class_< VoronoiDiagram_py, bp::bases<VoronoiDiagram> >("VoronoiDiagram")
         .def(bp::init<double, unsigned int>())
-        .def("addVertexSite",  &VoronoiDiagram_py::insert_point_site)
-        .def("addLineSite",  &VoronoiDiagram_py::insert_line_site)
-        .def("addLineSiteStep",  &VoronoiDiagram_py::insert_line_site_step)
-        //.def("addLineSite1",  &VoronoiDiagram_py::insert_line_site1) // only find seed vertex
-        //.def("addLineSite2",  &VoronoiDiagram_py::insert_line_site2) // find seed, augment tree
-        //.def("addLineSite3",  &VoronoiDiagram_py::insert_line_site3) // find seed, augment tree
+        .def("addVertexSite",  &VoronoiDiagram_py::insert_point_site1 )
+        .def("addVertexSite",  &VoronoiDiagram_py::insert_point_site2 )
+        .def("addLineSite",  &VoronoiDiagram_py::insert_line_site2 ) // takes one argument
+        .def("addLineSite",  &VoronoiDiagram_py::insert_line_site3 ) // takes two arguments
         .def("getGenerators",  &VoronoiDiagram_py::getGenerators)
         .def("getEdgesGenerators",  &VoronoiDiagram_py::getEdgesGenerators)
         .def("getVoronoiVertices",  &VoronoiDiagram_py::getVoronoiVertices)
@@ -55,13 +53,6 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         .def("getVoronoiEdges",  &VoronoiDiagram_py::getVoronoiEdges)
         .def("numPointSites", &VoronoiDiagram_py::num_point_sites)
         .def("numLineSites", &VoronoiDiagram_py::num_line_sites)
-        //.def("getClosestFaceGenerator",  &VoronoiDiagram_py::getClosestFaceGenerator)
-        //.def("getSeedVertex",  &VoronoiDiagram_py::getSeedVertex) 
-        //.def("getSeedVertexLine",  &VoronoiDiagram_py::getSeedVertexLine) 
-        //.def("getDeleteSet",  &VoronoiDiagram_py::getDeleteSet) //getDeleteSetLine(
-        //.def("getDeleteSetLine",  &VoronoiDiagram_py::getDeleteSetLine)
-        //.def("getDeleteEdges",  &VoronoiDiagram_py::getDeleteEdges)
-        //.def("getModEdges",  &VoronoiDiagram_py::getModEdges)
         .def("__str__", &VoronoiDiagram_py::print)
         .def("version", &VoronoiDiagram_py::version)
     ;

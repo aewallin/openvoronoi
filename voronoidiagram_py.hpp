@@ -34,73 +34,19 @@ class VoronoiDiagram_py : public VoronoiDiagram {
         VoronoiDiagram_py(double far, unsigned int n_bins) 
             : VoronoiDiagram( far, n_bins) {}
         
-        /*
-        // for visualizing the closest face (returns it's generator)
-        Point getClosestFaceGenerator( const Point p ) {
-            HEFace closest_face = fgrid->grid_find_closest_face( p );
-            return g[closest_face].generator;
+        int insert_point_site1(const Point& p) {
+            return insert_point_site(p);
+        }
+        int insert_point_site2(const Point& p, int step) {
+            return insert_point_site(p,step);
         }
         
-        // for visualizing seed-vertex
-        Point getSeedVertex( const Point p ) {
-            HEFace closest_face = fgrid->grid_find_closest_face( p );
-            HEVertex v = find_seed_vertex(closest_face, p);
-            return g[ v ].position;
+        bool insert_line_site2(int idx1, int idx2) {
+            return insert_line_site( idx1, idx2);
         }
-        
-        // for visualizing the delete-set
-        boost::python::list getDeleteSet( Point p ) { // no const here(?)
-            boost::python::list out;
-            HEFace closest_face = fgrid->grid_find_closest_face( p );
-            HEVertex v_seed = find_seed_vertex(closest_face, p);
-            augment_vertex_set(v_seed, p);
-            v0.erase( v0.begin() ); // remove the seed vertex, as it is already visualized
-            BOOST_FOREACH( HEVertex v, v0) {
-                boost::python::list vert;
-                vert.append( g[ v ].position );
-                vert.append( g[ v ].status );
-                out.append( vert );
-            }
-            reset_status();            
-            return out;
+        bool insert_line_site3(int idx1, int idx2, int step) {
+            return insert_line_site( idx1, idx2, step);
         }
-        /// for visualizing the delete-edges
-        boost::python::list getDeleteEdges( Point p ) {
-            boost::python::list out;
-            HEFace closest_face = fgrid->grid_find_closest_face( p );
-            HEVertex v_seed = find_seed_vertex(closest_face, p);
-            augment_vertex_set(v_seed, p);
-            EdgeVector del = find_in_in_edges();
-            BOOST_FOREACH( HEEdge e, del) {
-                boost::python::list edge;
-                HEVertex src = g.source(e);
-                HEVertex trg = g.target(e);
-                edge.append( g[ src ].position );
-                edge.append( g[ trg ].position );
-                out.append( edge );
-            }
-            reset_status();            
-            return out;
-        }
-        /// for visualizing the edges to be modified
-        boost::python::list getModEdges( Point p ) {
-            boost::python::list out;
-            HEFace closest_face = fgrid->grid_find_closest_face( p );
-            HEVertex v_seed = find_seed_vertex(closest_face, p);
-            augment_vertex_set(v_seed, p);
-            EdgeVector del = find_in_out_edges();
-            BOOST_FOREACH( HEEdge e, del) {
-                boost::python::list edge;
-                HEVertex src = g.source(e);
-                HEVertex trg = g.target(e);
-                edge.append( g[ src ].position );
-                edge.append( g[ trg ].position );
-                out.append( edge );
-            }
-            reset_status();            
-            return out;
-        }
-        */
         
         /// return list of generators to python
         boost::python::list getGenerators()  {
@@ -116,18 +62,6 @@ class VoronoiDiagram_py : public VoronoiDiagram {
                 }
             }
             return plist;
-            /*
-            boost::python::list plist;
-            for ( HEFace f=0;f< g.num_faces();++f ) {
-                if ( g[f].site->isPoint() ) {
-                    boost::python::list p_data;
-                    p_data.append( g[f].site->position()  ); // Point
-                    p_data.append( g[f].site->face  ); // face-descriptor
-                    plist.append( p_data );
-                }
-            }
-            return plist;
-            */
         }
         
         /// return list of vd vertices to python
@@ -188,6 +122,8 @@ class VoronoiDiagram_py : public VoronoiDiagram {
                     } 
                     edge_data.append( point_list );
                     edge_data.append( g[edge].type );
+                    edge_data.append( g[v1].status ); // source status
+                    edge_data.append( g[v2].status ); // target status
                     edge_list.append( edge_data );
             }
             return edge_list;

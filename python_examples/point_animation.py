@@ -16,9 +16,9 @@ def drawLine(myscreen, p1, p2):
 def writeFrame( w2if, lwr, n ):
     w2if.Modified() 
     current_dir = os.getcwd()
-    filename = current_dir + "/frames/vd500_zoomout"+ ('%05d' % n)+".png"
+    filename = current_dir + "/frames/vd_"+ ('%05d' % n)+".png"
     lwr.SetFileName( filename )
-    #lwr.Write()
+    lwr.Write()
 
 def regularGridGenerators(far, Nmax):
     # REGULAR GRID
@@ -88,7 +88,7 @@ if __name__ == "__main__":
     # camPos/float(1000)
     myscreen.camera.SetPosition(0, -camPos/float(1000), zmult*camPos) 
     myscreen.camera.SetClippingRange(-(zmult+1)*camPos,(zmult+1)*camPos)
-    myscreen.camera.SetFocalPoint(0.0, 0, 0)
+    myscreen.camera.SetFocalPoint(0, 0, 0)
     
     vd = ovd.VoronoiDiagram(far,120)
     print vd.version()
@@ -100,60 +100,21 @@ if __name__ == "__main__":
     #vod.clearance_disk=1
     vod.vertexRadius = 0.005
     vod.textScale = 0.02
-    Nmax = 20
+    Nmax = 25
     
     plist = randomGenerators(far, Nmax)
-        
-    #plist = regularGridGenerators(far, Nmax)
-    #plist = circleGenerators(far, Nmax)
-    
-    #plist = randomGenerators(far, Nmax) 
-    #plist = []
-    #plist.append( ovd.Point(0.0,0.1) )
-    #plist.append( ovd.Point(0,0.9) )
-    #plist.append( ovd.Point(-0.15, -0.15) )
-    #+ regularGridGenerators(far, Nmax) + circleGenerators(far, Nmax)
-
-    #plist = [ovd.Point(0,0)]
     
     t_before = time.time() 
     n=0
     id_list=[]
+    npts = Nmax-1
     for p in plist: 
-        print n," adding ",p
-        id_list.append( vd.addVertexSite( p ) )
-        n=n+1
-
-    Nsegs = 0
-    
-    
-    print "returned: ",vd.addLineSite(69,105,10)
-    """
-    vd.addLineSite(83,35)
-    vd.addLineSite(63,153)
-    vd.addLineSite(48,20)
-    vd.addLineSite(74,143)
-    vd.addLineSite(125,173)
-    vd.addLineSite(165,91)
-    """
-    #segs=[]
-    
-    
-    #for n in range(Nsegs*2):
-    #    ids.append( id_list[n] )
-    #segs.append( [17,13] )
-    #segs.append( [21,34] )
-    #segs.append( [26,44] ) 
-    #id1 = id_list[0]
-    #id2 = id_list[1]
-    #id3 = id_list[2]
-    #id4 = id_list[3]
-    #for seg in segs:
-    #    id1= seg[0]
-    #    id2= seg[1]
-    #    print "add segment ",id1, " to ", id2
-    #    vd.addLineSite( id1, id2 , 20)
-    #vd.addLineSite( id3, id4 )
+        if n<npts:
+            print n," adding ",p
+            id_list.append( vd.addVertexSite( p ) )
+            n=n+1
+    nstep = 7
+    vd.addVertexSite( plist[npts], nstep ) 
     
     t_after = time.time()
     calctime = t_after-t_before
@@ -163,7 +124,7 @@ if __name__ == "__main__":
     
     vod.setAll()
     myscreen.render()
-            
+    writeFrame( w2if, lwr, nstep )        
 
         
     print "PYTHON All DONE."

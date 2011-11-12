@@ -22,6 +22,7 @@ red= (1,0,0)
 pink = ( float(255)/255,float(192)/255,float(203)/255)
 orange = ( float(255)/255,float(165)/255,float(0)/255)
 yellow= (1,1,0)
+purple=( float(255)/255,float(0)/255,float(176)/255)
 
 green= (0,1,0)
 lgreen = ( float(150)/255,float(255)/255,float(150)/255)
@@ -190,6 +191,31 @@ class VD:
         self.edge_actor.GetProperty().SetColor( cyan )
         self.myscreen.addActor( self.edge_actor )
         self.myscreen.render() 
+        
+    def edgeStatusColor(self, src_status, trg_status, default_color):
+        if ( (src_status == ovd.VoronoiVertexStatus.IN) and (trg_status == ovd.VoronoiVertexStatus.IN)):
+            return red
+        #elif ( (src_status == ovd.VoronoiVertexStatus.IN) and (trg_status == ovd.VoronoiVertexStatus.OUT)):
+        #    return purple
+        elif ( ((src_status == ovd.VoronoiVertexStatus.OUT) and 
+             (trg_status == ovd.VoronoiVertexStatus.IN) ) or 
+             ((src_status == ovd.VoronoiVertexStatus.IN) and 
+             (trg_status == ovd.VoronoiVertexStatus.OUT) ) ):
+            return purple
+        elif ( ((src_status == ovd.VoronoiVertexStatus.OUT) and 
+             (trg_status == ovd.VoronoiVertexStatus.NEW) ) or 
+             ((src_status == ovd.VoronoiVertexStatus.NEW) and 
+             (trg_status == ovd.VoronoiVertexStatus.OUT) ) ):
+            return default_color
+        elif ( ((src_status == ovd.VoronoiVertexStatus.IN) and 
+             (trg_status == ovd.VoronoiVertexStatus.NEW) ) or 
+             ((src_status == ovd.VoronoiVertexStatus.NEW) and 
+             (trg_status == ovd.VoronoiVertexStatus.IN) ) ):
+            return red    
+        elif ( (src_status == ovd.VoronoiVertexStatus.NEW) and (trg_status == ovd.VoronoiVertexStatus.NEW)):
+            return green
+        else:
+            return default_color
 
     def setEdges(self):
         for e in self.edges:
@@ -198,11 +224,14 @@ class VD:
         for e in self.vd.getVoronoiEdges():
             epts  = e[0]  # points
             etype = e[1]  # type
+            src_status = e[2] # src status
+            trg_status = e[3] # trg status
             ecolor = pink # self.edgeColor
             #print "drawing etype=", etype
             actor = 0
+            
             if (etype == ovd.VoronoiEdgeType.LINELINE):
-                ecolor = lblue
+                ecolor = self.edgeStatusColor(src_status,trg_status,lblue)
                 for n in range( len(epts)-1 ):
                     p1 = self.scale*epts[n]  
                     p2 = self.scale*epts[n+1] 
@@ -211,7 +240,7 @@ class VD:
                     self.myscreen.addActor(actor)
                     self.edges.append(actor)
             if (etype == ovd.VoronoiEdgeType.LINE):
-                ecolor = cyan
+                ecolor = self.edgeStatusColor(src_status,trg_status,cyan)
                 for n in range( len(epts)-1 ):
                     p1 = self.scale*epts[n]  
                     p2 = self.scale*epts[n+1] 
@@ -234,7 +263,8 @@ class VD:
                 self.myscreen.addActor(actor)
                 self.edges.append(actor)
             if (etype == ovd.VoronoiEdgeType.SEPARATOR):
-                ecolor = orange
+                ecolor = self.edgeStatusColor(src_status,trg_status, orange)
+                #ecolor = orange
                 p1 = self.scale*epts[0]  
                 p2 = self.scale*epts[1] 
                 actor = Line( p1=( p1.x,p1.y, 0), p2=(p2.x,p2.y, 0), color=ecolor)
@@ -248,12 +278,11 @@ class VD:
                 self.myscreen.addActor(actor)
                 self.edges.append(actor)
             elif (etype == ovd.VoronoiEdgeType.PARABOLA):
-                ecolor = blue2
-                #print " drawing ", len(epts), " points"
+                ecolor = self.edgeStatusColor(src_status,trg_status, blue2)
+                #ecolor = blue2
                 for n in range( len(epts)-1 ):
                     p1 = self.scale*epts[n]  
                     p2 = self.scale*epts[n+1] 
-                    #print "line ",n," : ",p1," to ",p2
                     actor = Line( p1=( p1.x,p1.y, 0), p2=(p2.x,p2.y, 0), color=ecolor)
                     self.myscreen.addActor(actor)
                     self.edges.append(actor)

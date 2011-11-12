@@ -100,7 +100,7 @@ class VoronoiDiagram {
         void initialize();
         HEVertex find_seed_vertex(HEFace f, Site* site) const;
         EdgeVector find_in_out_edges(); 
-        EdgeData find_edge_data(HEFace f, HEVertex v=HEVertex());
+        EdgeData find_edge_data(HEFace f, VertexVector startverts=VertexVector());
         EdgeVector find_split_edges(HEFace f, Point pt1, Point pt2);
         
         void augment_vertex_set(HEVertex& v_seed, Site* site);        

@@ -930,13 +930,30 @@ void VoronoiDiagram::add_edge(HEFace newface, HEFace f, HEFace newface2) {
         add_edge(ed, newface, newface2);
     } else if ( new_vertex_count(f) == 4 ) {        // need to add TWO new edges to fix the face
         std::cout << " 4 NEW case!!\n";
+        VertexVector startverts;
         EdgeData ed = find_edge_data(f);
-        EdgeData ed2 = find_edge_data(f,ed.v1);
+        startverts.push_back(ed.v1);
+        EdgeData ed2 = find_edge_data(f, startverts);
         std::cout << "1st edge is " << g[ed.v1].index << " - " << g[ed.v2].index << "\n";
         std::cout << "2nd edge is " << g[ed2.v1].index << " - " << g[ed2.v2].index << "\n";
         add_edge(ed, newface, newface2);
         add_edge(ed2, newface, newface2);
+    } else if ( new_vertex_count(f) == 6 ) {
+		std::cout << " 6 NEW case!!\n";
+        EdgeData ed = find_edge_data(f);
+        VertexVector startverts;
+        startverts.push_back( ed.v1 );
+        EdgeData ed2 = find_edge_data(f, startverts);
+        startverts.push_back( ed2.v1 );
+        EdgeData ed3 = find_edge_data(f, startverts);
+        std::cout << "1st edge is " << g[ed.v1].index << " - " << g[ed.v2].index << "\n";
+        std::cout << "2nd edge is " << g[ed2.v1].index << " - " << g[ed2.v2].index << "\n";
+        std::cout << "3rd edge is " << g[ed3.v1].index << " - " << g[ed3.v2].index << "\n";
+        add_edge(ed, newface, newface2);
+        add_edge(ed2, newface, newface2);
+        add_edge(ed3, newface, newface2);
     } else { 
+		std::cout << " new_vertex_count(f)=" << new_vertex_count(f) << " error!\n";
         assert(0); // unhandled case! panic.
     }
 }
@@ -1124,7 +1141,7 @@ int VoronoiDiagram::new_vertex_count(HEFace f) {
 // on a face which has IN and OUT-vertices, find the sequence
 // OUT-OUT-OUT-..-OUT-NEW(v1)-IN-...-IN-NEW(v2)-OUT-OUT
 // and return v1/v2 together with their previous and next edges
-EdgeData VoronoiDiagram::find_edge_data(HEFace f, HEVertex v)  {
+EdgeData VoronoiDiagram::find_edge_data(HEFace f, VertexVector startverts)  {
     EdgeData ed;
     ed.f = f;
     std::cout << " find_edge_data, ";
@@ -1137,7 +1154,12 @@ EdgeData VoronoiDiagram::find_edge_data(HEFace f, HEVertex v)  {
         HEEdge next_edge = g[current_edge].next;
         HEVertex next_vertex = g.target( next_edge );
         if ( g[current_vertex].status == OUT ) {
-            if ( g[next_vertex].status == NEW && next_vertex!=v) {
+			bool not_found=true;
+			BOOST_FOREACH(HEVertex v, startverts) {
+				if (next_vertex==v)
+					not_found=false;
+			}
+            if ( g[next_vertex].status == NEW &&  not_found) {
                     ed.v1 = next_vertex;
                     ed.v1_prv = next_edge;
                     ed.v1_nxt = g[next_edge].next;

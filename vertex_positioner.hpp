@@ -64,7 +64,7 @@ private:
                       qd_real soln[][3]);
     int quadratic_roots(qd_real a, qd_real b, qd_real c, qd_real roots[]);
 
-    double edge_t(HEEdge e, const Point& p );
+    double edge_t( const Point& p );
     double edge_error(HEEdge e, Solution& s );
 
     bool solution_on_edge(Solution& s);

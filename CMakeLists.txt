@@ -32,9 +32,11 @@ endif(NOT BUILD_PY_LIB)
 if (CMAKE_BUILD_TOOL MATCHES "make")
     MESSAGE(STATUS "setting gcc options: -Wall -Werror -Wno-deprecated -pedantic-errors")
     
+    # -pedantic -W -Wall -Wundef -Wfloat-equal -Wshadow -Winline -Wno-long-long
+    add_definitions( -W -Wall -Wundef  -Wshadow -Winline -Wno-long-long -Wno-deprecated -Werror -pedantic-errors)
     
-    # NON-optimized build:
-    add_definitions( -Wall  -Wno-deprecated -Werror -pedantic-errors)
+    # this gives warning when comparing float/double with != or ==
+    # -Wfloat-equal
     
     add_definitions(-fPIC)
 endif (CMAKE_BUILD_TOOL MATCHES "make")

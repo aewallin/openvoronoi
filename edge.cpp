@@ -229,7 +229,7 @@ double EdgeProps::minimum_pp_t(Site* s1, Site* s2) {
     return p1p2/2; // this splits point-point edges at APEX
 }
 
-double EdgeProps::minimum_pl_t(Site* s1, Site* s2) {
+double EdgeProps::minimum_pl_t(Site* , Site* ) {
     double mint = - x[6]/(2.0*x[7]);
     assert( mint >=0 );
     return mint;

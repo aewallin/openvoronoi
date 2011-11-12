@@ -49,7 +49,7 @@ VoronoiDiagram::~VoronoiDiagram() {
 // add one vertex at origo and three vertices at 'infinity' and their associated edges
 void VoronoiDiagram::initialize() {
     // add init vertices
-    HEVertex v0  = g.add_vertex();
+    HEVertex v00 = g.add_vertex();
     HEVertex v01 = g.add_vertex();
     HEVertex v02 = g.add_vertex();
     HEVertex v03 = g.add_vertex();
@@ -62,9 +62,9 @@ void VoronoiDiagram::initialize() {
     Point gen1 = Point( 0, 3.0*far_radius);
     Point gen2 = Point( -3.0*sqrt(3.0)*far_radius/2.0, -3.0*far_radius/2.0 );
     Point gen3 = Point( +3.0*sqrt(3.0)*far_radius/2.0, -3.0*far_radius/2.0 );
-    g[v0].position = Point(0,0);    // OR we could run vpos->position( gen1, gen2, gen3 );
+    g[v00].position = Point(0,0);    // OR we could run vpos->position( gen1, gen2, gen3 );
     
-    g[ v0].init_dist( gen1 );
+    g[v00].init_dist( gen1 );
     g[v01].init_dist( gen3 );
     g[v02].init_dist( gen1 );
     g[v03].init_dist( gen2 );
@@ -95,11 +95,11 @@ void VoronoiDiagram::initialize() {
     g[a3].init_dist(gen1);   
 
     // add face 1: v0-v1-v2 which encloses gen3
-    HEEdge e1_1 =  g.add_edge( v0 , a1 ); //v01 );   
+    HEEdge e1_1 =  g.add_edge( v00 , a1 ); //v01 );   
     HEEdge e1_2 =  g.add_edge( a1 , v01); //v01 );  
     HEEdge e2 =  g.add_edge( v01, v02 );
     HEEdge e3_1 =  g.add_edge( v02, a2 ); 
-    HEEdge e3_2 =  g.add_edge( a2 , v0 ); 
+    HEEdge e3_2 =  g.add_edge( a2 , v00 ); 
     HEFace f1 =  g.add_face();
     g[f1].edge = e2;
     g[f1].site = new PointSite(gen3,f1);
@@ -118,12 +118,12 @@ void VoronoiDiagram::initialize() {
     g[e3_2].next = e1_1;
 
     // add face 2: v0-v02-v03 which encloses gen1
-    HEEdge e4_1 = g.add_edge( v0, a2  );
+    HEEdge e4_1 = g.add_edge( v00, a2  );
     HEEdge e4_2 = g.add_edge( a2, v02 );
 
     HEEdge e5 = g.add_edge( v02, v03  );
     HEEdge e6_1 = g.add_edge( v03, a3 );
-    HEEdge e6_2 = g.add_edge( a3, v0 ); 
+    HEEdge e6_2 = g.add_edge( a3, v00 ); 
     HEFace f2 =  g.add_face();
     g[f2].edge = e5;
     g[f2].site = new PointSite(gen1,f2);
@@ -142,11 +142,11 @@ void VoronoiDiagram::initialize() {
     g[e6_2].next = e4_1;
     
     // add face 3: v0-v3-v1 which encloses gen2
-    HEEdge e7_1 = g.add_edge( v0 , a3 );  
+    HEEdge e7_1 = g.add_edge( v00, a3 );  
     HEEdge e7_2 = g.add_edge( a3 , v03 );   
     HEEdge e8 = g.add_edge( v03, v01 );
     HEEdge e9_1 = g.add_edge( v01, a1  ); 
-    HEEdge e9_2 = g.add_edge( a1 , v0  ); 
+    HEEdge e9_2 = g.add_edge( a1 , v00 ); 
 
     HEFace f3 =  g.add_face();
     g[f3].edge = e8;
@@ -249,7 +249,7 @@ int VoronoiDiagram::insert_point_site(const Point& p, int step) {
     if (step==current_step) return -1; current_step++;
 
     
-    augment_vertex_set(v_seed, g[new_vert].site );
+    augment_vertex_set( g[new_vert].site );
     
     if (step==current_step) return -1; current_step++;
 
@@ -350,7 +350,7 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
     if (step==current_step) return false; current_step++;
 
     
-    augment_vertex_set(v_seed, pos_site ); // should not matter if we use pos_site or neg_site here
+    augment_vertex_set( pos_site ); // should not matter if we use pos_site or neg_site here
     std::cout << "   delete-set is("<< v0.size() <<"): "; print_vertices(v0);
     
     if (step==current_step) return false; current_step++;
@@ -535,7 +535,7 @@ HEVertex VoronoiDiagram::find_seed_vertex(HEFace f, Site* site) const { //const 
 //  we process UNDECIDED vertices adjacent to known IN-vertices in a "weighted breadth-first-search" manner
 //  where vertices with a large fabs(detH) are processed first, since we assume the in-circle predicate
 //  to be more reliable the larger fabs(in_circle()) is.
-void VoronoiDiagram::augment_vertex_set( HEVertex& v_seed, Site* site ) {
+void VoronoiDiagram::augment_vertex_set(  Site* site ) {
 
     while( !vertexQueue.empty() ) {
         HEVertex v;

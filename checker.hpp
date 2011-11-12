@@ -51,7 +51,7 @@ public:
   
     bool faceVerticesConnected( HEFace f, VoronoiVertexStatus Vtype );
     bool incidentFaceVerticesConnected(  VoronoiVertexStatus Vtype );
-    bool inCircle_is_negative(  const Point& p, HEFace f, HEVertex minimalVertex );
+    bool in_circle_is_negative( const Point& p, HEVertex minimalVertex );
     bool current_face_equals_next_face( HEEdge e); 
     bool face_ok(HEFace f);
     bool all_faces_ok();

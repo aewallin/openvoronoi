@@ -62,8 +62,8 @@ public:
     virtual std::string str() const {assert(0); return "Site";}
     virtual bool isPoint() const { return false;}
     virtual bool isLine() const {  return false;}
-    virtual bool in_region(const Point& p) const {return false;}
-    virtual double in_region_t(const Point& p) const {return 0;} 
+    virtual bool in_region(const Point& ) const {return false;}
+    virtual double in_region_t(const Point& ) const {return 0;} 
     
     typedef unsigned int HEFace;    
     HEFace face;
@@ -82,7 +82,7 @@ public:
         eq.c = p.x*p.x + p.y*p.y;
     }
     ~PointSite() {}
-    virtual Point apex_point(const Point& p) { return _p; }
+    virtual Point apex_point(const Point& ) { return _p; }
     virtual const Point position() const { return _p; }
     virtual double x() const {return _p.x;}
     virtual double y() const {return _p.y;}
@@ -90,7 +90,7 @@ public:
     virtual double k() const {return 0;}
     virtual bool isPoint() const {return true;}
     virtual std::string str() const {return "PointSite";}
-    virtual bool in_region(const Point& p) const {return true;}
+    virtual bool in_region(const Point& ) const {return true;}
 private:
     PointSite() {} // don't use!
     Point _p;
@@ -165,7 +165,7 @@ private:
 /// arc or circle site
 class ArcSite : public Site {
 public:
-    ArcSite( const Point& s, const Point& e, const Point& c, bool dir): _start(s), _end(e), _center(c), _dir(dir) {
+    ArcSite( const Point& s, const Point& e, const Point& center, bool dir): _start(s), _end(e), _center(center), _dir(dir) {
         _radius = (_center - _start).norm();
         eq.a = -2*_center.x;
         eq.b = -2*_center.y;
@@ -174,7 +174,7 @@ public:
     }
     ~ArcSite() {}
     Point apex_point(const Point& p) {
-        return Point(0,0); // FIXME
+        return p+Point(0,0); // FIXME
     }
     virtual double x() const {return _center.x;}
     virtual double y() const {return _center.y;}

@@ -165,13 +165,13 @@ bool VoronoiDiagramChecker::faceVerticesConnected(  HEFace f, VoronoiVertexStatu
 }
 
 // sanity check: IN-vertices for each face should be connected
-bool VoronoiDiagramChecker::incidentFaceVerticesConnected( VoronoiVertexStatus Vtype ) {    
-    BOOST_FOREACH( HEFace f, vd->incident_faces ) {
-        if ( !faceVerticesConnected(  f, IN ) ) {
+bool VoronoiDiagramChecker::incidentFaceVerticesConnected( VoronoiVertexStatus  ) {    
+    BOOST_FOREACH( HEFace f1, vd->incident_faces ) {
+        if ( !faceVerticesConnected(  f1, IN ) ) {
             std::cout << " VoronoiDiagramChecker::incidentFaceVerticesConnected() ERROR, IN-vertices not connected.\n";
             std::cout << " printing all incident faces for debug: \n";
-            BOOST_FOREACH( HEFace f, vd->incident_faces ) {
-                vd->print_face( f );
+            BOOST_FOREACH( HEFace f2, vd->incident_faces ) {
+                vd->print_face( f2 );
             } 
             return false;
         }
@@ -179,7 +179,7 @@ bool VoronoiDiagramChecker::incidentFaceVerticesConnected( VoronoiVertexStatus V
     return true;
 }
 
-bool VoronoiDiagramChecker::inCircle_is_negative(  const Point& p, HEFace f, HEVertex minimalVertex ) {
+bool VoronoiDiagramChecker::in_circle_is_negative(  const Point& p, HEVertex minimalVertex ) {
     double minimumH = vd->g[minimalVertex].in_circle(p);
     
     if (!(minimumH <= 0) ) {

@@ -65,13 +65,13 @@ struct EdgeProps {
     double y[8];
     bool sign; // choose either +/- in front of sqrt()
     
-    inline double sq(double x) const {return x*x;}
-    inline double round(double x) const {
+    inline double sq(double a) const {return a*a;}
+    inline double round(double a) const {
         double eps = 1e-8;
-        if (fabs(x) < eps)
+        if (fabs(a) < eps)
             return 0.0;
         else
-            return x;
+            return a;
     }
     
     Point point(double t) const; 

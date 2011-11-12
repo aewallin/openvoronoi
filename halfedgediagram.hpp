@@ -92,6 +92,8 @@ public:
                                             > BGLGraph;
     typedef typename boost::graph_traits< BGLGraph >::edge_descriptor Edge;
     typedef typename boost::graph_traits< BGLGraph >::vertex_descriptor Vertex;
+    typedef typename boost::graph_traits< BGLGraph >::vertex_iterator    VertexItr;
+    
     typedef std::vector<Vertex> VertexVector;
     typedef std::vector<Face> FaceVector;
     typedef std::vector<Edge> EdgeVector;  
@@ -171,11 +173,8 @@ Vertex source( Edge e )  {
 
 /// return all vertices in a vector of vertex descriptors
 VertexVector vertices()  {
-    typedef typename boost::graph_traits< BGLGraph >::vertex_descriptor  HEVertex;
-    typedef std::vector<HEVertex> VertexVector;
-    typedef typename boost::graph_traits< BGLGraph >::vertex_iterator    HEVertexItr;
     VertexVector vv;
-    HEVertexItr it_begin, it_end, itr;
+    VertexItr it_begin, it_end, itr;
     boost::tie( it_begin, it_end ) = boost::vertices( g );
     for ( itr=it_begin ; itr != it_end ; ++itr ) {
         vv.push_back( *itr );
@@ -200,19 +199,19 @@ VertexVector face_vertices(Face face_idx) const {
     verts.push_back(start_target);
     Edge current = g[startedge].next;
     int count=0;
-    EdgeVector edges; // for debug.
-    edges.push_back(current);
+    EdgeVector face_edges; // for debug.
+    face_edges.push_back(current);
     do {
         Vertex current_target = boost::target( current, g ); 
         //assert( current_target != start_target );
         verts.push_back(current_target);
-        edges.push_back(current);
+        face_edges.push_back(current);
         assert( g[current].face == g[ g[current].next ].face );
         current = g[current].next;
         
         if (count >= 300 ) {
             std::cout << " ERROR too many vertices on face! count=" << count << "\n";
-            std::cout << " verts.size() = " << verts.size() << " edges.size()=" << edges.size() <<"\n";
+            std::cout << " verts.size() = " << verts.size() << " edges.size()=" << face_edges.size() <<"\n";
             for (unsigned int n=0;n<verts.size()-10;n++) {
                 std::cout << n << "   : " << g[ verts[n] ].index << "\n"; //" e=" << edges[n] << "\n";
             }
@@ -343,12 +342,12 @@ void insert_vertex_in_edge(Vertex v, Edge e ) {
     //                    twin_face
     
     Edge twin = g[e].twin;
-    Vertex source = boost::source( e , g );
-    Vertex target = boost::target( e , g);
+    Vertex src = boost::source( e , g );
+    Vertex trg = boost::target( e , g);
     Vertex twin_source = boost::source( twin , g);
     Vertex twin_target = boost::target( twin , g );
-    assert( source == twin_target );    
-    assert( target == twin_source );
+    assert( src == twin_target );    
+    assert( trg == twin_source );
     
     Face face = g[e].face;
     Face twin_face = g[twin].face;
@@ -357,8 +356,8 @@ void insert_vertex_in_edge(Vertex v, Edge e ) {
     Edge twin_previous = previous_edge(twin);
     assert( g[twin_previous].face == g[twin].face );
     
-    Edge e1 = add_edge( source, v ); // these replace e
-    Edge e2 = add_edge( v, target );
+    Edge e1 = add_edge( src, v ); // these replace e
+    Edge e2 = add_edge( v, trg );
     
     // preserve the left/right face link
     g[e1].face = face;

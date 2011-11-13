@@ -39,11 +39,14 @@ struct Solution {
 /// Calculates the (x,y) position of vertices in a voronoi diagram
 class VertexPositioner {
 public:
-    VertexPositioner(VoronoiDiagram* vodi): vd(vodi) {}
+    VertexPositioner(VoronoiDiagram* vodi): vd(vodi) {
+        errstat.clear();
+    }
     /// calculate the position of a new voronoi-vertex lying on the given edge
     /// with the given new site 
     Point position( HEEdge e, Site* s);
     double get_k3() const {return k3;}
+    std::vector<double> get_stat() {return errstat;}
 private:
     Solution position(Site* p1, double k1, Site* p2, double k2, Site* p3);
     
@@ -64,7 +67,6 @@ private:
                       qd_real soln[][3]);
     int quadratic_roots(qd_real a, qd_real b, qd_real c, qd_real roots[]);
 
-    double edge_t( const Point& p );
     double edge_error(HEEdge e, Solution& s );
 
     bool solution_on_edge(Solution& s);
@@ -98,6 +100,7 @@ private:
     double t_max;
     double k3; // the offset-direction to the new site
     HEEdge edge;
+    std::vector<double> errstat;
 };
 
 

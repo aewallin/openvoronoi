@@ -56,7 +56,8 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         .def("__str__", &VoronoiDiagram_py::print)
         .def("version", &VoronoiDiagram_py::version)
         .def("reset_vertex_count", &VoronoiDiagram_py::reset_vertex_count)
-        .staticmethod("reset_vertex_count") 
+        .staticmethod("reset_vertex_count")
+        .def("getStat", &VoronoiDiagram_py::getStat)
     ;
     bp::enum_<VoronoiVertexStatus>("VoronoiVertexStatus")
         .value("OUT", OUT)   

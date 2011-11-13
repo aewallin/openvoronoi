@@ -63,6 +63,13 @@ class VoronoiDiagram_py : public VoronoiDiagram {
             }
             return plist;
         }
+        boost::python::list getStat() {
+            boost::python::list elist;
+            BOOST_FOREACH( double  e, vpos->get_stat() ) {
+                elist.append(e);
+            }
+            return elist;
+        }
         
         /// return list of vd vertices to python
         boost::python::list getVoronoiVertices()  {
@@ -100,16 +107,16 @@ class VoronoiDiagram_py : public VoronoiDiagram {
                     boost::python::list point_list; // the endpoints of each edge
                     HEVertex v1 = g.source( edge );
                     HEVertex v2 = g.target( edge );
-                    if ( (g[edge].type == SEPARATOR) || (g[edge].type == LINESITE) || (g[edge].type == OUTEDGE) || (g[edge].type == LINELINE) ) {
+                    if ( (g[edge].type == SEPARATOR) || (g[edge].type == LINE) || (g[edge].type == LINESITE) || (g[edge].type == OUTEDGE) || (g[edge].type == LINELINE) ) {
                         point_list.append( g[v1].position );
                         point_list.append( g[v2].position );
-                    } else if ( g[edge].type == PARABOLA || (g[edge].type == LINE)  ) {
+                    } else if ( g[edge].type == PARABOLA ) {
                         double t_src = g[v1].dist();
                         double t_trg = g[v2].dist();
                         double t_min = std::min(t_src,t_trg);
                         double t_max = std::max(t_src,t_trg);
                         //std::cout << g[v1].index << " t=" << g[v1].dist() << " - " << g[v2].index << " t=" << g[v2].dist() << "\n";
-                        int Nmax = 20;
+                        int Nmax = 40;
                         double dt = (t_max-t_min)/(Nmax-1);
                         for (int n=0;n<Nmax;n++) {
                             double t = t_min + n*dt;

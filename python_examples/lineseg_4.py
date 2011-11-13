@@ -56,10 +56,10 @@ def segmentIntersects(segs, s):
     
 if __name__ == "__main__":  
     #print ocl.revision()
-    w=1920
-    h=1080
-    #w=1024
-    #h=720
+    #w=1920
+    #h=1080
+    w=1024
+    h=720
     myscreen = ovdvtk.VTKScreen(width=w, height=h) 
     ovdvtk.drawOCLtext(myscreen, rev_text=ovd.revision() )
     
@@ -87,12 +87,12 @@ if __name__ == "__main__":
     # for vtk visualization
     vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
     vod.drawFarCircle()
-    vod.textScale = 0.005
-    vod.vertexRadius = 0.001
-    
+    vod.textScale = 0.002
+    vod.vertexRadius = 0.00031
+    vod.drawVertices=1
     t_before = time.time()
     
-    Nmax = 100
+    Nmax = 15
 
     segs = []
     id_list = []
@@ -109,16 +109,27 @@ if __name__ == "__main__":
 
     #exit()
     
-    nsegs = Nmax
-    #nsegs = 27 #Nmax
+    #nsegs = Nmax
+    nsegs = 14 #Nmax
     n=1
     for s in id_list:
         if n<= nsegs:
             vd.addLineSite(s[0],s[1])
         n=n+1
     
-    #s = id_list[nsegs]
-    #vd.addLineSite( s[0], s[1], 5) 
+    
+    s = id_list[nsegs]
+    vd.addLineSite( s[0], s[1], 5) 
+    
+    err = vd.getStat()
+    #print err 
+    print "got ",len(err)," errors"
+    minerr = min(err)
+    maxerr = max(err)
+    print minerr
+    print maxerr
+    
+    
     # 4 delete-tree
     # 5 create new vertices
     # 6 add startpoint separator

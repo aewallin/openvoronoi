@@ -69,10 +69,11 @@ class VD:
         self.N_linegen = 0
         self.vdtext_text = ""
         self.setVDText()
-        self.clearance_disk = 0
+        self.drawClearanceDisk = 0
         self.textScale = textscale
         self.drawVertexIndex=1
-
+        self.drawVertices=1
+        
     def getActors(self):
         acts=[]
         for a in self.verts:
@@ -162,10 +163,11 @@ class VD:
                 vcolor = green
             elif status == ovd.VoronoiVertexStatus.OUT:
                 vcolor = blue
-                
-            actor = Sphere( center=(p.x,p.y, 0), radius=self.vertexRadius, color=vcolor )
-            self.verts.append(actor)
-            self.myscreen.addActor( actor )
+            
+            if self.drawVertices:
+                actor = Sphere( center=(p.x,p.y, 0), radius=self.vertexRadius, color=vcolor )
+                self.verts.append(actor)
+                self.myscreen.addActor( actor )
                         
             if self.drawVertexIndex:
                 id_text = str(idx)
@@ -173,7 +175,7 @@ class VD:
                 self.verts.append(factor)
                 self.myscreen.addActor( factor )
             
-            if self.clearance_disk:
+            if self.drawClearanceDisk:
                 #draw clearance-disk
                 cir_actor = Circle( center=(p.x,p.y,0), radius=pt[1]*self.scale, color=self.vertexColor )
                 self.verts.append(cir_actor)
@@ -313,7 +315,7 @@ class VD:
         self.setVDText()
         #self.setGenerators()
         #self.setFar(vd)
-        #self.setVertices()
+        self.setVertices()
         #self.setEdgesPolydata(vd)
         self.setEdges()
         

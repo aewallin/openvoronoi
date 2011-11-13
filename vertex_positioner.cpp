@@ -57,7 +57,8 @@ Point VertexPositioner::position(HEEdge e, Site* s) {
     //std::cout << " clipped t-vals t_min= " << t_min << " t_max= " << t_max << "\n";
     
     Solution sl = position( vd->g[face].site  , vd->g[e].k, vd->g[twin_face].site  , vd->g[twin].k, s );
-    std::cout << " new vertex positioned at " << sl.p << " t=" << sl.t << " k3=" << sl.k3 << "\n";
+    std::cout << " new vertex positioned at " << sl.p << " t=" << sl.t << " k3=" << sl.k3;
+    std::cout << " err=" << edge_error(edge,sl) << "\n";
     assert( solution_on_edge(sl) );
     check_far_circle(sl.p);
     //check_on_edge(e, p);
@@ -150,7 +151,7 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     // either 0, or >= 2 solutions found. error.
     std::cout << " None, or too many solutions found! candidates are:\n";
     BOOST_FOREACH(Solution s, solutions ) {
-        std::cout << s.p << " t=" << s.t << " k3=" << s.k3 << " tr=" << s3->in_region(s.p) << " te=" << edge_t( s.p) << " e_err=" << edge_error(edge,s) <<"\n";
+        std::cout << s.p << " t=" << s.t << " k3=" << s.k3 << " tr=" << s3->in_region(s.p) << " e_err=" << edge_error(edge,s) <<"\n";
     }
     std::cout << " edge: " << vd->g[ vd->g.source(edge) ].position << " - " << vd->g[ vd->g.target(edge) ].position << "\n";
     assert(0);
@@ -159,36 +160,18 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
 
 bool VertexPositioner::solution_on_edge(Solution& s) {
     double err = edge_error(edge,s);
-    double limit = 1E-4;
+    errstat.push_back(err);
+    double limit = 5E-5;
     if ( err>=limit ) {
         std::cout << "solution_on_edge() ERROR err= " << err << "\n";
         std::cout << " edge: " << vd->g[ vd->g.source(edge) ].index << " - " << vd->g[ vd->g.target(edge) ].index << "\n";
     }
-    return (err<1E-4);
+    return (err<5E-5);
 }
 
 double VertexPositioner::edge_error(HEEdge e, Solution& s) {
     Point ep = vd->g[e].point( s.t );
     return (ep-s.p).norm();
-}
-
-double VertexPositioner::edge_t( const Point& p ) {
-    // project onto src-target edge and check t-value.
-    HEVertex src = vd->g.source(edge);
-    HEVertex trg = vd->g.target(edge);
-    Point src_p = vd->g[src].position;
-    Point trg_p = vd->g[trg].position;
-    Point s_p = p - src_p;
-    Point s_e = trg_p - src_p; // line: src + t*(trg-src)
-    double t = s_p.dot(s_e) / s_e.dot(s_e);
-    // rounding... UGLY
-    double eps = 2e-10;
-    if (fabs(t) < eps) 
-        t= 0;
-    else if ( fabs(t-1.0) < eps )
-        t= 1;
-    
-    return t;
 }
 
 int VertexPositioner::solver(Site* s1, double k1, Site* s2, double k2, Site* s3, double kk3, std::vector<Solution>& solns) {

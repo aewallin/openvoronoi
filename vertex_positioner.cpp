@@ -236,13 +236,13 @@ int VertexPositioner::solver(Site* s1, double k1, Site* s2, double k2, Site* s3,
         xk = s3->x(); // point: (x,y, r=0, kk=1)  circle( x,y,r,k[i] )
         yk = s3->y();
         rk = s3->r();
-        kk = s3->k()*k3;
+        kk = s3->k()*kk3;
         if (s3->isPoint())
-            kk=k3;
+            kk=kk3;
     }
     
     if (linear_count == 3)
-        return lll_solver(vectors, k3, solns);
+        return lll_solver(vectors, kk3, solns);
     
     assert( linear_count < 3 ); // ==3 should be caught above by lll_solve()
     assert( quadratic_count > 0); // we should have one or more quadratic
@@ -421,7 +421,6 @@ int VertexPositioner::quadratic_roots(qd_real a, qd_real b, qd_real c, qd_real r
 
 int VertexPositioner::lll_solver(qd_real vectors[][4], double kk3, std::vector<Solution>& slns ) {
     std::cout << " lll_solver() k3= " << k3 << "\n";
-    qd_real d, t, x, y;
     qd_real ai, bi, ki, ci;
     qd_real aj, bj, kj, cj;
     qd_real ak, bk, kk, ck;
@@ -437,22 +436,20 @@ int VertexPositioner::lll_solver(qd_real vectors[][4], double kk3, std::vector<S
     bk = vectors[2][1];
     kk = vectors[2][2];
     ck = vectors[2][3];
-    // determinant
-    d = (ai*bj-aj*bi)*kk + (-ai*bk + ak*bi)*kj + (aj*bk-ak*bj)*ki;
-    d = chop(d); // rounds small values to zero
+    qd_real d = chop( (ai*bj-aj*bi)*kk + (-ai*bk + ak*bi)*kj + (aj*bk-ak*bj)*ki ); // determinant
     if (d != 0) {
-        t = ((-ai*bj + aj*bi)*ck + (ai*bk - ak*bi)*cj  + (-aj*bk + ak*bj)*ci)/d;
+        qd_real t = ((-ai*bj + aj*bi)*ck + (ai*bk - ak*bi)*cj  + (-aj*bk + ak*bj)*ci)/d;
         if (t >= 0) {
             qd_real sol_x = ((bi*cj - bj*ci)*kk + (-bi*ck + bk*ci)*kj + (bj*ck-bk*cj)*ki)/d;
             qd_real sol_y = ((-ai*cj + aj*ci)*kk + (ai*ck-ak*ci)*kj + (-aj*ck +ak*cj)*ki)/d;
-            //qd_real sol_t = t;
-            slns.push_back( Solution( Point( to_double(sol_x), to_double(sol_y) ), to_double(t), kk3 ) );
+            slns.push_back( Solution( Point( to_double(sol_x), to_double(sol_y) ), to_double(t), kk3 ) ); // kk3 just passes through without any effect!?
             return 1;
         }
     }
     return 0; // no solution if determinant zero, or t-value negative
 }
 
+/// Old. not used anymore!
 /// point-point-point vertex positioner based on Sugihara & Iri paper
 Point VertexPositioner::ppp_solver(const Point& p1, const Point& p2, const Point& p3) {
     Point pi(p1),pj(p2),pk(p3);

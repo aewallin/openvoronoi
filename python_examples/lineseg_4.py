@@ -92,7 +92,7 @@ if __name__ == "__main__":
     
     t_before = time.time()
     
-    Nmax = 57
+    Nmax = 200
 
     segs = []
     id_list = []
@@ -109,16 +109,16 @@ if __name__ == "__main__":
 
     #exit()
     
-    #nsegs = Nmax
-    nsegs = 26 #Nmax
+    nsegs = Nmax
+    #nsegs = 27 #Nmax
     n=1
     for s in id_list:
         if n<= nsegs:
             vd.addLineSite(s[0],s[1])
         n=n+1
     
-    s = id_list[nsegs]
-    vd.addLineSite( s[0], s[1], 5) 
+    #s = id_list[nsegs]
+    #vd.addLineSite( s[0], s[1], 5) 
     # 4 delete-tree
     # 5 create new vertices
     # 6 add startpoint separator

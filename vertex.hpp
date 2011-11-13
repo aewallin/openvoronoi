@@ -78,6 +78,7 @@ public:
     /// return distance to a point from this vertex
     double dist(const Point& p) const { return (position-p).norm(); }
     /// return clearance-disk radius
+    void zero_dist() {r=0;}
     double dist() const { return r; }
     /// in-circle predicate 
     double in_circle(const Point& p) const { return dist(p) - r; }

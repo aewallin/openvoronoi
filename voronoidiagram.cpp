@@ -305,6 +305,8 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
     g[start].status=OUT; 
     g[end].type=ENDPOINT; 
     g[end].status=OUT; 
+    g[start].zero_dist();
+    g[end].zero_dist();
     
     if (step==current_step) return false; current_step++;
     
@@ -724,7 +726,7 @@ void VoronoiDiagram::add_vertices( Site* new_site ) {
         modified_vertices.push_back(q);
         std::cout << "position new vertex " << g[q].index << " on ";
         std::cout <<  g[ g.source(q_edges[m])].index << "(t=" << g[ g.source(q_edges[m])].dist() << ")-"; 
-        std::cout << g[ g.target(q_edges[m])].index << "(t=" << g[ g.target(q_edges[m])].dist();
+        std::cout << g[ g.target(q_edges[m])].index << "(t=" << g[ g.target(q_edges[m])].dist() << ")";
         std::cout <<  " edge, type=" << g[q_edges[m]].type << "\n";
         g[q].position = vpos->position( q_edges[m], new_site ); // set position
         g[q].k3 = vpos->get_k3();

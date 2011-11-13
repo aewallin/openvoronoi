@@ -56,10 +56,10 @@ def segmentIntersects(segs, s):
     
 if __name__ == "__main__":  
     #print ocl.revision()
-    #w=1920
-    #h=1080
-    w=1024
-    h=720
+    w=1920
+    h=1080
+    #w=1024
+    #h=720
     myscreen = ovdvtk.VTKScreen(width=w, height=h) 
     ovdvtk.drawOCLtext(myscreen, rev_text=ovd.revision() )
     
@@ -92,7 +92,7 @@ if __name__ == "__main__":
     
     t_before = time.time()
     
-    Nmax = 200
+    Nmax = 100
 
     segs = []
     id_list = []

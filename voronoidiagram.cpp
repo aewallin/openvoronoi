@@ -832,36 +832,15 @@ HEFace VoronoiDiagram::add_face(Site* s) {
 // by adding a NEW-NEW edge, split the face f into one part which is newface, and the other part is the old f
 // for linesegment or arc sites we pass in both the k=+1 face newface and the k=-1 face newface2
 void VoronoiDiagram::add_edge(HEFace newface, HEFace f, HEFace newface2) {
-    if (new_vertex_count(f) == 2) {        // add one new edge src-target to fix the face
-        EdgeData ed = find_edge_data(f);
-        add_edge(ed, newface, newface2);
-    } else if ( new_vertex_count(f) == 4 ) {        // need to add TWO new edges to fix the face
-        std::cout << " 4 NEW case!!\n";
-        VertexVector startverts;
-        EdgeData ed = find_edge_data(f);
+    int new_count = new_vertex_count(f);
+    assert( new_count > 0 );
+    assert( (new_count % 2) == 0 );
+    int new_pairs = new_count / 2;
+    VertexVector startverts;
+    for (int m=0;m<new_pairs;m++) {
+        EdgeData ed = find_edge_data(f, startverts);
+        add_edge(ed,newface,newface2);
         startverts.push_back(ed.v1);
-        EdgeData ed2 = find_edge_data(f, startverts);
-        std::cout << "1st edge is " << g[ed.v1].index << " - " << g[ed.v2].index << "\n";
-        std::cout << "2nd edge is " << g[ed2.v1].index << " - " << g[ed2.v2].index << "\n";
-        add_edge(ed, newface, newface2);
-        add_edge(ed2, newface, newface2);
-    } else if ( new_vertex_count(f) == 6 ) {
-		std::cout << " 6 NEW case!!\n";
-        EdgeData ed = find_edge_data(f);
-        VertexVector startverts;
-        startverts.push_back( ed.v1 );
-        EdgeData ed2 = find_edge_data(f, startverts);
-        startverts.push_back( ed2.v1 );
-        EdgeData ed3 = find_edge_data(f, startverts);
-        std::cout << "1st edge is " << g[ed.v1].index << " - " << g[ed.v2].index << "\n";
-        std::cout << "2nd edge is " << g[ed2.v1].index << " - " << g[ed2.v2].index << "\n";
-        std::cout << "3rd edge is " << g[ed3.v1].index << " - " << g[ed3.v2].index << "\n";
-        add_edge(ed, newface, newface2);
-        add_edge(ed2, newface, newface2);
-        add_edge(ed3, newface, newface2);
-    } else { 
-		std::cout << " new_vertex_count(f)=" << new_vertex_count(f) << " error!\n";
-        assert(0); // unhandled case! panic.
     }
 }
 

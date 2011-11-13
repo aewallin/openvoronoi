@@ -58,7 +58,7 @@ Point VertexPositioner::position(HEEdge e, Site* s) {
     
     Solution sl = position( vd->g[face].site  , vd->g[e].k, vd->g[twin_face].site  , vd->g[twin].k, s );
     std::cout << " new vertex positioned at " << sl.p << " t=" << sl.t << " k3=" << sl.k3 << "\n";
-    //assert( solution_on_edge(sl) );
+    assert( solution_on_edge(sl) );
     check_far_circle(sl.p);
     //check_on_edge(e, p);
     //check_dist(e, p, v);
@@ -159,7 +159,12 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
 
 bool VertexPositioner::solution_on_edge(Solution& s) {
     double err = edge_error(edge,s);
-    return (err<1E-6);
+    double limit = 1E-5;
+    if ( err>=limit ) {
+        std::cout << "solution_on_edge() ERROR err= " << err << "\n";
+        std::cout << " edge: " << vd->g[ vd->g.source(edge) ].index << " - " << vd->g[ vd->g.target(edge) ].index << "\n";
+    }
+    return (err<1E-5);
 }
 
 double VertexPositioner::edge_error(HEEdge e, Solution& s) {

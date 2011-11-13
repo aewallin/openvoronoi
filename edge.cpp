@@ -174,6 +174,32 @@ void EdgeProps::set_pl_parameters(Site* s1, Site* s2) {
     y[7]=kk;            // -1 = k2 side of line??
 }
 
+// set separator edge-parameters
+void EdgeProps::set_sep_parameters(Point& endp, Point& p) {
+    type = SEPARATOR;
+    double dx = p.x - endp.x;
+    double dy = p.y - endp.y;
+    double d = (p-endp).norm();
+    assert( d > 0 );
+    x[0]=endp.x;
+    x[1]=0;
+    x[2]=-dx/d; // negative of normalized direction from endp to p
+    x[3]=0;
+    x[4]=0;
+    x[5]=0;
+    x[6]=0;
+    x[7]=0;
+
+    y[0]=endp.y;
+    y[1]=0;
+    y[2]=-dy/d;
+    y[3]=0;
+    y[4]=0;
+    y[5]=0;
+    y[6]=0;
+    y[7]=0;
+}
+
 // line(s1)-line(s2) edge
 void EdgeProps::set_ll_parameters(Site* s1, Site* s2) {  // Held thesis p96
     assert( s1->isLine() && s2->isLine() );

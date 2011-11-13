@@ -174,8 +174,8 @@ if __name__ == "__main__":
             vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
             vod.drawFarCircle()
             vod.vertexRadius = 0.005
-            vod.textScale = 0.02
-
+            vod.textScale = 0.01
+            vod.drawVertexIndex=0
             drawFrame(Nmax,myscreen, vd, vod, nframe,npt,step)
             vd.reset_vertex_count()
             gc.collect()
@@ -205,7 +205,7 @@ if __name__ == "__main__":
             vod.drawFarCircle()
             vod.vertexRadius = 0.005
             vod.textScale = 0.02
-
+            vod.drawVertexIndex=0
             drawLinesegFrame(Nmax,myscreen, vd, vod, nframe, npt,step)
             vd.reset_vertex_count()
             gc.collect()

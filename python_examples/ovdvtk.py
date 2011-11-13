@@ -71,7 +71,7 @@ class VD:
         self.setVDText()
         self.clearance_disk = 0
         self.textScale = textscale
-        
+        self.drawVertexIndex=1
 
     def getActors(self):
         acts=[]
@@ -124,13 +124,14 @@ class VD:
             
             p = self.scale*pt
             actor = Sphere( center=(p.x,p.y, 0), radius=self.vertexRadius, color=self.generatorColor )
-            id_text = str(idx)
-            factor = FollowerText( text=id_text,center=(p.x,p.y,0), scale = self.textScale, color=self.generatorColor)
-            
             self.gens.append(actor)
             self.myscreen.addActor( actor )
-            self.gens.append(factor)
-            self.myscreen.addActor( factor )
+            
+            if self.drawVertexIndex:
+                id_text = str(idx)
+                factor = FollowerText( text=id_text,center=(p.x,p.y,0), scale = self.textScale, color=self.generatorColor)
+                self.gens.append(factor)
+                self.myscreen.addActor( factor )
 
         self.myscreen.render() 
     
@@ -163,15 +164,14 @@ class VD:
                 vcolor = blue
                 
             actor = Sphere( center=(p.x,p.y, 0), radius=self.vertexRadius, color=vcolor )
-            
-            id_text = str(idx)
-            factor = FollowerText( text=id_text,center=(p.x,p.y,0), scale = self.textScale, color=vcolor)
-            
             self.verts.append(actor)
             self.myscreen.addActor( actor )
-            
-            self.verts.append(factor)
-            self.myscreen.addActor( factor )
+                        
+            if self.drawVertexIndex:
+                id_text = str(idx)
+                factor = FollowerText( text=id_text,center=(p.x,p.y,0), scale = self.textScale, color=vcolor)
+                self.verts.append(factor)
+                self.myscreen.addActor( factor )
             
             if self.clearance_disk:
                 #draw clearance-disk

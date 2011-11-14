@@ -518,22 +518,6 @@ double VertexPositioner::error(HEEdge e, const Point& p, HEVertex v) {
     return sq(d1-d2)+sq(d1-d3)+sq(d2-d3);
 }
 
-bool VertexPositioner::check_on_edge(HEEdge e, const Point& p) {
-    HEVertex trg = vd->g.target(e);
-    HEVertex src = vd->g.source(e);
-    Point trgP = vd->g[trg].position;
-    Point srcP = vd->g[src].position;
-    Point newP = p;
-    double dtl = p.distance_to_line(srcP, trgP);
-    if (dtl > 1e-3* ( trgP - srcP ).norm() ) {
-        std::cout << "WARNING!! check_vertex_on_edge()  dtl= " << dtl << "\n";
-        std::cout << "    edge= " << vd->g[src].index << " - " << vd->g[trg].index << "\n";
-        std::cout << "    (src-trg).norm()= " << (srcP-trgP).norm() << "\n";
-        return false;
-    }
-    return true;
-}
-
 // distance to adjacent sites should be equal
 bool VertexPositioner::check_dist(HEEdge e, const Point& p, HEVertex v) {
     HEVertex trg = vd->g.target(e);

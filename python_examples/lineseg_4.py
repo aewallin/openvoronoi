@@ -88,7 +88,7 @@ if __name__ == "__main__":
     vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
     vod.drawFarCircle()
     vod.textScale = 0.002
-    vod.vertexRadius = 0.00031
+    vod.vertexRadius = 0.000031
     vod.drawVertices=1
     t_before = time.time()
     
@@ -122,12 +122,12 @@ if __name__ == "__main__":
     vd.addLineSite( s[0], s[1], 5) 
     
     err = vd.getStat()
-    #print err 
-    print "got ",len(err)," errors"
+    print err 
+    print "got errorstats for ",len(err)," points"
     minerr = min(err)
     maxerr = max(err)
-    print minerr
-    print maxerr
+    print "min error= ",minerr
+    print "max error= ",maxerr
     
     
     # 4 delete-tree

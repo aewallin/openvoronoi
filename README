@@ -1,0 +1,47 @@
+
+The OpenVoronoi project aims to produce an algorithm for calculating
+the 2D voronoi-diagram for point, line-segment, and circular-arc sites.
+Currently point-sites work well and line-segment sites are being worked
+on. The incremental topology-oriented algorithm is used 
+(see References).
+
+Voronoi diagrams are used for many purposes in computational geometry,
+but the motivation for OpenVoronoi has mainly been 2D offset-generation
+for cnc mill toolpath calcuations.
+
+The OpenVoronoi project is at 
+https://github.com/aewallin/openvoronoi
+
+The mailing-list for OpenVoronoi is at
+https://groups.google.com/forum/?hl=en#!forum/opencamlib
+
+Build instructions
+This project uses cmake, and can be built out-of-source:
+$ mkdir bld
+$ cd bld
+$ cmake ..
+$ make
+
+Other voronoi-diagram codes
+CGAL.
+Boost/Sweepline. This was a Google Summer of Code 2010 project.
+Boostcon video:
+VRONI/Martin Held. This code is commercial and not available, as far as
+we know.
+
+References
+
+Sugihara and Iri, (1992) "construction of the voronoi diagram for one 
+million generators in single-precision arithmetic" 
+http://dx.doi.org/10.1109/5.163412
+
+Imai (1996) "A Topology-Oriented Algorithm for the Voronoi Diagram 
+of Polygons" http://www.cccg.ca/proceedings/1996/cccg1996_0019.pdf
+
+Sugihara, Iri, Inagaki, Imai, (2000) "topology oriented implementation 
+- an approach to robust geometric algorithms" 
+http://dx.doi.org/10.1007/s004530010002
+
+Held, (2001) "VRONI: an engineering approach to the reliable and 
+efficient computation of Voronoi diagrams of points and line 
+segments" http://dx.doi.org/10.1016/S0925-7721(01)00003-7

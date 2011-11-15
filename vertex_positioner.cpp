@@ -2,7 +2,7 @@
  *  Copyright 2010-2011 Anders Wallin (anders.e.e.wallin "at" gmail.com)
  * 
  *  Idea and code for point/line/arc voronoi-vertex positioning code by
- *  Andy Payone, andy "at" payne "dot" org, November, 2010
+ *  Andy Payne, andy "at" payne "dot" org, November, 2010
  *  see: http://www.payne.org/index.php/Calculating_Voronoi_Nodes
  * 
  *  This file is part of OpenVoronoi.

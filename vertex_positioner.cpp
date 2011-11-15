@@ -23,6 +23,9 @@
 
 #include "vertex_positioner.hpp"
 #include "voronoidiagram.hpp"
+#include "numeric.hpp"
+
+using namespace ovd::numeric; // sq() chop()
 
 namespace ovd {
 

@@ -157,6 +157,8 @@ class VoronoiDiagram {
 
 };
 
+// class for passing to numerical boost::toms748 root-finding algorithm
+// to locate split-points
 class SplitPointError {
 public:
     SplitPointError(VoronoiDiagram* v, HEEdge split_edge,Point pt1, Point pt2) :

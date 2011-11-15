@@ -86,8 +86,8 @@ public:
     Site* site;
     double k3; // the offset-direction to the newly inserted site.
     static void reset_count() {
-		count = 0;
-	}
+        count = 0;
+    }
 protected:
     /// global vertex count
     static int count;

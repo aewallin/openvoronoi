@@ -22,8 +22,6 @@
 #include <boost/foreach.hpp>
 #include <boost/math/tools/roots.hpp> // for toms748
 
-
-
 #include "voronoidiagram.hpp"
 #include "facegrid.hpp"
 #include "checker.hpp"

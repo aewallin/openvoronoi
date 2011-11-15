@@ -71,22 +71,6 @@ private:
 
     bool solution_on_edge(Solution& s);
 
-    double chop(double val) {
-        double _epsilon = 1e-10;
-        if (fabs(val) < _epsilon) 
-            return 0;
-        else
-            return val;
-    }
-    qd_real chop(qd_real val) {
-        qd_real _epsilon = 1e-10;
-        if (fabs(val) < _epsilon) 
-            return qd_real(0);
-        else
-            return val;
-    }
-    inline double sq(double x) {return x*x;}
-
 // geometry-checks
     bool check_in_edge(HEEdge e, const Point& p, HEVertex v);
     bool check_far_circle(const Point& p);

@@ -65,17 +65,7 @@ struct EdgeProps {
     double y[8];
     bool sign; // choose either +/- in front of sqrt()
     
-    inline double sq(double a) const {return a*a;}
-    inline double round(double a) const {
-        double eps = 1e-8;
-        if (fabs(a) < eps)
-            return 0.0;
-        else
-            return a;
-    }
-    
     Point point(double t) const; 
-
     double minimum_t( Site* s1, Site* s2);
     double minimum_pp_t(Site* s1, Site* s2);
     double minimum_pl_t(Site* s1, Site* s2);

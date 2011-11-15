@@ -38,11 +38,12 @@ namespace ovd {
 // - given new Site s
 Point VertexPositioner::position(HEEdge e, Site* s) {
     edge = e;
-    HEFace face = vd->g[e].face;     assert(  vd->g[face].status == INCIDENT);
+    HEFace face = vd->g[e].face;     
     HEEdge twin = vd->g[e].twin;
-    HEFace twin_face = vd->g[twin].face;      assert( vd->g[twin_face].status == INCIDENT);
+    HEFace twin_face = vd->g[twin].face;      
+    assert(  vd->g[face].status == INCIDENT);
+    assert( vd->g[twin_face].status == INCIDENT);
     
-
     HEVertex src = vd->g.source(e);
     HEVertex trg = vd->g.target(e);
     double t_src = vd->g[src].dist();
@@ -50,16 +51,13 @@ Point VertexPositioner::position(HEEdge e, Site* s) {
     t_min = std::min( t_src, t_trg );
     t_max = std::max( t_src, t_trg );
 
-    std::cout << "  sites: " << vd->g[face].site->str() << "(k="<< vd->g[e].k<< ") " << vd->g[twin_face].site->str() << "(k="<< vd->g[twin].k<< ") new= " << s->str() << "\n";
-    //std::cout << "   k-vals: e.k = " <<  vd->g[e].k << " twin.k = " << vd->g[twin].k  << "\n";
+    std::cout << "  sites: " << vd->g[face].site->str() << "(k="<< vd->g[e].k<< ") ";
+    std::cout << vd->g[twin_face].site->str() << "(k="<< vd->g[twin].k;
+    std::cout << ") new= " << s->str() << "\n";
     std::cout << " t-vals t_min= " << t_min << " t_max= " << t_max << "\n";
-    
-    //if ( s->isPoint() )
-        //t_min = 0;
-        //t_max = 1000000;
-    //std::cout << " clipped t-vals t_min= " << t_min << " t_max= " << t_max << "\n";
-    
+        
     Solution sl = position( vd->g[face].site  , vd->g[e].k, vd->g[twin_face].site  , vd->g[twin].k, s );
+    
     std::cout << " new vertex positioned at " << sl.p << " t=" << sl.t << " k3=" << sl.k3;
     std::cout << " err=" << edge_error(edge,sl) << "\n";
     assert( solution_on_edge(sl) );
@@ -80,15 +78,9 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     
     int count1=0,count2=0;
     
-    //if ( s1->is_linear() && s2->is_linear() && s3->is_linear() ) {
-    //    count1 =  lll_solver(s1,k1,s2,k2,s3,+1, solutions);
-    //    count1 =  lll_solver(s1,k1,s2,k2,s3,+1, solutions);
-    //} else {
-        count1 = solver(s1,k1,s2,k2,s3,+1, solutions);
-        if (!s3->isPoint()) // for points k3=+1 allways
-            count2 = solver(s1,k1,s2,k2,s3,-1, solutions); // for lineSite or ArcSite we may try k3=-1 also
-    //}
-    
+    count1 = solver(s1,k1,s2,k2,s3,+1, solutions);
+    if (!s3->isPoint()) // for points k3=+1 allways
+        count2 = solver(s1,k1,s2,k2,s3,-1, solutions); // for lineSite or ArcSite we try k3=-1 also    
 
     // choose only t>0 solutions
     std::vector<Solution> pos_slns;
@@ -107,18 +99,7 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
         // two or more points remain so we must further filter here!
         std::vector<Solution> sln2 = pos_slns;
         
-        // filter with t-edge value (??)
-        /*
-        for (unsigned int m=0;m<pos_slns.size();m++)  {
-            double t = edge_t(edge, pos_slns[m].p );
-            std::cout << m << " : k3=" << pos_slns[m].k3 << " p=" << pos_slns[m].p << " t=" << pos_slns[m].t << " in_region= " << s3->in_region( pos_slns[m].p ) ;
-            std::cout << " edge_t= " << t << "\n";
-            if ( (t>=0) && (t<=1) ) {
-                sln2.push_back( pos_slns[m]  );
-            }
-        }*/
-        
-        // if after edge_t filtering only one point remains, return that
+        // if only one point remains, return that
         if ( sln2.size() == 1) {
             std::cout << " returning k3= " << sln2[0].k3 << " pt= " << sln2[0].p << " t=" << sln2[0].t << "\n";
             k3 = sln2[0].k3;
@@ -348,66 +329,22 @@ int VertexPositioner::qll_solve( qd_real a0, qd_real b0, qd_real c0, qd_real d0,
                       qd_real a2, qd_real b2, 
                       qd_real soln[][3])
 {
-    qd_real roots[2];
     // TODO:  optimize using abs(a0) == abs(c0) == abs(d0) == 1
     qd_real a = chop( (a0*(a1*a1) + c0*(a2*a2) + e0) ); 
     qd_real b = chop( (2*a0*a1*b1 + 2*a2*b2*c0 + a1*b0 + a2*d0 + f0) ); 
     qd_real c = a0*(b1*b1) + c0*(b2*b2) + b0*b1 + b2*d0 + g0;
-    int rcount = quadratic_roots(a, b, c, roots); // solves a*w^2 + b*w + c = 0
-    if (rcount == 0) { // No roots, no solutions
+    std::vector<qd_real> roots = quadratic_roots(a, b, c); // solves a*w^2 + b*w + c = 0
+    if ( roots.empty() ) { // No roots, no solutions
         std::cout << " qll_solve no w roots. no solutions.\n";
         return 0;
     }
-    for (int i=0; i<rcount; i++) {
+    for (unsigned int i=0; i<roots.size(); i++) {
         qd_real w = roots[i];
         soln[i][0] = a1*w + b1; // u
         soln[i][1] = a2*w + b2; // v
         soln[i][2] = w;         // t
     }
-    return rcount;
-}
-
-/// solves: a*x*x + b*x + c = 0
-/// returns number of roots found (0, 1, or 2) and the values in roots[]
-int VertexPositioner::quadratic_roots(qd_real a, qd_real b, qd_real c, qd_real roots[]) {
-    if ((a == 0) and (b == 0)) {
-        std::cout << " quadratic_roots() a == b == 0. no roots.\n";
-        return 0;
-    }
-    if (a == 0) {
-        roots[0] = -c / b;
-        return 1;
-    }
-    if (b == 0) {
-        qd_real sqr = -c / a;
-        if (sqr > 0) {
-            roots[0] = sqrt(sqr);
-            roots[1] = -roots[0];
-            return 2;
-        } else if (sqr == 0) {
-            roots[0] = qd_real(0);
-            return 1;
-        } else {
-            std::cout << " quadratic_roots() b == 0. no roots.\n";
-            return 0;
-        }
-    }
-    qd_real disc = chop(b*b - 4*a*c); // discriminant, chop!
-    if (disc > 0) {
-        qd_real q;
-        if (b > 0)
-            q = (b + sqrt(disc)) / -2;
-        else
-            q = (b - sqrt(disc)) / -2;
-        roots[0] = q / a;
-        roots[1] = c / q; // (?)
-        return 2;
-    } else if (disc == 0) {
-        roots[0] = (-b / (2*a));
-        return 1;
-    }
-    std::cout << " quadratic_roots() disc < 0. no roots. disc= " << disc << "\n";
-    return 0;
+    return roots.size();
 }
 
 int VertexPositioner::lll_solver(qd_real vectors[][4], double kk3, std::vector<Solution>& slns ) {
@@ -415,7 +352,7 @@ int VertexPositioner::lll_solver(qd_real vectors[][4], double kk3, std::vector<S
     qd_real ai, bi, ki, ci;
     qd_real aj, bj, kj, cj;
     qd_real ak, bk, kk, ck;
-    ai = vectors[0][0];
+    ai = vectors[0][0]; // 3 equations, each has 4 parameters
     bi = vectors[0][1];
     ki = vectors[0][2];
     ci = vectors[0][3];
@@ -475,39 +412,6 @@ bool VertexPositioner::check_far_circle(const Point& p) {
     return true;
 }
 
-// new vertices should lie "on" or at least "close" to the HEEdge e they were supposed to lie on
-bool VertexPositioner::check_in_edge(HEEdge e, const Point& p, HEVertex v) {
-    HEVertex trg = vd->g.target(e);
-    HEVertex src = vd->g.source(e);
-    Point trgP = vd->g[trg].position;
-    Point srcP = vd->g[src].position;
-    Point newP = p; //vd->g[q].position;
-    if (( trgP - srcP ).norm() <= 0 ) {
-        std::cout << "WARNING check_vertex_in_edge() zero-length edge! \n";
-    } else {
-        assert( ( trgP - srcP ).norm() > 0.0 ); // edge has finite length
-        assert( ( trgP - srcP ).dot( trgP - srcP ) > 0.0 ); // length squared
-        double t = ((newP - srcP).dot( trgP - srcP )) / ( trgP - srcP ).dot( trgP - srcP ) ;
-        if ( t < 0.0 || t > 1.0  ) {
-            std::cout << "WARNING: check_vertex_In_edge() t= " << t << "\n";
-            std::cout << "    edge= " << vd->g[src].index << " - " << vd->g[trg].index << "\n";
-            std::cout << "    src= " << vd->g[src].index << "  " << srcP << " error= " << error(e,srcP,v) << "\n";
-            std::cout << "    new= " <<  newP << " error= " << error(e,p,v) << "\n";
-            std::cout << "    trg= " << vd->g[trg].index << "  " << trgP << " error= " << error(e,trgP,v) << "\n";
-            std::cout << "    (src-trg).norm()= " << (srcP-trgP).norm() << "\n";
-            int Nmax = 100;
-            double dt =1.0/(double)(Nmax-1);
-            for (int n=0;n<Nmax;++n) {
-                double mt = n*dt;
-                Point mp = srcP + mt*(trgP-srcP);
-                std::cout << "    mid= " <<  mp << " error= " << error(e, mp ,v) << "\n";
-            }
-            return false;
-        }
-    }
-    return true;
-}
-
 double VertexPositioner::error(HEEdge e, const Point& p, HEVertex v) {
     //HEVertex trg = vd->g.target(e);
     //HEVertex src = vd->g.source(e);
@@ -521,7 +425,8 @@ double VertexPositioner::error(HEEdge e, const Point& p, HEVertex v) {
     return sq(d1-d2)+sq(d1-d3)+sq(d2-d3);
 }
 
-// distance to adjacent sites should be equal
+// all vertices should be of degree three, i.e. three adjacent faces/sites
+// distance to the three adjacent sites should be equal
 bool VertexPositioner::check_dist(HEEdge e, const Point& p, HEVertex v) {
     HEVertex trg = vd->g.target(e);
     HEVertex src = vd->g.source(e);

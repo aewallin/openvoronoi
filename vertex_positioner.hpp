@@ -3,18 +3,18 @@
  *  
  *  This file is part of OpenVoronoi.
  *
- *  OpenCAMlib is free software: you can redistribute it and/or modify
+ *  OpenVoronoi is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  OpenCAMlib is distributed in the hope that it will be useful,
+ *  OpenVoronoi is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with OpenCAMlib.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with OpenVoronoi.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #ifndef VERTEX_POSITIONER_HPP
@@ -42,8 +42,9 @@ public:
     VertexPositioner(VoronoiDiagram* vodi): vd(vodi) {
         errstat.clear();
     }
-    /// calculate the position of a new voronoi-vertex lying on the given edge
-    /// with the given new site 
+    /// calculate the position of a new voronoi-vertex lying on the given edge.
+    /// The new vertex is equidistant to the two sites that defined the edge
+    /// and to the new site. 
     Point position( HEEdge e, Site* s);
     double get_k3() const {return k3;}
     std::vector<double> get_stat() {return errstat;}
@@ -65,14 +66,10 @@ private:
                       qd_real a1, qd_real b1, 
                       qd_real a2, qd_real b2, 
                       qd_real soln[][3]);
-    int quadratic_roots(qd_real a, qd_real b, qd_real c, qd_real roots[]);
-
-    double edge_error(HEEdge e, Solution& s );
-
-    bool solution_on_edge(Solution& s);
 
 // geometry-checks
-    bool check_in_edge(HEEdge e, const Point& p, HEVertex v);
+    double edge_error(HEEdge e, Solution& s );
+    bool solution_on_edge(Solution& s);
     bool check_far_circle(const Point& p);
     bool check_dist(HEEdge e, const Point& p, HEVertex v);
     bool equal(double d1, double d2);

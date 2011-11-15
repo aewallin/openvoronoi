@@ -20,10 +20,13 @@
 #ifndef NUMERIC_HPP
 #define NUMERIC_HPP
 
+#include <vector>
 #include <qd/qd_real.h> 
 
 namespace ovd {
 
+// this namespace holds general numerical functions that are not specific
+// to voronoi-diagrams and may be useful elsewhere too
 namespace numeric {
     double chop8(double a);
     double chop(double val);
@@ -31,6 +34,52 @@ namespace numeric {
     
     template<class Scalar>
     Scalar sq( Scalar x) {return x*x;}
+    
+    /// solves: a*x*x + b*x + c = 0
+    /// returns real roots (0, 1, or 2) as vector
+    template<class Scalar>
+    std::vector<Scalar>  quadratic_roots(Scalar a, Scalar b, Scalar c) {
+        std::vector<Scalar> roots;
+        if ((a == 0) and (b == 0)) {
+            std::cout << " quadratic_roots() a == b == 0. no roots.\n";
+            return roots;
+        }
+        if (a == 0) {
+            roots.push_back( -c / b );
+            return roots;
+        }
+        if (b == 0) {
+            Scalar sqr = -c / a;
+            if (sqr > 0) {
+                roots.push_back( sqrt(sqr) );
+                roots.push_back( -roots[0] );
+                return roots;
+            } else if (sqr == 0) {
+                roots.push_back( Scalar(0) );
+                return roots;
+            } else {
+                std::cout << " quadratic_roots() b == 0. no roots.\n";
+                return roots;
+            }
+        }
+        Scalar disc = chop(b*b - 4*a*c); // discriminant, chop!
+        if (disc > 0) {
+            Scalar q;
+            if (b > 0)
+                q = (b + sqrt(disc)) / -2;
+            else
+                q = (b - sqrt(disc)) / -2;
+            roots.push_back( q / a );
+            roots.push_back( c / q ); 
+            return roots;
+        } else if (disc == 0) {
+            roots.push_back( -b / (2*a) );
+            return roots;
+        }
+        std::cout << " quadratic_roots() disc < 0. no roots. disc= " << disc << "\n";
+        return roots;
+    }
+    
 } // numeric
 } // ovd
 

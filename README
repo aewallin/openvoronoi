@@ -15,6 +15,14 @@ https://github.com/aewallin/openvoronoi
 The mailing-list for OpenVoronoi is at
 https://groups.google.com/forum/?hl=en#!forum/opencamlib
 
+Dependencies
+git (required only for the version-string)
+cmake
+Boost graph library
+Boost python (if python bindings are built)
+libQD ( a quad-precision arithmetic library). Available as package 
+"liqd-dev" on ubuntu. See "http://crd.lbl.gov/~dhbailey/mpdist/
+
 Build instructions
 This project uses cmake, and can be built out-of-source:
 $ mkdir bld
@@ -45,3 +53,5 @@ http://dx.doi.org/10.1007/s004530010002
 Held, (2001) "VRONI: an engineering approach to the reliable and 
 efficient computation of Voronoi diagrams of points and line 
 segments" http://dx.doi.org/10.1016/S0925-7721(01)00003-7
+
+todo: Held 1991 thesis, Held 2009 arcVroni paper, Burnikel-papers?

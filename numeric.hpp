@@ -17,41 +17,21 @@
  *  along with OpenVoronoi.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#ifndef NUMERIC_HPP
+#define NUMERIC_HPP
 
 #include <qd/qd_real.h> 
-#include <cmath>
 
 namespace ovd {
 
 namespace numeric {
- 
-    double chop8(double a) {
-        double eps = 1e-8;
-        if (fabs(a) < eps)
-            return 0.0;
-        else
-            return a;
-    }
-    
-    double chop(double val) {
-        double _epsilon = 1e-10;
-        if (fabs(val) < _epsilon) 
-            return 0;
-        else
-            return val;
-    }
-    qd_real chop(qd_real val) {
-        qd_real _epsilon = 1e-10;
-        if (fabs(val) < _epsilon) 
-            return qd_real(0);
-        else
-            return val;
-    }
+    double chop8(double a);
+    double chop(double val);
+    qd_real chop(qd_real val);
     
     template<class Scalar>
     Scalar sq( Scalar x) {return x*x;}
-    
-
 } // numeric
 } // ovd
+
+#endif

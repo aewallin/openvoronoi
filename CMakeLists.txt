@@ -2,8 +2,6 @@ project(OpenVoronoi)
 
 cmake_minimum_required(VERSION 2.4)
 
-
-
 # some options to set what is built:
 option(BUILD_CXX_LIB
   "Build/install the pure c++ library? " ON)
@@ -19,8 +17,6 @@ endif(NOT BUILD_CXX_LIB)
 if (NOT BUILD_PY_LIB)
     MESSAGE(STATUS " Note: will NOT build python library")
 endif(NOT BUILD_PY_LIB)
-
-
 
 #
 # Turn compiler warnings up to 11, at least with gcc.  I dont know how to
@@ -120,9 +116,11 @@ set(OVD_SRC
     ${OpenVoronoi_SOURCE_DIR}/facegrid.cpp
     ${OpenVoronoi_SOURCE_DIR}/point.cpp
     ${OpenVoronoi_SOURCE_DIR}/vertex_positioner.cpp
+    ${OpenVoronoi_SOURCE_DIR}/numeric.cpp
 )
 
-set( OVD_INCLUDE_FILES  
+set( OVD_INCLUDE_FILES
+    ${OpenVoronoi_SOURCE_DIR}/numeric.hpp  
     ${OpenVoronoi_SOURCE_DIR}/point.hpp
     ${OpenVoronoi_SOURCE_DIR}/halfedgediagram.hpp
     ${OpenVoronoi_SOURCE_DIR}/graph.hpp

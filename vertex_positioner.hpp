@@ -33,12 +33,36 @@ namespace ovd {
 
 class VoronoiDiagram;
 
+// a new vd-vertex position solution
+// includes the offset-distamce t, and the offset direction k3
 struct Solution {
     Solution(Point pt, double tv, double k) : p(pt), t(tv), k3(k) {}
     Point p;
     double t;
     double k3;
 };
+
+// predicate for filtering solutions based on t-value being in [tmin,tmax] range
+struct t_filter {
+    t_filter(double tmin, double tmax): tmin_(tmin),tmax_(tmax) {}
+    bool operator()(Solution s) { 
+        return (s.t<tmin_) || (s.t>tmax_); 
+    }
+private:
+    double tmin_;
+    double tmax_;
+};
+
+struct in_region_filter {
+    in_region_filter(Site* s): site_(s) {}
+    bool operator()(Solution s) { 
+        return !site_->in_region(s.p); //s.t>=tmin_) && (s.t<=tmax); 
+    }
+private:
+    Site* site_;
+    //double tmax_;
+};
+
 
 /// Calculates the (x,y) position of vertices in a voronoi diagram
 class VertexPositioner {

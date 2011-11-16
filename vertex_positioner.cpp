@@ -21,6 +21,8 @@
  *  along with OpenVoronoi.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <algorithm> // std::erase()
+
 #include "vertex_positioner.hpp"
 #include "voronoidiagram.hpp"
 #include "numeric.hpp"
@@ -75,61 +77,38 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     assert( (k1==1) || (k1 == -1) );
     assert( (k2==1) || (k2 == -1) );
     std::vector<Solution> solutions;
-    
-    int count1=0,count2=0;
-    
-    count1 = solver(s1,k1,s2,k2,s3,+1, solutions);
+    solver(s1,k1,s2,k2,s3,+1, solutions);
     if (!s3->isPoint()) // for points k3=+1 allways
-        count2 = solver(s1,k1,s2,k2,s3,-1, solutions); // for lineSite or ArcSite we try k3=-1 also    
+        solver(s1,k1,s2,k2,s3,-1, solutions); // for lineSite or ArcSite we try k3=-1 also    
 
-    // choose only t>0 solutions
-    std::vector<Solution> pos_slns;
-    BOOST_FOREACH(Solution s, solutions) {
-        if ( (s.t>0) && (s.t<= t_max) && (s.t >= t_min) && (s3->in_region(s.p)) ) // require in_region() and positive t-value
-            pos_slns.push_back(s);
-    }
+    // choose only t_min < t < t_max solutions 
+    solutions.erase( std::remove_if(solutions.begin(),solutions.end(), t_filter(t_min,t_max) ), solutions.end() );
+    // choose only in_region() solutions
+    solutions.erase( std::remove_if(solutions.begin(),solutions.end(), in_region_filter(s3) ), solutions.end() );
     
-    std::cout << "   pos solutions: pts.size() = " << pos_slns.size() << " count1=" << count1 << " count2=" << count2 << "\n";
-    // further filtering here
-    if ( pos_slns.size() == 1) {
-        k3 = pos_slns[0].k3; // k3s[0];
-        //assert( solution_on_edge(pos_slns[0]) );
-        return pos_slns[0]; //pts[0];
-    } else if (pos_slns.size()>1) {
+    if ( solutions.size() == 1)
+        return solutions[0];
+    else if (solutions.size()>1) {
         // two or more points remain so we must further filter here!
-        std::vector<Solution> sln2 = pos_slns;
-        
-        // if only one point remains, return that
-        if ( sln2.size() == 1) {
-            std::cout << " returning k3= " << sln2[0].k3 << " pt= " << sln2[0].p << " t=" << sln2[0].t << "\n";
-            k3 = sln2[0].k3;
-            //assert( solution_on_edge(sln2[0]) );
-            return sln2[0];
-        } else {
-            // filter further using edge_error
-            double min_error=100;
-            Solution min_solution(Point(0,0),0,0);
-            std::cout << " edge_error filter: \n";
-            BOOST_FOREACH(Solution s, sln2) {
-                double err = edge_error(edge,s);
-                std::cout << s.p << " k3=" << s.k3 << " t=" <<  s.t << " err=" << err << "\n";
-                if ( err < min_error) {
-                    min_solution = s;
-                    min_error = err;
-                    //std::cout << s.p << " t=" <<  s.t << " err=" << err << "\n";
-                }
+        // filter further using edge_error
+        double min_error=100;
+        Solution min_solution(Point(0,0),0,0);
+        std::cout << " edge_error filter: \n";
+        BOOST_FOREACH(Solution s, solutions) {
+            double err = edge_error(edge,s);
+            std::cout << s.p << " k3=" << s.k3 << " t=" <<  s.t << " err=" << err << "\n";
+            if ( err < min_error) {
+                min_solution = s;
+                min_error = err;
             }
-            if (min_error >= 1e-6) {
-                std::cout << " sln=" << min_solution.p << " err=" << min_error << "\n";
-                std::cout << " edge: " << vd->g[ vd->g.source(edge) ].position << " - " << vd->g[ vd->g.target(edge) ].position;
-                std::cout << " edge-point(t="<<min_solution.t << ")= " << vd->g[edge].point(min_solution.t) << "\n";
-
-            }
-            //assert( min_error < 1e-6 );
-            //assert( solution_on_edge(min_solution) );
-            return min_solution;
         }
-        
+        if (min_error >= 1e-6) {
+            std::cout << " sln=" << min_solution.p << " err=" << min_error << "\n";
+            std::cout << " edge: " << vd->g[ vd->g.source(edge) ].position << " - " << vd->g[ vd->g.target(edge) ].position;
+            std::cout << " edge-point(t="<<min_solution.t << ")= " << vd->g[edge].point(min_solution.t) << "\n";
+        }
+        //assert( min_error < 1e-6 );
+        return min_solution;
     } 
     
     // either 0, or >= 2 solutions found. error.
@@ -150,7 +129,7 @@ bool VertexPositioner::solution_on_edge(Solution& s) {
         std::cout << "solution_on_edge() ERROR err= " << err << "\n";
         std::cout << " edge: " << vd->g[ vd->g.source(edge) ].index << " - " << vd->g[ vd->g.target(edge) ].index << "\n";
     }
-    return (err<5E-5);
+    return (err<limit);
 }
 
 double VertexPositioner::edge_error(HEEdge e, Solution& s) {

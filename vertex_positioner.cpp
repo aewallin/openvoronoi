@@ -213,19 +213,6 @@ int VertexPositioner::solver(Site* s1, double k1, Site* s2, double k2, Site* s3,
         assert(linear_count == 2); // At this point, we should have exactly two linear equations.
     }
     
-    /*
-    std::cout << " AFTER SUBTRACT linear_count = " << linear_count << " : ";
-    for (int m=0;m<linear_count;m++)
-        std::cout << " " << linear[m] ;
-    std::cout << "\n";
-    std::cout << " quadratic_count = " << quadratic_count << " : ";
-    for (int m=0;m<quadratic_count;m++)
-        std::cout << " " << quadratic[m] ;
-    std::cout << "\n";
-    for(int m=0;m<3;m++) {
-        std::cout << m << " : " << vectors[m][0] << "  "  << vectors[m][1] << "  "  << vectors[m][2] << "  "  << vectors[m][3]  << "\n"; 
-    }
-    */
     // TODO:  pick the solution appraoch with the best numerical stability.
 
     // index shuffling determines if we solve:
@@ -251,7 +238,7 @@ int VertexPositioner::solver(Site* s1, double k1, Site* s2, double k2, Site* s3,
 // returns number of solutions found
 int VertexPositioner::qqq_solver( qd_real l0[], qd_real l1[], int xi, int yi, int ti, 
       qd_real xk, qd_real yk, qd_real kk, qd_real rk , qd_real kk3, std::vector<Solution>& solns) { 
-    qd_real aargs[3][2];
+
     qd_real ai = l0[xi]; // first linear 
     qd_real bi = l0[yi];
     qd_real ki = l0[ti];
@@ -260,28 +247,33 @@ int VertexPositioner::qqq_solver( qd_real l0[], qd_real l1[], int xi, int yi, in
     qd_real bj = l1[yi];
     qd_real kj = l1[ti];
     qd_real cj = l1[3];
-    qd_real d = chop( ai*bj - aj*bi ); // chop!
+
+    qd_real d = chop( ai*bj - aj*bi ); // chop! (determinant for 2 linear eqns (?))
     if (d == 0) // no solution can be found!
         return -1;
-    
+    // these are the w-equations for qll_solve()
+    // (2) u = a1 w + b1
+    // (3) v = a2 w + b2
     qd_real a0 =  (bi*kj - bj*ki) / d;
     qd_real a1 = -(ai*kj - aj*ki) / d;
     qd_real b0 =  (bi*cj - bj*ci) / d;
     qd_real b1 = -(ai*cj - aj*ci) / d;
-    
+    // based on the 'last' quadratic of (s1,s2,s3)
+    qd_real aargs[3][2];
     aargs[0][0] = 1.0;
-    aargs[0][1] = -2*xk;
+    aargs[0][1] = -2*xk;   // quad.a
     aargs[1][0] = 1.0;
-    aargs[1][1] = -2*yk;
+    aargs[1][1] = -2*yk;   // quad.b
     aargs[2][0] = -1.0;
-    aargs[2][1] = -2*rk*kk; // (kk == sign of quadratic offset ?)
+    aargs[2][1] = -2*rk*kk; // quad.k*kk
     
     qd_real isolns[2][3];
     // this solves for w, and returns either 0, 1, or 2 triplets of (u,v,t) in isolns
+    // NOTE: indexes of aargs shuffled depending on (xi,yi,ti) !
     int scount = qll_solve( aargs[xi][0], aargs[xi][1],
                             aargs[yi][0], aargs[yi][1],
                             aargs[ti][0], aargs[ti][1],
-                            xk*xk + yk*yk - rk*rk,
+                            xk*xk + yk*yk - rk*rk, // quad.c
                             a0, b0, 
                             a1, b1, isolns);
     double tsolns[2][3];
@@ -333,16 +325,16 @@ int VertexPositioner::lll_solver(std::vector< Eq<qd_real> >& eq, double kk3, std
                       (-eq[i].a*eq[k].b + eq[k].a*eq[i].b)*eq[j].k +  
                       ( eq[j].a*eq[k].b - eq[k].a*eq[j].b)*eq[i].k   ); // determinant
     if (d != 0) {
-        qd_real t = (  (-eq[i].a*eq[j].b + eq[j].a*eq[i].b)*eq[k].c + 
-                       ( eq[i].a*eq[k].b - eq[k].a*eq[i].b)*eq[j].c + 
-                       (-eq[j].a*eq[k].b + eq[k].a*eq[j].b)*eq[i].c   )/d;
+        qd_real t = ( (-eq[i].a*eq[j].b + eq[j].a*eq[i].b)*eq[k].c + 
+                      ( eq[i].a*eq[k].b - eq[k].a*eq[i].b)*eq[j].c + 
+                      (-eq[j].a*eq[k].b + eq[k].a*eq[j].b)*eq[i].c   )/d;
         if (t >= 0) {
-            qd_real sol_x = (  ( eq[i].b*eq[j].c - eq[j].b*eq[i].c)*eq[k].k + 
-                               (-eq[i].b*eq[k].c + eq[k].b*eq[i].c)*eq[j].k + 
-                               ( eq[j].b*eq[k].c - eq[k].b*eq[j].c)*eq[i].k   )/d;
-            qd_real sol_y = (  (-eq[i].a*eq[j].c + eq[j].a*eq[i].c)*eq[k].k + 
-                               ( eq[i].a*eq[k].c - eq[k].a*eq[i].c)*eq[j].k + 
-                               (-eq[j].a*eq[k].c + eq[k].a*eq[j].c)*eq[i].k   )/d;
+            qd_real sol_x = ( ( eq[i].b*eq[j].c - eq[j].b*eq[i].c)*eq[k].k + 
+                              (-eq[i].b*eq[k].c + eq[k].b*eq[i].c)*eq[j].k + 
+                              ( eq[j].b*eq[k].c - eq[k].b*eq[j].c)*eq[i].k   )/d;
+            qd_real sol_y = ( (-eq[i].a*eq[j].c + eq[j].a*eq[i].c)*eq[k].k + 
+                              ( eq[i].a*eq[k].c - eq[k].a*eq[i].c)*eq[j].k + 
+                              (-eq[j].a*eq[k].c + eq[k].a*eq[j].c)*eq[i].k   )/d;
             slns.push_back( Solution( Point( to_double(sol_x), to_double(sol_y) ), to_double(t), kk3 ) ); // kk3 just passes through without any effect!?
             return 1;
         }

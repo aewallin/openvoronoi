@@ -30,11 +30,23 @@ namespace ovd {
 /// line:   (0,   a,   b,    k, c          )    line ax+by+c=0  where a*a+b*b=1
 /// circle: (1, -2x, -2y, -2kr, x*x+y*y-r*r)    circle center at (x,y) and radius r
 /// point:  (1, -2x, -2y,    0, x*x+y*y    )    point at (x,y)
-struct Eqp {
-    double a;
-    double b;
-    double c;
-    double k;
+template<class Scalar>
+struct Eq {
+    bool q; // true for quadratic, false for linear
+    Scalar a;
+    Scalar b;
+    Scalar c;
+    Scalar k;
+    
+    template<class Scalar2>
+    Eq<Scalar>& operator=(const Eq<Scalar2>& other) {
+        q = other.q;
+        a = other.a;
+        b = other.b;
+        c = other.c;
+        k = other.k;
+        return *this;
+    }
 };
 
 /// Base-class for a voronoi-diagram site, or generator.
@@ -47,7 +59,13 @@ public:
     virtual const Point position() const {assert(0); return Point(0,0);}
     virtual const Point start() const {assert(0); return Point(0,0);}
     virtual const Point end() const {assert(0); return Point(0,0);}
-    Eqp eqp() {return eq;} 
+    Eq<double> eqp() {return eq;} 
+    Eq<double> eqp(double kk) {
+        Eq<double> eq2(eq);
+        eq2.k *= kk;
+        return eq2;
+    } 
+    
     bool is_linear() {return isLine(); }
     
     virtual double x() const {assert(0); return 0;}
@@ -68,7 +86,7 @@ public:
     typedef unsigned int HEFace;    
     HEFace face;
 protected:
-    Eqp eq;
+    Eq<double> eq;
 };
 
 /// point, or vertex site.
@@ -76,6 +94,7 @@ class PointSite : public Site {
 public:
     PointSite( const Point& p, HEFace f=0): _p(p) {
         face = f;
+        eq.q = true;
         eq.a = -2*p.x;
         eq.b = -2*p.y;
         eq.k = 0;
@@ -102,6 +121,7 @@ public:
     /// create line-site between start and end Point.
     LineSite( const Point& s, const Point& e, double koff, HEFace f = 0): _start(s), _end(e) {
         face = f;
+        eq.q = false;
         eq.a = _end.y - _start.y;
         eq.b = _start.x - _end.x;
         eq.k = koff; // ??
@@ -167,6 +187,7 @@ class ArcSite : public Site {
 public:
     ArcSite( const Point& s, const Point& e, const Point& center, bool dir): _start(s), _end(e), _center(center), _dir(dir) {
         _radius = (_center - _start).norm();
+        eq.q = true;
         eq.a = -2*_center.x;
         eq.b = -2*_center.y;
         eq.k = -2*_radius; 

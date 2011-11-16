@@ -110,7 +110,7 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
         //assert( min_error < 1e-6 );
         return min_solution;
     } 
-    
+
     // either 0, or >= 2 solutions found. error.
     std::cout << " None, or too many solutions found! candidates are:\n";
     BOOST_FOREACH(Solution s, solutions ) {
@@ -121,29 +121,26 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     return Solution( Point(0,0), -1, 1 );
 }
 
-bool VertexPositioner::solution_on_edge(Solution& s) {
-    double err = edge_error(edge,s);
-    errstat.push_back(err);
-    double limit = 5E-5;
-    if ( err>=limit ) {
-        std::cout << "solution_on_edge() ERROR err= " << err << "\n";
-        std::cout << " edge: " << vd->g[ vd->g.source(edge) ].index << " - " << vd->g[ vd->g.target(edge) ].index << "\n";
-    }
-    return (err<limit);
-}
-
-double VertexPositioner::edge_error(HEEdge e, Solution& s) {
-    Point ep = vd->g[e].point( s.t );
-    return (ep-s.p).norm();
-}
-
 int VertexPositioner::solver(Site* s1, double k1, Site* s2, double k2, Site* s3, double kk3, std::vector<Solution>& solns) {
     qd_real vectors[3][4]; // hold eqn data here. three equations with four parameters (a,b,k,c) each
     // indexes and count of linear/quadratic eqns
     int linear[3],    linear_count = 0;
     int quadratic[3], quadratic_count = 0;
-    qd_real xk, yk, rk;
-    qd_real kk;
+    
+    std::vector< Eq<qd_real> > equations(3); // equation-parameters, in quad-precision
+    equations[0] = s1->eqp(k1);
+    equations[1] = s2->eqp(k2);
+    equations[2] = s3->eqp(kk3);
+    int lin_cnt = 0, quad_cnt=0;
+    BOOST_FOREACH( Eq<qd_real>& eqn, equations ) {
+        if ( eqn.q )
+            quad_cnt++;
+        else
+            lin_cnt++;
+    }
+    
+    qd_real xk, yk, rk, kk; // holds center, radius, direction of 'last' quadratic, if present
+    
     // populate vectors
     vectors[0][0] = s1->eqp().a;
     vectors[0][1] = s1->eqp().b;
@@ -192,8 +189,11 @@ int VertexPositioner::solver(Site* s1, double k1, Site* s2, double k2, Site* s3,
             kk=kk3;
     }
     
+    assert( linear_count == lin_cnt );
+    assert( quadratic_count == quad_cnt );
+    
     if (linear_count == 3)
-        return lll_solver(vectors, kk3, solns);
+        return lll_solver(equations, kk3, solns); //kk3 just passes through, has no effect in kk3
     
     assert( linear_count < 3 ); // ==3 should be caught above by lll_solve()
     assert( quadratic_count > 0); // we should have one or more quadratic
@@ -231,7 +231,7 @@ int VertexPositioner::solver(Site* s1, double k1, Site* s2, double k2, Site* s3,
     // index shuffling determines if we solve:
     // x and y in terms of t
     // y and t in terms of x
-    // t and x in terms of y    
+    // t and x in terms of y
     int scount = qqq_solver(vectors[linear[0]], vectors[linear[1]], 0, 1, 2, xk, yk, kk, rk, kk3, solns);
     if (scount <= 0) { // negative scount when discriminant is zero, so shuffle around coord-indexes:
         scount = qqq_solver(vectors[linear[0]], vectors[linear[1]], 2, 0, 1, xk, yk, kk, rk, kk3, solns);
@@ -326,29 +326,23 @@ int VertexPositioner::qll_solve( qd_real a0, qd_real b0, qd_real c0, qd_real d0,
     return roots.size();
 }
 
-int VertexPositioner::lll_solver(qd_real vectors[][4], double kk3, std::vector<Solution>& slns ) {
+int VertexPositioner::lll_solver(std::vector< Eq<qd_real> >& eq, double kk3, std::vector<Solution>& slns ) {
     std::cout << " lll_solver() k3= " << k3 << "\n";
-    qd_real ai, bi, ki, ci;
-    qd_real aj, bj, kj, cj;
-    qd_real ak, bk, kk, ck;
-    ai = vectors[0][0]; // 3 equations, each has 4 parameters
-    bi = vectors[0][1];
-    ki = vectors[0][2];
-    ci = vectors[0][3];
-    aj = vectors[1][0];
-    bj = vectors[1][1];
-    kj = vectors[1][2];
-    cj = vectors[1][3];
-    ak = vectors[2][0];
-    bk = vectors[2][1];
-    kk = vectors[2][2];
-    ck = vectors[2][3];
-    qd_real d = chop( (ai*bj-aj*bi)*kk + (-ai*bk + ak*bi)*kj + (aj*bk-ak*bj)*ki ); // determinant
+    unsigned int i = 0, j=1, k=2;
+    qd_real d = chop( ( eq[i].a*eq[j].b - eq[j].a*eq[i].b)*eq[k].k + 
+                      (-eq[i].a*eq[k].b + eq[k].a*eq[i].b)*eq[j].k +  
+                      ( eq[j].a*eq[k].b - eq[k].a*eq[j].b)*eq[i].k   ); // determinant
     if (d != 0) {
-        qd_real t = ((-ai*bj + aj*bi)*ck + (ai*bk - ak*bi)*cj  + (-aj*bk + ak*bj)*ci)/d;
+        qd_real t = (  (-eq[i].a*eq[j].b + eq[j].a*eq[i].b)*eq[k].c + 
+                       ( eq[i].a*eq[k].b - eq[k].a*eq[i].b)*eq[j].c + 
+                       (-eq[j].a*eq[k].b + eq[k].a*eq[j].b)*eq[i].c   )/d;
         if (t >= 0) {
-            qd_real sol_x = ((bi*cj - bj*ci)*kk + (-bi*ck + bk*ci)*kj + (bj*ck-bk*cj)*ki)/d;
-            qd_real sol_y = ((-ai*cj + aj*ci)*kk + (ai*ck-ak*ci)*kj + (-aj*ck +ak*cj)*ki)/d;
+            qd_real sol_x = (  ( eq[i].b*eq[j].c - eq[j].b*eq[i].c)*eq[k].k + 
+                               (-eq[i].b*eq[k].c + eq[k].b*eq[i].c)*eq[j].k + 
+                               ( eq[j].b*eq[k].c - eq[k].b*eq[j].c)*eq[i].k   )/d;
+            qd_real sol_y = (  (-eq[i].a*eq[j].c + eq[j].a*eq[i].c)*eq[k].k + 
+                               ( eq[i].a*eq[k].c - eq[k].a*eq[i].c)*eq[j].k + 
+                               (-eq[j].a*eq[k].c + eq[k].a*eq[j].c)*eq[i].k   )/d;
             slns.push_back( Solution( Point( to_double(sol_x), to_double(sol_y) ), to_double(t), kk3 ) ); // kk3 just passes through without any effect!?
             return 1;
         }
@@ -380,6 +374,22 @@ Point VertexPositioner::ppp_solver(const Point& p1, const Point& p2, const Point
     return Point( -J2/J4 + pk.x, J3/J4 + pk.y );
 }
 
+
+bool VertexPositioner::solution_on_edge(Solution& s) {
+    double err = edge_error(edge,s);
+    errstat.push_back(err);
+    double limit = 5E-5;
+    if ( err>=limit ) {
+        std::cout << "solution_on_edge() ERROR err= " << err << "\n";
+        std::cout << " edge: " << vd->g[ vd->g.source(edge) ].index << " - " << vd->g[ vd->g.target(edge) ].index << "\n";
+    }
+    return (err<limit);
+}
+
+double VertexPositioner::edge_error(HEEdge e, Solution& s) {
+    Point ep = vd->g[e].point( s.t );
+    return (ep-s.p).norm();
+}
 
 // new vertices should lie within the far_radius
 bool VertexPositioner::check_far_circle(const Point& p) {

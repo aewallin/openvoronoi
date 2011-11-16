@@ -86,8 +86,8 @@ private:
     
     int lll_solver(std::vector< Eq<qd_real> >& eqns, double k3, std::vector<Solution>& slns ); // linear 3x3 system
     
-    int qqq_solver( qd_real l0[], qd_real l1[], int xi, int yi, int ti, 
-                    qd_real xk, qd_real yk, qd_real kk, qd_real rk, qd_real k3, std::vector<Solution>& slns );
+    int qll_solver( const std::vector< Eq<qd_real> >& lins, int xi, int yi, int ti, 
+                    const Eq<qd_real>& quad, qd_real k3, std::vector<Solution>& slns );
     
     int qll_solve( qd_real a0, qd_real b0, qd_real c0, qd_real d0, 
                       qd_real e0, qd_real f0, qd_real g0, 

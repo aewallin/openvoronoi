@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include <qd/qd_real.h> 
+
 #include "point.hpp"
 
 namespace ovd {
@@ -47,6 +49,34 @@ struct Eq {
         k = other.k;
         return *this;
     }
+    
+    Eq<Scalar>& operator-=(const Eq<Scalar>& other) {
+        a-=other.a;
+        b-=other.b;
+        c-=other.c;
+        k-=other.k;
+
+        return *this;
+    }
+        
+    const Eq<Scalar> operator-(const Eq<Scalar>& other) const {
+        return Eq<Scalar>(*this) -= other;
+    }
+    
+    Scalar operator[](int idx) const {
+        switch (idx) {
+            case 0:
+                return a;
+            case 1:
+                return b;
+            case 2:
+                return k;
+            default:
+                assert(0);
+                return Scalar(0);
+        }
+    }
+    
 };
 
 /// Base-class for a voronoi-diagram site, or generator.
@@ -65,8 +95,15 @@ public:
         eq2.k *= kk;
         return eq2;
     } 
+    Eq<qd_real> eqp_qd(double kk) const {
+        Eq<qd_real> eq2;
+        eq2=eq;
+        eq2.k *= kk;
+        return eq2;
+    }
     
     bool is_linear() {return isLine(); }
+    bool is_quadratic() {return isPoint();}
     
     virtual double x() const {assert(0); return 0;}
     virtual double y() const {assert(0); return 0;}

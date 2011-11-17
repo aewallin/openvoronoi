@@ -92,7 +92,7 @@ if __name__ == "__main__":
     vod.drawVertices=1
     t_before = time.time()
     
-    Nmax = 15
+    Nmax = 100
 
     segs = []
     id_list = []
@@ -109,19 +109,19 @@ if __name__ == "__main__":
 
     #exit()
     
-    #nsegs = Nmax
-    nsegs = 14 #Nmax
+    nsegs = Nmax
+    #nsegs = 14 #Nmax
     n=1
     for s in id_list:
         if n<= nsegs:
             vd.addLineSite(s[0],s[1])
         n=n+1
     
-    s = id_list[nsegs]
-    vd.addLineSite( s[0], s[1], 5) 
+    #s = id_list[nsegs]
+    #vd.addLineSite( s[0], s[1], 5) 
     
     err = vd.getStat()
-    print err 
+    #print err 
     print "got errorstats for ",len(err)," points"
     minerr = min(err)
     maxerr = max(err)

@@ -254,6 +254,8 @@ class VD:
             
             if (etype == ovd.VoronoiEdgeType.LINELINE):
                 ecolor = self.edgeStatusColor(src_status,trg_status,lblue)
+
+                
                 for n in range( len(epts)-1 ):
                     p1 = self.scale*epts[n]  
                     p2 = self.scale*epts[n+1] 
@@ -261,6 +263,7 @@ class VD:
                     actor = Line( p1=( p1.x,p1.y, 0), p2=(p2.x,p2.y, 0), color=ecolor)
                     self.myscreen.addActor(actor)
                     self.edges.append(actor)
+                
             if (etype == ovd.VoronoiEdgeType.LINE):
                 ecolor = self.edgeStatusColor(src_status,trg_status,cyan)
                 for n in range( len(epts)-1 ):
@@ -301,14 +304,18 @@ class VD:
                 self.edges.append(actor)
             elif (etype == ovd.VoronoiEdgeType.PARABOLA):
                 ecolor = self.edgeStatusColor(src_status,trg_status, blue2)
-                #ecolor = blue2
+                #print "drawing ",len(epts)," length edge!"
+                eactor = PolyLine(pointList=epts,color=ecolor)
+                self.myscreen.addActor(eactor)
+                self.edges.append(eactor)
+                """
                 for n in range( len(epts)-1 ):
                     p1 = self.scale*epts[n]  
                     p2 = self.scale*epts[n+1] 
                     actor = Line( p1=( p1.x,p1.y, 0), p2=(p2.x,p2.y, 0), color=ecolor)
                     self.myscreen.addActor(actor)
                     self.edges.append(actor)
-
+                """
         self.myscreen.render() 
         
     def setAll(self):
@@ -662,6 +669,52 @@ class Line(CamvtkActor):
         self.mapper.SetInput(self.src.GetOutput())
         self.SetMapper(self.mapper)
         self.SetColor(color)
+
+class PolyLine(CamvtkActor):
+    def __init__(self, pointList=[], color=(1,1,1) ):
+        self.src=[]
+        points = vtk.vtkPoints()
+        polyline = vtk.vtkCellArray()
+        
+        idx = 0
+        first = 1
+        last_idx = 0
+        segs=[]
+        for p in pointList:
+            points.InsertNextPoint(p.x, p.y, 0)
+            #print "p = ",p
+            if first==0:
+                seg = [last_idx,idx]
+                segs.append(seg)
+            first = 0
+            last_idx = idx
+            idx = idx + 1
+
+        for seg in segs:
+            line = vtk.vtkLine()
+            line.GetPointIds().SetId(0, seg[0])
+            line.GetPointIds().SetId(1, seg[1])
+            #print " indexes: ", seg[0]," to ",seg[1]
+            polyline.InsertNextCell(line)
+            
+
+        polydata = vtk.vtkPolyData()
+        polydata.SetPoints(points)
+        polydata.SetLines(polyline)
+        polydata.Modified()
+        polydata.Update()
+        self.src=polydata
+        
+        self.mapper = vtk.vtkPolyDataMapper()
+        self.mapper.SetInput(self.src)
+        self.SetMapper(self.mapper)
+        self.SetColor(color)
+        polydata.Modified()
+        polydata.Update()
+
+        # SetScaleFactor(double)
+        # GetOrigin
+
 
 class Tube(CamvtkActor):
     """ line with tube filter"""

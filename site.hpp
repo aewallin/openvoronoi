@@ -115,6 +115,7 @@ public:
     virtual double c() const {assert(0); return 0;}
     
     virtual std::string str() const {assert(0); return "Site";}
+    virtual std::string str2() const {assert(0); return "Site";}
     virtual bool isPoint() const { return false;}
     virtual bool isLine() const {  return false;}
     virtual bool in_region(const Point& ) const {return false;}
@@ -146,6 +147,11 @@ public:
     virtual double k() const {return 0;}
     virtual bool isPoint() const {return true;}
     virtual std::string str() const {return "PointSite";}
+    virtual std::string str2() const {
+        std::string out = "PointSite: ";
+        out.append( _p.str() );
+        return out;
+    }
     virtual bool in_region(const Point& ) const {return true;}
 private:
     PointSite() {} // don't use!
@@ -187,6 +193,13 @@ public:
         }
     }
     virtual std::string str() const {return "LineSite";}
+    virtual std::string str2() const {
+        std::string out = "LineSite: ";
+        out.append( _start.str() );
+        out.append( " - " );
+        out.append( _end.str() );
+        return out;
+    }
     virtual bool in_region(const Point& p) const{
         double t = in_region_t(p);
         return ( (t>=0) && (t<=1) );

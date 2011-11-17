@@ -117,7 +117,6 @@ if __name__ == "__main__":
             vd.addLineSite(s[0],s[1])
         n=n+1
     
-    
     s = id_list[nsegs]
     vd.addLineSite( s[0], s[1], 5) 
     

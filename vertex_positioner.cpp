@@ -106,9 +106,14 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
             }
         }
         if (min_error >= 1e-6) {
+            std::cout << "WARNING: EDGE ERROR TOO LARGE\n";
+            std::cout << " s1 = " << s1->str2() << " k1= " << k1 << "\n";
+            std::cout << " s2 = " << s2->str2() << " k2= " << k2 << "\n";
+            std::cout << " s3 = " << s3->str2() << "\n";
             std::cout << " sln=" << min_solution.p << " err=" << min_error << "\n";
             std::cout << " edge: " << vd->g[ vd->g.source(edge) ].position << " - " << vd->g[ vd->g.target(edge) ].position;
             std::cout << " edge-point(t="<<min_solution.t << ")= " << vd->g[edge].point(min_solution.t) << "\n";
+            //assert(0);
         }
         //assert( min_error < 1e-6 );
         return min_solution;
@@ -155,15 +160,22 @@ int VertexPositioner::solver(Site* s1, double k1, Site* s2, double k2, Site* s3,
     // x and y in terms of t
     // y and t in terms of x
     // t and x in terms of y
+    /*
     int scount = qll_solver( lins, 0, 1, 2, quads[0], kk3, solns);
     if (scount <= 0) { // negative scount when discriminant is zero, so shuffle around coord-indexes:
         scount = qll_solver(lins, 2, 0, 1, quads[0], kk3, solns);
         if (scount <= 0) {
             scount = qll_solver(lins, 1, 2, 0, quads[0], kk3, solns);
         }
-    }
+    }*/
+    
+    // call all three permutations
+    qll_solver( lins, 0, 1, 2, quads[0], kk3, solns);
+    qll_solver( lins, 2, 0, 1, quads[0], kk3, solns);
+    qll_solver( lins, 1, 2, 0, quads[0], kk3, solns);
+    
     //std::cout << " solver() found " << scount << " roots\n";
-    return scount;
+    return solns.size();
 }
 
 // l0 first linear eqn

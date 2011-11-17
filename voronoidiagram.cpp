@@ -618,26 +618,18 @@ void VoronoiDiagram::mark_adjacent_faces( HEVertex v, Site* site) {
 // return edges whose endpoints are on separate sides of pt1-pt2 line
 EdgeVector VoronoiDiagram::find_split_edges(HEFace f, Point pt1, Point pt2) {
     EdgeVector out;
-    //HEVertex split_src, split_trg;
     HEEdge current_edge = g[f].edge;
     HEEdge start_edge = current_edge;
-    //HEEdge split_edge;
     bool done = false;
     int count=0;                             
     while (!done) { // FIND ALL! not just one.
         HEVertex trg = g.target( current_edge );
         HEVertex src = g.source( current_edge );
-        bool src_sign = g[src].position.is_right(pt1,pt2);
-        bool trg_sign = g[trg].position.is_right(pt1,pt2);
-        //std::cout << g[src].index << ":" << src_sign << " " << g[trg].index << ":" << trg_sign << "\n";
+        bool src_is_right = g[src].position.is_right(pt1,pt2);
+        bool trg_is_right = g[trg].position.is_right(pt1,pt2);
         if ( g[src].type == NORMAL || g[src].type == APEX ) {
-            if ( src_sign != trg_sign ) {
-                    //split_src = src;
-                    //split_trg = trg;
-                    //found = true;
-                    //split_edge = current_edge;    
-                    out.push_back(current_edge);             
-            }
+            if ( src_is_right != trg_is_right  ) 
+                    out.push_back(current_edge);
         }
         current_edge = g[current_edge].next;   
         count++;
@@ -663,10 +655,8 @@ void VoronoiDiagram::add_split_vertex(HEFace f, Site* s) {
         if ( fs->position() == s->start() || fs->position() == s->end() )
             return;
     }
-    
-    
-    if ( fs->isPoint() && s->isLine() && s->in_region( fs->position() ) ) {
         
+    if ( fs->isPoint() && s->isLine() && s->in_region( fs->position() ) ) {
         // 1) find the correct edge
         Point pt1 = fs->position();
         Point pt2 = s->apex_point(pt1);       
@@ -698,8 +688,12 @@ void VoronoiDiagram::add_split_vertex(HEFace f, Site* s) {
             
             std::cout << " min_t err=" << errFunctr(min_t) << " ";
             std::cout << " max_t err=" << errFunctr(max_t) << "\n";
-            Result r1 = boost::math::tools::toms748_solve(errFunctr, min_t, max_t, tol, max_iter);
             
+            // require that min_t and max_t bracket the root
+            if ( errFunctr(min_t)*errFunctr(max_t) >= 0 )
+                return;
+                
+            Result r1 = boost::math::tools::toms748_solve(errFunctr, min_t, max_t, tol, max_iter);
             Point split_pt = g[split_edge].point( r1.first ); 
             HEVertex v = g.add_vertex();
             g[v].type = APEX;

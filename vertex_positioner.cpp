@@ -320,7 +320,7 @@ Point VertexPositioner::ppp_solver(const Point& p1, const Point& p2, const Point
 
 bool VertexPositioner::solution_on_edge(Solution& s) {
     double err = edge_error(edge,s);
-    double limit = 9E-5;
+    double limit = 9E-4;
     if ( err>=limit ) {
         std::cout << "solution_on_edge() ERROR err= " << err << "\n";
         std::cout << " edge: " << vd->g[ vd->g.source(edge) ].index << " - " << vd->g[ vd->g.target(edge) ].index << "\n";

@@ -67,7 +67,7 @@ Point VertexPositioner::position(HEEdge e, Site* s) {
     assert( solution_on_edge(sl) );
     check_far_circle(sl.p);
     //check_on_edge(e, p);
-    //check_dist(e, p, v);
+    assert( check_dist(edge, sl, s) );
     k3 = sl.k3;
     return sl.p;
 }
@@ -320,8 +320,7 @@ Point VertexPositioner::ppp_solver(const Point& p1, const Point& p2, const Point
 
 bool VertexPositioner::solution_on_edge(Solution& s) {
     double err = edge_error(edge,s);
-    errstat.push_back(err);
-    double limit = 5E-5;
+    double limit = 9E-5;
     if ( err>=limit ) {
         std::cout << "solution_on_edge() ERROR err= " << err << "\n";
         std::cout << " edge: " << vd->g[ vd->g.source(edge) ].index << " - " << vd->g[ vd->g.target(edge) ].index << "\n";
@@ -344,37 +343,30 @@ bool VertexPositioner::check_far_circle(const Point& p) {
     return true;
 }
 
-double VertexPositioner::error(HEEdge e, const Point& p, HEVertex v) {
+// all vertices should be of degree three, i.e. three adjacent faces/sites
+// distance to the three adjacent sites should be equal
+bool VertexPositioner::check_dist(HEEdge e, const Solution& sl, Site* s3) {
     //HEVertex trg = vd->g.target(e);
     //HEVertex src = vd->g.source(e);
     HEFace face = vd->g[e].face;     
-    HEEdge twin = vd->g[e].twin;
-    HEFace twin_face = vd->g[twin].face; 
-    // distance from point p to all three generators
-    double d1 = (p - vd->g[face].site->position() ).norm_sq();
-    double d2 = (p - vd->g[twin_face].site->position() ).norm_sq();  
-    double d3 = (p - vd->g[v].position).norm_sq(); 
-    return sq(d1-d2)+sq(d1-d3)+sq(d2-d3);
-}
+    HEEdge tw_edge = vd->g[e].twin;
+    HEFace twin_face = vd->g[tw_edge].face;      
+    
+    Site* s1 = vd->g[face].site;
+    Site* s2 = vd->g[twin_face].site;
+    
+    double d1 = (sl.p - s1->apex_point(sl.p) ).norm();
+    double d2 = (sl.p - s2->apex_point(sl.p) ).norm();  
+    double d3 = (sl.p - s3->apex_point(sl.p) ).norm(); 
+    
+    double maxd = std::max( std::max( fabs(sl.t-d1),fabs(sl.t-d2)) , fabs(sl.t-d3));
+    errstat.push_back(maxd);
 
-// all vertices should be of degree three, i.e. three adjacent faces/sites
-// distance to the three adjacent sites should be equal
-bool VertexPositioner::check_dist(HEEdge e, const Point& p, HEVertex v) {
-    HEVertex trg = vd->g.target(e);
-    HEVertex src = vd->g.source(e);
-    HEFace face = vd->g[e].face;     
-    HEEdge twin = vd->g[e].twin;
-    HEFace twin_face = vd->g[twin].face;      
-    
-    double d1 = (p - vd->g[face].site->position() ).norm_sq();
-    double d2 = (p - vd->g[twin_face].site->position() ).norm_sq();  
-    double d3 = (p - vd->g[v].position).norm_sq(); 
         
-    if ( !equal(d1,d2) || !equal(d1,d3) || !equal(d2,d3) ) {
+    if ( !equal(d1,d2) || !equal(d1,d3) || !equal(d2,d3) ||
+         !equal(sl.t,d1) || !equal(sl.t,d2) || !equal(sl.t,d3) ) {
         std::cout << "WARNING check_dist() ! \n";
-        std::cout << "  src.dist= " << vd->g[src].dist() << "\n";
-        std::cout << "  trg.dist= " << vd->g[trg].dist() << "\n";
-    
+        std::cout << "  sl.t= " << sl.t << "\n";
         std::cout << "  d1= " << d1 << "\n"; 
         std::cout << "  d2= " << d2 << "\n";
         std::cout << "  d3= " << d3 << "\n";

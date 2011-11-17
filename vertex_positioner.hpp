@@ -99,9 +99,9 @@ private:
     double edge_error(HEEdge e, Solution& s );
     bool solution_on_edge(Solution& s);
     bool check_far_circle(const Point& p);
-    bool check_dist(HEEdge e, const Point& p, HEVertex v);
+    bool check_dist(HEEdge e, const Solution& s, Site* s3);
     bool equal(double d1, double d2);
-    double error(HEEdge e, const Point& p, HEVertex v);
+  
 // DATA
     VoronoiDiagram* vd;
     double t_min;

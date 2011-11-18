@@ -128,7 +128,9 @@ if __name__ == "__main__":
     print "min error= ",minerr
     print "max error= ",maxerr
     
-    print "num vertices: ",vd.numVertices() # Nmax=200 gives 1877 vertices
+    print "num vertices: ",vd.numVertices() # Nmax=200 gives 1856(187)
+    print "num SPLIT vertices: ",vd.numSplitVertices() 
+    # nmax= 20 gives 175(13)
     
     # 4 delete-tree
     # 5 create new vertices

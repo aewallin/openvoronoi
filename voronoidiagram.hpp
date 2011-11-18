@@ -88,10 +88,8 @@ class VoronoiDiagram {
         /// return number of line-segments sites in diagram
         int num_line_sites() const {return num_lsites;}
         /// return number of voronoi-vertices
-        int num_vertices() const {
-            int verts = g.num_vertices();
-            return verts-num_point_sites();
-        }
+        int num_vertices() const { return g.num_vertices()-num_point_sites(); }
+        int num_split_vertices();
         /// string repr
         std::string print() const;
         std::string version() const { return VERSION_STRING; }
@@ -122,6 +120,7 @@ class VoronoiDiagram {
         
         void repair_face( HEFace f );
         void remove_vertex_set();
+        void remove_split_vertex(HEFace f);
         void reset_status();
         int new_vertex_count(HEFace f);
     // PRINT ETC

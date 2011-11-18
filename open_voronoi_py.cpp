@@ -54,6 +54,7 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         .def("numPointSites", &VoronoiDiagram_py::num_point_sites)
         .def("numLineSites", &VoronoiDiagram_py::num_line_sites)
         .def("numVertices", &VoronoiDiagram_py::num_vertices)
+        .def("numSplitVertices", &VoronoiDiagram_py::num_split_vertices)
         .def("__str__", &VoronoiDiagram_py::print)
         .def("version", &VoronoiDiagram_py::version)
         .def("reset_vertex_count", &VoronoiDiagram_py::reset_vertex_count)

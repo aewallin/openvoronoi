@@ -36,6 +36,7 @@ VertexDegreeMap VoronoiVertex::expected_degree = boost::assign::map_list_of
     (NORMAL,6)  // normal vertex in the graph
     (POINTSITE,0) // point site
     (ENDPOINT,6)  // end-point of line or arc
+    (SPLIT,4)  // split point, to avoid loops in delete-tree
     (APEX,4) ; // apex point on quadratic bisector
 
 VoronoiVertex::VoronoiVertex() {

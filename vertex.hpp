@@ -42,7 +42,7 @@ enum VoronoiVertexStatus {OUT, IN, UNDECIDED, NEW };
 /// NORMAL are normal voronoi-vertices, should have degree==6  (degree 3 graph with double-edges)
 /// ENDPOINT vertices are end-points of line-segments or arc-segments
 /// APEX vertices split quadratic edges at their apex(closest point to site)
-enum VoronoiVertexType {OUTER, NORMAL, POINTSITE, ENDPOINT, APEX};
+enum VoronoiVertexType {OUTER, NORMAL, POINTSITE, ENDPOINT, APEX, SPLIT};
 
 /// a map of this type is used by topology-checker to check that all vertices
 /// have the expected (correct) degree (i.e. number of edges)

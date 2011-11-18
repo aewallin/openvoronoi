@@ -406,7 +406,14 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
     std::cout << " neg face: "; print_face( neg_face );
     std::cout << "faces " << start_face << " " << end_face << " " << pos_face << " " << neg_face << " repaired \n";
 
+    // we are done and can remove split-vertices
+    BOOST_FOREACH(HEFace f, incident_faces ) {
+        remove_split_vertex(f);
+    }
+ 
     reset_status();
+    
+    
     std::cout << "insert_line_site(" << g[start].index << "-"<< g[end].index << ") done.\n";
     
     
@@ -598,7 +605,7 @@ void VoronoiDiagram::mark_adjacent_faces( HEVertex v, Site* site) {
     assert( g[v].status == IN );
     FaceVector new_adjacent_faces = g.adjacent_faces( v ); 
         
-    if (g[v].type == APEX)
+    if (g[v].type == APEX || g[v].type == SPLIT)
         assert( new_adjacent_faces.size()==2 );
     else
         assert( new_adjacent_faces.size()==3 );
@@ -696,7 +703,7 @@ void VoronoiDiagram::add_split_vertex(HEFace f, Site* s) {
             Result r1 = boost::math::tools::toms748_solve(errFunctr, min_t, max_t, tol, max_iter);
             Point split_pt = g[split_edge].point( r1.first ); 
             HEVertex v = g.add_vertex();
-            g[v].type = APEX;
+            g[v].type = SPLIT;
             g[v].status = UNDECIDED;
             g[v].position = split_pt;
             g[v].init_dist( fs->position() );
@@ -704,6 +711,63 @@ void VoronoiDiagram::add_split_vertex(HEFace f, Site* s) {
             std::cout << " inserted into edge " << g[split_src].index << "-" << g[split_trg].index  << "\n";
             // 3) insert new SPLIT vertex into the edge
             add_vertex_in_edge(v, split_edge);
+        }
+    }
+}
+
+void VoronoiDiagram::remove_split_vertex(HEFace f) {
+    
+    //                    face1 e[1]
+    //    v1_prev -> v1 -> SPLIT -> v2 -> v2_next
+    //    v1_next <- v1 <- SPLIT <- v2 <- v2_prev
+    //                  e[0]  face2
+    // is replaced with a single edge:
+    //                    face1
+    //    v1_prev -> v1 ----------> v2 -> v2_next
+    //    v1_next <- v1 <---------- v2 <- v2_prev
+    //                     face2
+    
+    VertexVector verts = g.face_vertices(f);
+    BOOST_FOREACH(HEVertex v, verts) {
+        if (g[v].type == SPLIT) {
+            std::cout << " removing split-vertex " << g[v].index << "\n";
+            EdgeVector edges = g.out_edges(v);
+            assert( edges.size() == 2);
+            assert( g.source(edges[0]) == v && g.source(edges[1]) == v );
+             
+            HEVertex v1 = g.target( edges[0] );
+            HEVertex v2 = g.target( edges[1] );
+            HEEdge v1_next = g[ edges[0] ].next;
+            HEEdge v1_prev = g.previous_edge( g[ edges[0] ].twin );
+            HEEdge v2_next = g[ edges[1] ].next;
+            HEEdge v2_prev = g.previous_edge( g[ edges[1] ].twin );
+            HEFace face1 = g[ edges[1] ].face;
+            HEFace face2 = g[ edges[0] ].face;
+            
+            HEEdge new1 = g.add_edge(v1,v2);
+            HEEdge new2 = g.add_edge(v2,v1);
+            g[new1].face = face1;
+            g[new2].face = face2;
+            g[new1].next = v2_next;
+            g[new2].next = v1_next;
+            g[v2_prev].next = new2;
+            g[v1_prev].next = new1;
+            g[face1].edge = new1;
+            g[face2].edge = new2;
+            
+            g[new1].copy_parameters( g[ edges[1] ] );
+            g[new2].copy_parameters( g[ edges[0] ] );
+            g.twin_edges(new1,new2);
+            g[new1].k = g[ edges[1] ].k;
+            g[new2].k = g[ edges[0] ].k;
+            g[new1].type = g[ edges[1] ].type;
+            g[new2].type = g[ edges[0] ].type;
+            
+            g.remove_edge(v,v1);
+            g.remove_edge(v1,v);
+            g.remove_edge(v,v2);
+            g.remove_edge(v2,v);
+            g.remove_vertex(v);
         }
     }
 }
@@ -1032,11 +1096,11 @@ EdgeData VoronoiDiagram::find_edge_data(HEFace f, VertexVector startverts)  {
         HEEdge next_edge = g[current_edge].next;
         HEVertex next_vertex = g.target( next_edge );
         if ( g[current_vertex].status == OUT ) {
-			bool not_found=true;
-			BOOST_FOREACH(HEVertex v, startverts) {
-				if (next_vertex==v)
-					not_found=false;
-			}
+            bool not_found=true;
+            BOOST_FOREACH(HEVertex v, startverts) {
+                if (next_vertex==v)
+                    not_found=false;
+            }
             if ( g[next_vertex].status == NEW &&  not_found) {
                     ed.v1 = next_vertex;
                     ed.v1_prv = next_edge;
@@ -1152,7 +1216,7 @@ bool VoronoiDiagram::predicate_c4(HEVertex v) {
 // do any of the three faces that are adjacent to the given IN-vertex v have an IN-vertex ?
 // predicate C5 i.e. "connectedness"  from Sugihara&Iri 1992 "one million" paper
 bool VoronoiDiagram::predicate_c5(HEVertex v) {
-    if (g[v].type == APEX ) { return true; } // ?
+    if (g[v].type == APEX || g[v].type == SPLIT ) { return true; } // ?
     
     FaceVector adj_faces = g.adjacent_faces(v);   
     assert( adj_faces.size() == 3 );    
@@ -1176,6 +1240,15 @@ bool VoronoiDiagram::predicate_c5(HEVertex v) {
             all_found=false;
     }
     return all_found; // if this returns false, we mark a vertex OUT, on topology grounds.
+}
+
+int VoronoiDiagram::num_split_vertices()  { 
+    int count = 0;
+    BOOST_FOREACH( HEVertex v, g.vertices() ) {
+        if (g[v].type == SPLIT)
+            count++;
+    }
+    return count; 
 }
 
 void VoronoiDiagram::print_faces() {

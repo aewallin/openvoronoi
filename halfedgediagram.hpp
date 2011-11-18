@@ -460,6 +460,14 @@ void remove_edge( Edge e) {
     boost::remove_edge( e , g );
 }
 
+/// remove given vertex
+void remove_edge( Vertex v1, Vertex v2) { 
+    assert( has_edge(v1,v2) );
+    typedef typename std::pair<Edge, bool> EdgeBool;
+    EdgeBool result = boost::edge(v1, v2, g );    
+    boost::remove_edge( result.first , g );
+}
+
 }; // end class definition
 
 } // end hedi namespace

@@ -207,13 +207,16 @@ bool VoronoiDiagramChecker::face_ok(HEFace f) {
     double k = vd->g[current_edge].k;
     assert( (k==1) || (k==-1) );
     if ( vd->g[f].site->isPoint() ) {
-        assert( k==1 );
+        if ( !(k==1) )
+            return false;
     }
     int n=0;
     do {
-        assert( vd->g[current_edge].k == k ); // all edges should have the same k-value
-        assert( current_face_equals_next_face(current_edge) ); // all edges should have the same face
-        
+        if (vd->g[current_edge].k != k ) // all edges should have the same k-value
+            return false;
+        if ( !current_face_equals_next_face(current_edge) ) // all edges should have the same face
+            return false;
+            
         current_edge = vd->g[current_edge].next; 
         n++;
         assert( n < 100 ); // reasonable max

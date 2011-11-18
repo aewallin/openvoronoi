@@ -26,10 +26,10 @@ endif(NOT BUILD_PY_LIB)
 # thus we use now use -Wno-deprecated here.
 #
 if (CMAKE_BUILD_TOOL MATCHES "make")
-    MESSAGE(STATUS "setting gcc options: -Wall -Werror -Wno-deprecated -pedantic-errors")
+    MESSAGE(STATUS "setting gcc options: -W -Wall -Wundef  -Wshadow -Winline -Wno-long-long -Wno-deprecated -Werror -pedantic-errors")
     
     # -pedantic -W -Wall -Wundef -Wfloat-equal -Wshadow -Winline -Wno-long-long
-    add_definitions( -W -Wall -Wundef  -Wshadow -Winline -Wno-long-long -Wno-deprecated -Werror -pedantic-errors)
+    add_definitions( -W -Wall -Wundef  -Wshadow -Wno-long-long -Wno-deprecated -Werror -pedantic-errors)
     
     # this gives warning when comparing float/double with != or ==
     # -Wfloat-equal
@@ -39,7 +39,7 @@ endif (CMAKE_BUILD_TOOL MATCHES "make")
 
 
 option(BUILD_TYPE
-  "Build type: Release=ON/Debug=OFF  " OFF)
+  "Build type: Release=ON/Debug=OFF  " ON)
 
 if (BUILD_TYPE)
     MESSAGE(STATUS " CMAKE_BUILD_TYPE = Release")

@@ -19,8 +19,6 @@
 #ifndef HEDI_H
 #define HEDI_H
 
-//#define NDEBUG 
-
 #include <vector>
 #include <list>
 

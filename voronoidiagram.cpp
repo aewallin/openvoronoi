@@ -280,7 +280,7 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
     num_lsites++;
     int current_step=1;
     // find the vertices corresponding to idx1 and idx2
-    HEVertex start, end;
+    HEVertex start=HEVertex(), end=HEVertex();
     bool start_found=false;
     bool end_found=false;
     // FIXME: search for vertex-descriptor from an index/descriptor table ( O(1) ?)
@@ -294,10 +294,9 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
             end_found = true;
         }
     }
-    assert(start_found);
-    assert(end_found);
-    std::cout << " found startvert = " << g[start].index << " " << g[start].position <<"\n";
-    std::cout << "   found endvert = " << g[end].index << " " << g[end].position << "\n";
+    assert(start_found && end_found );
+    std::cout << " found " << start_found << " startvert = " << g[start].index << " " << g[start].position <<"\n";
+    std::cout << " found " << end_found << "     endvert = " << g[end].index << " " << g[end].position << "\n";
     
     g[start].type=ENDPOINT; 
     g[start].status=OUT; 
@@ -1137,7 +1136,6 @@ EdgeData VoronoiDiagram::find_edge_data(HEFace f, VertexVector startverts)  {
 // start on g[newface].edge, walk around the face and repair the next-pointers
 // this is called on the newly created face after all NEW-NEW edges have been added
 void VoronoiDiagram::repair_face( HEFace f ) {
-    //std::cout << "repair_face( " << f << " )\n";
     HEEdge current_edge = g[f].edge; 
     HEEdge start_edge = current_edge;
     do {
@@ -1146,22 +1144,19 @@ void VoronoiDiagram::repair_face( HEFace f ) {
         bool found_next_edge= false;
         BOOST_FOREACH( HEEdge edge, g.out_edges( current_target ) ) { // loop through potential "next" candidates
             HEVertex out_target = g.target( edge );
-            //std::cout << g[current_source].index << " - " << g[current_target].index << " f= "<< g[current_edge].face;
-            //std::cout << " target= " << g[out_target].index << " f=" << g[edge].face << " "; 
             if ( ( (g[out_target].status == NEW) || (g[out_target].type == ENDPOINT) ) && (g[edge].face == f) ) { // the next vertex along the face should be "NEW"
                 if ( out_target != current_source ) { // but not where we came from
                     g[current_edge].next = edge; // this is the edge we want to take
-                    //std::cout << " VALID!.\n";
                     found_next_edge = true;
                     assert( vd_checker->current_face_equals_next_face( current_edge ) );
                 }
             } 
         }
+        if (!found_next_edge)
+            std::cout << " repair_face( " << f << " ) error. could not find next-edge!\n";
         assert(found_next_edge); // must find a next-edge!
         current_edge = g[current_edge].next; // jump to the next edge
     } while (g[current_edge].next != start_edge);
-    //std::cout << " repair done:\n";
-    //print_face(f);
 }
 
 void VoronoiDiagram::remove_vertex_set() {

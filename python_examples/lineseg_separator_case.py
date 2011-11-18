@@ -137,7 +137,7 @@ if __name__ == "__main__":
     vd.addLineSite( s[0], s[1]) 
     
     s = id_list[1]
-    vd.addLineSite( s[0], s[1],5) 
+    vd.addLineSite( s[0], s[1]) 
     
     err = vd.getStat()
     #print err 

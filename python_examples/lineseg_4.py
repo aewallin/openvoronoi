@@ -92,7 +92,7 @@ if __name__ == "__main__":
     vod.drawVertices=1
     t_before = time.time()
     
-    Nmax = 18
+    Nmax = 200
 
     segs = []
     id_list = []

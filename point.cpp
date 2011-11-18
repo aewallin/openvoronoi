@@ -47,7 +47,7 @@ void Point::normalize() {
         *this *=(1/this->norm());
 }
 
-Point Point::xyPerp() const {
+Point Point::xy_perp() const {
     return Point(-y, x);
     // 2D rotation matrix:
     //   cos   -sin

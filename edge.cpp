@@ -53,17 +53,17 @@ EdgeProps::EdgeProps() {
 * ellipse (circle/circle)
 */
 Point EdgeProps::point(double t) const {
-    double discr1 =  sq(x[4]+x[5]*t) - sq(x[6]+x[7]*t) ;
-    double discr2 =  sq(y[4]+y[5]*t) - sq(y[6]+y[7]*t) ;
+    double discr1 =  chop( sq(x[4]+x[5]*t) - sq(x[6]+x[7]*t), 1e-16 );
+    double discr2 =  chop( sq(y[4]+y[5]*t) - sq(y[6]+y[7]*t), 1e-16 );
     if ( (discr1 >= 0) && (discr2 >= 0) ) {
         double psig = sign ? +1 : -1;
         double nsig = sign ? -1 : +1;
         double xc = x[0] - x[1] - x[2]*t + psig * x[3] * sqrt( discr1 );
         double yc = y[0] - y[1] - y[2]*t + nsig * y[3] * sqrt( discr2 );
         if (xc!=xc) { // test for NaN!
-        std::cout << xc << " , " << yc << " t=" << t << "\n";
-        print_params();
-        assert(0);
+            std::cout << xc << " , " << yc << " t=" << t << "\n";
+            print_params();
+            assert(0);
         }
         return Point(xc,yc);
     } else {

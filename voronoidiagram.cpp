@@ -313,7 +313,7 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
     // the we know which site/face is the k==+1 and which is k==-1
     Point src_se = g[start].position;
     Point trg_se = g[end  ].position;
-    Point left = 0.5*(src_se+trg_se) + (trg_se-src_se).xyPerp();
+    Point left = 0.5*(src_se+trg_se) + (trg_se-src_se).xy_perp();
     LineSite* pos_site;
     LineSite* neg_site;
     bool se_sign = left.is_right(src_se,trg_se);

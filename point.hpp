@@ -47,7 +47,7 @@ class Point {
         /// scales vector so that norm()==1.0
         void normalize();
         /// return perpendicular in the xy plane, rotated 90 degree to the left
-        Point xyPerp() const;
+        Point xy_perp() const;
         /// distance from this to p1-p2 line
         double distance_to_line(const Point &p1, const Point &p2) const;
         bool is_right(const Point &p1, const Point &p2) const;

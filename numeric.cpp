@@ -25,13 +25,21 @@
 namespace ovd {
 
 namespace numeric {
- 
+    
+    /*
     double chop8(double a) {
         double eps = 1e-8;
         if (fabs(a) < eps)
             return 0.0;
         else
             return a;
+    }*/
+    double chop(double val, double tol) {
+        double _epsilon = tol;
+        if (fabs(val) < _epsilon) 
+            return 0;
+        else
+            return val;
     }
     
     double chop(double val) {

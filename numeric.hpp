@@ -28,8 +28,9 @@ namespace ovd {
 // this namespace holds general numerical functions that are not specific
 // to voronoi-diagrams and may be useful elsewhere too
 namespace numeric {
-    double chop8(double a);
+    //double chop8(double a);
     double chop(double val);
+    double chop(double val, double tolerance);
     qd_real chop(qd_real val);
     
     template<class Scalar>

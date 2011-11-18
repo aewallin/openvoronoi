@@ -6,6 +6,9 @@ import datetime
 import math
 import random
 import os
+import sys
+
+import ovdgenerators as gens
 
 def writeFrame( w2if, lwr, n ):
     w2if.Modified() 
@@ -14,52 +17,14 @@ def writeFrame( w2if, lwr, n ):
     lwr.SetFileName( filename )
     #lwr.Write()
 
-def randomGenerators(far=1, Nmax=2):
-    pradius = (1.0/math.sqrt(2))*far
-    plist=[]
-    for n in range(Nmax):
-        x=-pradius+2*pradius*random.random()
-        y=-pradius+2*pradius*random.random()
-        plist.append( ovd.Point(x,y) )
-    return plist
 
-def intersects(s1,s2):
-    p1 = s1[0]
-    p2 = s1[1]
-    p = p1
-    r = p2-p1
-    q1 = s2[0]
-    q2 = s2[1]
-    q = q1
-    s = q2-q1
-    # t = (q-p) cross (s) / (r cross s)
-    # u = (q-p) cross (r) / (r cross s)
-    if ( r.cross(s) == 0 ): #parallel lines
-        if ( (q-p).cross(r) == 0 ): #collinear
-            return 1   
-        else:
-            return 0 # parallel lines that never intersect
-
-    t = (q-p).cross(s) / (r.cross(s))
-    u = (q-p).cross(r) / (r.cross(s))
-    if ( (0<=t) and (t<=1) and (0<=u) and (u<=1) ):
-        return 1
-    return 0
-
-# test if s intersects with any of the segments in seg
-def segmentIntersects(segs, s):
-    for sg in segs:
-        if intersects(sg,s):
-            return 1
-    
-    return 0 # no intersections found
     
 if __name__ == "__main__":  
     #print ocl.revision()
-    #w=1920
-    #h=1080
-    w=1024
-    h=720
+    w=1920
+    h=1080
+    #w=1024
+    #h=720
     myscreen = ovdvtk.VTKScreen(width=w, height=h) 
     ovdvtk.drawOCLtext(myscreen, rev_text=ovd.revision() )
     
@@ -90,20 +55,24 @@ if __name__ == "__main__":
     vod.textScale = 0.002
     vod.vertexRadius = 0.000031
     vod.drawVertices=1
-    t_before = time.time()
     
-    Nmax = 200
+    Nmax = 724
+    print "waiting for ",Nmax," segments..",
+    sys.stdout.flush()
+    segs = gens.randomSegments(far,Nmax)
+    print ".done."
 
-    segs = []
     id_list = []
-    for n in range(Nmax):
-        seg = randomGenerators()
-        while segmentIntersects(segs, seg):
-            seg = randomGenerators()
-        segs.append(seg)
+    m=0
+    t_before = time.time()
+    for seg in segs:
         seg_id=[]
         seg_id.append( vd.addVertexSite( seg[0] ) )
+        print m," added vertex", seg_id[0]
+        m=m+1
         seg_id.append( vd.addVertexSite( seg[1] ) )
+        print m," added vertex", seg_id[1]
+        m=m+1
         id_list.append( seg_id )
         #print seg[0].x," , ",seg[1].x
 
@@ -116,6 +85,8 @@ if __name__ == "__main__":
         if n<= nsegs:
             vd.addLineSite(s[0],s[1])
         n=n+1
+    t_after = time.time()
+    
     
     #s = id_list[nsegs]
     #vd.addLineSite( s[0], s[1], 5) 
@@ -123,10 +94,11 @@ if __name__ == "__main__":
     err = vd.getStat()
     #print err 
     print "got errorstats for ",len(err)," points"
-    minerr = min(err)
-    maxerr = max(err)
-    print "min error= ",minerr
-    print "max error= ",maxerr
+    if len(err)>1:
+        minerr = min(err)
+        maxerr = max(err)
+        print "min error= ",minerr
+        print "max error= ",maxerr
     
     print "num vertices: ",vd.numVertices() # Nmax=200 gives 1856(187)
     print "num SPLIT vertices: ",vd.numSplitVertices() 
@@ -136,7 +108,7 @@ if __name__ == "__main__":
     # 5 create new vertices
     # 6 add startpoint separator
     # 7 add endpoint separator
-    t_after = time.time()
+    
     calctime = t_after-t_before
     if Nmax==0:
         Nmax=1

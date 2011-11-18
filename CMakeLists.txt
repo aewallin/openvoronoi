@@ -44,6 +44,7 @@ option(BUILD_TYPE
 if (BUILD_TYPE)
     MESSAGE(STATUS " CMAKE_BUILD_TYPE = Release")
     set(CMAKE_BUILD_TYPE Release)
+    add_definitions( -O3 ) 
 endif(BUILD_TYPE)
 
 if (NOT BUILD_TYPE)

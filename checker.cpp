@@ -73,20 +73,6 @@ bool VoronoiDiagramChecker::vertex_degree_ok() {
             std::cout << " expected degree = " << VoronoiVertex::expected_degree[ vd->g[v].type ]  << "\n";
             return false;
         }
-            
-       /* 
-        if ( vd->g[v].type == NORMAL ) {
-            if ( vd->g.degree( v ) != 6 )
-                return false;
-        }
-        if ( vd->g[v].type == OUTER ) {
-            if ( vd->g.degree( v ) != 4 )
-                return false;
-        }
-        if ( vd->g[v].type == VERTEXGEN ) {
-            if ( vd->g.degree( v ) != 0 )
-                return false;
-        }*/
     }
     return true;
 }
@@ -219,7 +205,7 @@ bool VoronoiDiagramChecker::face_ok(HEFace f) {
             
         current_edge = vd->g[current_edge].next; 
         n++;
-        assert( n < 100 ); // reasonable max
+        assert( n < 10000 ); // reasonable max
     } while( current_edge != start_edge);
     //std::cout << " face ok, edges=" << n-1 << "\n";
     return true;

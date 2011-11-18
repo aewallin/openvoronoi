@@ -54,16 +54,17 @@ Point VertexPositioner::position(HEEdge e, Site* s) {
     double t_trg = vd->g[trg].dist();
     t_min = std::min( t_src, t_trg );
     t_max = std::max( t_src, t_trg );
-
+/*
     std::cout << "  sites: " << vd->g[face].site->str() << "(k="<< vd->g[e].k<< ") ";
     std::cout << vd->g[twin_face].site->str() << "(k="<< vd->g[twin].k;
     std::cout << ") new= " << s->str() << "\n";
     std::cout << " t-vals t_min= " << t_min << " t_max= " << t_max << "\n";
-        
+  */      
     Solution sl = position( vd->g[face].site  , vd->g[e].k, vd->g[twin_face].site  , vd->g[twin].k, s );
-    
+    /*
     std::cout << " new vertex positioned at " << sl.p << " t=" << sl.t << " k3=" << sl.k3;
     std::cout << " err=" << edge_error(edge,sl) << "\n";
+    */
     assert( solution_on_edge(sl) );
     check_far_circle(sl.p);
     //check_on_edge(e, p);
@@ -83,7 +84,7 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     if (!s3->isPoint()) // for points k3=+1 allways
         solver(s1,k1,s2,k2,s3,-1, solutions); // for lineSite or ArcSite we try k3=-1 also    
 
-    std::cout << " solver() done \n";
+    //std::cout << " solver() done \n";
     // choose only t_min < t < t_max solutions 
     solutions.erase( std::remove_if(solutions.begin(),solutions.end(), t_filter(t_min,t_max) ), solutions.end() );
     // choose only in_region() solutions
@@ -96,16 +97,17 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
         // filter further using edge_error
         double min_error=100;
         Solution min_solution(Point(0,0),0,0);
-        std::cout << " edge_error filter: \n";
+        //std::cout << " edge_error filter: \n";
         BOOST_FOREACH(Solution s, solutions) {
             double err = edge_error(edge,s);
-            std::cout << s.p << " k3=" << s.k3 << " t=" <<  s.t << " err=" << err << "\n";
+            //std::cout << s.p << " k3=" << s.k3 << " t=" <<  s.t << " err=" << err << "\n";
             if ( err < min_error) {
                 min_solution = s;
                 min_error = err;
             }
         }
         if (min_error >= 1e-6) {
+            /*
             std::cout << "WARNING: EDGE ERROR TOO LARGE\n";
             std::cout << " s1 = " << s1->str2() << " k1= " << k1 << "\n";
             std::cout << " s2 = " << s2->str2() << " k2= " << k2 << "\n";
@@ -113,6 +115,7 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
             std::cout << " sln=" << min_solution.p << " err=" << min_error << "\n";
             std::cout << " edge: " << vd->g[ vd->g.source(edge) ].position << " - " << vd->g[ vd->g.target(edge) ].position;
             std::cout << " edge-point(t="<<min_solution.t << ")= " << vd->g[edge].point(min_solution.t) << "\n";
+            */
             //assert(0);
         }
         //assert( min_error < 1e-6 );
@@ -232,7 +235,7 @@ int VertexPositioner::qll_solver( const std::vector< Eq<qd_real> >& lins, int xi
         tsolns[i][ti] = to_double(isolns[i][2]);       // t       t  chop!
         solns.push_back( Solution( Point( tsolns[i][0], tsolns[i][1] ), tsolns[i][2], to_double(kk3) ) );
     }
-    std::cout << " k3="<<kk3<<" qqq_solve found " << scount << " roots\n";
+    //std::cout << " k3="<<kk3<<" qqq_solve found " << scount << " roots\n";
     return scount;
 }
 
@@ -249,14 +252,14 @@ int VertexPositioner::qll_solve( qd_real a0, qd_real b0, qd_real c0, qd_real d0,
                       qd_real a2, qd_real b2, 
                       qd_real soln[][3])
 {
-    std::cout << "qll_solver()\n";
+    //std::cout << "qll_solver()\n";
     // TODO:  optimize using abs(a0) == abs(c0) == abs(d0) == 1
     qd_real a = chop( (a0*(a1*a1) + c0*(a2*a2) + e0) ); 
     qd_real b = chop( (2*a0*a1*b1 + 2*a2*b2*c0 + a1*b0 + a2*d0 + f0) ); 
     qd_real c = a0*(b1*b1) + c0*(b2*b2) + b0*b1 + b2*d0 + g0;
     std::vector<qd_real> roots = quadratic_roots(a, b, c); // solves a*w^2 + b*w + c = 0
     if ( roots.empty() ) { // No roots, no solutions
-        std::cout << " qll_solve no w roots. no solutions.\n";
+        //std::cout << " qll_solve no w roots. no solutions.\n";
         return 0;
     }
     for (unsigned int i=0; i<roots.size(); i++) {
@@ -270,7 +273,7 @@ int VertexPositioner::qll_solve( qd_real a0, qd_real b0, qd_real c0, qd_real d0,
 
 // all three sites are lines
 int VertexPositioner::lll_solver(std::vector< Eq<qd_real> >& eq, double kk3, std::vector<Solution>& slns ) {
-    std::cout << " lll_solver() k3= " << k3 << "\n";
+    //std::cout << " lll_solver() k3= " << k3 << "\n";
     unsigned int i = 0, j=1, k=2;
     qd_real d = chop( ( eq[i].a*eq[j].b - eq[j].a*eq[i].b)*eq[k].k + 
                       (-eq[i].a*eq[k].b + eq[k].a*eq[i].b)*eq[j].k +  
@@ -335,7 +338,7 @@ double VertexPositioner::edge_error(HEEdge e, Solution& s) {
 
 // new vertices should lie within the far_radius
 bool VertexPositioner::check_far_circle(const Point& p) {
-    if (!(p.norm() < 5*vd->far_radius)) {
+    if (!(p.norm() < 18*vd->far_radius)) {
         std::cout << "WARNING check_far_circle() new vertex outside far_radius! \n";
         std::cout << p << " norm=" << p.norm() << " far_radius=" << vd->far_radius << "\n"; 
         return false;

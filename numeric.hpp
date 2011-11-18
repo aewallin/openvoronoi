@@ -42,7 +42,7 @@ namespace numeric {
     std::vector<Scalar>  quadratic_roots(Scalar a, Scalar b, Scalar c) {
         std::vector<Scalar> roots;
         if ((a == 0) and (b == 0)) {
-            std::cout << " quadratic_roots() a == b == 0. no roots.\n";
+            //std::cout << " quadratic_roots() a == b == 0. no roots.\n";
             return roots;
         }
         if (a == 0) {
@@ -59,7 +59,7 @@ namespace numeric {
                 roots.push_back( Scalar(0) );
                 return roots;
             } else {
-                std::cout << " quadratic_roots() b == 0. no roots.\n";
+                //std::cout << " quadratic_roots() b == 0. no roots.\n";
                 return roots;
             }
         }
@@ -77,7 +77,7 @@ namespace numeric {
             roots.push_back( -b / (2*a) );
             return roots;
         }
-        std::cout << " quadratic_roots() disc < 0. no roots. disc= " << disc << "\n";
+        //std::cout << " quadratic_roots() disc < 0. no roots. disc= " << disc << "\n";
         return roots;
     }
     

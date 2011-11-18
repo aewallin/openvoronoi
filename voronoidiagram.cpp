@@ -55,7 +55,7 @@ void VoronoiDiagram::initialize() {
     g[v01] = VoronoiVertex(Point(             0                 , -3.0*far_radius*far_multiplier    )               , OUT, OUTER);
     g[v02] = VoronoiVertex(Point(  +3.0*sqrt(3.0)*far_radius*far_multiplier/2.0, +3.0*far_radius*far_multiplier/2.0), OUT, OUTER);
     g[v03] = VoronoiVertex(Point(  -3.0*sqrt(3.0)*far_radius*far_multiplier/2.0, +3.0*far_radius*far_multiplier/2.0), OUT, OUTER);
-    out_verts[0]=v01; out_verts[1]=v02; out_verts[2]=v03;
+    //out_verts[0]=v01; out_verts[1]=v02; out_verts[2]=v03;
     // the locations of the initial generators:
     Point gen1 = Point( 0, 3.0*far_radius);
     Point gen2 = Point( -3.0*sqrt(3.0)*far_radius/2.0, -3.0*far_radius/2.0 );
@@ -1115,9 +1115,6 @@ void VoronoiDiagram::reset_status() {
         g[v].reset();
     }
     modified_vertices.clear();
-    g[out_verts[0]].status = OUT; // the outer vertices are special.
-    g[out_verts[1]].status = OUT;
-    g[out_verts[2]].status = OUT;
     BOOST_FOREACH(HEFace f, incident_faces ) { 
         g[f].status = NONINCIDENT; 
     }

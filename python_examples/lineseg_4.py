@@ -128,6 +128,7 @@ if __name__ == "__main__":
     print "min error= ",minerr
     print "max error= ",maxerr
     
+    print "num vertices: ",vd.numVertices() # Nmax=200 gives 1877 vertices
     
     # 4 delete-tree
     # 5 create new vertices

@@ -87,7 +87,11 @@ class VoronoiDiagram {
         int num_point_sites() const {return num_psites-3;} // the three initial vertices don't count
         /// return number of line-segments sites in diagram
         int num_line_sites() const {return num_lsites;}
-
+        /// return number of voronoi-vertices
+        int num_vertices() const {
+            int verts = g.num_vertices();
+            return verts-num_point_sites();
+        }
         /// string repr
         std::string print() const;
         std::string version() const { return VERSION_STRING; }
@@ -98,9 +102,9 @@ class VoronoiDiagram {
     protected:
         /// initialize the diagram with three generators
         void initialize();
-        HEVertex find_seed_vertex(HEFace f, Site* site) const;
+        HEVertex   find_seed_vertex(HEFace f, Site* site) const;
         EdgeVector find_in_out_edges(); 
-        EdgeData find_edge_data(HEFace f, VertexVector startverts=VertexVector());
+        EdgeData   find_edge_data(HEFace f, VertexVector startverts=VertexVector());
         EdgeVector find_split_edges(HEFace f, Point pt1, Point pt2);
         
         void augment_vertex_set( Site* site);        
@@ -110,14 +114,11 @@ class VoronoiDiagram {
         void mark_vertex(HEVertex& v,  Site* site); 
         void   add_vertices( Site* site );
         HEFace add_face(Site* site);
-                       // positive,    old-face      negative 
         void   add_edge(HEFace new_f1, HEFace f, HEFace new_f2 = 0);
-                       //  data           positive    negative
         void   add_edge(EdgeData ed, HEFace new1, HEFace new2=0);
-
         void   add_vertex_in_edge(HEVertex v, HEEdge e);
         void   add_separator(HEFace f, HEVertex endp, Site* s1, Site* s2);
-        void add_split_vertex(HEFace f, Site* s);
+        void   add_split_vertex(HEFace f, Site* s);
         
         void repair_face( HEFace f );
         void remove_vertex_set();
@@ -140,10 +141,9 @@ class VoronoiDiagram {
         HEGraph g;
         /// the voronoi diagram is constructed for sites within a circle with radius far_radius
         double far_radius;
-        /// special initial/outer vertices
-        HEVertex out_verts[3];
-        /// the number of generators
+        /// the number of point sites
         int num_psites;
+        /// the number of line-segment sites
         int num_lsites;
         /// temporary variable for incident faces, will be reset to NONINCIDENT after a site has been inserted
         FaceVector incident_faces;

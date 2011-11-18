@@ -82,18 +82,19 @@ if __name__ == "__main__":
     myscreen.camera.SetFocalPoint(0.0, 0, 0)
     
     vd = ovd.VoronoiDiagram(far,120)
+    vd.setEdgePoints(1000)
     print vd.version()
     
     # for vtk visualization
     vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
     vod.drawFarCircle()
-    vod.textScale = 0.002
-    vod.vertexRadius = 0.00031
+    vod.textScale = 0.0002
+    vod.vertexRadius = 0.0000031
     vod.drawVertices=1
     
     t_before = time.time()
     
-    Nmax = 15
+    Nmax = 20
 
     segs = []
     id_list = []
@@ -105,13 +106,13 @@ if __name__ == "__main__":
             seg = randomGenerators()
         segs.append(seg)
         seg_id=[]
-        if n==4 or n==14:
+        if n==17 or n==18:
             seg_id.append( vd.addVertexSite( seg[0] ) )
             seg_id.append( vd.addVertexSite( seg[1] ) )
             ssegs.append(seg)
             
             id_list.append( seg_id )
-        n=n+1
+        #n=n+1
         #print seg[0].x," , ",seg[1].x
     
     #exit()
@@ -136,7 +137,7 @@ if __name__ == "__main__":
     vd.addLineSite( s[0], s[1]) 
     
     s = id_list[1]
-    vd.addLineSite( s[0], s[1], 5) 
+    vd.addLineSite( s[0], s[1],5) 
     
     err = vd.getStat()
     #print err 

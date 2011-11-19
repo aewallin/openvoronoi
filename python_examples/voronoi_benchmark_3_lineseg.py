@@ -46,26 +46,36 @@ def timeVoronoiSegs(Nmax):
     
 if __name__ == "__main__":  
     far = 1
-    Nmax_exp = 20
-    # 10 -> 22 linesites
-    # 15 -> 128
-    # 20 -> 724
-    # 25 -> 4096  lineseg benchmark crashes with segfault at 1448 generators!
-    # 31 -> 32768
-    # 36 -> 185363
+    Nmax_exp = 36
+    # 10 -> 32 linesites
+    # 14 -> 128
+    # 18 -> 512
+    # 20 -> 1024
+    # 24 -> 4096  lineseg benchmark crashes with segfault at 1448 generators!
+    # 28 -> 16384
+    # 32 -> 65536
+    # 33 -> 92681
+    # 34 -> 131072
+    # 35 -> 185363
+    # 36 -> 262144
+    
     random.seed(1)
-    exp_list = [0.5*x for x in range(5,Nmax_exp)]
+    exp_list = [0.5*x for x in range(5,Nmax_exp+1)]
     Nmax_list=[]
+    n=5
     for e in exp_list:
-        Nmax_list.append( int( math.floor( (math.pow(2,e) ) ) ) )
-
-    print Nmax_list
+        Nmax_list.append( [ n, int( math.floor( (math.pow(2,e) ) ) ) ] )
+        n=n+1
+        
+    #print Nmax_list
     #exit()
     csvWriter = csv.writer(open('results_rand_opt.csv', 'wb'), delimiter=',' )
-    for Nmax in Nmax_list:
-        #times = timeVoronoiPoints(Nmax)
-        times = timeVoronoiSegs(Nmax)
-        print Nmax," gens took ", sum(times) ," seconds, ", 1e6*float( sum(times) )/(float(Nmax)*float(math.log10(Nmax)))," us/n*log(n)"
+    for case in Nmax_list:
+        n=case[0]
+        Nmax=case[1]
+        times = timeVoronoiPoints(Nmax)
+        #times = timeVoronoiSegs(Nmax)
+        print n," ",Nmax," gens took ", sum(times) ," seconds, ", 1e6*float( sum(times) )/(float(Nmax)*float(math.log10(Nmax)))," us/n*log(n)"
         row = []
         row.append(Nmax)
         for t in times:

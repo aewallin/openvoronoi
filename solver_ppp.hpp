@@ -24,6 +24,9 @@
 #ifndef PPP_SOLVER_HPP
 #define PPP_SOLVER_HPP
 
+#include <vector>
+#include <cassert>
+
 #include "point.hpp"
 #include "numeric.hpp"
 
@@ -35,7 +38,7 @@ namespace ovd {
 class PPPSolver : public Solver {
 public:
 
-int solve( Site* s1, double k1, 
+int solve(      Site* s1, double k1, 
                 Site* s2, double k2, 
                 Site* s3, double k3, std::vector<Solution>& slns ) {
     assert( s1->isPoint() && s2->isPoint() && s3->isPoint() );
@@ -56,11 +59,17 @@ int solve( Site* s1, double k1,
     assert( !pi.is_right(pj,pk) );
     assert( (pi - pj).norm() >=  (pj - pk).norm() );
     assert( (pi - pj).norm() >=  (pk - pi).norm() );
-    double J2 = (pi.y-pk.y)*( sq(pj.x-pk.x)+sq(pj.y-pk.y) )/2.0 - (pj.y-pk.y)*( sq(pi.x-pk.x)+sq(pi.y-pk.y) )/2.0;
-    double J3 = (pi.x-pk.x)*( sq(pj.x-pk.x)+sq(pj.y-pk.y) )/2.0 - (pj.x-pk.x)*( sq(pi.x-pk.x)+sq(pi.y-pk.y) )/2.0;
+    double J2 = (pi.y-pk.y)*( sq(pj.x-pk.x)+sq(pj.y-pk.y) )/2.0 - 
+                (pj.y-pk.y)*( sq(pi.x-pk.x)+sq(pi.y-pk.y) )/2.0;
+    double J3 = (pi.x-pk.x)*( sq(pj.x-pk.x)+sq(pj.y-pk.y) )/2.0 - 
+                (pj.x-pk.x)*( sq(pi.x-pk.x)+sq(pi.y-pk.y) )/2.0;
     double J4 = (pi.x-pk.x)*(pj.y-pk.y) - (pj.x-pk.x)*(pi.y-pk.y);
     assert( J4 != 0.0 );
-    slns.push_back( Solution( Point(-J2/J4 + pk.x, J3/J4 + pk.y) , k1+k2+k3 , 0) );
+    if (J4==0.0)
+        std::cout << " Warning divide-by-zero!!\n";
+    Point pt = Point(-J2/J4 + pk.x, J3/J4 + pk.y);
+    double dist = (pt-pi).norm();
+    slns.push_back( Solution(  pt , dist , +1) );
     return 1;
 }
 

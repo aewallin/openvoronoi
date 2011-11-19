@@ -26,11 +26,12 @@ endif(NOT BUILD_PY_LIB)
 # thus we use now use -Wno-deprecated here.
 #
 if (CMAKE_BUILD_TOOL MATCHES "make")
-    MESSAGE(STATUS "setting gcc options: -W -Wall -Wundef  -Wshadow -Winline -Wno-long-long -Wno-deprecated -Werror -pedantic-errors")
+    MESSAGE(STATUS "setting gcc options: -W -Wall -Wundef  
+    -Wshadow -Winline -Wno-long-long -Wno-deprecated -Werror -pedantic-errors")
     
     # -pedantic -W -Wall -Wundef -Wfloat-equal -Wshadow -Winline -Wno-long-long
-    add_definitions( -W -Wall -Wundef  -Wshadow -Wno-long-long -Wno-deprecated -Werror -pedantic-errors)
-    
+    add_definitions( -W -Wall -Wundef  -Wshadow -Wno-long-long -Wno-deprecated  -pedantic-errors)
+    add_definitions( -Wno-error=unused-variable )
     # this gives warning when comparing float/double with != or ==
     # -Wfloat-equal
     

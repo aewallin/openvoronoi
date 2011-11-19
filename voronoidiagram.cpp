@@ -792,8 +792,9 @@ void VoronoiDiagram::add_vertices( Site* new_site ) {
         std::cout << g[ g.target(q_edges[m])].index << "(t=" << g[ g.target(q_edges[m])].dist() << ")";
         std::cout <<  " edge, type=" << g[q_edges[m]].type << "\n";
         */
-        g[q].position = vpos->position( q_edges[m], new_site ); // set position
-        g[q].k3 = vpos->get_k3();
+        Solution sl = vpos->position( q_edges[m], new_site );
+        g[q].position = sl.p; // set position
+        g[q].k3 = sl.k3;
         g[q].init_dist( new_site->apex_point( g[q].position ) ); // set initial clearance-disk
         add_vertex_in_edge(q, q_edges[m] );
     }

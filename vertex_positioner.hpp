@@ -63,6 +63,7 @@ private:
     Site* site_;
 };
 
+// abstract base-class for vertex-solvers
 class Solver {
 public:
     virtual int solve(Site* s1, double k1, 
@@ -78,16 +79,19 @@ public:
     /// calculate the position of a new voronoi-vertex lying on the given edge.
     /// The new vertex is equidistant to the two sites that defined the edge
     /// and to the new site. 
-    Point position( HEEdge e, Site* s);
-    double get_k3() const {return k3;}
+    Solution position( HEEdge e, Site* s);
+
     std::vector<double> get_stat() {return errstat;}
 private:
-    Solution position(Site* p1, double k1, Site* p2, double k2, Site* p3);
+    Solution position(Site* s1, double k1, 
+                      Site* s2, double k2, 
+                      Site* s3);
     
-    int solver(Site* s1, double k1, Site* s2, double k2, Site* s3, double k3, std::vector<Solution>& slns ); 
+    int solver_dispatch(Site* s1, double k1, 
+               Site* s2, double k2, 
+               Site* s3, double k3, std::vector<Solution>& slns ); 
     
-    //int lll_solver(std::vector< Eq<qd_real> >& eqns, double k3, std::vector<Solution>& slns ); // linear 3x3 system
-    
+    /*
     int qll_solver( const std::vector< Eq<qd_real> >& lins, int xi, int yi, int ti, 
                     const Eq<qd_real>& quad, qd_real k3, std::vector<Solution>& slns );
     
@@ -96,7 +100,8 @@ private:
                       qd_real a1, qd_real b1, 
                       qd_real a2, qd_real b2, 
                       qd_real soln[][3]);
-
+    */
+    
 // geometry-checks
     double edge_error(HEEdge e, Solution& s );
     bool solution_on_edge(Solution& s);
@@ -106,11 +111,11 @@ private:
   
     Solver* ppp_solver;
     Solver* lll_solver;
+    Solver* qll_solver;
 // DATA
     VoronoiDiagram* vd;
     double t_min;
     double t_max;
-    double k3; // the offset-direction to the new site
     HEEdge edge;
     std::vector<double> errstat;
 };

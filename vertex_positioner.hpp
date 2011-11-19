@@ -65,9 +65,9 @@ private:
 
 class Solver {
 public:
-    virtual Solution solve(Site* s1, double k1, 
+    virtual int solve(Site* s1, double k1, 
                            Site* s2, double k2, 
-                           Site* s3, double k3) = 0;
+                           Site* s3, double k3, std::vector<Solution>& slns ) = 0;
 };
 
 /// Calculates the (x,y) position of vertices in a voronoi diagram
@@ -86,7 +86,7 @@ private:
     
     int solver(Site* s1, double k1, Site* s2, double k2, Site* s3, double k3, std::vector<Solution>& slns ); 
     
-    int lll_solver(std::vector< Eq<qd_real> >& eqns, double k3, std::vector<Solution>& slns ); // linear 3x3 system
+    //int lll_solver(std::vector< Eq<qd_real> >& eqns, double k3, std::vector<Solution>& slns ); // linear 3x3 system
     
     int qll_solver( const std::vector< Eq<qd_real> >& lins, int xi, int yi, int ti, 
                     const Eq<qd_real>& quad, qd_real k3, std::vector<Solution>& slns );
@@ -105,6 +105,7 @@ private:
     bool equal(double d1, double d2);
   
     Solver* ppp_solver;
+    Solver* lll_solver;
 // DATA
     VoronoiDiagram* vd;
     double t_min;

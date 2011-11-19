@@ -35,10 +35,10 @@ namespace ovd {
 class PPPSolver : public Solver {
 public:
 
-Solution solve( Site* s1, double k1, 
+int solve( Site* s1, double k1, 
                 Site* s2, double k2, 
-                Site* s3, double k3) {
-                    
+                Site* s3, double k3, std::vector<Solution>& slns ) {
+    assert( s1->isPoint() && s2->isPoint() && s3->isPoint() );
     Point pi = s1->position();
     Point pj = s2->position();
     Point pk = s3->position();
@@ -60,8 +60,8 @@ Solution solve( Site* s1, double k1,
     double J3 = (pi.x-pk.x)*( sq(pj.x-pk.x)+sq(pj.y-pk.y) )/2.0 - (pj.x-pk.x)*( sq(pi.x-pk.x)+sq(pi.y-pk.y) )/2.0;
     double J4 = (pi.x-pk.x)*(pj.y-pk.y) - (pj.x-pk.x)*(pi.y-pk.y);
     assert( J4 != 0.0 );
-    //return Point( -J2/J4 + pk.x, J3/J4 + pk.y );
-    return Solution( Point(-J2/J4 + pk.x, J3/J4 + pk.y) , k1+k2+k3 , 0);
+    slns.push_back( Solution( Point(-J2/J4 + pk.x, J3/J4 + pk.y) , k1+k2+k3 , 0) );
+    return 1;
 }
 
 };

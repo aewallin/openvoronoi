@@ -30,6 +30,7 @@
 #include "numeric.hpp"
 
 #include "solver_ppp.hpp"
+#include "solver_lll.hpp"
 
 using namespace ovd::numeric; // sq() chop()
 
@@ -37,11 +38,13 @@ namespace ovd {
 
 VertexPositioner::VertexPositioner(VoronoiDiagram* vodi): vd(vodi) {
     ppp_solver = new PPPSolver();
+    lll_solver = new LLLSolver();
     errstat.clear();
 }
 
 VertexPositioner::~VertexPositioner() {
     delete ppp_solver;
+    delete lll_solver;
 }
 
 // calculate the position of a new vertex on the given edge e
@@ -156,7 +159,7 @@ int VertexPositioner::solver(Site* s1, double k1, Site* s2, double k2, Site* s3,
     }
     
     if (lins.size() == 3) // all lines.
-        return lll_solver( lins, kk3, solns); // kk3 just passes through, has no effect in lll_solver
+        return lll_solver->solve( s1,k1,s2,k2,s3,kk3, solns); // kk3 just passes through, has no effect in lll_solver
     
     assert( !quads.empty() );
     
@@ -283,6 +286,7 @@ int VertexPositioner::qll_solve( qd_real a0, qd_real b0, qd_real c0, qd_real d0,
 }
 
 // all three sites are lines
+/*
 int VertexPositioner::lll_solver(std::vector< Eq<qd_real> >& eq, double kk3, std::vector<Solution>& slns ) {
     //std::cout << " lll_solver() k3= " << k3 << "\n";
     unsigned int i = 0, j=1, k=2;
@@ -305,7 +309,7 @@ int VertexPositioner::lll_solver(std::vector< Eq<qd_real> >& eq, double kk3, std
         }
     }
     return 0; // no solution if determinant zero, or t-value negative
-}
+}*/
 
 
 

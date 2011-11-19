@@ -21,10 +21,10 @@ def writeFrame( w2if, lwr, n ):
     
 if __name__ == "__main__":  
     #print ocl.revision()
-    w=1920
-    h=1080
-    #w=1024
-    #h=720
+    #w=1920
+    #h=1080
+    w=1024
+    h=720
     myscreen = ovdvtk.VTKScreen(width=w, height=h) 
     ovdvtk.drawOCLtext(myscreen, rev_text=ovd.revision() )
     
@@ -56,7 +56,7 @@ if __name__ == "__main__":
     vod.vertexRadius = 0.000031
     vod.drawVertices=1
     
-    Nmax = 724
+    Nmax = 20
     print "waiting for ",Nmax," segments..",
     sys.stdout.flush()
     segs = gens.randomSegments(far,Nmax)

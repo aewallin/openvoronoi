@@ -63,13 +63,18 @@ private:
     Site* site_;
 };
 
+class Solver {
+public:
+    virtual Solution solve(Site* s1, double k1, 
+                           Site* s2, double k2, 
+                           Site* s3, double k3) = 0;
+};
 
 /// Calculates the (x,y) position of vertices in a voronoi diagram
 class VertexPositioner {
 public:
-    VertexPositioner(VoronoiDiagram* vodi): vd(vodi) {
-        errstat.clear();
-    }
+    VertexPositioner(VoronoiDiagram* vodi);
+    virtual ~VertexPositioner();
     /// calculate the position of a new voronoi-vertex lying on the given edge.
     /// The new vertex is equidistant to the two sites that defined the edge
     /// and to the new site. 
@@ -78,9 +83,6 @@ public:
     std::vector<double> get_stat() {return errstat;}
 private:
     Solution position(Site* p1, double k1, Site* p2, double k2, Site* p3);
-    
-    /// point-point-point positioner
-    Point ppp_solver(const Point& p1, const Point& p2, const Point& p3);
     
     int solver(Site* s1, double k1, Site* s2, double k2, Site* s3, double k3, std::vector<Solution>& slns ); 
     
@@ -102,6 +104,7 @@ private:
     bool check_dist(HEEdge e, const Solution& s, Site* s3);
     bool equal(double d1, double d2);
   
+    Solver* ppp_solver;
 // DATA
     VoronoiDiagram* vd;
     double t_min;

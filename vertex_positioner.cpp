@@ -29,9 +29,20 @@
 #include "voronoidiagram.hpp"
 #include "numeric.hpp"
 
+#include "solver_ppp.hpp"
+
 using namespace ovd::numeric; // sq() chop()
 
 namespace ovd {
+
+VertexPositioner::VertexPositioner(VoronoiDiagram* vodi): vd(vodi) {
+    ppp_solver = new PPPSolver();
+    errstat.clear();
+}
+
+VertexPositioner::~VertexPositioner() {
+    delete ppp_solver;
+}
 
 // calculate the position of a new vertex on the given edge e
 // the edge e holds information about which face it belongs to.
@@ -296,29 +307,7 @@ int VertexPositioner::lll_solver(std::vector< Eq<qd_real> >& eq, double kk3, std
     return 0; // no solution if determinant zero, or t-value negative
 }
 
-/// Old. not used anymore!
-/// point-point-point vertex positioner based on Sugihara & Iri paper
-Point VertexPositioner::ppp_solver(const Point& p1, const Point& p2, const Point& p3) {
-    Point pi(p1),pj(p2),pk(p3);
-    if ( pi.is_right(pj,pk) ) 
-        std::swap(pi,pj);
-    assert( !pi.is_right(pj,pk) );
-    // 2) point pk should have the largest angle. largest angle is opposite longest side.
-    double longest_side = (pi - pj).norm();
-    while (  ((pj - pk).norm() > longest_side) || (((pi - pk).norm() > longest_side)) ) { 
-        std::swap(pi,pj); // cyclic rotation of points until pk is opposite the longest side pi-pj
-        std::swap(pi,pk);  
-        longest_side = (pi - pj).norm();
-    }
-    assert( !pi.is_right(pj,pk) );
-    assert( (pi - pj).norm() >=  (pj - pk).norm() );
-    assert( (pi - pj).norm() >=  (pk - pi).norm() );
-    double J2 = (pi.y-pk.y)*( sq(pj.x-pk.x)+sq(pj.y-pk.y) )/2.0 - (pj.y-pk.y)*( sq(pi.x-pk.x)+sq(pi.y-pk.y) )/2.0;
-    double J3 = (pi.x-pk.x)*( sq(pj.x-pk.x)+sq(pj.y-pk.y) )/2.0 - (pj.x-pk.x)*( sq(pi.x-pk.x)+sq(pi.y-pk.y) )/2.0;
-    double J4 = (pi.x-pk.x)*(pj.y-pk.y) - (pj.x-pk.x)*(pi.y-pk.y);
-    assert( J4 != 0.0 );
-    return Point( -J2/J4 + pk.x, J3/J4 + pk.y );
-}
+
 
 
 bool VertexPositioner::solution_on_edge(Solution& s) {

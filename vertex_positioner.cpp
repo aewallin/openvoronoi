@@ -100,7 +100,10 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     solver_dispatch(s1,k1,s2,k2,s3,+1, solutions);
     if (!s3->isPoint()) // for points k3=+1 allways
         solver_dispatch(s1,k1,s2,k2,s3,-1, solutions); // for lineSite or ArcSite we try k3=-1 also    
-
+    
+    if ( solutions.size() == 1 && (t_min<=solutions[0].t) && (t_max>=solutions[0].t) && (s3->in_region( solutions[0].p)) )
+        return solutions[0];
+    
     //std::cout << " solver() done \n";
     // choose only t_min < t < t_max solutions 
     solutions.erase( std::remove_if(solutions.begin(),solutions.end(), t_filter(t_min,t_max) ), solutions.end() );

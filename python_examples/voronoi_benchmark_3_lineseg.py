@@ -10,7 +10,12 @@ import ovdgenerators as gens
 def timeVoronoiPoints(Nmax):
     far = 1
     vd = ovd.VoronoiDiagram(far, int( math.floor( math.sqrt(2)*math.sqrt(Nmax) ) ) )
+    print "waiting for ",Nmax," random points..",
+    sys.stdout.flush()
+    t_before = time.time() 
     plist = gens.randomGenerators(far, Nmax)
+    t_after = time.time()
+    print ".done in ",(t_after - t_before)," seconds"
     #plist = regularGridGenerators(far, Nmax)
     #plist = circleGenerators(far, Nmax)
     t_before = time.time() 
@@ -21,11 +26,13 @@ def timeVoronoiPoints(Nmax):
 
 def timeVoronoiSegs(Nmax):
     far = 1
-    vd = ovd.VoronoiDiagram(far, 10*int( math.floor( math.sqrt(2)*math.sqrt(Nmax) ) ) )
-    print "waiting for ",Nmax," segments..",
+    vd = ovd.VoronoiDiagram(far, int( math.floor( math.sqrt(2)*math.sqrt(Nmax) ) ) )
+    print "waiting for ",Nmax," random segments..",
     sys.stdout.flush()
+    t_before = time.time() 
     segs = gens.randomSegments(far,Nmax)
-    print ".done."
+    t_after = time.time()
+    print ".done in {0:.3f} seconds".format( (t_after - t_before) ) 
     id_list = []
     t_before = time.time() 
     for s in segs:
@@ -46,7 +53,7 @@ def timeVoronoiSegs(Nmax):
     
 if __name__ == "__main__":  
     far = 1
-    Nmax_exp = 32
+    Nmax_exp = 20
     # 10 -> 32 linesites
     # 14 -> 128
     # 18 -> 512
@@ -73,9 +80,9 @@ if __name__ == "__main__":
     for case in Nmax_list:
         n=case[0]
         Nmax=case[1]
-        times = timeVoronoiPoints(Nmax)
-        #times = timeVoronoiSegs(Nmax)
-        print n," ",Nmax," gens took ", sum(times) ," seconds, ", 1e6*float( sum(times) )/(float(Nmax)*float(math.log10(Nmax)))," us/n*log(n)"
+        #times = timeVoronoiPoints(Nmax)
+        times = timeVoronoiSegs(Nmax)
+        print n," voronoi-diagram for ",Nmax," sites took {0:.3f}".format(sum(times)) ," seconds, {0:.0f}".format( 1e6*float( sum(times) )/(float(Nmax)*float(math.log10(Nmax))) ) ,"us/n*log(n)"
         row = []
         row.append(Nmax)
         for t in times:

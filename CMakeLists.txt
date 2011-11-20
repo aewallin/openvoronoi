@@ -31,7 +31,6 @@ if (CMAKE_BUILD_TOOL MATCHES "make")
     
     # -pedantic -W -Wall -Wundef -Wfloat-equal -Wshadow -Winline -Wno-long-long
     add_definitions( -W -Wall -Wundef  -Wshadow -Wno-long-long -Wno-deprecated  -pedantic-errors)
-    add_definitions( -Wno-error=unused-variable )
     # this gives warning when comparing float/double with != or ==
     # -Wfloat-equal
     

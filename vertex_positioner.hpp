@@ -90,18 +90,7 @@ private:
     int solver_dispatch(Site* s1, double k1, 
                Site* s2, double k2, 
                Site* s3, double k3, std::vector<Solution>& slns ); 
-    
-    /*
-    int qll_solver( const std::vector< Eq<qd_real> >& lins, int xi, int yi, int ti, 
-                    const Eq<qd_real>& quad, qd_real k3, std::vector<Solution>& slns );
-    
-    int qll_solve( qd_real a0, qd_real b0, qd_real c0, qd_real d0, 
-                      qd_real e0, qd_real f0, qd_real g0, 
-                      qd_real a1, qd_real b1, 
-                      qd_real a2, qd_real b2, 
-                      qd_real soln[][3]);
-    */
-    
+        
 // geometry-checks
     double edge_error(HEEdge e, Solution& s );
     bool solution_on_edge(Solution& s);

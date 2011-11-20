@@ -152,8 +152,8 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
 int VertexPositioner::solver_dispatch(Site* s1, double k1, Site* s2, double k2, Site* s3, double k3, std::vector<Solution>& solns) {    
     if ( s1->isLine() && s2->isLine() && s3->isLine() ) 
         return lll_solver->solve( s1,k1,s2,k2,s3,k3, solns ); // all lines.
-    //else if ( s1->isPoint() && s2->isPoint() && s3->isPoint() )
-    //    return ppp_solver->solve( s1,k1,s2,k2,s3,k3, solns ); // all points
+    else if ( s1->isPoint() && s2->isPoint() && s3->isPoint() )
+        return ppp_solver->solve( s1,k1,s2,k2,s3,k3, solns ); // all points
     else
         return qll_solver->solve( s1,k1,s2,k2,s3,k3, solns ); // general case solver
  

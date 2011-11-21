@@ -284,6 +284,9 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
     it_start = vertex_map.find(idx1);
     it_end = vertex_map.find(idx2);
     assert( it_start != vertex_map.end() && it_end != vertex_map.end() );
+    if ( it_start == vertex_map.end() || it_end == vertex_map.end()) 
+        std::cout << " insert_line_site() ERROR. Can't find segment start/endpoint!ņ";
+        
     start = it_start->second;
     end = it_end->second;
     
@@ -669,8 +672,7 @@ void VoronoiDiagram::add_split_vertex(HEFace f, Site* s) {
         BOOST_FOREACH(HEEdge split_edge, split_edges) {
             if ( (g[split_edge].type == SEPARATOR) || (g[split_edge].type == LINESITE) )
                 return; // don't place split points on linesites or separators(?)
-            HEVertex split_src = g.source(split_edge);
-            HEVertex split_trg = g.target(split_edge);
+
             
             /*
             std::cout << " split src=" << g[split_src].index << "("<< g[split_src].dist() << ")";
@@ -680,7 +682,11 @@ void VoronoiDiagram::add_split_vertex(HEFace f, Site* s) {
             // find a point = src + u*(trg-src)
             // with min_t < u < max_t
             // and minimum distance to the pt1-pt2 line
-            
+        
+        
+        #ifdef TOMS748
+            HEVertex split_src = g.source(split_edge);
+            HEVertex split_trg = g.target(split_edge);
             SplitPointError errFunctr(this, split_edge, pt1, pt2); // error functor
             typedef std::pair<double, double> Result;
             boost::uintmax_t max_iter=500;
@@ -693,23 +699,33 @@ void VoronoiDiagram::add_split_vertex(HEFace f, Site* s) {
                 
             Result r1 = boost::math::tools::toms748_solve(errFunctr, min_t, max_t, tol, max_iter);
             Point split_pt = g[split_edge].point( r1.first ); 
-            
+        #endif
+        
             // alternative SPLIT-vertex positioning:
             // - create virtual line-site vs: same direction as s(lineSite), but goes through fs(pointSite)
             // - use solver to position SPLIT vertex. The sites are: (vs,fs, fs-adjacent)
-            //Site* vs = new LineSite(*s);
-            //vs->set_c( fs->position() ); // modify the line-equation so that the line goes trough fs->position()
-            //Solution sl = vpos->position( split_edge, vs );
-            
+        #ifndef TOMS748
+            Site* vs = new LineSite(*s);
+            vs->set_c( fs->position() ); // modify the line-equation so that the line goes trough fs->position()
+            Solution sl = vpos->position( split_edge, vs );
+        #endif
+        
             HEVertex v = g.add_vertex();
             g[v].type = SPLIT;
             g[v].status = UNDECIDED;
-            //g[v].position = sl.p;
+        #ifndef TOMS748
+            g[v].position = sl.p;
+        #endif
+        
+        #ifdef TOMS748
             g[v].position = split_pt;
+        #endif
             g[v].init_dist( fs->position() );
             
-            //delete vs;
-            
+        #ifndef TOMS748
+            delete vs;
+        #endif
+        
             //std::cout << "toms748: " << split_pt << "\n";
             //std::cout << "solver:  " << sl.p << "\n";
             /*

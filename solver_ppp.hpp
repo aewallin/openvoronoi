@@ -66,7 +66,7 @@ int solve(      Site* s1, double k1,
     double J4 = (pi.x-pk.x)*(pj.y-pk.y) - (pj.x-pk.x)*(pi.y-pk.y);
     assert( J4 != 0.0 );
     if (J4==0.0)
-        std::cout << " Warning divide-by-zero!!\n";
+        std::cout << " PPPSolver: Warning divide-by-zero!!\n";
     Point pt = Point(-J2/J4 + pk.x, J3/J4 + pk.y);
     double dist = (pt-pi).norm();
     slns.push_back( Solution(  pt , dist , +1) );

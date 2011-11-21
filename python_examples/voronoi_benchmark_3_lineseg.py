@@ -4,6 +4,7 @@ import math
 import random
 import csv
 import sys
+import gc
 
 import ovdgenerators as gens
 
@@ -30,9 +31,10 @@ def timeVoronoiSegs(Nmax):
     print "waiting for ",Nmax," random segments..",
     sys.stdout.flush()
     t_before = time.time() 
-    segs = gens.randomSegments(far,Nmax)
+    segs = gens.randomSegments(far,Nmax,seed=1)
     t_after = time.time()
     print ".done in {0:.3f} seconds".format( (t_after - t_before) ) 
+    #print " first seg is ", segs[0]
     id_list = []
     t_before = time.time() 
     for s in segs:
@@ -53,7 +55,8 @@ def timeVoronoiSegs(Nmax):
     
 if __name__ == "__main__":  
     far = 1
-    Nmax_exp = 10
+    Nmax_exp_start = 5
+    Nmax_exp_end = 20
     # 10 -> 32 linesites
     # 14 -> 128
     # 18 -> 512
@@ -67,7 +70,7 @@ if __name__ == "__main__":
     # 36 -> 262144
     
     random.seed(1)
-    exp_list = [0.5*x for x in range(5,Nmax_exp+1)]
+    exp_list = [0.5*x for x in range(Nmax_exp_start,Nmax_exp_end+1)]
     Nmax_list=[]
     n=5
     for e in exp_list:
@@ -91,7 +94,7 @@ if __name__ == "__main__":
         for t in times:
             row.append(t)
         csvWriter.writerow( row )
-        
+        #gc.clean()
 
         
     print "PYTHON All DONE."

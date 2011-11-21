@@ -4,7 +4,8 @@ import random
 
 # this file has function for generating test-cases for OpenVoronoi
 
-def randomSegments(far=1,Nmax=1):
+def randomSegments(far=1,Nmax=1,seed=1):
+    random.seed(seed)
     segs = []
     for n in range(Nmax):
         seg = randomGenerators(far,2)

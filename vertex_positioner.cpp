@@ -62,8 +62,8 @@ Solution VertexPositioner::position(HEEdge e, Site* s) {
     HEFace face = vd->g[e].face;     
     HEEdge twin = vd->g[e].twin;
     HEFace twin_face = vd->g[twin].face;      
-    assert(  vd->g[face].status == INCIDENT);
-    assert( vd->g[twin_face].status == INCIDENT);
+    //assert(  vd->g[face].status == INCIDENT);
+    //assert( vd->g[twin_face].status == INCIDENT);
     
     HEVertex src = vd->g.source(e);
     HEVertex trg = vd->g.target(e);

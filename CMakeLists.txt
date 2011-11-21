@@ -37,21 +37,26 @@ if (CMAKE_BUILD_TOOL MATCHES "make")
     add_definitions(-fPIC)
 endif (CMAKE_BUILD_TOOL MATCHES "make")
 
+# uncomment one of these to change build-type
+ set(CMAKE_BUILD_TYPE Release)
+# set(CMAKE_BUILD_TYPE Debug)
+# set(CMAKE_BUILD_TYPE Profile)
 
-option(BUILD_TYPE
-  "Build type: Release=ON/Debug=OFF  " ON)
+MESSAGE(STATUS " CMAKE_BUILD_TYPE  = " ${CMAKE_BUILD_TYPE})
 
-if (BUILD_TYPE)
-    MESSAGE(STATUS " CMAKE_BUILD_TYPE = Release")
-    set(CMAKE_BUILD_TYPE Release)
-    add_definitions( -O3 ) 
-endif(BUILD_TYPE)
+if (CMAKE_BUILD_TYPE MATCHES "Profile")
+    set(CMAKE_CXX_FLAGS_PROFILE -pg)
+    MESSAGE(STATUS " CMAKE_CXX_FLAGS_PROFILE = " ${CMAKE_CXX_FLAGS_PROFILE})
+endif (CMAKE_BUILD_TYPE MATCHES "Profile")
 
-if (NOT BUILD_TYPE)
-    MESSAGE(STATUS " CMAKE_BUILD_TYPE = Debug")
-    set(CMAKE_BUILD_TYPE Debug)
-endif(NOT BUILD_TYPE)
 
+if (CMAKE_BUILD_TYPE MATCHES "Release")
+    MESSAGE(STATUS " CMAKE_CXX_FLAGS_RELEASE = " ${CMAKE_CXX_FLAGS_RELEASE})
+endif (CMAKE_BUILD_TYPE MATCHES "Release")
+
+if (CMAKE_BUILD_TYPE MATCHES "Debug")
+    MESSAGE(STATUS " CMAKE_CXX_FLAGS_DEBUG = " ${CMAKE_CXX_FLAGS_DEBUG})
+endif (CMAKE_BUILD_TYPE MATCHES "Debug")
 
 #
 # this figures out the Python include directories and adds them to the

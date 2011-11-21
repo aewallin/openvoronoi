@@ -54,9 +54,11 @@ if __name__ == "__main__":
     vod.drawFarCircle()
     vod.textScale = 0.002
     vod.vertexRadius = 0.000031
-    vod.drawVertices=1
+    vod.drawVertices=0
+    vod.drawVertexIndex=0
     
-    Nmax = 800
+    Nmax = 400
+    linesegs = 0
     print "waiting for ",Nmax," segments..",
     sys.stdout.flush()
     segs = gens.randomSegments(far,Nmax)
@@ -82,7 +84,7 @@ if __name__ == "__main__":
     #nsegs = 14 #Nmax
     n=1
     for s in id_list:
-        if n<= nsegs:
+        if n<= nsegs and linesegs==1:
             vd.addLineSite(s[0],s[1])
             print n," added line-segment"
         n=n+1

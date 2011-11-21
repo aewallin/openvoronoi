@@ -53,7 +53,7 @@ def timeVoronoiSegs(Nmax):
     
 if __name__ == "__main__":  
     far = 1
-    Nmax_exp = 18
+    Nmax_exp = 20
     # 10 -> 32 linesites
     # 14 -> 128
     # 18 -> 512
@@ -83,6 +83,9 @@ if __name__ == "__main__":
         #times = timeVoronoiPoints(Nmax)
         times = timeVoronoiSegs(Nmax)
         print n," voronoi-diagram for ",Nmax," sites took {0:.3f}".format(sum(times)) ," seconds, {0:.2f}".format( 1e6*float( sum(times) )/(float(Nmax)*float(math.log10(Nmax))) ) ,"us/n*log(n)"
+        if len(times)==2:
+            print "   ",2*Nmax," point-sites sites took {0:.3f}".format(times[0])," seconds, {0:.2f}".format( 1e6*float( times[0] )/(float(2*Nmax)*float(math.log10(2*Nmax))) ) ,"us/n*log(n)"
+            print "   ",Nmax," line-sites sites took {0:.3f}".format(times[1])," seconds, {0:.2f}".format( 1e6*float( times[1] )/(float(Nmax)*float(math.log10(Nmax))) ) ,"us/n*log(n)"
         row = []
         row.append(Nmax)
         for t in times:

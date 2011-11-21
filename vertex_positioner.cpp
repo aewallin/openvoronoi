@@ -141,11 +141,24 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     } 
 
     // either 0, or >= 2 solutions found. error.
-    std::cout << " None, or too many solutions found! candidates are:\n";
-    BOOST_FOREACH(Solution s, solutions ) {
-        std::cout << s.p << " t=" << s.t << " k3=" << s.k3 << " tr=" << s3->in_region(s.p) << " e_err=" << edge_error(edge,s) <<"\n";
+    std::cout << " None, or too many solutions found! \n";
+    std::cout << " solution edge: " << vd->g[ vd->g.source(edge) ].position << " - " << vd->g[ vd->g.target(edge) ].position << " type=" << vd->g[edge].type << "\n";
+    std::cout << " t-vals t_min= " << t_min << " t_max= " << t_max << "\n";
+    std::cout << "  sites: " << s1->str() << "(k="<< k1<< ") " << s2->str() << "(k="<< k2 << ") new= " << s3->str() << "\n";
+    std::cout << "s1= " << s1->str2() << "\n";
+    std::cout << "s2= " << s2->str2() << "\n";
+    std::cout << "s3= " << s3->str2() << "\n";
+    
+    // run the solver(s) one more time in order to print out un-filtered solution points for debugging
+    std::vector<Solution> solutions2;
+    solver_dispatch(s1,k1,s2,k2,s3,+1, solutions2);
+    if (!s3->isPoint()) // for points k3=+1 allways
+        solver_dispatch(s1,k1,s2,k2,s3,-1, solutions2); // for lineSite or ArcSite we try k3=-1 also    
+        
+    BOOST_FOREACH(Solution s, solutions2 ) {
+        std::cout << s.p << " t=" << s.t << " k3=" << s.k3 << " tr=" << s3->in_region(s.p) << " trt=" << s3->in_region_t(s.p) << " e_err=" << edge_error(edge,s) <<"\n";
     }
-    std::cout << " edge: " << vd->g[ vd->g.source(edge) ].position << " - " << vd->g[ vd->g.target(edge) ].position << "\n";
+    
     assert(0);
     return Solution( Point(0,0), -1, 1 );
 }
@@ -201,7 +214,6 @@ bool VertexPositioner::check_dist(HEEdge e, const Solution& sl, Site* s3) {
     
     double maxd = std::max( std::max( fabs(sl.t-d1),fabs(sl.t-d2)) , fabs(sl.t-d3));
     errstat.push_back(maxd);
-
         
     if ( !equal(d1,d2) || !equal(d1,d3) || !equal(d2,d3) ||
          !equal(sl.t,d1) || !equal(sl.t,d2) || !equal(sl.t,d3) ) {

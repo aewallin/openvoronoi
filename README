@@ -50,8 +50,22 @@ Sugihara, Iri, Inagaki, Imai, (2000) "topology oriented implementation
 - an approach to robust geometric algorithms" 
 http://dx.doi.org/10.1007/s004530010002
 
+Held, (1991) "On the Computational Geometry of Pocket Machining"
+Lecture notes in computer science, vol 500
+http://www.amazon.com/Computational-Geometry-Machining-Lecture-Computer/dp/3540541039/
+
 Held, (2001) "VRONI: an engineering approach to the reliable and 
 efficient computation of Voronoi diagrams of points and line 
 segments" http://dx.doi.org/10.1016/S0925-7721(01)00003-7
 
-todo: Held 1991 thesis, Held 2009 arcVroni paper, Burnikel-papers?
+Martin Held, Stefan Huber, (2009) "Topology-oriented incremental 
+computation of Voronoi diagrams of circular arcs and straight-line 
+segments", Computer-Aided Design, Volume 41, Issue 5, May 2009, Pages 327-338
+http://dx.doi.org/10.1016/j.cad.2008.08.004
+
+A smooth spiral tool path for high speed machining of 2D pockets  
+Computer-Aided Design, Volume 41, Issue 7, July 2009, Pages 539-550
+Martin Held, Christian Spielberger
+http://dx.doi.org/10.1016/j.cad.2009.04.002
+
+todo: Burnikel-papers? 

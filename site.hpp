@@ -113,6 +113,7 @@ public:
     virtual double a() const {assert(0); return 0;}
     virtual double b() const {assert(0); return 0;}
     virtual double c() const {assert(0); return 0;}
+    virtual void set_c(const Point& p) {}
     
     virtual std::string str() const {assert(0); return "Site";}
     virtual std::string str2() const {assert(0); return "Site";}
@@ -176,7 +177,16 @@ public:
         eq.c /= d;
         assert( fabs( eq.a*eq.a + eq.b*eq.b -1.0 ) < 1e-5);
     }
+    LineSite( Site& s ) {
+        eq = s.eqp();
+        face = s.face;
+        _start = s.start();
+        _end = s.end();
+    }
     ~LineSite() {}
+    virtual void set_c(const Point& p) {
+        eq.c = -( eq.a * p.x + eq.b * p.y );
+    }
     /// closest point on start-end segment to given point.
     /// project onto line and return either the projected point
     /// or one endpoint of the linesegment

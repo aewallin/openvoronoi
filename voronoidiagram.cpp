@@ -279,32 +279,13 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
     num_lsites++;
     int current_step=1;
     // find the vertices corresponding to idx1 and idx2
-    HEVertex start=HEVertex(), end=HEVertex();
-    //bool start_found=false;
-    //bool end_found=false;
-    // FIXME: search for vertex-descriptor from an index/descriptor table ( O(1) ?)
-    /*
-    BOOST_FOREACH( HEVertex v, g.vertices() ) {
-        if ( g[v].index == idx1 ) {
-            start = v;
-            //start_found = true;
-        }
-        if (g[v].index == idx2) {
-            end = v;
-            //end_found = true;
-        }
-    }*/
-    
+    HEVertex start=HEVertex(), end=HEVertex();    
     std::map<int,HEVertex>::iterator it_start, it_end;
     it_start = vertex_map.find(idx1);
     it_end = vertex_map.find(idx2);
     assert( it_start != vertex_map.end() && it_end != vertex_map.end() );
-    
     start = it_start->second;
     end = it_end->second;
-    //assert(start_found && end_found );
-    //std::cout << " found " << start_found << " startvert = " << g[start].index << " " << g[start].position <<"\n";
-    //std::cout << " found " << end_found << "     endvert = " << g[end].index << " " << g[end].position << "\n";
     
     g[start].type=ENDPOINT; 
     g[start].status=OUT; 
@@ -357,13 +338,13 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
     if (step==current_step) return false; current_step++;
 
     
-    augment_vertex_set( pos_site ); // should not matter if we use pos_site or neg_site here
+    augment_vertex_set( pos_site ); // it should not matter if we use pos_site or neg_site here
     //std::cout << "   delete-set is("<< v0.size() <<"): "; print_vertices(v0);
     
     if (step==current_step) return false; current_step++;
 
-    
-    // check that end_face is INCIDENT?
+    // todo(?) sanity checks:
+    // check that end_face is INCIDENT? 
     // check that tree includes end_face_seed ?
     
     add_vertices( pos_site );  
@@ -664,6 +645,7 @@ EdgeVector VoronoiDiagram::find_split_edges(HEFace f, Point pt1, Point pt2) {
 void VoronoiDiagram::add_split_vertex(HEFace f, Site* s) {
     if (s->isPoint())
         return; // no split-vertices when inserting point-sites
+        
     Site* fs = g[f].site;
     
     // don't search for split-vertex on the start or end face
@@ -697,30 +679,39 @@ void VoronoiDiagram::add_split_vertex(HEFace f, Site* s) {
             // with min_t < u < max_t
             // and minimum distance to the pt1-pt2 line
             
+            
             SplitPointError errFunctr(this, split_edge, pt1, pt2); // error functor
             typedef std::pair<double, double> Result;
             boost::uintmax_t max_iter=500;
             boost::math::tools::eps_tolerance<double> tol(30); // bits of tolerance?
             double min_t = std::min( g[split_src].dist() , g[split_trg].dist() );
             double max_t = std::max( g[split_src].dist() , g[split_trg].dist() );
-            
-            /*
-            std::cout << " min_t err=" << errFunctr(min_t) << " ";
-            std::cout << " max_t err=" << errFunctr(max_t) << "\n";
-            */
-            
             // require that min_t and max_t bracket the root
             if ( errFunctr(min_t)*errFunctr(max_t) >= 0 )
                 return;
                 
             Result r1 = boost::math::tools::toms748_solve(errFunctr, min_t, max_t, tol, max_iter);
             Point split_pt = g[split_edge].point( r1.first ); 
+            
+            // alternative SPLIT-vertex positioning:
+            // - create virtual line-site vs: same direction as s(lineSite), but goes through fs(pointSite)
+            // - use solver to position SPLIT vertex. The sites are: (vs,fs, fs-adjacent)
+            
+            //Site* vs = new LineSite(*s);
+            //vs->set_c( fs->position() ); // modify the line-equation so that the line goes trough fs->position()
+            //Solution sl = vpos->position( split_edge, vs );
+            
             HEVertex v = g.add_vertex();
             g[v].type = SPLIT;
             g[v].status = UNDECIDED;
+            //g[v].position = sl.p;
             g[v].position = split_pt;
             g[v].init_dist( fs->position() );
             
+            //delete vs;
+            
+            //std::cout << "toms748: " << split_pt << "\n";
+            //std::cout << "solver:  " << sl.p << "\n";
             /*
             std::cout << " new split-vertex " << g[v].index << " t=" << r1.first;
             std::cout << " inserted into edge " << g[split_src].index << "-" << g[split_trg].index  << "\n";

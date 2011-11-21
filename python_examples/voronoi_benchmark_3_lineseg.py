@@ -58,7 +58,7 @@ if __name__ == "__main__":
     # 14 -> 128
     # 18 -> 512
     # 20 -> 1024
-    # 24 -> 4096  lineseg benchmark crashes with segfault at 1448 generators!
+    # 24 -> 4096
     # 28 -> 16384
     # 32 -> 65536
     # 33 -> 92681

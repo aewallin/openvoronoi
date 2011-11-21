@@ -176,7 +176,6 @@ class VD:
                 self.myscreen.addActor( factor )
             
             if self.drawClearanceDisk:
-                #draw clearance-disk
                 cir_actor = Circle( center=(p.x,p.y,0), radius=pt[1]*self.scale, color=self.vertexColor )
                 self.verts.append(cir_actor)
                 self.myscreen.addActor(cir_actor)

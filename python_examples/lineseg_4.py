@@ -57,8 +57,9 @@ if __name__ == "__main__":
     vod.drawVertices=0
     vod.drawVertexIndex=0
     
-    Nmax = 400
-    linesegs = 0
+    Nmax = 10
+    linesegs = 1 # switch to turn on/off line-segments
+    
     print "waiting for ",Nmax," segments..",
     sys.stdout.flush()
     segs = gens.randomSegments(far,Nmax)

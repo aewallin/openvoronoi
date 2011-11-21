@@ -613,6 +613,7 @@ void VoronoiDiagram::mark_adjacent_faces( HEVertex v, Site* site) {
 
 // walk around the face f
 // return edges whose endpoints are on separate sides of pt1-pt2 line
+// todo ?not all edges found like this need SPLIT vertices?
 EdgeVector VoronoiDiagram::find_split_edges(HEFace f, Point pt1, Point pt2) {
     EdgeVector out;
     HEEdge current_edge = g[f].edge;
@@ -628,6 +629,7 @@ EdgeVector VoronoiDiagram::find_split_edges(HEFace f, Point pt1, Point pt2) {
             if ( src_is_right != trg_is_right  ) 
                     out.push_back(current_edge);
         }
+        
         current_edge = g[current_edge].next;   
         count++;
         assert(count<100); // some reasonable max number of edges in face, to avoid infinite loop

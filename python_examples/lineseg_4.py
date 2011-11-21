@@ -57,7 +57,7 @@ if __name__ == "__main__":
     vod.drawVertices=0
     vod.drawVertexIndex=0
     
-    Nmax = 10
+    Nmax = 200
     linesegs = 1 # switch to turn on/off line-segments
     
     print "waiting for ",Nmax," segments..",

@@ -83,8 +83,7 @@ Solution VertexPositioner::position(HEEdge e, Site* s) {
     std::cout << " err=" << edge_error(edge,sl) << "\n";
     */
     assert( solution_on_edge(sl) );
-    check_far_circle(sl.p);
-    //check_on_edge(e, p);
+    assert( check_far_circle(sl) );
     assert( check_dist(edge, sl, s) );
     
     return sl;
@@ -104,7 +103,6 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     if ( solutions.size() == 1 && (t_min<=solutions[0].t) && (t_max>=solutions[0].t) && (s3->in_region( solutions[0].p)) )
         return solutions[0];
     
-    //std::cout << " solver() done \n";
     // choose only t_min < t < t_max solutions 
     solutions.erase( std::remove_if(solutions.begin(),solutions.end(), t_filter(t_min,t_max) ), solutions.end() );
     // choose only in_region() solutions
@@ -178,10 +176,10 @@ double VertexPositioner::edge_error(HEEdge e, Solution& s) {
 }
 
 // new vertices should lie within the far_radius
-bool VertexPositioner::check_far_circle(const Point& p) {
-    if (!(p.norm() < 18*vd->far_radius)) {
+bool VertexPositioner::check_far_circle(Solution& s) {
+    if (!(s.p.norm() < 18*vd->far_radius)) {
         std::cout << "WARNING check_far_circle() new vertex outside far_radius! \n";
-        std::cout << p << " norm=" << p.norm() << " far_radius=" << vd->far_radius << "\n"; 
+        std::cout << s.p << " norm=" << s.p.norm() << " far_radius=" << vd->far_radius << "\n"; 
         return false;
     }
     return true;
@@ -190,8 +188,6 @@ bool VertexPositioner::check_far_circle(const Point& p) {
 // all vertices should be of degree three, i.e. three adjacent faces/sites
 // distance to the three adjacent sites should be equal
 bool VertexPositioner::check_dist(HEEdge e, const Solution& sl, Site* s3) {
-    //HEVertex trg = vd->g.target(e);
-    //HEVertex src = vd->g.source(e);
     HEFace face = vd->g[e].face;     
     HEEdge tw_edge = vd->g[e].twin;
     HEFace twin_face = vd->g[tw_edge].face;      

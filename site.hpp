@@ -86,7 +86,7 @@ public:
     virtual ~Site() {}
     /// return closest point on site to given point p
     virtual Point apex_point(const Point& p) = 0;
-    virtual const Point position() const {assert(0); return Point(0,0);}
+    inline virtual const Point position() const {assert(0); return Point(0,0);}
     virtual const Point start() const {assert(0); return Point(0,0);}
     virtual const Point end() const {assert(0); return Point(0,0);}
     Eq<double> eqp() {return eq;} 
@@ -116,8 +116,8 @@ public:
     
     virtual std::string str() const {assert(0); return "Site";}
     virtual std::string str2() const {assert(0); return "Site";}
-    virtual bool isPoint() const { return false;}
-    virtual bool isLine() const {  return false;}
+    inline virtual bool isPoint() const { return false;}
+    inline virtual bool isLine() const {  return false;}
     virtual bool in_region(const Point& ) const {return false;}
     virtual double in_region_t(const Point& ) const {return 0;} 
     
@@ -140,12 +140,12 @@ public:
     }
     ~PointSite() {}
     virtual Point apex_point(const Point& ) { return _p; }
-    virtual const Point position() const { return _p; }
+    inline virtual const Point position() const { return _p; }
     virtual double x() const {return _p.x;}
     virtual double y() const {return _p.y;}
     virtual double r() const {return 0;}
     virtual double k() const {return 0;}
-    virtual bool isPoint() const {return true;}
+    inline virtual bool isPoint() const {return true;}
     virtual std::string str() const {return "PointSite";}
     virtual std::string str2() const {
         std::string out = "PointSite: ";
@@ -216,7 +216,7 @@ public:
         //std::cout << "in_region t= " << t << "\n";
         return t;
     }
-    virtual bool isLine() const {return true;}
+    inline virtual bool isLine() const {return true;}
     virtual double a() const { return eq.a; }
     virtual double b() const { return eq.b; }
     virtual double c() const { return eq.c; }

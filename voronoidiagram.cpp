@@ -237,6 +237,7 @@ int VoronoiDiagram::insert_point_site(const Point& p, int step) {
     g[new_vert].type=POINTSITE; 
     g[new_vert].status=OUT; 
     g[new_vert].site = new PointSite(p);
+    vertex_map.insert( std::pair<int,HEVertex>(g[new_vert].index,new_vert) );
     
     HEFace closest_face = fgrid->grid_find_closest_face( p ); 
     HEVertex v_seed = find_seed_vertex(closest_face, g[new_vert].site ) ;
@@ -270,7 +271,6 @@ if (step==current_step) return -1; current_step++;
     
     assert( vd_checker->face_ok( newface ) );
     assert( vd_checker->is_valid() );
-    //print_faces();
     return g[new_vert].index;
 }
 
@@ -283,6 +283,7 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
     //bool start_found=false;
     //bool end_found=false;
     // FIXME: search for vertex-descriptor from an index/descriptor table ( O(1) ?)
+    /*
     BOOST_FOREACH( HEVertex v, g.vertices() ) {
         if ( g[v].index == idx1 ) {
             start = v;
@@ -292,7 +293,15 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
             end = v;
             //end_found = true;
         }
-    }
+    }*/
+    
+    std::map<int,HEVertex>::iterator it_start, it_end;
+    it_start = vertex_map.find(idx1);
+    it_end = vertex_map.find(idx2);
+    assert( it_start != vertex_map.end() && it_end != vertex_map.end() );
+    
+    start = it_start->second;
+    end = it_end->second;
     //assert(start_found && end_found );
     //std::cout << " found " << start_found << " startvert = " << g[start].index << " " << g[start].position <<"\n";
     //std::cout << " found " << end_found << "     endvert = " << g[end].index << " " << g[end].position << "\n";
@@ -603,12 +612,13 @@ void VoronoiDiagram::mark_vertex(HEVertex& v,  Site* site) {
 void VoronoiDiagram::mark_adjacent_faces( HEVertex v, Site* site) {
     assert( g[v].status == IN );
     FaceVector new_adjacent_faces = g.adjacent_faces( v ); 
-        
-    if (g[v].type == APEX || g[v].type == SPLIT)
-        assert( new_adjacent_faces.size()==2 );
-    else
-        assert( new_adjacent_faces.size()==3 );
     
+    assert( 
+        (g[v].type == APEX && new_adjacent_faces.size()==2 ) ||
+        (g[v].type == SPLIT && new_adjacent_faces.size()==2 ) ||
+        new_adjacent_faces.size()==3
+    );
+
     BOOST_FOREACH( HEFace adj_face, new_adjacent_faces ) {
         if ( g[adj_face].status  != INCIDENT ) {
             if ( site->isLine() )
@@ -1075,10 +1085,8 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
         */
         //std::cout << " k3 target-source: "<<  g[new_target].k3 << " - " << g[new_source].k3 << "\n";
 
-        
         g[apex].init_dist(f_site->apex_point(g[apex].position));
         modified_vertices.push_back( apex );
-        
     }
 }
 

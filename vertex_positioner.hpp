@@ -94,7 +94,7 @@ private:
 // geometry-checks
     double edge_error(HEEdge e, Solution& s );
     bool solution_on_edge(Solution& s);
-    bool check_far_circle(const Point& p);
+    bool check_far_circle(Solution& s);
     bool check_dist(HEEdge e, const Solution& s, Site* s3);
     bool equal(double d1, double d2);
   

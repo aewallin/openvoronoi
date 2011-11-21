@@ -153,7 +153,7 @@ class VoronoiDiagram {
         VertexVector v0;
         /// queue of vertices to be processed
         VertexQueue vertexQueue; 
-
+        std::map<int,HEVertex> vertex_map;
 };
 
 // class for passing to numerical boost::toms748 root-finding algorithm

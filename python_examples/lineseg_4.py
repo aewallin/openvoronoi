@@ -56,7 +56,7 @@ if __name__ == "__main__":
     vod.vertexRadius = 0.000031
     vod.drawVertices=1
     
-    Nmax = 20
+    Nmax = 800
     print "waiting for ",Nmax," segments..",
     sys.stdout.flush()
     segs = gens.randomSegments(far,Nmax)
@@ -84,6 +84,7 @@ if __name__ == "__main__":
     for s in id_list:
         if n<= nsegs:
             vd.addLineSite(s[0],s[1])
+            print n," added line-segment"
         n=n+1
     t_after = time.time()
     

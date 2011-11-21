@@ -681,7 +681,6 @@ void VoronoiDiagram::add_split_vertex(HEFace f, Site* s) {
             // with min_t < u < max_t
             // and minimum distance to the pt1-pt2 line
             
-            
             SplitPointError errFunctr(this, split_edge, pt1, pt2); // error functor
             typedef std::pair<double, double> Result;
             boost::uintmax_t max_iter=500;
@@ -698,7 +697,6 @@ void VoronoiDiagram::add_split_vertex(HEFace f, Site* s) {
             // alternative SPLIT-vertex positioning:
             // - create virtual line-site vs: same direction as s(lineSite), but goes through fs(pointSite)
             // - use solver to position SPLIT vertex. The sites are: (vs,fs, fs-adjacent)
-            
             //Site* vs = new LineSite(*s);
             //vs->set_c( fs->position() ); // modify the line-equation so that the line goes trough fs->position()
             //Solution sl = vpos->position( split_edge, vs );

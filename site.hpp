@@ -55,7 +55,6 @@ struct Eq {
         b-=other.b;
         c-=other.c;
         k-=other.k;
-
         return *this;
     }
         
@@ -113,7 +112,7 @@ public:
     virtual double a() const {assert(0); return 0;}
     virtual double b() const {assert(0); return 0;}
     virtual double c() const {assert(0); return 0;}
-    virtual void set_c(const Point& p) {}
+    virtual void set_c(const Point& ) {}
     
     virtual std::string str() const {assert(0); return "Site";}
     virtual std::string str2() const {assert(0); return "Site";}

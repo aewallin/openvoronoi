@@ -53,7 +53,7 @@ def timeVoronoiSegs(Nmax):
     
 if __name__ == "__main__":  
     far = 1
-    Nmax_exp = 20
+    Nmax_exp = 10
     # 10 -> 32 linesites
     # 14 -> 128
     # 18 -> 512

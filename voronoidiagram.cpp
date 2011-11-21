@@ -682,7 +682,7 @@ void VoronoiDiagram::add_split_vertex(HEFace f, Site* s) {
             // find a point = src + u*(trg-src)
             // with min_t < u < max_t
             // and minimum distance to the pt1-pt2 line
-        
+        #define TOMS748
         
         #ifdef TOMS748
             HEVertex split_src = g.source(split_edge);
@@ -796,6 +796,7 @@ void VoronoiDiagram::remove_split_vertex(HEFace f) {
 }
 
 // generate new voronoi-vertices on all IN-OUT edges 
+// Note: used only by insert_point_site() !!
 void VoronoiDiagram::add_vertices( Site* new_site ) {
     assert( !v0.empty() );
     EdgeVector q_edges = find_in_out_edges();       // new vertices generated on these IN-OUT edges
@@ -803,13 +804,19 @@ void VoronoiDiagram::add_vertices( Site* new_site ) {
         HEVertex q = g.add_vertex();
         g[q].status = NEW;
         modified_vertices.push_back(q);
-        /*
-        std::cout << "position new vertex " << g[q].index << " on ";
-        std::cout <<  g[ g.source(q_edges[m])].index << "(t=" << g[ g.source(q_edges[m])].dist() << ")-"; 
-        std::cout << g[ g.target(q_edges[m])].index << "(t=" << g[ g.target(q_edges[m])].dist() << ")";
-        std::cout <<  " edge, type=" << g[q_edges[m]].type << "\n";
-        */
+        
+
+        
         Solution sl = vpos->position( q_edges[m], new_site );
+        
+        if ( vpos->dist_error( q_edges[m], sl, new_site) > 1e-9 ) {
+            std::cout << "position new vertex " << g[q].index << " on ";
+            std::cout <<  g[ g.source(q_edges[m])].index << "(t=" << g[ g.source(q_edges[m])].dist() << ")-"; 
+            std::cout << g[ g.target(q_edges[m])].index << "(t=" << g[ g.target(q_edges[m])].dist() << ")";
+            std::cout <<  " , type=" << g[q_edges[m]].type << "\n";
+            std::cout <<  "     derr =" << vpos->dist_error( q_edges[m], sl, new_site) << "\n";
+        }
+        
         g[q].position = sl.p; // set position
         g[q].k3 = sl.k3;
         g[q].init_dist( new_site->apex_point( g[q].position ) ); // set initial clearance-disk

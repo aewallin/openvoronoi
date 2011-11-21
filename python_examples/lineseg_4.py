@@ -21,10 +21,13 @@ def writeFrame( w2if, lwr, n ):
     
 if __name__ == "__main__":  
     #print ocl.revision()
+    w=2500
+    h=1500
+    
     #w=1920
     #h=1080
-    w=1024
-    h=720
+    #w=1024
+    #h=720
     myscreen = ovdvtk.VTKScreen(width=w, height=h) 
     ovdvtk.drawOCLtext(myscreen, rev_text=ovd.revision() )
     
@@ -40,7 +43,7 @@ if __name__ == "__main__":
     random.seed(42)
     far = 1
     camPos = far
-    zmult = 4
+    zmult = 3
     # camPos/float(1000)
     myscreen.camera.SetPosition(0, -camPos/float(1000), zmult*camPos) 
     myscreen.camera.SetClippingRange(-(zmult+1)*camPos,(zmult+1)*camPos)
@@ -57,14 +60,14 @@ if __name__ == "__main__":
     vod.drawVertices=0
     vod.drawVertexIndex=0
     
-    Nmax = 200
+    Nmax = 4096
     linesegs = 1 # switch to turn on/off line-segments
     
     print "waiting for ",Nmax," segments..",
     sys.stdout.flush()
     segs = gens.randomSegments(far,Nmax)
     print ".done."
-
+    times=[]
     id_list = []
     m=0
     t_before = time.time()
@@ -78,19 +81,26 @@ if __name__ == "__main__":
         m=m+1
         id_list.append( seg_id )
         #print seg[0].x," , ",seg[1].x
-
+    t_after = time.time()
+    times.append( t_after-t_before )
     #exit()
     
     nsegs = Nmax
-    #nsegs = 14 #Nmax
+    #nsegs = 1 #Nmax
     n=1
+    t_before = time.time()
     for s in id_list:
         if n<= nsegs and linesegs==1:
             vd.addLineSite(s[0],s[1])
             print n," added line-segment"
         n=n+1
     t_after = time.time()
+    times.append( t_after-t_before )
     
+    print "   ",2*Nmax," point-sites sites took {0:.3f}".format(times[0])," seconds, {0:.2f}".format( 1e6*float( times[0] )/(float(2*Nmax)*float(math.log10(2*Nmax))) ) ,"us/n*log(n)"
+    print "   ",Nmax," line-sites sites took {0:.3f}".format(times[1])," seconds, {0:.2f}".format( 1e6*float( times[1] )/(float(Nmax)*float(math.log10(Nmax))) ) ,"us/n*log(n)"
+            
+    vod.setVDText2(times)
     
     #s = id_list[nsegs]
     #vd.addLineSite( s[0], s[1], 5) 
@@ -122,5 +132,9 @@ if __name__ == "__main__":
         
     print "PYTHON All DONE."
 
-    myscreen.render()    
+    myscreen.render()   
+    w2if.Modified()
+    lwr.SetFileName("{0}.png".format(Nmax))
+    lwr.Write()
+     
     myscreen.iren.Start()

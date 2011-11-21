@@ -59,8 +59,13 @@ class VD:
         myscreen.addActor(self.vdtext)
         self.actors.append( self.vdtext )
         
+        self.vdtext2  = Text()
+        self.vdtext2.SetPos( (myscreen.width-500, 200) ) 
+        myscreen.addActor(self.vdtext2)
+        self.actors.append( self.vdtext2 )
+        
         self.gittext  = Text()
-        self.gittext.SetPos( (50, 30) )
+        self.gittext.SetPos( (50, 50) )
         self.gittext_text = "github.com/aewallin"
         self.gittext.SetText( self.gittext_text )
         myscreen.addActor(self.gittext)
@@ -105,7 +110,7 @@ class VD:
         self.N_linegen = self.vd.numLineSites()
 
         #self.vdtext_text = " "
-        self.vdtext_text = "VD with :\n"
+        self.vdtext_text = "Voronoi-Diagram with :\n"
         self.vdtext_text += str(self.N_pointgen) + " point-sites.\n"
         self.vdtext_text += str(self.N_linegen) + " line-sites.\n"
         #self.vdtext_text += "YELLOW = New point-generator/site\n"
@@ -113,6 +118,19 @@ class VD:
         #self.vdtext_text += "RED = Delete vertices/edges\n"
         #self.vdtext_text += "GREEN = Modified VD edges\n"
         self.vdtext.SetText( self.vdtext_text )
+    
+    def setVDText2(self,times):
+        self.N_pointgen = self.vd.numPointSites()
+        self.N_linegen = self.vd.numLineSites()
+        pts = self.N_pointgen
+        print times
+        lns = self.N_linegen
+        self.vdtext2_text = "Used {0:.3f} seconds of CPU time to calculate diagram:\n".format(sum(times))
+        self.vdtext2_text += "N={0} point-sites in {1:.3f} s ".format(pts, times[0])
+        self.vdtext2_text += "= {0:.2f} us*N*log(N) \n".format( 1e6*float( times[0] )/(float(pts)*float(math.log10(pts))) )
+        self.vdtext2_text += "M={0} line-sites in {1:.3f} s ".format(lns, times[1])
+        self.vdtext2_text += "= {0:.2f} us*M*log(M)".format( 1e6*float( times[1] )/(float(lns)*float(math.log10(lns))) )
+        self.vdtext2.SetText( self.vdtext2_text )
         
         
     def setGenerators(self):

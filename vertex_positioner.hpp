@@ -82,6 +82,7 @@ public:
     Solution position( HEEdge e, Site* s);
 
     std::vector<double> get_stat() {return errstat;}
+    double dist_error(HEEdge e, const Solution& sl, Site* s3);
 private:
     Solution position(Site* s1, double k1, 
                       Site* s2, double k2, 

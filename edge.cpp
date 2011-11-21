@@ -69,8 +69,8 @@ Point EdgeProps::point(double t) const {
     } else {
         std::cout << " warning bisector sqrt(-1) discr1=" << discr1 << " discr2=" << discr2 << "!\n";
         std::cout << " t= " << t << "\n";
-        assert(0);
-        return Point(0,0);
+        // assert(0);
+        return Point(x[0] - x[1] - x[2]*t ,y[0] - y[1] - y[2]*t); // coordinates without sqrt()
     }
 }
 

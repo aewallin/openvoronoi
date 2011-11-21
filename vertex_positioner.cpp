@@ -85,6 +85,10 @@ Solution VertexPositioner::position(HEEdge e, Site* s) {
     assert( solution_on_edge(sl) );
     assert( check_far_circle(sl) );
     assert( check_dist(edge, sl, s) );
+    errstat.push_back( dist_error(edge, sl, s) );
+    if ( dist_error(edge, sl, s) > 1e-9 ) {
+        std::cout << " VertexPositioner::position() ERROR dist_error = " << dist_error(edge,  sl, s) << "\n";
+    }
     
     return sl;
 }
@@ -225,6 +229,22 @@ bool VertexPositioner::check_dist(HEEdge e, const Solution& sl, Site* s3) {
         return false;
     }
     return true;
+}
+
+double VertexPositioner::dist_error(HEEdge e, const Solution& sl, Site* s3) {
+    HEFace face = vd->g[e].face;     
+    HEEdge tw_edge = vd->g[e].twin;
+    HEFace twin_face = vd->g[tw_edge].face;      
+    
+    Site* s1 = vd->g[face].site;
+    Site* s2 = vd->g[twin_face].site;
+    
+    double d1 = (sl.p - s1->apex_point(sl.p) ).norm();
+    double d2 = (sl.p - s2->apex_point(sl.p) ).norm();  
+    double d3 = (sl.p - s3->apex_point(sl.p) ).norm(); 
+    
+    return std::max( std::max( fabs(sl.t-d1),fabs(sl.t-d2)) , fabs(sl.t-d3));
+
 }
 
 bool VertexPositioner::equal(double d1, double d2) {

@@ -337,7 +337,7 @@ class VD:
         
     def setAll(self):
         self.setVDText()
-        #self.setGenerators()
+        self.setGenerators()
         #self.setFar(vd)
         self.setVertices()
         #self.setEdgesPolydata(vd)

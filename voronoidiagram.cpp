@@ -37,6 +37,7 @@ VoronoiDiagram::VoronoiDiagram(double far, unsigned int n_bins) {
     num_psites=3;
     num_lsites=0;
     reset_vertex_count();
+    debug = false;
 }
 
 VoronoiDiagram::~VoronoiDiagram() { 
@@ -364,7 +365,8 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
     HEVertex v_seed = find_seed_vertex(start_face, pos_site ) ;
     mark_vertex( v_seed, pos_site );
     modified_vertices.push_back( v_seed );
-    //std::cout << " start face seed  = " << g[v_seed].index << " " << g[v_seed].position << "\n";
+    if (debug)
+        std::cout << " start face seed  = " << g[v_seed].index << " " << g[v_seed].position << "\n";
     
     if (step==current_step) return false; current_step++;
 
@@ -424,11 +426,11 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
     //std::cout << "faces " << start_face << " " << end_face << " " << pos_face << " " << neg_face << " repaired \n";
 
     // we are done and can remove split-vertices
-    /*
-    BOOST_FOREACH(HEFace f, incident_faces ) {
-        remove_split_vertex(f);
-    }
-    */
+    
+    //BOOST_FOREACH(HEFace f, incident_faces ) {
+    //    remove_split_vertex(f);
+    //}
+    
     
     reset_status();
     
@@ -598,17 +600,22 @@ void VoronoiDiagram::augment_vertex_set(  Site* site ) {
         if ( h < 0.0 ) { // mark IN if h<0 and passes (C4) and (C5) tests and in_region(). otherwise mark OUT
             if ( predicate_c4(v) || !predicate_c5(v) || !site->in_region(g[v].position) ) {
                 g[v].status = OUT; // C4 or C5 violated, so mark OUT
-                //std::cout << g[v].index << " marked OUT (topo): c4="<< predicate_c4(v) << " c5=" << !predicate_c5(v) << " r=" << !site->in_region(g[v].position) << " h=" << h << "\n";
+                if (debug)
+                    std::cout << g[v].index << " marked OUT (topo): c4="<< predicate_c4(v) << " c5=" << !predicate_c5(v) << " r=" << !site->in_region(g[v].position) << " h=" << h << "\n";
             } else {
                 mark_vertex( v,  site); // h<0 and no violations, so mark IN. push adjacent UNDECIDED vertices onto Q.
-                //std::cout << g[v].index << " marked IN (in_circle) ( " << h << " )\n";
+                if (debug)
+                    std::cout << g[v].index << " marked IN (in_circle) ( " << h << " )\n";
             }
         } else { 
             g[v].status = OUT; // detH was positive (or zero), so mark OUT
-            //std::cout << g[v].index << " marked OUT (in_circle) ( " << h << " )\n";
+            if (debug)
+                std::cout << g[v].index << " marked OUT (in_circle) ( " << h << " )\n";
         }
         modified_vertices.push_back( v );
     }
+    
+    assert( vertexQueue.empty() );
     
     // sanity-check: for all incident_faces the IN-vertices should be connected
     //assert( vd_checker->incidentFaceVerticesConnected(  IN ) );
@@ -628,6 +635,8 @@ void VoronoiDiagram::mark_vertex(HEVertex& v,  Site* site) {
                 // when pushing onto queue we also evaluate in_circle predicate so that we process vertices in the correct order
                 vertexQueue.push( VertexDetPair(w , g[w].in_circle(site->apex_point(g[w].position)) ) ); 
                 g[w].in_queue=true;
+                if (debug)
+                    std::cout << "  " << g[w].index << " queued \n";
         }
     }
 }
@@ -648,7 +657,7 @@ void VoronoiDiagram::mark_adjacent_faces( HEVertex v, Site* site) {
         if ( g[adj_face].status  != INCIDENT ) {
             if ( site->isLine() )
                 add_split_vertex(adj_face, site);
-                
+
             g[adj_face].status = INCIDENT; 
             incident_faces.push_back(adj_face);
         }
@@ -703,7 +712,11 @@ void VoronoiDiagram::add_split_vertex(HEFace f, Site* s) {
     if ( fs->isPoint() && s->isLine() && s->in_region( fs->position() ) ) {
         // 1) find the correct edge
         Point pt1 = fs->position();
-        Point pt2 = s->apex_point(pt1);       
+        //Point pt2 = s->apex_point(pt1);       
+        
+                //Point line_dir( new_site->a(), new_site->b() );
+        Point pt2 = pt1-Point( s->a(), s->b() ); 
+        
         assert( (pt1-pt2).norm() > 0 ); 
         
         EdgeVector split_edges = find_split_edges(f, pt1, pt2);
@@ -849,7 +862,7 @@ void VoronoiDiagram::remove_split_vertex(HEFace f) {
         
         assert( vd_checker->check_edge(new1) );
         assert( vd_checker->check_edge(new2) );
-        
+        assert( vd_checker->face_ok( f ) );
     }
     
     assert( vd_checker->face_ok( f ) );
@@ -1046,9 +1059,13 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
     bool src_sign=true, trg_sign=true;
     if (f_site->isPoint()  && new_site->isLine() ) {
         Point pt1 = f_site->position();
+        //Point line_dir( new_site->a(), new_site->b() );
+        //Point pt2 = pt1-line_dir; 
         Point pt2 = new_site->apex_point(pt1);
+        
         src_sign = g[new_source].position.is_right( pt1, pt2 );
         trg_sign = g[new_target].position.is_right( pt1, pt2 );
+        
     } else if (f_site->isPoint() && new_site->isPoint() ) {
         src_sign = g[new_source].position.is_right( f_site->position(), new_site->position() );
         trg_sign = g[new_target].position.is_right( f_site->position(), new_site->position() );
@@ -1356,7 +1373,7 @@ bool VoronoiDiagram::predicate_c5(HEVertex v) {
         BOOST_FOREACH( HEVertex w, g.face_vertices(f) ) { 
             if ( w != v && g[w].status == IN && g.has_edge(w,v) )  // v should be adjacent to an IN vertex on the face
                 face_ok = true;
-            else if ( w!=v && ( g[w].type == ENDPOINT || g[w].type == APEX) ) // if we are next to an ENDPOINT, then ok(?)
+            else if ( w!=v && ( g[w].type == ENDPOINT || g[w].type == APEX  || g[w].type == SPLIT) ) // if we are next to an ENDPOINT, then ok(?)
                 face_ok=true;
         }
         if (!face_ok)

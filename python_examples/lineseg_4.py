@@ -55,10 +55,10 @@ if __name__ == "__main__":
     vod.drawFarCircle()
     vod.textScale = 0.002
     vod.vertexRadius = 0.000031
-    vod.drawVertices=0
+    vod.drawVertices=1
     vod.drawVertexIndex=1
     
-    Nmax = 181
+    Nmax = 400
     linesegs = 1 # switch to turn on/off line-segments
     
     print "waiting for ",Nmax," segments..",
@@ -84,7 +84,7 @@ if __name__ == "__main__":
     #exit()
     
     #nsegs = Nmax
-    nsegs = 7 #Nmax
+    nsegs = 183 #Nmax
     n=1
     t_before = time.time()
     for s in id_list:
@@ -95,8 +95,9 @@ if __name__ == "__main__":
     t_after = time.time()
     times.append( t_after-t_before )
     
-    #s = id_list[nsegs]
-    #vd.addLineSite( s[0], s[1], 5) 
+    s = id_list[nsegs]
+    vd.debug_on()
+    vd.addLineSite( s[0], s[1], 4) 
     #seg = id_list[nsegs]
     #vd.addLineSite(seg[0],seg[1],10)
     # 4 delete-tree

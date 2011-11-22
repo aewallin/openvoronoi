@@ -59,6 +59,7 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         .def("version", &VoronoiDiagram_py::version)
         .def("reset_vertex_count", &VoronoiDiagram_py::reset_vertex_count)
         .def("setEdgePoints", &VoronoiDiagram_py::set_edge_points)
+        .def("debug_on", &VoronoiDiagram_py::debug_on)
         .staticmethod("reset_vertex_count")
         .def("getStat", &VoronoiDiagram_py::getStat)
     ;

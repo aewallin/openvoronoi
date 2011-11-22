@@ -97,6 +97,7 @@ class VoronoiDiagram {
         friend class VertexPositioner;
         friend class SplitPointError;
         static void reset_vertex_count() { VoronoiVertex::reset_count(); }
+        void debug_on() {debug=true;}
     protected:
         /// initialize the diagram with three generators
         void initialize();
@@ -155,6 +156,7 @@ class VoronoiDiagram {
         /// queue of vertices to be processed
         VertexQueue vertexQueue; 
         std::map<int,HEVertex> vertex_map;
+        bool debug;
 };
 
 // class for passing to numerical boost::toms748 root-finding algorithm

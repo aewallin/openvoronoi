@@ -147,6 +147,9 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     // either 0, or >= 2 solutions found. error.
     std::cout << " None, or too many solutions found! solutions.size()=" << solutions.size() << "\n";
     std::cout << " solution edge: " << vd->g[ vd->g.source(edge) ].position << " - " << vd->g[ vd->g.target(edge) ].position << " type=" << vd->g[edge].type << "\n";
+    std::cout << " solution edge: " << vd->g[ vd->g.source(edge) ].index << " type=" << vd->g[ vd->g.source(edge) ].type;
+    std::cout << " - ";
+    std::cout << vd->g[ vd->g.target(edge) ].index << " type=" << vd->g[ vd->g.target(edge) ].type << "\n";
     std::cout << " t-vals t_min= " << t_min << " t_max= " << t_max << "\n";
     std::cout << "  sites: " << s1->str() << "(k="<< k1<< ") " << s2->str() << "(k="<< k2 << ") new= " << s3->str() << "\n";
     std::cout << "s1= " << s1->str2() << "\n";

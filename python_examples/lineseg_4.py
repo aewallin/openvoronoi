@@ -58,7 +58,7 @@ if __name__ == "__main__":
     vod.drawVertices=1
     vod.drawVertexIndex=1
     
-    Nmax = 400
+    Nmax = 4096
     linesegs = 1 # switch to turn on/off line-segments
     
     print "waiting for ",Nmax," segments..",
@@ -83,8 +83,8 @@ if __name__ == "__main__":
     times.append( t_after-t_before )
     #exit()
     
-    #nsegs = Nmax
-    nsegs = 183 #Nmax
+    nsegs = Nmax
+    #nsegs = 183 #Nmax
     n=1
     t_before = time.time()
     for s in id_list:
@@ -95,9 +95,9 @@ if __name__ == "__main__":
     t_after = time.time()
     times.append( t_after-t_before )
     
-    s = id_list[nsegs]
-    vd.debug_on()
-    vd.addLineSite( s[0], s[1], 4) 
+    #s = id_list[nsegs]
+    #vd.debug_on()
+    #vd.addLineSite( s[0], s[1], 5) 
     #seg = id_list[nsegs]
     #vd.addLineSite(seg[0],seg[1],10)
     # 4 delete-tree

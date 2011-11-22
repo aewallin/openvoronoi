@@ -433,9 +433,10 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
     
     
     reset_status();
-    
-    std::cout << "faces " << start_face << " " << end_face << " " << pos_face << " " << neg_face << " repaired \n";
-    std::cout << "insert_line_site(" << g[start].index << "-"<< g[end].index << ") done.\n";
+    if (debug) {
+        std::cout << "faces " << start_face << " " << end_face << " " << pos_face << " " << neg_face << " repaired \n";
+        std::cout << "insert_line_site(" << g[start].index << "-"<< g[end].index << ") done.\n";
+    }
     //std::cout << " num_lsites = " << num_lsites << "\n";
     
     assert( vd_checker->face_ok( start_face ) );
@@ -678,7 +679,7 @@ EdgeVector VoronoiDiagram::find_split_edges(HEFace f, Point pt1, Point pt2) {
         HEVertex src = g.source( current_edge );
         bool src_is_right = g[src].position.is_right(pt1,pt2);
         bool trg_is_right = g[trg].position.is_right(pt1,pt2);
-        if ( g[src].type == NORMAL || g[src].type == APEX ) {
+        if ( g[src].type == NORMAL || g[src].type == APEX || g[src].type == SPLIT) { //? check edge-type instead?
             if ( src_is_right != trg_is_right  ) 
                     out.push_back(current_edge);
         }
@@ -688,6 +689,12 @@ EdgeVector VoronoiDiagram::find_split_edges(HEFace f, Point pt1, Point pt2) {
         assert(count<100); // some reasonable max number of edges in face, to avoid infinite loop
         if ( current_edge == start_edge )
             done = true;
+    }
+    if (debug) {
+        std::cout << " face " << f << " requires SPLIT vertices on edges: \n";
+        BOOST_FOREACH( HEEdge e, out ) {
+            std::cout << "  " << g[g.source(e)].index << " - " << g[g.target(e)].index << "\n";
+        }
     }
     return out;
 }
@@ -714,7 +721,7 @@ void VoronoiDiagram::add_split_vertex(HEFace f, Site* s) {
         Point pt1 = fs->position();
         //Point pt2 = s->apex_point(pt1);       
         
-                //Point line_dir( new_site->a(), new_site->b() );
+        //Point line_dir( new_site->a(), new_site->b() );
         Point pt2 = pt1-Point( s->a(), s->b() ); 
         
         assert( (pt1-pt2).norm() > 0 ); 
@@ -728,11 +735,7 @@ void VoronoiDiagram::add_split_vertex(HEFace f, Site* s) {
                 return; // don't place split points on linesites or separators(?)
 
             
-            /*
-            std::cout << " split src=" << g[split_src].index << "("<< g[split_src].dist() << ")";
-            std::cout << " trg=" << g[split_trg].index << "("<< g[split_trg].dist() << ") \n";
-            std::cout << "is_right src=" << g[split_src].position.is_right(pt1,pt2) << "  trg="<< g[split_trg].position.is_right(pt1,pt2) << "\n";
-            */
+
             // find a point = src + u*(trg-src)
             // with min_t < u < max_t
             // and minimum distance to the pt1-pt2 line
@@ -741,6 +744,11 @@ void VoronoiDiagram::add_split_vertex(HEFace f, Site* s) {
         #ifdef TOMS748
             HEVertex split_src = g.source(split_edge);
             HEVertex split_trg = g.target(split_edge);
+            if (debug) {
+                std::cout << " split src=" << g[split_src].index << "("<< g[split_src].dist() << ")";
+                std::cout << " trg=" << g[split_trg].index << "("<< g[split_trg].dist() << ") \n";
+                std::cout << "is_right src=" << g[split_src].position.is_right(pt1,pt2) << "  trg="<< g[split_trg].position.is_right(pt1,pt2) << "\n";
+            }
             SplitPointError errFunctr(this, split_edge, pt1, pt2); // error functor
             typedef std::pair<double, double> Result;
             boost::uintmax_t max_iter=500;
@@ -782,10 +790,10 @@ void VoronoiDiagram::add_split_vertex(HEFace f, Site* s) {
         
             //std::cout << "toms748: " << split_pt << "\n";
             //std::cout << "solver:  " << sl.p << "\n";
-            /*
-            std::cout << " new split-vertex " << g[v].index << " t=" << r1.first;
-            std::cout << " inserted into edge " << g[split_src].index << "-" << g[split_trg].index  << "\n";
-            */
+            if (debug) {
+                std::cout << " new split-vertex " << g[v].index << " t=" << r1.first;
+                std::cout << " inserted into edge " << g[split_src].index << "-" << g[split_trg].index  << "\n";
+            }
             // 3) insert new SPLIT vertex into the edge
             add_vertex_in_edge(v, split_edge);
         }

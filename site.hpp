@@ -40,6 +40,14 @@ struct Eq {
     Scalar c;
     Scalar k;
     
+    Eq<Scalar>() {
+        a = Scalar(0);
+        b = Scalar(0);
+        c = Scalar(0);
+        k = Scalar(0);
+        q = false;
+    }
+    
     template<class Scalar2>
     Eq<Scalar>& operator=(const Eq<Scalar2>& other) {
         q = other.q;
@@ -104,22 +112,56 @@ public:
     bool is_linear() {return isLine(); }
     bool is_quadratic() {return isPoint();}
     
-    virtual double x() const {assert(0); return 0;}
-    virtual double y() const {assert(0); return 0;}
-    virtual double r() const {assert(0); return 0;}
-    virtual double k() const {assert(0); return 0;}
+    virtual double x() const {
+        std::cout << " WARNING: never call Site !\n";
+        assert(0); 
+        return 0;
+    }
+    virtual double y() const {
+        std::cout << " WARNING: never call Site !\n";
+        assert(0); 
+        return 0;
+    }
+    virtual double r() const {
+        std::cout << " WARNING: never call Site !\n";
+        assert(0); 
+        return 0;
+    }
+    virtual double k() const {
+        std::cout << " WARNING: never call Site !\n";
+        assert(0); 
+        return 0;
+    }
 
-    virtual double a() const {assert(0); return 0;}
-    virtual double b() const {assert(0); return 0;}
-    virtual double c() const {assert(0); return 0;}
+    virtual double a() const {
+        std::cout << " WARNING: never call Site !\n";
+        assert(0); 
+        return 0;
+    }
+    virtual double b() const {
+        std::cout << " WARNING: never call Site !\n";
+        assert(0); 
+        return 0;
+    }
+    virtual double c() const {
+        std::cout << " WARNING: never call Site !\n";
+        assert(0); 
+        return 0;
+    }
     virtual void set_c(const Point& ) {}
     
     virtual std::string str() const {assert(0); return "Site";}
     virtual std::string str2() const {assert(0); return "Site";}
     inline virtual bool isPoint() const { return false;}
-    inline virtual bool isLine() const {  return false;}
-    virtual bool in_region(const Point& ) const {return false;}
-    virtual double in_region_t(const Point& ) const {return 0;} 
+    inline virtual bool isLine() const  { return false;}
+    virtual bool in_region(const Point& ) const {
+        std::cout << " WARNING: never call Site !\n";
+        return false;
+    }
+    virtual double in_region_t(const Point& ) const {
+        std::cout << " WARNING: never call Site !\n";
+        return 0;
+    } 
     
     typedef unsigned int HEFace;    
     HEFace face;

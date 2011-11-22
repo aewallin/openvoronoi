@@ -47,7 +47,7 @@ public:
     bool all_in( const VertexVector& q);
 
     /// check that no undecided vertices remain in the face
-    bool  noUndecidedInFace(  HEFace f );
+    bool  noUndecidedInFace( HEFace f );
   
     bool faceVerticesConnected( HEFace f, VoronoiVertexStatus Vtype );
     bool incidentFaceVerticesConnected(  VoronoiVertexStatus Vtype );
@@ -55,6 +55,8 @@ public:
     bool current_face_equals_next_face( HEEdge e); 
     bool face_ok(HEFace f);
     bool all_faces_ok();
+    bool check_edge(HEEdge e);
+    
 private:
     VoronoiDiagram* vd;
 };

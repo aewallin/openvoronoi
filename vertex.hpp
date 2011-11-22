@@ -58,21 +58,14 @@ public:
     VoronoiVertex( Point p, VoronoiVertexStatus st);
     /// vertex with given position, status, and type
     VoronoiVertex( Point p, VoronoiVertexStatus st, VoronoiVertexType t);
+    virtual ~VoronoiVertex() {
+        //if (site)
+        //    delete site;
+    }
     void init();
     /// reset status
     void reset();
-    /// index of vertex
-    int index;
-    /// vertex status. when the incremental algorithm runs
-    /// vertices are marked: undecided, in, out, or new
-    VoronoiVertexStatus status;
-    VoronoiVertexType type;
-    bool in_queue;
-    /// the position of the vertex
-    Point position;
-
     friend class VoronoiDiagramChecker;
-    
     /// initialize clerance-disk
     void init_dist(const Point& p) { r = dist(p); }
     /// return distance to a point from this vertex
@@ -82,12 +75,21 @@ public:
     double dist() const { return r; }
     /// in-circle predicate 
     double in_circle(const Point& p) const { return dist(p) - r; }
-    /// if this vertex is a PointSite, then we store a pointer to the site here.
-    Site* site;
-    double k3; // the offset-direction to the newly inserted site.
     static void reset_count() {
         count = 0;
     }
+// DATA
+    int index;
+    /// vertex status. when the incremental algorithm runs
+    /// vertices are marked: undecided, in, out, or new
+    VoronoiVertexStatus status;
+    VoronoiVertexType type;
+    bool in_queue;
+    /// the position of the vertex
+    Point position;
+    /// if this vertex is a PointSite, then we store a pointer to the site here.
+    Site* site;
+    double k3; // the offset-direction to the newly inserted site.
 protected:
     /// global vertex count
     static int count;

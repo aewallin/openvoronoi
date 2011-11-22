@@ -28,6 +28,7 @@ def timeVoronoiPoints(Nmax):
 def timeVoronoiSegs(Nmax):
     far = 1
     vd = ovd.VoronoiDiagram(far, int( math.floor( math.sqrt(2)*math.sqrt(Nmax) ) ) )
+    vd.reset_vertex_count()
     print "waiting for ",Nmax," random segments..",
     sys.stdout.flush()
     t_before = time.time() 
@@ -55,7 +56,7 @@ def timeVoronoiSegs(Nmax):
     
 if __name__ == "__main__":  
     far = 1
-    Nmax_exp_start = 5
+    Nmax_exp_start = 13
     Nmax_exp_end = 20
     # 10 -> 32 linesites
     # 14 -> 128

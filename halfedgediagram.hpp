@@ -110,6 +110,8 @@ public:
     std::vector< TFaceProperties > faces;
     BGLGraph g;
 
+    virtual ~HEDIGraph(){}
+    
 /// add a blank vertex and return its descriptor
 Vertex add_vertex() { 
     return boost::add_vertex( g );

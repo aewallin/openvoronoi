@@ -53,8 +53,8 @@ EdgeProps::EdgeProps() {
 * ellipse (circle/circle)
 */
 Point EdgeProps::point(double t) const {
-    double discr1 =  chop( sq(x[4]+x[5]*t) - sq(x[6]+x[7]*t), 1e-16 );
-    double discr2 =  chop( sq(y[4]+y[5]*t) - sq(y[6]+y[7]*t), 1e-16 );
+    double discr1 =  chop( sq(x[4]+x[5]*t) - sq(x[6]+x[7]*t), 1e-14 );
+    double discr2 =  chop( sq(y[4]+y[5]*t) - sq(y[6]+y[7]*t), 1e-14 );
     if ( (discr1 >= 0) && (discr2 >= 0) ) {
         double psig = sign ? +1 : -1;
         double nsig = sign ? -1 : +1;

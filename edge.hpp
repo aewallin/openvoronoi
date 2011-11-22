@@ -21,6 +21,7 @@
 
 #include <cassert>
 #include <cmath>
+#include <boost/array.hpp>
 
 #include <boost/graph/adjacency_list.hpp>
 
@@ -61,8 +62,8 @@ struct EdgeProps {
     HEFace face; // each face corresponds to an input Site/generator
     double k; // offset-direction from the adjacent site, either +1 or -1
     VoronoiEdgeType type;
-    double x[8];
-    double y[8];
+    boost::array<double,8> x;
+    boost::array<double,8> y;
     bool sign; // choose either +/- in front of sqrt()
     
     Point point(double t) const; 

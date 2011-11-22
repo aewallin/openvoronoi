@@ -181,8 +181,11 @@ bool VoronoiDiagramChecker::in_circle_is_negative(  const Point& p, HEVertex min
 // check that all faces are ok
 bool VoronoiDiagramChecker::all_faces_ok() {
     for(HEFace f=0;f< vd->g.num_faces() ; f++ ) {
-        if (!face_ok(f))
-            return false;    
+        if (!face_ok(f)) {
+            std::cout << " all_faces_ok() ERROR: f= " << f << "\n";
+            vd->print_face(f);
+            return false;
+        }
     }
     return true;
 }
@@ -202,7 +205,18 @@ bool VoronoiDiagramChecker::face_ok(HEFace f) {
             return false;
         if ( !current_face_equals_next_face(current_edge) ) // all edges should have the same face
             return false;
-            
+        
+        if ( !check_edge(current_edge) ) {
+            std::cout << " face_ok() f= " << f << " check_edge ERROR\n";
+            std::cout << " edge: " << vd->g[ vd->g.source(current_edge)].index << " t=" << vd->g[ vd->g.source(current_edge)].type; 
+            std::cout << " - ";
+            std::cout <<  vd->g[ vd->g.target(current_edge)].index << " t=" << vd->g[ vd->g.target(current_edge) ].type; 
+            std::cout << " edge-type= " << vd->g[current_edge].type << "\n";
+            //HEEdge twin = vd->g[current_edge].twin;
+            //std::cout << " twin: " << vd->g[ vd->g.source(twin)].index << " - " <<  vd->g[ vd->g.target(twin)].index << "\n";
+            return false;
+        }
+        
         current_edge = vd->g[current_edge].next; 
         n++;
         assert( n < 10000 ); // reasonable max
@@ -234,7 +248,18 @@ bool VoronoiDiagramChecker::current_face_equals_next_face( HEEdge e) {
     }
     return true;
 }
-                    
+
+bool VoronoiDiagramChecker::check_edge(HEEdge e) {
+    HEVertex src = vd->g.source(e);
+    HEVertex trg = vd->g.target(e);
+    HEEdge twin = vd->g[e].twin;
+    if (twin == HEEdge() )
+        return true;
+    HEVertex tw_src = vd->g.source(twin);
+    HEVertex tw_trg = vd->g.target(twin);
+    return ( (src==tw_trg) && (trg==tw_src) );
+}
+                 
 /* OLD CODE NOT USED ANYMORE
 int VoronoiDiagram::outVertexCount(HEFace f) {
     int outCount = 0;

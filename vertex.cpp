@@ -17,7 +17,6 @@
  *  along with OpenCAMlib.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//#define NDEBUG  // this turns off assertions
 #include <cassert>
 
 #include <boost/assign.hpp>
@@ -47,21 +46,22 @@ VoronoiVertex::VoronoiVertex() {
 
 /// construct vertex at position p with type t
 VoronoiVertex::VoronoiVertex( Point p, VoronoiVertexStatus st) {
+    init();
     position=p;
     status=st;
     type = NORMAL;
-    init();
 }
     
 VoronoiVertex::VoronoiVertex( Point p, VoronoiVertexStatus st, VoronoiVertexType t) {
+    init();
     position=p;
     status=st;
     type=t;
-    init();
 }
 
 /// set index, increase count, initialize in_queue to false.
 void VoronoiVertex::init() {
+    site = 0;
     index = count;
     count++;
     in_queue = false;

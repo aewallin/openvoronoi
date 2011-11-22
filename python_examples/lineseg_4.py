@@ -21,13 +21,13 @@ def writeFrame( w2if, lwr, n ):
     
 if __name__ == "__main__":  
     #print ocl.revision()
-    w=2500
-    h=1500
+    #w=2500
+    #h=1500
     
     #w=1920
     #h=1080
-    #w=1024
-    #h=720
+    w=1024
+    h=720
     myscreen = ovdvtk.VTKScreen(width=w, height=h) 
     ovdvtk.drawOCLtext(myscreen, rev_text=ovd.revision() )
     
@@ -58,9 +58,9 @@ if __name__ == "__main__":
     vod.textScale = 0.002
     vod.vertexRadius = 0.000031
     vod.drawVertices=0
-    vod.drawVertexIndex=0
+    vod.drawVertexIndex=1
     
-    Nmax = 4096
+    Nmax = 181
     linesegs = 1 # switch to turn on/off line-segments
     
     print "waiting for ",Nmax," segments..",
@@ -85,8 +85,8 @@ if __name__ == "__main__":
     times.append( t_after-t_before )
     #exit()
     
-    nsegs = Nmax
-    #nsegs = 1 #Nmax
+    #nsegs = Nmax
+    nsegs = 6 #Nmax
     n=1
     t_before = time.time()
     for s in id_list:
@@ -97,13 +97,24 @@ if __name__ == "__main__":
     t_after = time.time()
     times.append( t_after-t_before )
     
+    #s = id_list[nsegs]
+    #vd.addLineSite( s[0], s[1], 5) 
+    #seg = id_list[nsegs]
+    #vd.addLineSite(seg[0],seg[1],10)
+    # 4 delete-tree
+    # 5 create new vertices
+    # 6 add startpoint separator
+    # 7 add endpoint separator
+    # 8 add new edges
+    # 9 delete delete-tree edges
+    # 10 reset status
+    
     print "   ",2*Nmax," point-sites sites took {0:.3f}".format(times[0])," seconds, {0:.2f}".format( 1e6*float( times[0] )/(float(2*Nmax)*float(math.log10(2*Nmax))) ) ,"us/n*log(n)"
     print "   ",Nmax," line-sites sites took {0:.3f}".format(times[1])," seconds, {0:.2f}".format( 1e6*float( times[1] )/(float(Nmax)*float(math.log10(Nmax))) ) ,"us/n*log(n)"
             
     vod.setVDText2(times)
     
-    #s = id_list[nsegs]
-    #vd.addLineSite( s[0], s[1], 5) 
+
     
     err = vd.getStat()
     #print err 
@@ -118,10 +129,7 @@ if __name__ == "__main__":
     print "num SPLIT vertices: ",vd.numSplitVertices() 
     # nmax= 20 gives 175(13)
     
-    # 4 delete-tree
-    # 5 create new vertices
-    # 6 add startpoint separator
-    # 7 add endpoint separator
+
     
     calctime = t_after-t_before
     if Nmax==0:

@@ -121,7 +121,13 @@ enum VoronoiFaceStatus {INCIDENT, NONINCIDENT};
 /// properties of a face in the voronoi diagram
 /// each face stores one edge on the boundary of the face
 struct FaceProps {
-    FaceProps( ) {}
+    FaceProps() {
+        site = 0;
+    }
+    virtual ~FaceProps() {
+        //if (site)
+        //    delete site;
+    }
     /// create face with given edge, generator, and type
     FaceProps( HEEdge e , Site* s, VoronoiFaceStatus st) : edge(e), site(s), status(st) {}
     /// operator for sorting faces
@@ -156,12 +162,12 @@ typedef boost::graph_traits< HEGraph::BGLGraph >::out_edge_iterator  HEOutEdgeIt
 typedef boost::graph_traits< HEGraph::BGLGraph >::adjacency_iterator HEAdjacencyItr;
 typedef boost::graph_traits< HEGraph::BGLGraph >::vertices_size_type HEVertexSize;
 
-// these containers are used instead of iterators when accessing
+// these containers are used, for simplicity, instead of iterators (like in BGL) when accessing
 // adjacent vertices, edges, faces.
 // FIXME: it may be faster to rewrite the code so it uses iterators, as does the BGL.
 typedef std::vector<HEVertex> VertexVector;
-typedef std::vector<HEFace> FaceVector;
-typedef std::vector<HEEdge> EdgeVector;  
+typedef std::vector<HEFace>   FaceVector;
+typedef std::vector<HEEdge>   EdgeVector;  
 
 } // end namespace
 #endif

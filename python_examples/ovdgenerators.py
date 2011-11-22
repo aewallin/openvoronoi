@@ -14,6 +14,25 @@ def randomSegments(far=1,Nmax=1,seed=1):
         segs.append(seg)
     return segs
 
+def randomSegments2(far=1,Nmax=1,seed=1):
+    random.seed(seed)
+    segs = []
+    for n in range(Nmax):
+        seg=randomSegment2(far,Nmax)
+        while segmentIntersects(segs, seg):
+            seg = randomSegment2(far,Nmax)
+        segs.append(seg)
+    return segs
+
+def randomSegment2(far,Nmax):
+    s1 = randomPoint(far)
+    s2 = s1+randomPoint(float(far)/math.sqrt(float(Nmax)))
+    while ( s2.norm() > far ):
+        s1 = randomPoint(far)
+        s2 = s1+randomPoint(float(far)/math.sqrt(float(Nmax)))
+
+    return [s1,s2]
+    
 def intersects(s1,s2):
     """ test if line-segment s1 intersects with line-segment s2 """
     p1 = s1[0]
@@ -45,7 +64,15 @@ def segmentIntersects(segs, s):
             return 1
     
     return 0 # no intersections found
-    
+
+def randomPoint(far):
+    # random points
+    #random.seed(seed)
+    pradius = (1.0/math.sqrt(2))*far
+    x=-pradius+2*pradius*random.random()
+    y=-pradius+2*pradius*random.random()
+    #plist.append( ovd.Point(x,y) )
+    return ovd.Point(x,y)
 
 def randomGenerators(far, Nmax):
     # random points

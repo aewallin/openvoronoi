@@ -25,14 +25,18 @@ def timeVoronoiPoints(Nmax):
     t_after = time.time()
     return [(t_after - t_before)]
 
-def timeVoronoiSegs(Nmax):
+def timeVoronoiSegs(Nmax, segtype=1):
     far = 1
     vd = ovd.VoronoiDiagram(far, int( math.floor( math.sqrt(2)*math.sqrt(Nmax) ) ) )
     vd.reset_vertex_count()
     print "waiting for ",Nmax," random segments..",
     sys.stdout.flush()
     t_before = time.time() 
-    segs = gens.randomSegments(far,Nmax,seed=1)
+    segs=[]
+    if segtype==1:
+        segs = gens.randomSegments(far,Nmax,seed=1)
+    elif segtype==2:
+        segs = gens.randomSegments2(far,Nmax,seed=1)
     t_after = time.time()
     print ".done in {0:.3f} seconds".format( (t_after - t_before) ) 
     #print " first seg is ", segs[0]
@@ -85,7 +89,7 @@ if __name__ == "__main__":
         n=case[0]
         Nmax=case[1]
         #times = timeVoronoiPoints(Nmax)
-        times = timeVoronoiSegs(Nmax)
+        times = timeVoronoiSegs(Nmax,segtype=1)
         print n," voronoi-diagram for ",Nmax," sites took {0:.3f}".format(sum(times)) ," seconds, {0:.2f}".format( 1e6*float( sum(times) )/(float(Nmax)*float(math.log10(Nmax))) ) ,"us/n*log(n)"
         if len(times)==2:
             print "   ",2*Nmax," point-sites sites took {0:.3f}".format(times[0])," seconds, {0:.2f}".format( 1e6*float( times[0] )/(float(2*Nmax)*float(math.log10(2*Nmax))) ) ,"us/n*log(n)"

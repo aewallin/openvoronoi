@@ -155,17 +155,19 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     std::cout << "s1= " << s1->str2() << "\n";
     std::cout << "s2= " << s2->str2() << "\n";
     std::cout << "s3= " << s3->str2() << "\n";
-    
+
     // run the solver(s) one more time in order to print out un-filtered solution points for debugging
     std::vector<Solution> solutions2;
     solver_dispatch(s1,k1,s2,k2,s3,+1, solutions2);
     if (!s3->isPoint()) // for points k3=+1 allways
         solver_dispatch(s1,k1,s2,k2,s3,-1, solutions2); // for lineSite or ArcSite we try k3=-1 also    
-        
+
     BOOST_FOREACH(Solution s, solutions2 ) {
-        std::cout << s.p << " t=" << s.t << " k3=" << s.k3 << " tr=" << s3->in_region(s.p) << " trt=" << s3->in_region_t(s.p) << " e_err=" << edge_error(edge,s) <<"\n";
+        std::cout << s.p << " t=" << s.t << " k3=" << s.k3  << " e_err=" << edge_error(edge,s) <<"\n";
+        std::cout << "   t_positive=" << (s.t>0) << " min<t<max=" << ((s.t>=t_min) && (s.t<=t_max));
+        std::cout << " in_region=" << s3->in_region(s.p) << " region-t=" << s3->in_region_t(s.p) << "\n";
     }
-    
+
     assert(0);
     return Solution( Point(0,0), -1, 1 );
 }

@@ -78,6 +78,7 @@ class VD:
         self.textScale = textscale
         self.drawVertexIndex=1
         self.drawVertices=1
+        self.drawGenerators=1
         
     def getActors(self):
         acts=[]
@@ -142,9 +143,10 @@ class VD:
             idx = pt_data[3] # index
             
             p = self.scale*pt
-            actor = Sphere( center=(p.x,p.y, 0), radius=self.vertexRadius, color=self.generatorColor )
-            self.gens.append(actor)
-            self.myscreen.addActor( actor )
+            if self.drawGenerators:
+                actor = Sphere( center=(p.x,p.y, 0), radius=self.vertexRadius, color=self.generatorColor )
+                self.gens.append(actor)
+                self.myscreen.addActor( actor )
             
             if self.drawVertexIndex:
                 id_text = str(idx)

@@ -22,10 +22,10 @@ if __name__ == "__main__":
     #w=2500
     #h=1500
     
-    #w=1920
-    #h=1080
-    w=1024
-    h=720
+    w=1920
+    h=1080
+    #w=1024
+    #h=720
     myscreen = ovdvtk.VTKScreen(width=w, height=h) 
     ovdvtk.drawOCLtext(myscreen, rev_text=ovd.revision() )
     
@@ -54,17 +54,20 @@ if __name__ == "__main__":
     vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
     vod.drawFarCircle()
     vod.textScale = 0.002
-    vod.vertexRadius = 0.000031
-    vod.drawVertices=1
-    vod.drawVertexIndex=1
+    vod.vertexRadius = 0.00031
+    vod.drawVertices=0
+    vod.drawVertexIndex=0
+    vod.drawGenerators=0
     
-    Nmax = 4096
+    Nmax = 2048
     linesegs = 1 # switch to turn on/off line-segments
     
     print "waiting for ",Nmax," segments..",
     sys.stdout.flush()
-    segs = gens.randomSegments(far,Nmax)
-    print ".done."
+    t_before = time.time()
+    segs = gens.randomSegments2(far,Nmax)
+    t_after = time.time()
+    print ".done in {0:.3f} s.".format( t_after-t_before )
     times=[]
     id_list = []
     m=0
@@ -141,7 +144,7 @@ if __name__ == "__main__":
 
     myscreen.render()   
     w2if.Modified()
-    lwr.SetFileName("{0}.png".format(Nmax))
+    lwr.SetFileName("{0}alt.png".format(Nmax))
     lwr.Write()
      
     myscreen.iren.Start()

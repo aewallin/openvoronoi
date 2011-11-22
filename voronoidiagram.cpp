@@ -424,10 +424,12 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
     //std::cout << "faces " << start_face << " " << end_face << " " << pos_face << " " << neg_face << " repaired \n";
 
     // we are done and can remove split-vertices
+    /*
     BOOST_FOREACH(HEFace f, incident_faces ) {
         remove_split_vertex(f);
     }
- 
+    */
+    
     reset_status();
     
     std::cout << "faces " << start_face << " " << end_face << " " << pos_face << " " << neg_face << " repaired \n";
@@ -777,61 +779,80 @@ void VoronoiDiagram::add_split_vertex(HEFace f, Site* s) {
     }
 }
 
+bool VoronoiDiagram::find_split_vertex(HEFace f, HEVertex& v)  {
+    VertexVector verts = g.face_vertices(f);
+    BOOST_FOREACH(HEVertex q, verts) {
+        if (g[q].type == SPLIT) {
+            v = q;
+            return true;
+        }
+    }
+    return false;
+}
+
 void VoronoiDiagram::remove_split_vertex(HEFace f) {
     
     //                    face1 e[1]
     //    v1_prev -> v1 -> SPLIT -> v2 -> v2_next
     //    v1_next <- v1 <- SPLIT <- v2 <- v2_prev
     //                  e[0]  face2
+    //
     // is replaced with a single edge:
     //                    face1
     //    v1_prev -> v1 ----------> v2 -> v2_next
     //    v1_next <- v1 <---------- v2 <- v2_prev
     //                     face2
+    assert( vd_checker->face_ok( f ) );
     
-    VertexVector verts = g.face_vertices(f);
-    BOOST_FOREACH(HEVertex v, verts) {
-        if (g[v].type == SPLIT) {
-            //std::cout << " removing split-vertex " << g[v].index << "\n";
-            EdgeVector edges = g.out_edges(v);
-            assert( edges.size() == 2);
-            assert( g.source(edges[0]) == v && g.source(edges[1]) == v );
-             
-            HEVertex v1 = g.target( edges[0] );
-            HEVertex v2 = g.target( edges[1] );
-            HEEdge v1_next = g[ edges[0] ].next;
-            HEEdge v1_prev = g.previous_edge( g[ edges[0] ].twin );
-            HEEdge v2_next = g[ edges[1] ].next;
-            HEEdge v2_prev = g.previous_edge( g[ edges[1] ].twin );
-            HEFace face1 = g[ edges[1] ].face;
-            HEFace face2 = g[ edges[0] ].face;
-            
-            HEEdge new1 = g.add_edge(v1,v2);
-            HEEdge new2 = g.add_edge(v2,v1);
-            g[new1].face = face1;
-            g[new2].face = face2;
-            g[new1].next = v2_next;
-            g[new2].next = v1_next;
-            g[v2_prev].next = new2;
-            g[v1_prev].next = new1;
-            g[face1].edge = new1;
-            g[face2].edge = new2;
-            
-            g[new1].copy_parameters( g[ edges[1] ] );
-            g[new2].copy_parameters( g[ edges[0] ] );
-            g.twin_edges(new1,new2);
-            g[new1].k = g[ edges[1] ].k;
-            g[new2].k = g[ edges[0] ].k;
-            g[new1].type = g[ edges[1] ].type;
-            g[new2].type = g[ edges[0] ].type;
-            
-            g.remove_edge(v,v1);
-            g.remove_edge(v1,v);
-            g.remove_edge(v,v2);
-            g.remove_edge(v2,v);
-            g.remove_vertex(v);
-        }
+    //VertexVector verts = g.face_vertices(f);
+    HEVertex v;
+    while ( find_split_vertex(f,v) ) {
+        assert(g[v].type == SPLIT); 
+        //std::cout << " removing split-vertex " << g[v].index << "\n";
+        EdgeVector edges = g.out_edges(v);
+        assert( edges.size() == 2);
+        assert( g.source(edges[0]) == v && g.source(edges[1]) == v );
+         
+        HEVertex v1 = g.target( edges[0] );
+        HEVertex v2 = g.target( edges[1] );
+        HEEdge v1_next = g[ edges[0] ].next;
+        HEEdge v1_prev = g.previous_edge( g[ edges[0] ].twin );
+        HEEdge v2_next = g[ edges[1] ].next;
+        HEEdge v2_prev = g.previous_edge( g[ edges[1] ].twin );
+        HEFace face1 = g[ edges[1] ].face;
+        HEFace face2 = g[ edges[0] ].face;
+        
+        HEEdge new1 = g.add_edge(v1,v2);
+        HEEdge new2 = g.add_edge(v2,v1);
+        g[new1].face = face1;
+        g[new2].face = face2;
+        g[new1].next = v2_next;
+        g[new2].next = v1_next;
+        g[v2_prev].next = new2;
+        g[v1_prev].next = new1;
+        g[face1].edge = new1;
+        g[face2].edge = new2;
+        
+        g[new1].copy_parameters( g[ edges[1] ] );
+        g[new2].copy_parameters( g[ edges[0] ] );
+        g.twin_edges(new1,new2);
+        g[new1].k = g[ edges[1] ].k;
+        g[new2].k = g[ edges[0] ].k;
+        g[new1].type = g[ edges[1] ].type;
+        g[new2].type = g[ edges[0] ].type;
+        
+        g.remove_edge(v,v1);
+        g.remove_edge(v1,v);
+        g.remove_edge(v,v2);
+        g.remove_edge(v2,v);
+        g.remove_vertex(v);
+        
+        assert( vd_checker->check_edge(new1) );
+        assert( vd_checker->check_edge(new2) );
+        
     }
+    
+    assert( vd_checker->face_ok( f ) );
 }
 
 // generate new voronoi-vertices on all IN-OUT edges 

@@ -17,8 +17,6 @@ def writeFrame( w2if, lwr, n ):
     lwr.SetFileName( filename )
     #lwr.Write()
 
-
-    
 if __name__ == "__main__":  
     #print ocl.revision()
     #w=2500
@@ -86,7 +84,7 @@ if __name__ == "__main__":
     #exit()
     
     #nsegs = Nmax
-    nsegs = 6 #Nmax
+    nsegs = 7 #Nmax
     n=1
     t_before = time.time()
     for s in id_list:

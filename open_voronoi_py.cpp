@@ -100,6 +100,7 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         .def("__str__", &Point::str)
         .def_readwrite("x", &Point::x)
         .def_readwrite("y", &Point::y)
+        .def_pickle(point_pickle_suite())
     ;
 }
 

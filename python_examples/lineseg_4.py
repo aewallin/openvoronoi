@@ -7,7 +7,8 @@ import math
 import random
 import os
 import sys
-
+import pickle
+import gzip
 import ovdgenerators as gens
 
 def writeFrame( w2if, lwr, n ):
@@ -59,8 +60,8 @@ if __name__ == "__main__":
     vod.drawVertexIndex=0
     vod.drawGenerators=0
     
-    Nmax = 124
-    # Nmax = 2048
+    # Nmax = 1024
+    Nmax = 512
     # 1024, 1.247sec, 398 SPLIT verts
     
     linesegs = 1 # switch to turn on/off line-segments
@@ -68,7 +69,13 @@ if __name__ == "__main__":
     print "waiting for ",Nmax," segments..",
     sys.stdout.flush()
     t_before = time.time()
-    segs = gens.randomSegments(far,Nmax)
+    #segs = gens.randomSegments(far,Nmax)
+    filename = "data/randomsegments_{0}.pickle.gz".format(Nmax)
+    f = gzip.open(filename, 'rb')
+    pstring = f.read()
+    segs = pickle.loads( pstring )
+    f.close()
+    
     t_after = time.time()
     print ".done in {0:.3f} s.".format( t_after-t_before )
     times=[]
@@ -146,6 +153,6 @@ if __name__ == "__main__":
     myscreen.render()   
     w2if.Modified()
     lwr.SetFileName("{0}alt.png".format(Nmax))
-    lwr.Write()
+    #lwr.Write()
      
     myscreen.iren.Start()

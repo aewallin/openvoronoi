@@ -259,7 +259,7 @@ public:
         Point s_p = p-_start;
         Point s_e = _end - _start;
         double t = s_p.dot(s_e) / s_e.dot(s_e);
-        double eps = 1e-9;
+        double eps = 1e-5;
         if (fabs(t) < eps)  // rounding... UGLY
             t = 0.0;
         else if ( fabs(t-1.0) < eps )

@@ -11,7 +11,7 @@ import ovdgenerators as gens
 def timeVoronoiPoints(Nmax):
     far = 1
     vd = ovd.VoronoiDiagram(far, int( math.floor( math.sqrt(2)*math.sqrt(Nmax) ) ) )
-    print "waiting for ",Nmax," random points..",
+    print "waiting for {0} random points..".format(Nmax)
     sys.stdout.flush()
     t_before = time.time() 
     plist = gens.randomGenerators(far, Nmax)
@@ -65,12 +65,12 @@ if __name__ == "__main__":
     # 10 -> 32 linesites
     # 14 -> 128
     # 18 -> 512
-    # 20 -> 1024
+    # 20 -> 1024        timeVoronoiSegs() segtype=1 (Release-build) (398-splitverts)
     # 24 -> 4096
     # 28 -> 16384
     # 32 -> 65536
     # 33 -> 92681
-    # 34 -> 131072
+    # 34 -> 131072      timeVoronoiPoints() (Release-build)
     # 35 -> 185363
     # 36 -> 262144
     

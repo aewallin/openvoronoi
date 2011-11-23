@@ -427,9 +427,9 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
 
     // we are done and can remove split-vertices
     
-    //BOOST_FOREACH(HEFace f, incident_faces ) {
+    // BOOST_FOREACH(HEFace f, incident_faces ) {
     //    remove_split_vertex(f);
-    //}
+    // }
     
     
     reset_status();

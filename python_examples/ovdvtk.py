@@ -60,7 +60,7 @@ class VD:
         self.actors.append( self.vdtext )
         
         self.vdtext2  = Text()
-        self.vdtext2.SetPos( (myscreen.width-500, 200) ) 
+        self.vdtext2.SetPos( (myscreen.width-500, 50) ) 
         myscreen.addActor(self.vdtext2)
         self.actors.append( self.vdtext2 )
         
@@ -126,7 +126,7 @@ class VD:
         pts = self.N_pointgen
         print times
         lns = self.N_linegen
-        self.vdtext2_text = "Used {0:.3f} seconds of CPU time to calculate diagram:\n".format(sum(times))
+        self.vdtext2_text = "Used {0:.3f} s CPU time:\n".format(sum(times))
         self.vdtext2_text += "N={0} point-sites in {1:.3f} s ".format(pts, times[0])
         self.vdtext2_text += "= {0:.2f} us*N*log(N) \n".format( 1e6*float( times[0] )/(float(pts)*float(math.log10(pts))) )
         self.vdtext2_text += "M={0} line-sites in {1:.3f} s ".format(lns, times[1])
@@ -203,41 +203,83 @@ class VD:
     
     
         
-    def setEdgesPolydata(self, vd):
-        self.edges = []
-        self.edges = vd.getEdgesGenerators()
-        self.epts = vtk.vtkPoints()
-        nid = 0
-        lines=vtk.vtkCellArray()
+    def setEdgesPolydata(self):
         for e in self.edges:
-            p1 = self.scale*e[0]
-            p2 = self.scale*e[1] 
-            self.epts.InsertNextPoint( p1.x, p1.y, 0)
-            self.epts.InsertNextPoint( p2.x, p2.y, 0)
-            line = vtk.vtkLine()
-            line.GetPointIds().SetId(0,nid)
-            line.GetPointIds().SetId(1,nid+1)
-            nid = nid+2
-            lines.InsertNextCell(line)
-        
+            self.myscreen.removeActor(e)
+        self.edges = []
+        self.edgePoints = vtk.vtkPoints()
+        self.lineCells=vtk.vtkCellArray()
+        self.colorLUT = vtk.vtkLookupTable()
+        idx = 0
+        last_idx = 0
+        vd_edges = self.vd.getVoronoiEdges()
+        for e in vd_edges:
+            epts  = e[0]  # points
+            etype = e[1]  # type
+
+            first = 1
+            segs=[]
+            for p in epts:
+                self.edgePoints.InsertNextPoint( p.x, p.y, 0)
+                if first==0:
+                    seg = [last_idx,idx]
+                    segs.append(seg)
+                first = 0
+                last_idx = idx
+                idx = idx + 1
+                
+            # create line and ce
+            #line = vtk.vtkLine()
+            #for idx in pt_ids:
+            for seg in segs:
+                line = vtk.vtkLine()
+                line.GetPointIds().SetId(0, seg[0])
+                line.GetPointIds().SetId(1, seg[1])
+                #print " indexes: ", seg[0]," to ",seg[1]
+                self.lineCells.InsertNextCell(line)
+        Colors = vtk.vtkUnsignedCharArray()
+
+
+        self.colorLUT = vtk.vtkUnsignedCharArray()
+        self.colorLUT.SetNumberOfComponents(3)
+        self.colorLUT.SetName("Colors")
+        #self.colorLUT.SetNumberOfTableValues(idx)
+        #self.colorLUT.Build()
+        # go through edges once more and set colors
+        m=0
+        for e in vd_edges:
+            src_status = e[2] # src status
+            trg_status = e[3] # trg status
+            ecolor = self.edgeTypeColor( e[1], e[2], e[3] ) 
+            #print ecolor
+            for dummy in e[0]: # go through all the points
+                self.colorLUT.InsertNextTuple3( 255*ecolor[0], 255*ecolor[1], 255*ecolor[2])
+                m=m+1
+
         linePolyData = vtk.vtkPolyData()
-        linePolyData.SetPoints(self.epts)
-        linePolyData.SetLines(lines)
+        linePolyData.SetPoints(self.edgePoints)
+        linePolyData.SetLines(self.lineCells)
+        linePolyData.GetPointData().SetScalars(self.colorLUT)
+        linePolyData.Modified() 
+        linePolyData.Update()
         
         mapper = vtk.vtkPolyDataMapper()
         mapper.SetInput(linePolyData)
+        #mapper.SetScalarRange(0, idx-1)
+        #mapper.SetLookupTable(self.colorLUT)
+        #mapper.Update()
         
         self.edge_actor = vtk.vtkActor()
         self.edge_actor.SetMapper(mapper)
-        self.edge_actor.GetProperty().SetColor( cyan )
+        #self.edge_actor.GetProperty().SetColor( cyan )
         self.myscreen.addActor( self.edge_actor )
-        self.myscreen.render() 
+        self.edges.append(self.edge_actor)
+        #self.myscreen.render() 
         
     def edgeStatusColor(self, src_status, trg_status, default_color):
+        
         if ( (src_status == ovd.VoronoiVertexStatus.IN) and (trg_status == ovd.VoronoiVertexStatus.IN)):
             return red
-        #elif ( (src_status == ovd.VoronoiVertexStatus.IN) and (trg_status == ovd.VoronoiVertexStatus.OUT)):
-        #    return purple
         elif ( ((src_status == ovd.VoronoiVertexStatus.OUT) and 
              (trg_status == ovd.VoronoiVertexStatus.IN) ) or 
              ((src_status == ovd.VoronoiVertexStatus.IN) and 
@@ -257,7 +299,25 @@ class VD:
             return green
         else:
             return default_color
-
+            
+    
+    def edgeTypeColor(self, edgeType, src_status, trg_status):
+        #print " edgeStatusColor edgeType= ",edgeType
+        if (edgeType == ovd.VoronoiEdgeType.LINELINE):
+            return self.edgeStatusColor(src_status,trg_status,lblue)
+        if (edgeType == ovd.VoronoiEdgeType.LINE):
+            return  self.edgeStatusColor(src_status,trg_status,cyan)
+        if (edgeType == ovd.VoronoiEdgeType.OUTEDGE):
+            return pink
+        if (edgeType == ovd.VoronoiEdgeType.SEPARATOR):
+            return self.edgeStatusColor(src_status,trg_status, orange)
+        if (edgeType == ovd.VoronoiEdgeType.LINESITE):
+            return yellow
+        if (edgeType == ovd.VoronoiEdgeType.PARABOLA):
+            return self.edgeStatusColor(src_status,trg_status, blue2)
+        else:
+            return white
+            
     def setEdges(self):
         for e in self.edges:
             self.myscreen.removeActor(e)
@@ -273,8 +333,6 @@ class VD:
             
             if (etype == ovd.VoronoiEdgeType.LINELINE):
                 ecolor = self.edgeStatusColor(src_status,trg_status,lblue)
-
-                
                 for n in range( len(epts)-1 ):
                     p1 = self.scale*epts[n]  
                     p2 = self.scale*epts[n+1] 
@@ -288,17 +346,10 @@ class VD:
                 for n in range( len(epts)-1 ):
                     p1 = self.scale*epts[n]  
                     p2 = self.scale*epts[n+1] 
-                    #print "line ",n," : ",p1," to ",p2
                     actor = Line( p1=( p1.x,p1.y, 0), p2=(p2.x,p2.y, 0), color=ecolor)
                     self.myscreen.addActor(actor)
                     self.edges.append(actor)
-                    """
-                    p1 = self.scale*epts[0]  
-                    p2 = self.scale*epts[1] 
-                    actor = Line( p1=( p1.x,p1.y, 0), p2=(p2.x,p2.y, 0), color=ecolor)
-                    self.myscreen.addActor(actor)
-                    self.edges.append(actor)
-                    """
+
             if (etype == ovd.VoronoiEdgeType.OUTEDGE):
                 ecolor = pink
                 p1 = self.scale*epts[0]  
@@ -308,7 +359,6 @@ class VD:
                 self.edges.append(actor)
             if (etype == ovd.VoronoiEdgeType.SEPARATOR):
                 ecolor = self.edgeStatusColor(src_status,trg_status, orange)
-                #ecolor = orange
                 p1 = self.scale*epts[0]  
                 p2 = self.scale*epts[1] 
                 actor = Line( p1=( p1.x,p1.y, 0), p2=(p2.x,p2.y, 0), color=ecolor)
@@ -323,27 +373,19 @@ class VD:
                 self.edges.append(actor)
             elif (etype == ovd.VoronoiEdgeType.PARABOLA):
                 ecolor = self.edgeStatusColor(src_status,trg_status, blue2)
-                #print "drawing ",len(epts)," length edge!"
                 eactor = PolyLine(pointList=epts,color=ecolor)
                 self.myscreen.addActor(eactor)
                 self.edges.append(eactor)
-                """
-                for n in range( len(epts)-1 ):
-                    p1 = self.scale*epts[n]  
-                    p2 = self.scale*epts[n+1] 
-                    actor = Line( p1=( p1.x,p1.y, 0), p2=(p2.x,p2.y, 0), color=ecolor)
-                    self.myscreen.addActor(actor)
-                    self.edges.append(actor)
-                """
+
         self.myscreen.render() 
         
     def setAll(self):
         self.setVDText()
         self.setGenerators()
         #self.setFar(vd)
-        self.setVertices()
-        #self.setEdgesPolydata(vd)
-        self.setEdges()
+        #self.setVertices()
+        self.setEdgesPolydata()
+        #self.setEdges()
         
 
 def drawOCLtext(myscreen, rev_text=" "):

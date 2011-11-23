@@ -22,10 +22,10 @@ if __name__ == "__main__":
     #w=2500
     #h=1500
     
-    w=1920
-    h=1080
-    #w=1024
-    #h=720
+    #w=1920
+    #h=1080
+    w=1024
+    h=1024
     myscreen = ovdvtk.VTKScreen(width=w, height=h) 
     ovdvtk.drawOCLtext(myscreen, rev_text=ovd.revision() )
     
@@ -59,13 +59,16 @@ if __name__ == "__main__":
     vod.drawVertexIndex=0
     vod.drawGenerators=0
     
-    Nmax = 2048
+    Nmax = 124
+    # Nmax = 2048
+    # 1024, 1.247sec, 398 SPLIT verts
+    
     linesegs = 1 # switch to turn on/off line-segments
     
     print "waiting for ",Nmax," segments..",
     sys.stdout.flush()
     t_before = time.time()
-    segs = gens.randomSegments2(far,Nmax)
+    segs = gens.randomSegments(far,Nmax)
     t_after = time.time()
     print ".done in {0:.3f} s.".format( t_after-t_before )
     times=[]
@@ -115,8 +118,6 @@ if __name__ == "__main__":
     print "   ",Nmax," line-sites sites took {0:.3f}".format(times[1])," seconds, {0:.2f}".format( 1e6*float( times[1] )/(float(Nmax)*float(math.log10(Nmax))) ) ,"us/n*log(n)"
             
     vod.setVDText2(times)
-    
-
     
     err = vd.getStat()
     #print err 

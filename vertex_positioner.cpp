@@ -165,7 +165,8 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     BOOST_FOREACH(Solution s, solutions2 ) {
         std::cout << s.p << " t=" << s.t << " k3=" << s.k3  << " e_err=" << edge_error(edge,s) <<"\n";
         std::cout << "   t_positive=" << (s.t>0) << " min<t<max=" << ((s.t>=t_min) && (s.t<=t_max));
-        std::cout << " in_region=" << s3->in_region(s.p) << " region-t=" << s3->in_region_t(s.p) << "\n";
+        std::cout << " in_region=" << s3->in_region(s.p);
+        std::cout << std::fixed << std::cout.precision(10) << " region-t=" << s3->in_region_t(s.p) << "\n";
     }
 
     assert(0);

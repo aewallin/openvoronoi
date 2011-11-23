@@ -61,7 +61,7 @@ if __name__ == "__main__":
     vod.drawGenerators=0
     
     # Nmax = 1024
-    Nmax = 512
+    Nmax = 4096
     # 1024, 1.247sec, 398 SPLIT verts
     
     linesegs = 1 # switch to turn on/off line-segments

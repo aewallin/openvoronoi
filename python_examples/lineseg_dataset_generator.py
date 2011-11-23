@@ -10,7 +10,7 @@ if __name__ == "__main__":
     print ovd.revision()
     
     far = 1
-    Nmax = int(math.pow(2,12))
+    Nmax = int(math.pow(2,13))
     
     print "waiting for ",Nmax," segments..",
     sys.stdout.flush()

@@ -209,14 +209,14 @@ VertexVector face_vertices(Face face_idx) const {
         assert( g[current].face == g[ g[current].next ].face );
         current = g[current].next;
         
-        if (count >= 300 ) {
+        if (count >= 3000000 ) {
             std::cout << " ERROR too many vertices on face! count=" << count << "\n";
             std::cout << " verts.size() = " << verts.size() << " edges.size()=" << face_edges.size() <<"\n";
             for (unsigned int n=0;n<verts.size()-10;n++) {
                 std::cout << n << "   : " << g[ verts[n] ].index << "\n"; //" e=" << edges[n] << "\n";
             }
         }
-        assert( count < 300 ); // stop at some max limit
+        assert( count < 3000000 ); // stop at some max limit
         count++;
     } while ( current != startedge );
     return verts;

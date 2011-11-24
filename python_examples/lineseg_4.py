@@ -20,13 +20,13 @@ def writeFrame( w2if, lwr, n ):
 
 if __name__ == "__main__":  
     #print ocl.revision()
-    #w=2500
-    #h=1500
+    w=2500
+    h=1500
     
     #w=1920
     #h=1080
-    w=1024
-    h=1024
+    #w=1024
+    #h=1024
     myscreen = ovdvtk.VTKScreen(width=w, height=h) 
     ovdvtk.drawOCLtext(myscreen, rev_text=ovd.revision() )
     
@@ -61,7 +61,8 @@ if __name__ == "__main__":
     vod.drawGenerators=0
     
     # Nmax = 1024
-    Nmax = 4096
+    # Nmax = 4096
+    Nmax = 8192
     # 1024, 1.247sec, 398 SPLIT verts
     
     linesegs = 1 # switch to turn on/off line-segments
@@ -152,7 +153,7 @@ if __name__ == "__main__":
 
     myscreen.render()   
     w2if.Modified()
-    lwr.SetFileName("{0}alt.png".format(Nmax))
-    #lwr.Write()
+    lwr.SetFileName("{0}.png".format(Nmax))
+    lwr.Write()
      
     myscreen.iren.Start()

@@ -171,7 +171,11 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     }
 
     assert(0);
-    return Solution( Point(0,0), -1, 1 );
+    // try a desperate solution
+    double t_mid = 0.5*(t_min+t_max);
+    Point p_mid = vd->g[edge].point(t_mid);
+    
+    return Solution( p_mid, t_mid, 1 );
 }
 
 int VertexPositioner::solver_dispatch(Site* s1, double k1, Site* s2, double k2, Site* s3, double k3, std::vector<Solution>& solns) {    

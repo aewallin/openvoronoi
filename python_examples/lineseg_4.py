@@ -20,11 +20,11 @@ def writeFrame( w2if, lwr, n ):
 
 if __name__ == "__main__":  
     #print ocl.revision()
-    w=2500
-    h=1500
+    #w=2500
+    #h=1500
     
-    #w=1920
-    #h=1080
+    w=1920
+    h=1080
     #w=1024
     #h=1024
     myscreen = ovdvtk.VTKScreen(width=w, height=h) 
@@ -61,8 +61,9 @@ if __name__ == "__main__":
     vod.drawGenerators=0
     
     # Nmax = 1024
+    Nmax = 2048
     # Nmax = 4096
-    Nmax = 8192
+    # Nmax = 8192
     # 1024, 1.247sec, 398 SPLIT verts
     
     linesegs = 1 # switch to turn on/off line-segments
@@ -86,10 +87,10 @@ if __name__ == "__main__":
     for seg in segs:
         seg_id=[]
         seg_id.append( vd.addVertexSite( seg[0] ) )
-        print m," added vertex", seg_id[0]
+        #print m," added vertex", seg_id[0]
         m=m+1
         seg_id.append( vd.addVertexSite( seg[1] ) )
-        print m," added vertex", seg_id[1]
+        #print m," added vertex", seg_id[1]
         m=m+1
         id_list.append( seg_id )
         #print seg[0].x," , ",seg[1].x
@@ -97,6 +98,8 @@ if __name__ == "__main__":
     times.append( t_after-t_before )
     #exit()
     
+    print "   ",2*Nmax," point-sites sites took {0:.3f}".format(times[0])," seconds, {0:.2f}".format( 1e6*float( times[0] )/(float(2*Nmax)*float(math.log10(2*Nmax))) ) ,"us/n*log(n)"
+     
     nsegs = Nmax
     #nsegs = 183 #Nmax
     n=1
@@ -104,7 +107,7 @@ if __name__ == "__main__":
     for s in id_list:
         if n<= nsegs and linesegs==1:
             vd.addLineSite(s[0],s[1])
-            print n," added line-segment"
+            #print n," added line-segment"
         n=n+1
     t_after = time.time()
     times.append( t_after-t_before )
@@ -121,7 +124,7 @@ if __name__ == "__main__":
     # 8 add new edges
     # 9 delete delete-tree edges
     # 10 reset status
-    
+    print "Summary:"
     print "   ",2*Nmax," point-sites sites took {0:.3f}".format(times[0])," seconds, {0:.2f}".format( 1e6*float( times[0] )/(float(2*Nmax)*float(math.log10(2*Nmax))) ) ,"us/n*log(n)"
     print "   ",Nmax," line-sites sites took {0:.3f}".format(times[1])," seconds, {0:.2f}".format( 1e6*float( times[1] )/(float(Nmax)*float(math.log10(Nmax))) ) ,"us/n*log(n)"
             

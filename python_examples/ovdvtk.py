@@ -124,7 +124,7 @@ class VD:
         self.N_pointgen = self.vd.numPointSites()
         self.N_linegen = self.vd.numLineSites()
         pts = self.N_pointgen
-        print times
+        #print times
         lns = self.N_linegen
         self.vdtext2_text = "Used {0:.3f} s CPU time:\n".format(sum(times))
         self.vdtext2_text += "N={0} point-sites in {1:.3f} s ".format(pts, times[0])

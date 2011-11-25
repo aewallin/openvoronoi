@@ -425,11 +425,12 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
     //std::cout << " neg face: "; print_face( neg_face );
     //std::cout << "faces " << start_face << " " << end_face << " " << pos_face << " " << neg_face << " repaired \n";
 
-    // we are done and can remove split-vertices
     
-    // BOOST_FOREACH(HEFace f, incident_faces ) {
-    //    remove_split_vertex(f);
-    // }
+    
+    // we are done and can remove split-vertices
+    BOOST_FOREACH(HEFace f, incident_faces ) {
+        remove_split_vertex(f);
+    }
     
     
     reset_status();
@@ -437,6 +438,9 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
         std::cout << "faces " << start_face << " " << end_face << " " << pos_face << " " << neg_face << " repaired \n";
         std::cout << "insert_line_site(" << g[start].index << "-"<< g[end].index << ") done.\n";
     }
+    
+
+    
     //std::cout << " num_lsites = " << num_lsites << "\n";
     
     assert( vd_checker->face_ok( start_face ) );
@@ -669,6 +673,9 @@ void VoronoiDiagram::mark_adjacent_faces( HEVertex v, Site* site) {
 // return edges whose endpoints are on separate sides of pt1-pt2 line
 // todo ?not all edges found like this need SPLIT vertices?
 EdgeVector VoronoiDiagram::find_split_edges(HEFace f, Point pt1, Point pt2) {
+    if ( !(vd_checker->face_ok(f) ) )  {
+        std::cout << " find_split_edges() ERROR! face_ok(f) fails. \n";
+    }
     EdgeVector out;
     HEEdge current_edge = g[f].edge;
     HEEdge start_edge = current_edge;
@@ -680,8 +687,20 @@ EdgeVector VoronoiDiagram::find_split_edges(HEFace f, Point pt1, Point pt2) {
         bool src_is_right = g[src].position.is_right(pt1,pt2);
         bool trg_is_right = g[trg].position.is_right(pt1,pt2);
         if ( g[src].type == NORMAL || g[src].type == APEX || g[src].type == SPLIT) { //? check edge-type instead?
-            if ( src_is_right != trg_is_right  ) 
-                    out.push_back(current_edge);
+            if ( src_is_right != trg_is_right  ) { 
+                out.push_back(current_edge);
+                if ( !(vd_checker->check_edge(current_edge) ) ) {
+                    HEVertex source = g.source(current_edge); 
+                    HEVertex target = g.target(current_edge); 
+                    //HEVertex twin_source = g.source(e_twin); 
+                    //HEVertex twin_target = g.target(e_twin);
+                    
+                    std::cout << " find_split_edges() ERROR! check_edge(split_edge) \n";
+                    
+                    //std::cout << "  while adding vertex type= " << g[v].type << "\n";
+                    std::cout << " edge: " << g[source].index << " - " << g[target].index << "\n";
+                }
+            }
         }
         
         current_edge = g[current_edge].next;   
@@ -712,7 +731,7 @@ void VoronoiDiagram::add_split_vertex(HEFace f, Site* s) {
     
     // don't search for split-vertex on the start or end face
     if (fs->isPoint() && s->isLine()) {
-        if ( fs->position() == s->start() || fs->position() == s->end() )
+        if ( fs->position() == s->start() || fs->position() == s->end() ) // FIXME: don't compare Points, instead compare vertex-index!
             return;
     }
         
@@ -794,6 +813,30 @@ void VoronoiDiagram::add_split_vertex(HEFace f, Site* s) {
                 std::cout << " new split-vertex " << g[v].index << " t=" << r1.first;
                 std::cout << " inserted into edge " << g[split_src].index << "-" << g[split_trg].index  << "\n";
             }
+            
+            HEEdge split_twin = g[split_edge].twin;
+            
+            if ( split_edge != g[split_twin].twin ) {
+                std::cout << " add_split_vertex() ERROR! found edges not twins! \n";
+            }
+            
+            if ( !(vd_checker->check_edge(split_edge) && vd_checker->check_edge(split_twin) ) ) {
+                
+                HEVertex source = g.source(split_edge); 
+                HEVertex target = g.target(split_edge); 
+                HEVertex twin_source = g.source(split_twin); 
+                HEVertex twin_target = g.target(split_twin);
+                
+                std::cout << " add_split_vertex() ERROR! check_edge(split_edge) \n";
+                std::cout << "    vd_checker->check_edge(split_edge)= " << vd_checker->check_edge(split_edge) << "\n";
+                std::cout << "    vd_checker->check_edge(split_twin)= " << vd_checker->check_edge(split_twin) << "\n";
+                //std::cout << "  while adding vertex type= " << g[v].type << "\n";
+                std::cout << " split_edge: " << g[source].index << " (" << g[source].type<< ") - " << g[target].index << "( " << g[target].type <<" )\n";
+                std::cout << " split_twin: " << g[twin_source].index << " (" << g[twin_source].type<< ") - " << g[twin_target].index << "( " <<g[twin_target].type <<" )\n";
+                //std::cout << " twin: " << g[twin_source].index << " - " << g[twin_target].index << "\n" << std::flush;
+                
+            }
+            assert( vd_checker->check_edge(split_edge) );
             // 3) insert new SPLIT vertex into the edge
             add_vertex_in_edge(v, split_edge);
         }
@@ -833,6 +876,9 @@ void VoronoiDiagram::remove_split_vertex(HEFace f) {
         EdgeVector edges = g.out_edges(v);
         assert( edges.size() == 2);
         assert( g.source(edges[0]) == v && g.source(edges[1]) == v );
+        
+        assert( vd_checker->check_edge(edges[0]) );
+        assert( vd_checker->check_edge(edges[1]) );
          
         HEVertex v1 = g.target( edges[0] );
         HEVertex v2 = g.target( edges[1] );
@@ -925,14 +971,24 @@ void VoronoiDiagram::add_vertex_in_edge( HEVertex v, HEEdge e) {
     //                    twin_face
     //
     HEEdge e_twin = g[e].twin;
+    if ( e != g[e_twin].twin ) {
+        std::cout << " add_vertex_in_edge() ERROR! e_twin and e are not twins! \n";
+    }
     if ( !(vd_checker->check_edge(e) && vd_checker->check_edge(e_twin)) ) {
         HEVertex source = g.source(e); 
         HEVertex target = g.target(e); 
         HEVertex twin_source = g.source(e_twin); 
         HEVertex twin_target = g.target(e_twin);
         std::cout << " add_vertex_in_edge() ERROR! check_edge(e) check_edge(e_twin) \n";
-        std::cout << " edge: " << g[source].index << " - " << g[target].index << "\n";
-        std::cout << " twin: " << g[twin_source].index << " - " << g[twin_target].index << "\n" << std::flush;
+        std::cout << "  while adding vertex type= " << g[v].type << "\n";
+        std::cout << "         vd_checker->check_edge(e)= " << vd_checker->check_edge(e) << "\n";
+        std::cout << "    vd_checker->check_edge(e_twin)= " << vd_checker->check_edge(e_twin) << "\n";
+        std::cout << "        edge: " << g[source].index << " (" << g[source].type<< ") - " << g[target].index << "( " << g[target].type <<" )\n";
+        std::cout << "   twin edge: " << g[twin_source].index << " (" << g[twin_source].type<< ") - " << g[twin_target].index << "( " <<g[twin_target].type <<" )\n";
+ 
+ 
+       // std::cout << " edge: " << g[source].index << " - " << g[target].index << "\n";
+       // std::cout << " twin: " << g[twin_source].index << " - " << g[twin_target].index << "\n" << std::flush;
     }
     assert( vd_checker->check_edge(e) && vd_checker->check_edge(e_twin) );
     assert( e_twin != HEEdge() );
@@ -1042,11 +1098,13 @@ void VoronoiDiagram::add_edges(HEFace newface, HEFace f, HEFace newface2) {
 // newface2 = the k=-1 negative offset face
 void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
     HEEdge new_previous = ed.v1_prv;
-    HEVertex new_source = ed.v1;
+    HEVertex new_source = ed.v1;         //-OUT-NEW(v1)-IN-...
     HEEdge twin_next = ed.v1_nxt;
+    
     HEEdge twin_previous = ed.v2_prv;
-    HEVertex new_target = ed.v2;
+    HEVertex new_target = ed.v2;         // -IN-NEW(v2)-OUT-
     HEEdge new_next = ed.v2_nxt;
+    
     HEFace f = ed.f;
     Site* f_site = g[f].site;
     Site* new_site = g[newface].site;
@@ -1110,6 +1168,7 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
         }
 
     } else {
+        std::cout << " add_edge() WARNING: no code to deremine src_sign and trg_sign!\n";
         assert(0);
     }
     
@@ -1181,6 +1240,15 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
         g[twin_previous].next = e2_tw;
         g[e2_tw].next = e1_tw;
         g[e1_tw].next = twin_next;
+        
+        //g[e1_tw].k = g[twin_next].k;
+        //g[e2_tw].k = g[twin_next].k;
+        if ( g[new_source].k3 != g[new_target].k3 ) {
+            std::cout << " add_edge() WARNING: can't determine k-value for apex-edges.\n";
+            std::cout << "           g[new_source].k3= " << g[new_source].k3 << "\n";
+            std::cout << "           g[new_source].k3= " << g[new_target].k3 << "\n";
+            //: can't determine k-value for apex-edges.\n";
+        }
         g[e1_tw].k = g[new_source].k3;
         g[e2_tw].k = g[new_source].k3;
         
@@ -1198,7 +1266,15 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
         
         assert( vd_checker->check_edge(e1) && vd_checker->check_edge(e1_tw) );
         assert( vd_checker->check_edge(e2) && vd_checker->check_edge(e2_tw) );
-        
+        if ( !(vd_checker->check_edge(e1) && vd_checker->check_edge(e1_tw)) ||
+             !(vd_checker->check_edge(e2) && vd_checker->check_edge(e2_tw)) 
+        ) {
+            std::cout << " add_edge() ERROR \n";
+            std::cout << "      vd_checker->check_edge(e1)  = " << vd_checker->check_edge(e1)  << "\n";
+            std::cout << "   vd_checker->check_edge(e1_tw)  = " << vd_checker->check_edge(e1_tw)  << "\n";
+            std::cout << "      vd_checker->check_edge(e2)  = " << vd_checker->check_edge(e2)  << "\n";
+            std::cout << "   vd_checker->check_edge(e2_tw)  = " << vd_checker->check_edge(e2_tw)  << "\n";
+        }
     // position the apex
         double min_t = g[e1].minimum_t(f_site,new_site);
         g[apex].position = g[e1].point(min_t);

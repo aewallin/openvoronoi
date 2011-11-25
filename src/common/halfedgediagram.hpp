@@ -162,13 +162,13 @@ Face add_face() {
 }
 
 /// return the target vertex of the given edge
-Vertex target( Edge e ) { 
-    return boost::target( e, g);
+Vertex target(const Edge e ) const { 
+    return boost::target( e, g );
 }
 
 /// return the source vertex of the given edge
-Vertex source( Edge e )  { 
-    return boost::source( e, g); 
+Vertex source(const Edge e ) const { 
+    return boost::source( e, g ); 
 }
 
 /// return all vertices in a vector of vertex descriptors

@@ -210,10 +210,15 @@ bool VoronoiDiagramChecker::face_ok(HEFace f) {
             std::cout << " face_ok() f= " << f << " check_edge ERROR\n";
             std::cout << " edge: " << vd->g[ vd->g.source(current_edge)].index << " t=" << vd->g[ vd->g.source(current_edge)].type; 
             std::cout << " - ";
-            std::cout <<  vd->g[ vd->g.target(current_edge)].index << " t=" << vd->g[ vd->g.target(current_edge) ].type; 
-            std::cout << " edge-type= " << vd->g[current_edge].type << "\n";
-            //HEEdge twin = vd->g[current_edge].twin;
+            std::cout <<  vd->g[ vd->g.target(current_edge)].index << " t=" << vd->g[ vd->g.target(current_edge) ].type << "\n"; 
+            HEEdge twin = vd->g[current_edge].twin;
+            std::cout << " twin: " << vd->g[ vd->g.source(twin)].index  << " t=" << vd->g[ vd->g.source(twin)].type; 
+            std::cout << " - ";
+            std::cout <<  vd->g[ vd->g.target(twin)].index << " t=" << vd->g[ vd->g.target(twin) ].type << "\n"; 
             //std::cout << " twin: " << vd->g[ vd->g.source(twin)].index << " - " <<  vd->g[ vd->g.target(twin)].index << "\n";
+            
+            std::cout << " edge-type= " << vd->g[current_edge].type << "\n";
+
             return false;
         }
         
@@ -249,14 +254,20 @@ bool VoronoiDiagramChecker::current_face_equals_next_face( HEEdge e) {
     return true;
 }
 
-bool VoronoiDiagramChecker::check_edge(HEEdge e) {
+bool VoronoiDiagramChecker::check_edge(HEEdge e) const {
     HEVertex src = vd->g.source(e);
     HEVertex trg = vd->g.target(e);
-    HEEdge twin = vd->g[e].twin;
-    if (twin == HEEdge() )
+    HEEdge twine = vd->g[e].twin;
+
+    if (twine == HEEdge() ) {
         return true;
-    HEVertex tw_src = vd->g.source(twin);
-    HEVertex tw_trg = vd->g.target(twin);
+    } else if ( !( e == vd->g[twine].twin ) ) {
+        std::cout << " check_edge() twinning error!\n";
+        return false;
+    }
+    
+    HEVertex tw_src = vd->g.source(twine);
+    HEVertex tw_trg = vd->g.target(twine);
     return ( (src==tw_trg) && (trg==tw_src) );
 }
                  

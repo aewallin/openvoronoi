@@ -55,7 +55,7 @@ public:
     bool current_face_equals_next_face( HEEdge e); 
     bool face_ok(HEFace f);
     bool all_faces_ok();
-    bool check_edge(HEEdge e);
+    bool check_edge(HEEdge e) const ;
     
 private:
     VoronoiDiagram* vd;

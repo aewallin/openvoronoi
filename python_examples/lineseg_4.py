@@ -60,8 +60,9 @@ if __name__ == "__main__":
     vod.drawVertexIndex=0
     vod.drawGenerators=0
     
+    Nmax = 512
     # Nmax = 1024
-    Nmax = 2048
+    # Nmax = 2048
     # Nmax = 4096
     # Nmax = 8192
     # 1024, 1.247sec, 398 SPLIT verts

@@ -60,10 +60,12 @@ if __name__ == "__main__":
     vod.drawVertexIndex=0
     vod.drawGenerators=0
     
+    # Nmax = 128
+    # Nmax = 256
     # Nmax = 512
-    Nmax = 1024
+    # Nmax = 1024
     # Nmax = 2048
-    # Nmax = 4096
+    Nmax = 4096
     # Nmax = 8192
     # 1024, 1.247sec, 398 SPLIT verts
     
@@ -108,7 +110,7 @@ if __name__ == "__main__":
     for s in id_list:
         if n<= nsegs and linesegs==1:
             vd.addLineSite(s[0],s[1])
-            #print n," added line-segment"
+            print n," added line-segment"
         n=n+1
     t_after = time.time()
     times.append( t_after-t_before )

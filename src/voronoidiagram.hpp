@@ -20,6 +20,7 @@
 #define VORONOI_DIAGRAM_HPP
 
 #include <queue>
+#include <set>
 #include <boost/tuple/tuple.hpp>
 
 #include "common/point.hpp"
@@ -150,7 +151,7 @@ class VoronoiDiagram {
         FaceVector incident_faces;
         /// temporary variable for in-vertices, out-vertices that need to be reset
         /// after a site has been inserted
-        VertexVector modified_vertices;
+        std::set<HEVertex> modified_vertices;
         /// IN-vertices, i.e. to-be-deleted
         VertexVector v0;
         /// queue of vertices to be processed

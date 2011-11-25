@@ -199,28 +199,18 @@ void VoronoiDiagram::initialize() {
     assert( vd_checker->check_edge(e5) );
     assert( vd_checker->check_edge(e8) );
     
-    //g[e3_1].twin = e4_2;
     g.twin_edges(e3_1,e4_2);
     assert( vd_checker->check_edge(e3_1) );
-    //g[e3_2].twin = e4_1;
+    assert( vd_checker->check_edge(e4_2) );
     g.twin_edges( e3_2, e4_1);
     assert( vd_checker->check_edge(e3_2) );
-    //g[e4_1].twin = e3_2;
-    //g.twin_edges(e4_1, e3_2);
-    //assert( vd_checker->check_edge(e4_1) );
-    //g[e4_2].twin = e3_1;
-    
-    //assert( vd_checker->check_edge(e4_2) );
-    //g[e6_1].twin = e7_2;
+    assert( vd_checker->check_edge(e4_1) );
     g.twin_edges(e6_1,e7_2);
     assert( vd_checker->check_edge(e6_1) );
-    //g[e6_2].twin = e7_1;
+    assert( vd_checker->check_edge(e7_2) );
     g.twin_edges(e6_2,e7_1);
     assert( vd_checker->check_edge(e6_2) );
-    //g[e7_1].twin = e6_2;
-    //assert( vd_checker->check_edge(e7_1) );
-    //g[e7_2].twin = e6_1;
-    assert( vd_checker->check_edge(e7_2) );
+    assert( vd_checker->check_edge(e7_1) );
 
     // k-values all positive for PointSite generators
     g[e1_1].k = 1.0;
@@ -268,7 +258,7 @@ int VoronoiDiagram::insert_point_site(const Point& p, int step) {
     HEVertex v_seed = find_seed_vertex(closest_face, g[new_vert].site ) ;
     
     mark_vertex( v_seed, g[new_vert].site );
-    modified_vertices.push_back( v_seed );
+    modified_vertices.insert( v_seed );
     
 if (step==current_step) return -1; current_step++;
 
@@ -311,9 +301,10 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
     it_start = vertex_map.find(idx1);
     it_end = vertex_map.find(idx2);
     assert( it_start != vertex_map.end() && it_end != vertex_map.end() );
+    /*
     if ( it_start == vertex_map.end() || it_end == vertex_map.end()) 
         std::cout << " insert_line_site() ERROR. Can't find segment start/endpoint!ņ";
-        
+    */
     start = it_start->second;
     end = it_end->second;
     
@@ -364,7 +355,7 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
     // seed 
     HEVertex v_seed = find_seed_vertex(start_face, pos_site ) ;
     mark_vertex( v_seed, pos_site );
-    modified_vertices.push_back( v_seed );
+    modified_vertices.insert( v_seed );
     if (debug)
         std::cout << " start face seed  = " << g[v_seed].index << " " << g[v_seed].position << "\n";
     
@@ -425,13 +416,10 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
     //std::cout << " neg face: "; print_face( neg_face );
     //std::cout << "faces " << start_face << " " << end_face << " " << pos_face << " " << neg_face << " repaired \n";
 
-    
-    
     // we are done and can remove split-vertices
     BOOST_FOREACH(HEFace f, incident_faces ) {
         remove_split_vertex(f);
     }
-    
     
     reset_status();
     if (debug) {
@@ -439,19 +427,11 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
         std::cout << "insert_line_site(" << g[start].index << "-"<< g[end].index << ") done.\n";
     }
     
-
-    
-    //std::cout << " num_lsites = " << num_lsites << "\n";
-    
     assert( vd_checker->face_ok( start_face ) );
     assert( vd_checker->face_ok( end_face ) );
     assert( vd_checker->face_ok( pos_face ) );
-    assert( vd_checker->face_ok( neg_face ) );
-    
+    assert( vd_checker->face_ok( neg_face ) );    
     assert( vd_checker->is_valid() );
-    
-    //assert( vd_checker->is_valid() ); // this causes segfault with many segments (800-1600 or so)
-    //print_faces();
     return true; 
 }
 
@@ -486,6 +466,7 @@ void VoronoiDiagram::add_separator(HEFace f, HEVertex endp, Site* s1, Site* s2) 
             g[v1].k3 = +1;
             g[v2].k3 = -1; // FIXME, check k-value of vertex adjacent to v1/v2
         } else {
+            std::cout << " add_separator() WARNING: problem with setting k3 values \n";
             assert(0);
         }
     }
@@ -597,14 +578,13 @@ HEVertex VoronoiDiagram::find_seed_vertex(HEFace f, Site* site) const {
 //  where vertices with a large fabs(detH) are processed first, since we assume the in-circle predicate
 //  to be more reliable the larger fabs(in_circle()) is.
 void VoronoiDiagram::augment_vertex_set(  Site* site ) {
-
     while( !vertexQueue.empty() ) {
         HEVertex v = HEVertex();
         double h(0);
         boost::tie( v, h ) = vertexQueue.top();
         assert( g.g[v].status == UNDECIDED );
         vertexQueue.pop(); 
-        if ( h < 0.0 ) { // mark IN if h<0 and passes (C4) and (C5) tests and in_region(). otherwise mark OUT
+        if ( h < 0.0 ) { // try to mark IN if h<0 and passes (C4) and (C5) tests and in_region(). otherwise mark OUT
             if ( predicate_c4(v) || !predicate_c5(v) || !site->in_region(g[v].position) ) {
                 g[v].status = OUT; // C4 or C5 violated, so mark OUT
                 if (debug)
@@ -619,7 +599,7 @@ void VoronoiDiagram::augment_vertex_set(  Site* site ) {
             if (debug)
                 std::cout << g[v].index << " marked OUT (in_circle) ( " << h << " )\n";
         }
-        modified_vertices.push_back( v );
+        modified_vertices.insert( v );
     }
     
     assert( vertexQueue.empty() );
@@ -675,9 +655,9 @@ void VoronoiDiagram::mark_adjacent_faces( HEVertex v, Site* site) {
 // return edges whose endpoints are on separate sides of pt1-pt2 line
 // todo ?not all edges found like this need SPLIT vertices?
 EdgeVector VoronoiDiagram::find_split_edges(HEFace f, Point pt1, Point pt2) {
-    if ( !(vd_checker->face_ok(f) ) )  {
-         std::cout << " find_split_edges() ERROR! face_ok(f) fails. \n";
-    }
+    //if ( !(vd_checker->face_ok(f) ) )  {
+    //     std::cout << " find_split_edges() ERROR! face_ok(f) fails. \n";
+    //}
     assert( vd_checker->face_ok(f) );
     EdgeVector out;
     HEEdge current_edge = g[f].edge;
@@ -692,6 +672,8 @@ EdgeVector VoronoiDiagram::find_split_edges(HEFace f, Point pt1, Point pt2) {
         if ( g[src].type == NORMAL || g[src].type == APEX || g[src].type == SPLIT) { //? check edge-type instead?
             if ( src_is_right != trg_is_right  ) { 
                 out.push_back(current_edge);
+                assert(vd_checker->check_edge(current_edge));
+                /*
                 if ( !(vd_checker->check_edge(current_edge) ) ) {
                     HEVertex source = g.source(current_edge); 
                     HEVertex target = g.target(current_edge); 
@@ -702,13 +684,13 @@ EdgeVector VoronoiDiagram::find_split_edges(HEFace f, Point pt1, Point pt2) {
                     
                     //std::cout << "  while adding vertex type= " << g[v].type << "\n";
                     std::cout << " edge: " << g[source].index << " - " << g[target].index << "\n";
-                }
+                }*/
             }
         }
         
         current_edge = g[current_edge].next;   
         count++;
-        assert(count<100); // some reasonable max number of edges in face, to avoid infinite loop
+        assert(count<100000); // some reasonable max number of edges in face, to avoid infinite loop
         if ( current_edge == start_edge )
             done = true;
     }
@@ -817,6 +799,7 @@ void VoronoiDiagram::add_split_vertex(HEFace f, Site* s) {
                 std::cout << " inserted into edge " << g[split_src].index << "-" << g[split_trg].index  << "\n";
             }
             
+            /*
             HEEdge split_twin = g[split_edge].twin;
             
             if ( split_edge != g[split_twin].twin ) {
@@ -838,8 +821,9 @@ void VoronoiDiagram::add_split_vertex(HEFace f, Site* s) {
                 std::cout << " split_twin: " << g[twin_source].index << " (" << g[twin_source].type<< ") - " << g[twin_target].index << "( " <<g[twin_target].type <<" )\n";
                 //std::cout << " twin: " << g[twin_source].index << " - " << g[twin_target].index << "\n" << std::flush;
                 
-            }
-            assert( vd_checker->check_edge(split_edge) && vd_checker->check_edge(split_twin) );
+            }*/
+            //assert( vd_checker->check_edge(split_edge) && vd_checker->check_edge(split_twin) );
+            assert( vd_checker->check_edge(split_edge) );
             // 3) insert new SPLIT vertex into the edge
             add_vertex_in_edge(v, split_edge);
         }
@@ -916,6 +900,7 @@ void VoronoiDiagram::remove_split_vertex(HEFace f) {
         g.remove_edge(v,v2);
         g.remove_edge(v2,v);
         g.remove_vertex(v);
+        modified_vertices.erase(v);
         
         assert( vd_checker->check_edge(new1) );
         assert( vd_checker->check_edge(new2) );
@@ -933,12 +918,8 @@ void VoronoiDiagram::add_vertices( Site* new_site ) {
     for( unsigned int m=0; m<q_edges.size(); ++m )  {   
         HEVertex q = g.add_vertex();
         g[q].status = NEW;
-        modified_vertices.push_back(q);
-        
-
-        
+        modified_vertices.insert(q);
         Solution sl = vpos->position( q_edges[m], new_site );
-        
         if ( vpos->dist_error( q_edges[m], sl, new_site) > 1e-9 ) {
             std::cout << "position new vertex " << g[q].index << " on ";
             std::cout <<  g[ g.source(q_edges[m])].index << "(t=" << g[ g.source(q_edges[m])].dist() << ")-"; 
@@ -973,10 +954,11 @@ void VoronoiDiagram::add_vertex_in_edge( HEVertex v, HEEdge e) {
     //                    te2  te1
     //                    twin_face
     //
-    HEEdge e_twin = g[e].twin;
-    if ( e != g[e_twin].twin ) {
-        std::cout << " add_vertex_in_edge() ERROR! e_twin and e are not twins! \n";
-    }
+    
+    //if ( e != g[e_twin].twin ) {
+    //    std::cout << " add_vertex_in_edge() ERROR! e_twin and e are not twins! \n";
+    //}
+    /*
     if ( !(vd_checker->check_edge(e) && vd_checker->check_edge(e_twin)) ) {
         HEVertex source = g.source(e); 
         HEVertex target = g.target(e); 
@@ -994,13 +976,8 @@ void VoronoiDiagram::add_vertex_in_edge( HEVertex v, HEEdge e) {
         std::cout << " target= " << target << " twin_src= " << twin_source << " identical? " << (target==twin_source) << "\n";
         std::cout <<  (twin_target==source) << "\n";
         std::cout <<  (twin_source==target) << "\n";
-
-
-
- 
-       // std::cout << " edge: " << g[source].index << " - " << g[target].index << "\n";
-       // std::cout << " twin: " << g[twin_source].index << " - " << g[twin_target].index << "\n" << std::flush;
-    }
+    }*/
+    HEEdge e_twin = g[e].twin;
     assert( vd_checker->check_edge(e) && vd_checker->check_edge(e_twin) );
     assert( e_twin != HEEdge() );
     HEVertex source = g.source(e); 
@@ -1228,16 +1205,8 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
         HEVertex apex = g.add_vertex();
         g[apex].type = APEX;
         g[apex].status = NEW;
-        HEVertex tmp = apex;
         HEEdge e1 = g.add_edge( new_source, apex);
-        if (tmp!=apex) {
-            std::cout << " ERROOORRR !\n";
-        }
-        tmp = apex;
         HEEdge e2 = g.add_edge( apex, new_target);
-        if (tmp!=apex) {
-            std::cout << " ERROOORRR !\n";
-        }
         g[e1].set_parameters(f_site,new_site,!src_sign);
         g[e2].set_parameters(f_site,new_site,!trg_sign);
         g[new_previous].next = e1;
@@ -1260,14 +1229,7 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
         g[e2_tw].next = e1_tw;
         g[e1_tw].next = twin_next;
         
-        //g[e1_tw].k = g[twin_next].k;
-        //g[e2_tw].k = g[twin_next].k;
-        if ( g[new_source].k3 != g[new_target].k3 ) {
-            std::cout << " add_edge() WARNING: can't determine k-value for apex-edges.\n";
-            std::cout << "           g[new_source].k3= " << g[new_source].k3 << "\n";
-            std::cout << "           g[new_source].k3= " << g[new_target].k3 << "\n";
-            //: can't determine k-value for apex-edges.\n";
-        }
+        assert( g[new_source].k3 == g[new_target].k3 );
         g[e1_tw].k = g[new_source].k3;
         g[e2_tw].k = g[new_source].k3;
         
@@ -1285,6 +1247,7 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
         
         assert( vd_checker->check_edge(e1) && vd_checker->check_edge(e1_tw) );
         assert( vd_checker->check_edge(e2) && vd_checker->check_edge(e2_tw) );
+        /*
         if ( !(vd_checker->check_edge(e1) && vd_checker->check_edge(e1_tw)) ||
              !(vd_checker->check_edge(e2) && vd_checker->check_edge(e2_tw)) 
         ) {
@@ -1293,7 +1256,8 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
             std::cout << "   vd_checker->check_edge(e1_tw)  = " << vd_checker->check_edge(e1_tw)  << "\n";
             std::cout << "      vd_checker->check_edge(e2)  = " << vd_checker->check_edge(e2)  << "\n";
             std::cout << "   vd_checker->check_edge(e2_tw)  = " << vd_checker->check_edge(e2_tw)  << "\n";
-        }
+        }*/
+        
     // position the apex
         double min_t = g[e1].minimum_t(f_site,new_site);
         g[apex].position = g[e1].point(min_t);
@@ -1307,7 +1271,7 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
         //std::cout << " k3 target-source: "<<  g[new_target].k3 << " - " << g[new_source].k3 << "\n";
 
         g[apex].init_dist(f_site->apex_point(g[apex].position));
-        modified_vertices.push_back( apex );
+        modified_vertices.insert( apex );
     }
 }
 
@@ -1411,6 +1375,7 @@ void VoronoiDiagram::remove_vertex_set() {
     BOOST_FOREACH( HEVertex v, v0 ) {      // it should now be safe to delete all IN vertices
         assert( g[v].status == IN );
         g.delete_vertex(v); // this also removes edges connecting to v
+        modified_vertices.erase(v);
     }
 }
     

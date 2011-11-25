@@ -178,7 +178,7 @@ int VertexPositioner::solver_dispatch(Site* s1, double k1, Site* s2, double k2, 
     if ( s1->isLine() && s2->isLine() && s3->isLine() ) 
         return lll_solver->solve( s1,k1,s2,k2,s3,k3, solns ); // all lines.
     else if ( s1->isPoint() && s2->isPoint() && s3->isPoint() )
-        return ppp_solver->solve( s1,k1,s2,k2,s3,k3, solns ); // all points
+        return ppp_solver->solve( s1,s2,s3, solns ); // all points, no need to specify k1,k2,k3, they are all +1
     else
         return qll_solver->solve( s1,k1,s2,k2,s3,k3, solns ); // general case solver
  

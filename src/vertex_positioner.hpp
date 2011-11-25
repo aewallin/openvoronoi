@@ -24,19 +24,14 @@
 
 #include "graph.hpp"
 #include "vertex.hpp"
+// #include "solvers/solver.hpp"
+#include "solvers/solution.hpp"
 
 namespace ovd {
 
 class VoronoiDiagram;
+class Solver;
 
-// a new vd-vertex position solution
-// includes the offset-distamce t, and the offset direction k3
-struct Solution {
-    Solution(Point pt, double tv, double k) : p(pt), t(tv), k3(k) {}
-    Point p;
-    double t;
-    double k3;
-};
 
 // predicate for filtering solutions based on t-value being in [tmin,tmax] range
 struct t_filter {
@@ -59,15 +54,7 @@ private:
     Site* site_;
 };
 
-// abstract base-class for voronoi vertex-solvers
-// the input to the solver is three Sites (s1,s2,s3) and three offset-directions (k1,k2,k3) .
 
-class Solver {
-public:
-    virtual int solve(Site* s1, double k1, 
-                           Site* s2, double k2, 
-                           Site* s3, double k3, std::vector<Solution>& slns ) = 0;
-};
 
 /// Calculates the (x,y) position of vertices in a voronoi diagram
 class VertexPositioner {

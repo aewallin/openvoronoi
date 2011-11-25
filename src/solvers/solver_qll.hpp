@@ -26,7 +26,7 @@
 
 #include <qd/qd_real.h> // http://crd.lbl.gov/~dhbailey/mpdist/
 
-#include "common/point.hpp"
+#include "solver.hpp"
 #include "common/numeric.hpp"
 
 using namespace ovd::numeric; // sq() chop() quadratic_roots()

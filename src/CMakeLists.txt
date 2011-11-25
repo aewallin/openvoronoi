@@ -30,9 +30,12 @@ if (CMAKE_BUILD_TOOL MATCHES "make")
     -Wshadow -Winline -Wno-long-long -Wno-deprecated -Werror -pedantic-errors")
     
     # -pedantic -W -Wall -Wundef -Wfloat-equal -Wshadow -Winline -Wno-long-long
-    add_definitions( -W -Wall -Wundef  -Wshadow -Wno-long-long -Wno-deprecated -pedantic -pedantic-errors)
-    # this gives warning when comparing float/double with != or ==
-    # -Wfloat-equal
+    add_definitions( -Werror -Wall -Wundef  -Wshadow  -Wno-long-long -Wno-deprecated -pedantic -pedantic-errors)
+    
+    # some reasons why we don't enable certain errors:
+    # this gives warning when comparing float/double with != or ==:  -Wfloat-equal
+    # this gives warnings for BGL: -Winline
+    
     
     add_definitions(-fPIC)
 endif (CMAKE_BUILD_TOOL MATCHES "make")

@@ -27,7 +27,7 @@
 #include <vector>
 #include <cassert>
 
-#include "common/point.hpp"
+#include "solver.hpp"
 #include "common/numeric.hpp"
 
 using namespace ovd::numeric; // sq() chop()
@@ -38,9 +38,9 @@ namespace ovd {
 class PPPSolver : public Solver {
 public:
 
-int solve(      Site* s1, double k1, 
-                Site* s2, double k2, 
-                Site* s3, double k3, std::vector<Solution>& slns ) {
+int solve(      Site* s1, 
+                Site* s2,  
+                Site* s3,  std::vector<Solution>& slns ) {
     assert( s1->isPoint() && s2->isPoint() && s3->isPoint() );
     Point pi = s1->position();
     Point pj = s2->position();

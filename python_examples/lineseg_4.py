@@ -20,13 +20,13 @@ def writeFrame( w2if, lwr, n ):
 
 if __name__ == "__main__":  
     #print ocl.revision()
-    #w=2500
-    #h=1500
+    w=2500
+    h=1500
     
     #w=1920
     #h=1080
-    w=1024
-    h=1024
+    #w=1024
+    #h=1024
     myscreen = ovdvtk.VTKScreen(width=w, height=h) 
     ovdvtk.drawOCLtext(myscreen, rev_text=ovd.revision() )
     
@@ -65,8 +65,10 @@ if __name__ == "__main__":
     # Nmax = 512
     # Nmax = 1024
     # Nmax = 2048
-    Nmax = 4096
+    # Nmax = 4096
     # Nmax = 8192
+    # Nmax = 16384
+    Nmax = 32768
     # 1024, 1.247sec, 398 SPLIT verts
     
     linesegs = 1 # switch to turn on/off line-segments
@@ -110,7 +112,7 @@ if __name__ == "__main__":
     for s in id_list:
         if n<= nsegs and linesegs==1:
             vd.addLineSite(s[0],s[1])
-            print n," added line-segment"
+            #print n," added line-segment"
         n=n+1
     t_after = time.time()
     times.append( t_after-t_before )

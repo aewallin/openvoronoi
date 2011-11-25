@@ -27,8 +27,8 @@
 #include <vector>
 #include <cassert>
 
-#include "point.hpp"
-#include "numeric.hpp"
+#include "common/point.hpp"
+#include "common/numeric.hpp"
 
 using namespace ovd::numeric; // sq() chop()
 

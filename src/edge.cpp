@@ -18,7 +18,7 @@
 */
 
 #include "edge.hpp"
-#include "numeric.hpp"
+#include "common/numeric.hpp"
 
 using namespace ovd::numeric;
 

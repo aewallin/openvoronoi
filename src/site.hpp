@@ -21,7 +21,7 @@
 
 #include <qd/qd_real.h> 
 
-#include "point.hpp"
+#include "common/point.hpp"
 
 namespace ovd {
 

@@ -24,8 +24,8 @@
 
 #include <boost/graph/adjacency_list.hpp>
 
-#include "point.hpp"
-#include "halfedgediagram.hpp"
+#include "common/point.hpp"
+#include "common/halfedgediagram.hpp"
 #include "vertex.hpp"
 #include "site.hpp"
 #include "edge.hpp"

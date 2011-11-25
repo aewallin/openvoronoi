@@ -1,10 +1,6 @@
 /*  
  *  Copyright 2010-2011 Anders Wallin (anders.e.e.wallin "at" gmail.com)
  *
- *  Idea and code for point/line/arc voronoi-vertex positioning code by
- *  Andy Payne, andy "at" payne "dot" org, November, 2010
- *  see: http://www.payne.org/index.php/Calculating_Voronoi_Nodes
- * 
  *  This file is part of OpenVoronoi.
  *
  *  OpenVoronoi is free software: you can redistribute it and/or modify
@@ -63,7 +59,9 @@ private:
     Site* site_;
 };
 
-// abstract base-class for vertex-solvers
+// abstract base-class for voronoi vertex-solvers
+// the input to the solver is three Sites (s1,s2,s3) and three offset-directions (k1,k2,k3) .
+
 class Solver {
 public:
     virtual int solve(Site* s1, double k1, 

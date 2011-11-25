@@ -22,7 +22,7 @@
 
 #include "voronoidiagram.hpp"
 #include "facegrid.hpp"
-#include "numeric.hpp"
+#include "common/numeric.hpp"
 
 using namespace ovd::numeric;
 

@@ -25,7 +25,7 @@
 
 #include <boost/graph/adjacency_list.hpp>
 
-#include "point.hpp"
+#include "common/point.hpp"
 #include "site.hpp"
 
 namespace ovd {

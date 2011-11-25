@@ -1,10 +1,6 @@
 /*  
  *  Copyright 2010-2011 Anders Wallin (anders.e.e.wallin "at" gmail.com)
  * 
- *  Idea and code for point/line/arc voronoi-vertex positioning code by
- *  Andy Payne, andy "at" payne "dot" org, November, 2010
- *  see: http://www.payne.org/index.php/Calculating_Voronoi_Nodes
- * 
  *  This file is part of OpenVoronoi.
  *
  *  OpenVoronoi is free software: you can redistribute it and/or modify
@@ -27,11 +23,11 @@
 
 #include "vertex_positioner.hpp"
 #include "voronoidiagram.hpp"
-#include "numeric.hpp"
+#include "common/numeric.hpp"
 
-#include "solver_ppp.hpp"
-#include "solver_lll.hpp"
-#include "solver_qll.hpp"
+#include "solvers/solver_ppp.hpp"
+#include "solvers/solver_lll.hpp"
+#include "solvers/solver_qll.hpp"
 
 using namespace ovd::numeric; // sq() chop()
 

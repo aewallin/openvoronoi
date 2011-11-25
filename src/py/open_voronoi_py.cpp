@@ -20,7 +20,7 @@
 #include <boost/python.hpp>
 
 #include "voronoidiagram_py.hpp"  
-#include "point.hpp"
+#include "common/point.hpp"
 
 /*
  *  Python wrapping of voronoi diagram

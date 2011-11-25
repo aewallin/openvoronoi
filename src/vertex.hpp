@@ -23,7 +23,7 @@
 #include <map>
 #include <cmath>
 
-#include "point.hpp"
+#include "common/point.hpp"
 #include "site.hpp"
 
 namespace ovd {

@@ -38,8 +38,8 @@ if (CMAKE_BUILD_TOOL MATCHES "make")
 endif (CMAKE_BUILD_TOOL MATCHES "make")
 
 # uncomment one of these to change build-type
-# set(CMAKE_BUILD_TYPE Release)
- set(CMAKE_BUILD_TYPE Debug)
+ set(CMAKE_BUILD_TYPE Release)
+# set(CMAKE_BUILD_TYPE Debug)
 # set(CMAKE_BUILD_TYPE Profile)
 
 MESSAGE(STATUS " CMAKE_BUILD_TYPE  = " ${CMAKE_BUILD_TYPE})
@@ -120,15 +120,15 @@ set(OVD_SRC
     ${OpenVoronoi_SOURCE_DIR}/edge.cpp
     ${OpenVoronoi_SOURCE_DIR}/checker.cpp
     ${OpenVoronoi_SOURCE_DIR}/facegrid.cpp
-    ${OpenVoronoi_SOURCE_DIR}/point.cpp
+    ${OpenVoronoi_SOURCE_DIR}/common/point.cpp
     ${OpenVoronoi_SOURCE_DIR}/vertex_positioner.cpp
-    ${OpenVoronoi_SOURCE_DIR}/numeric.cpp
+    ${OpenVoronoi_SOURCE_DIR}/common/numeric.cpp
 )
 
 set( OVD_INCLUDE_FILES
-    ${OpenVoronoi_SOURCE_DIR}/numeric.hpp  
-    ${OpenVoronoi_SOURCE_DIR}/point.hpp
-    ${OpenVoronoi_SOURCE_DIR}/halfedgediagram.hpp
+    ${OpenVoronoi_SOURCE_DIR}/common/numeric.hpp  
+    ${OpenVoronoi_SOURCE_DIR}/common/point.hpp
+    ${OpenVoronoi_SOURCE_DIR}/common/halfedgediagram.hpp
     ${OpenVoronoi_SOURCE_DIR}/graph.hpp
     ${OpenVoronoi_SOURCE_DIR}/voronoidiagram.hpp
     ${OpenVoronoi_SOURCE_DIR}/vertex.hpp
@@ -158,7 +158,7 @@ set_target_properties(libopenvoronoi PROPERTIES PREFIX "")
 add_library(
     openvoronoi
     MODULE
-    open_voronoi_py.cpp
+    py/open_voronoi_py.cpp
 )
 # MESSAGE(STATUS "linking python binary with boost: " ${Boost_PYTHON_LIBRARY})
 target_link_libraries(openvoronoi libopenvoronoi ${Boost_LIBRARIES} ${QD_LIBRARY}) #${Boost_PYTHON_LIBRARY})

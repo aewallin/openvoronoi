@@ -24,8 +24,8 @@
 #ifndef LLL_SOLVER_HPP
 #define LLL_SOLVER_HPP
 
-#include "point.hpp"
-#include "numeric.hpp"
+#include "common/point.hpp"
+#include "common/numeric.hpp"
 
 using namespace ovd::numeric; // sq() chop()
 

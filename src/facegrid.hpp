@@ -26,7 +26,7 @@
 #include <boost/multi_array.hpp> 
 
 #include "graph.hpp"
-#include "point.hpp"
+#include "common/point.hpp"
 
 namespace ovd
 {

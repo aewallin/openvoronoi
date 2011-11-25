@@ -15,7 +15,7 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with OpenCAMlib.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 #include "checker.hpp"
 #include "voronoidiagram.hpp"
@@ -207,7 +207,7 @@ bool VoronoiDiagramChecker::face_ok(HEFace f) {
             return false;
         
         if ( !check_edge(current_edge) ) {
-            std::cout << " face_ok() f= " << f << " check_edge ERROR\n";
+            std::cout << " VoronoiDiagramChecker::face_ok() f= " << f << " check_edge ERROR\n";
             std::cout << " edge: " << vd->g[ vd->g.source(current_edge)].index << " t=" << vd->g[ vd->g.source(current_edge)].type; 
             std::cout << " - ";
             std::cout <<  vd->g[ vd->g.target(current_edge)].index << " t=" << vd->g[ vd->g.target(current_edge) ].type << "\n"; 
@@ -262,12 +262,24 @@ bool VoronoiDiagramChecker::check_edge(HEEdge e) const {
     if (twine == HEEdge() ) {
         return true;
     } else if ( !( e == vd->g[twine].twin ) ) {
-        std::cout << " check_edge() twinning error!\n";
+        std::cout << " VoronoiDiagramChecker::check_edge() twinning error!\n";
         return false;
     }
     
     HEVertex tw_src = vd->g.source(twine);
     HEVertex tw_trg = vd->g.target(twine);
+    //std::cout << (src==tw_trg) << " && " << (trg==tw_src) << "\n";
+    if ( !((src==tw_trg) && (trg==tw_src)) ) {
+        std::cout << "VoronoiDiagramChecker::check_edge() ERROR: \n";
+        std::cout << "      edge: " << vd->g[src].index << "("<< vd->g[src].type << ")";
+        std::cout << " - " << vd->g[trg].index << "("<< vd->g[trg].type << ")" << "\n";
+        //std::cout << "      twin: " << vd->g[tw_src].index << " - " << vd->g[tw_src].index << "\n";
+        std::cout << "      edge: " << e << "\n";
+        std::cout << "      twin: " << twine << "\n";
+        std::cout << "      edge: " << src << " - " << trg << "\n";
+        std::cout << "      twin: " << tw_src << " - " << tw_trg << "\n";
+
+    }
     return ( (src==tw_trg) && (trg==tw_src) );
 }
                  

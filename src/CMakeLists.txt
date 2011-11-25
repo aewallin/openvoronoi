@@ -30,7 +30,7 @@ if (CMAKE_BUILD_TOOL MATCHES "make")
     -Wshadow -Winline -Wno-long-long -Wno-deprecated -Werror -pedantic-errors")
     
     # -pedantic -W -Wall -Wundef -Wfloat-equal -Wshadow -Winline -Wno-long-long
-    add_definitions( -W -Wall -Wundef  -Wshadow -Wno-long-long -Wno-deprecated  -pedantic-errors)
+    add_definitions( -W -Wall -Wundef  -Wshadow -Wno-long-long -Wno-deprecated -pedantic -pedantic-errors)
     # this gives warning when comparing float/double with != or ==
     # -Wfloat-equal
     
@@ -38,8 +38,8 @@ if (CMAKE_BUILD_TOOL MATCHES "make")
 endif (CMAKE_BUILD_TOOL MATCHES "make")
 
 # uncomment one of these to change build-type
-# set(CMAKE_BUILD_TYPE Release)
- set(CMAKE_BUILD_TYPE Debug)
+ set(CMAKE_BUILD_TYPE Release)
+# set(CMAKE_BUILD_TYPE Debug)
 # set(CMAKE_BUILD_TYPE Profile)
 
 MESSAGE(STATUS " CMAKE_BUILD_TYPE  = " ${CMAKE_BUILD_TYPE})

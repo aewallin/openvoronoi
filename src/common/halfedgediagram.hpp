@@ -88,17 +88,16 @@ public:
                                             TGraphProperties,
                                             TEdgeList
                                             > BGLGraph;
-    typedef typename boost::graph_traits< BGLGraph >::edge_descriptor Edge;
+    typedef typename boost::graph_traits< BGLGraph >::edge_descriptor   Edge;
     typedef typename boost::graph_traits< BGLGraph >::vertex_descriptor Vertex;
-    typedef typename boost::graph_traits< BGLGraph >::vertex_iterator    VertexItr;
+    typedef typename boost::graph_traits< BGLGraph >::vertex_iterator   VertexItr;
     
     typedef std::vector<Vertex> VertexVector;
-    typedef std::vector<Face> FaceVector;
-    typedef std::vector<Edge> EdgeVector;  
+    typedef std::vector<Face>   FaceVector;
+    typedef std::vector<Edge>   EdgeVector;  
 
     inline TFaceProperties& operator[](Face f)  { return faces[f];  }
     inline const TFaceProperties& operator[](Face f) const  { return faces[f]; } 
-    
     
     inline TEdgeProperties& operator[](Edge e)  { return g[e];  }
     inline const TEdgeProperties& operator[](Edge e) const  { return g[e];  }

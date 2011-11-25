@@ -23,10 +23,10 @@ if __name__ == "__main__":
     #w=2500
     #h=1500
     
-    w=1920
-    h=1080
-    #w=1024
-    #h=1024
+    #w=1920
+    #h=1080
+    w=1024
+    h=1024
     myscreen = ovdvtk.VTKScreen(width=w, height=h) 
     ovdvtk.drawOCLtext(myscreen, rev_text=ovd.revision() )
     

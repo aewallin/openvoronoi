@@ -27,8 +27,14 @@ Build instructions
 This project uses cmake, and can be built out-of-source:
 $ mkdir bld
 $ cd bld
-$ cmake ..
+$ cmake ../src
 $ make
+$ sudo make install
+
+src/        has the source for the main algorithm
+src/solvers has vd-vertex solver code
+src/py      has python wrapping code
+src/common  has common classes not specific to voronoi diagrams
 
 Other voronoi-diagram codes
 CGAL.

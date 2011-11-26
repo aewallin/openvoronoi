@@ -34,13 +34,56 @@ using namespace ovd::numeric; // sq() chop()
 
 namespace ovd {
 
+template<class Scalar>
+struct scalar_pt {
+    scalar_pt<Scalar>() : x(0), y(0) {}
+    scalar_pt<Scalar>(Scalar xi, Scalar yi) : x(xi), y(yi) {}
+    
+    Scalar x;
+    Scalar y;
+    double getx() {
+        return x;
+    }
+    double gety() {
+        return y;
+    }
+    
+    scalar_pt<Scalar> &operator=(const Point& p) {
+        x = p.x;
+        y = p.y;
+        return *this;
+    }
+};
+
+// with the qd_real number-type we need to_double() to get the solution coordinates as double type.
+template<>
+struct scalar_pt<qd_real> {
+    scalar_pt<qd_real>() : x(qd_real(0)), y(qd_real(0)) {}
+    scalar_pt<qd_real>(qd_real xi, qd_real yi) : x(xi), y(yi) {}
+    
+    qd_real x;
+    qd_real y;
+        double getx() {
+        return to_double(x);
+    }
+    double gety() {
+        return to_double(y);
+    }
+    scalar_pt<qd_real> &operator=(const Point& p) {
+        x = p.x;
+        y = p.y;
+        return *this;
+    }
+
+};
+
+
 /// point-point-point vertex positioner based on Sugihara & Iri paper
+template<class Scalar>
 class PPPSolver : public Solver {
 public:
 
-int solve(      Site* s1, 
-                Site* s2,  
-                Site* s3,  std::vector<Solution>& slns ) {
+int solve( Site* s1, Site* s2, Site* s3,  std::vector<Solution>& slns ) {
     assert( s1->isPoint() && s2->isPoint() && s3->isPoint() );
     Point pi = s1->position();
     Point pj = s2->position();
@@ -59,17 +102,24 @@ int solve(      Site* s1,
     assert( !pi.is_right(pj,pk) );
     assert( (pi - pj).norm() >=  (pj - pk).norm() );
     assert( (pi - pj).norm() >=  (pk - pi).norm() );
-    double J2 = (pi.y-pk.y)*( sq(pj.x-pk.x)+sq(pj.y-pk.y) )/2.0 - 
-                (pj.y-pk.y)*( sq(pi.x-pk.x)+sq(pi.y-pk.y) )/2.0;
-    double J3 = (pi.x-pk.x)*( sq(pj.x-pk.x)+sq(pj.y-pk.y) )/2.0 - 
-                (pj.x-pk.x)*( sq(pi.x-pk.x)+sq(pi.y-pk.y) )/2.0;
-    double J4 = (pi.x-pk.x)*(pj.y-pk.y) - (pj.x-pk.x)*(pi.y-pk.y);
+    
+    // we now convert to a higher precision number-type to do the calculations
+    scalar_pt<Scalar> spi,spj,spk;
+    spi = pi;
+    spj = pj;
+    spk = pk;
+    Scalar J2 = (spi.y-spk.y)*( sq(spj.x-spk.x)+sq(spj.y-spk.y) )/2.0 - 
+                (spj.y-spk.y)*( sq(spi.x-spk.x)+sq(spi.y-spk.y) )/2.0;
+    Scalar J3 = (spi.x-spk.x)*( sq(spj.x-spk.x)+sq(spj.y-spk.y) )/2.0 - 
+                (spj.x-spk.x)*( sq(spi.x-spk.x)+sq(spi.y-spk.y) )/2.0;
+    Scalar J4 = (spi.x-spk.x)*(spj.y-spk.y) - (spj.x-spk.x)*(spi.y-spk.y);
     assert( J4 != 0.0 );
     if (J4==0.0)
         std::cout << " PPPSolver: Warning divide-by-zero!!\n";
-    Point pt = Point(-J2/J4 + pk.x, J3/J4 + pk.y);
-    double dist = (pt-pi).norm();
-    slns.push_back( Solution(  pt , dist , +1) );
+    scalar_pt<Scalar> pt( -J2/J4 + spk.x, J3/J4 + spk.y );
+    Point sln_pt = Point( pt.getx(), pt.gety());
+    double dist = (sln_pt-pi).norm();
+    slns.push_back( Solution(  sln_pt , dist , +1) );
     return 1;
 }
 

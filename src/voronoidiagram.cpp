@@ -1459,6 +1459,16 @@ int VoronoiDiagram::num_split_vertices()  {
     return count; 
 }
 
+bool VoronoiDiagram::check() {
+    if( vd_checker->is_valid() ) {
+        std::cout << "diagram check OK.\n";
+        return true;
+    } else {
+        std::cout << "diagram check ERROR.\n";
+        return false;
+    }
+}
+
 void VoronoiDiagram::print_faces() {
     for( HEFace f=0;f<g.num_faces();f++) {
         print_face(f);

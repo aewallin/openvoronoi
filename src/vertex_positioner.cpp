@@ -34,7 +34,7 @@ using namespace ovd::numeric; // sq() chop()
 namespace ovd {
 
 VertexPositioner::VertexPositioner(VoronoiDiagram* vodi): vd(vodi) {
-    ppp_solver = new PPPSolver();
+    ppp_solver = new PPPSolver<qd_real>();
     lll_solver = new LLLSolver();
     qll_solver = new QLLSolver();
     errstat.clear();
@@ -99,14 +99,21 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     solver_dispatch(s1,k1,s2,k2,s3,+1, solutions);
     if (!s3->isPoint()) // for points k3=+1 allways
         solver_dispatch(s1,k1,s2,k2,s3,-1, solutions); // for lineSite or ArcSite we try k3=-1 also    
-    
+
     if ( solutions.size() == 1 && (t_min<=solutions[0].t) && (t_max>=solutions[0].t) && (s3->in_region( solutions[0].p)) )
         return solutions[0];
     
-    // choose only t_min < t < t_max solutions 
-    solutions.erase( std::remove_if(solutions.begin(),solutions.end(), t_filter(t_min,t_max) ), solutions.end() );
     // choose only in_region() solutions
     solutions.erase( std::remove_if(solutions.begin(),solutions.end(), in_region_filter(s3) ), solutions.end() );
+    if (solutions.empty() ) 
+        std::cout << "WARNING in_region_filter() results in empty solution set!!\n";
+
+    // choose only t_min < t < t_max solutions 
+    solutions.erase( std::remove_if(solutions.begin(),solutions.end(), t_filter(t_min,t_max) ), solutions.end() );
+    if (solutions.empty() ) 
+        std::cout << "WARNING t_filter() results in empty solution set!!\n";
+
+    
     
     if ( solutions.size() == 1)
         return solutions[0];
@@ -141,15 +148,16 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     } 
 
     // either 0, or >= 2 solutions found. error.
-    std::cout << " None, or too many solutions found! solutions.size()=" << solutions.size() << "\n";
-    std::cout << " solution edge: " << vd->g[ vd->g.source(edge) ].position << " - " << vd->g[ vd->g.target(edge) ].position << " type=" << vd->g[edge].type << "\n";
-    std::cout << " solution edge: " << vd->g[ vd->g.source(edge) ].index << " type=" << vd->g[ vd->g.source(edge) ].type;
+    // std::cout << " None, or too many solutions found! solutions.size()=" << solutions.size() << "\n";
+    std::cout << " solution edge: " << vd->g[ vd->g.source(edge) ].position << " (t=" << vd->g[ vd->g.source(edge) ].dist() << ")";
+    std::cout << " - " << vd->g[ vd->g.target(edge) ].position << " (t=" << vd->g[ vd->g.target(edge) ].dist() << ") \n";
+    std::cout << " solution edge: " << vd->g[ vd->g.source(edge) ].index << " [" << vd->g[ vd->g.source(edge) ].type<<"]";
     std::cout << " - ";
-    std::cout << vd->g[ vd->g.target(edge) ].index << " type=" << vd->g[ vd->g.target(edge) ].type << "\n";
-    std::cout << " t-vals t_min= " << t_min << " t_max= " << t_max << "\n";
-    std::cout << "  sites: " << s1->str() << "(k="<< k1<< ") " << s2->str() << "(k="<< k2 << ") new= " << s3->str() << "\n";
-    std::cout << "s1= " << s1->str2() << "\n";
-    std::cout << "s2= " << s2->str2() << "\n";
+    std::cout << vd->g[ vd->g.target(edge) ].index << "[" << vd->g[ vd->g.target(edge) ].type << "]\n";
+    //std::cout << " t-vals t_min= " << t_min << " t_max= " << t_max << "\n";
+    //std::cout << "  sites: " << s1->str() << "(k="<< k1<< ") " << s2->str() << "(k="<< k2 << ") new= " << s3->str() << "\n";
+    std::cout << "s1= " << s1->str2() << "(k=" << k1<< ")\n";
+    std::cout << "s2= " << s2->str2() << "(k=" << k2<< ")\n";
     std::cout << "s3= " << s3->str2() << "\n";
 
     // run the solver(s) one more time in order to print out un-filtered solution points for debugging
@@ -158,20 +166,23 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     if (!s3->isPoint()) // for points k3=+1 allways
         solver_dispatch(s1,k1,s2,k2,s3,-1, solutions2); // for lineSite or ArcSite we try k3=-1 also    
 
+    std::cout << " The failing solutions are: \n";
     BOOST_FOREACH(Solution s, solutions2 ) {
         std::cout << s.p << " t=" << s.t << " k3=" << s.k3  << " e_err=" << edge_error(edge,s) <<"\n";
-        std::cout << "   t_positive=" << (s.t>0) << " min<t<max=" << ((s.t>=t_min) && (s.t<=t_max));
-        std::cout << " in_region=" << s3->in_region(s.p);
-        std::cout << std::fixed << std::cout.precision(10) << " region-t=" << s3->in_region_t(s.p) << "\n";
-        std::cout << std::scientific;
+        std::cout << " min<t<max=" << ((s.t>=t_min) && (s.t<=t_max));
+        std::cout << " s3.in_region=" << s3->in_region(s.p);
+        std::cout <<  " region-t=" << s3->in_region_t(s.p) << "\n";
+        //std::cout << std::scientific;
     }
 
     assert(0);
     // try a desperate solution
     double t_mid = 0.5*(t_min+t_max);
     Point p_mid = vd->g[edge].point(t_mid);
-    
-    return Solution( p_mid, t_mid, 1 );
+    Solution desp( p_mid, t_mid, 1 );
+    std::cout << " Returning desperate solution: \n";
+    std::cout << desp.p << " t=" << desp.t << " k3=" << desp.k3  << " e_err=" << edge_error(edge,desp) <<"\n";
+    return desp;
 }
 
 int VertexPositioner::solver_dispatch(Site* s1, double k1, Site* s2, double k2, Site* s3, double k3, std::vector<Solution>& solns) {    

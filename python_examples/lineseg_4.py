@@ -20,13 +20,13 @@ def writeFrame( w2if, lwr, n ):
 
 if __name__ == "__main__":  
     #print ocl.revision()
-    w=2500
-    h=1500
+    #w=2500
+    #h=1500
     
     #w=1920
     #h=1080
-    #w=1024
-    #h=1024
+    w=1024
+    h=1024
     myscreen = ovdvtk.VTKScreen(width=w, height=h) 
     ovdvtk.drawOCLtext(myscreen, rev_text=ovd.revision() )
     
@@ -66,8 +66,8 @@ if __name__ == "__main__":
     # Nmax = 1024
     # Nmax = 2048
     # Nmax = 4096
-    Nmax = 8192
-    # Nmax = 16384
+    # Nmax = 8192
+    Nmax = 16384
     # Nmax = 32768
     # 1024, 1.247sec, 398 SPLIT verts
     
@@ -82,6 +82,14 @@ if __name__ == "__main__":
     pstring = f.read()
     segs = pickle.loads( pstring )
     f.close()
+    
+    
+    """    
+    print "waiting for ",Nmax," segments..",
+    sys.stdout.flush()
+    t_before = time.time()
+    segs = gens.randomSegments2(1,Nmax,1)
+    """
     
     t_after = time.time()
     print ".done in {0:.3f} s.".format( t_after-t_before )
@@ -116,6 +124,8 @@ if __name__ == "__main__":
         n=n+1
     t_after = time.time()
     times.append( t_after-t_before )
+    
+    vd.check()
     
     #s = id_list[nsegs]
     #vd.debug_on()

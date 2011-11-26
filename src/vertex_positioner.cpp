@@ -149,11 +149,11 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
 
     // either 0, or >= 2 solutions found. error.
     // std::cout << " None, or too many solutions found! solutions.size()=" << solutions.size() << "\n";
-    std::cout << " solution edge: " << vd->g[ vd->g.source(edge) ].position << " (t=" << vd->g[ vd->g.source(edge) ].dist() << ")";
-    std::cout << " - " << vd->g[ vd->g.target(edge) ].position << " (t=" << vd->g[ vd->g.target(edge) ].dist() << ") \n";
-    std::cout << " solution edge: " << vd->g[ vd->g.source(edge) ].index << " [" << vd->g[ vd->g.source(edge) ].type<<"]";
-    std::cout << " - ";
-    std::cout << vd->g[ vd->g.target(edge) ].index << "[" << vd->g[ vd->g.target(edge) ].type << "]\n";
+    std::cout << " solution edge: " << vd->g[ vd->g.source(edge) ].position << "[" << vd->g[ vd->g.source(edge) ].type << "](t=" << vd->g[ vd->g.source(edge) ].dist() << ")";
+    std::cout << " - " << vd->g[ vd->g.target(edge) ].position << "[" << vd->g[ vd->g.target(edge) ].type << "](t=" << vd->g[ vd->g.target(edge) ].dist() << ") \n";
+    std::cout << " solution edge: " << vd->g[ vd->g.source(edge) ].index << "[" << vd->g[ vd->g.source(edge) ].type<<"]{" << vd->g[ vd->g.source(edge) ].status<<"}";
+    std::cout << " -[" << vd->g[edge].type << "]- ";
+    std::cout << vd->g[ vd->g.target(edge) ].index << "[" << vd->g[ vd->g.target(edge) ].type << "]{" << vd->g[ vd->g.target(edge) ].status<<"}\n";
     //std::cout << " t-vals t_min= " << t_min << " t_max= " << t_max << "\n";
     //std::cout << "  sites: " << s1->str() << "(k="<< k1<< ") " << s2->str() << "(k="<< k2 << ") new= " << s3->str() << "\n";
     std::cout << "s1= " << s1->str2() << "(k=" << k1<< ")\n";

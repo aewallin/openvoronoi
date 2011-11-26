@@ -80,6 +80,7 @@ struct EdgeProps {
     void set_ll_parameters(Site* s1, Site* s2);
     void set_sep_parameters(Point& endp, Point& p);
     void print_params() const;
+    
 
 };
 

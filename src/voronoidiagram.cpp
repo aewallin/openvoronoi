@@ -756,7 +756,7 @@ void VoronoiDiagram::add_split_vertex(HEFace f, Site* s) {
             SplitPointError errFunctr(this, split_edge, pt1, pt2); // error functor
             typedef std::pair<double, double> Result;
             boost::uintmax_t max_iter=500;
-            boost::math::tools::eps_tolerance<double> tol(30); // bits of tolerance?
+            boost::math::tools::eps_tolerance<double> tol(64); // bits of tolerance?
             double min_t = std::min( g[split_src].dist() , g[split_trg].dist() );
             double max_t = std::max( g[split_src].dist() , g[split_trg].dist() );
             // require that min_t and max_t bracket the root

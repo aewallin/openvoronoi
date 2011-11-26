@@ -99,7 +99,8 @@ namespace ovd {
 // vecS is slightly faster than listS
 // vecS   5.72us * n log(n)
 // listS  6.18 * n log(n)
-#define OUT_EDGE_CONTAINER boost::listS 
+//#define OUT_EDGE_CONTAINER boost::listS 
+#define OUT_EDGE_CONTAINER boost::vecS 
 
 // note: cannot use vecS since remove_vertex invalidates iterators/edge_descriptors (?)
 #define VERTEX_CONTAINER boost::listS

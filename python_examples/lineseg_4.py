@@ -66,9 +66,9 @@ if __name__ == "__main__":
     # Nmax = 1024
     # Nmax = 2048
     # Nmax = 4096
-    # Nmax = 8192
+    Nmax = 8192
     # Nmax = 16384
-    Nmax = 32768
+    # Nmax = 32768
     # 1024, 1.247sec, 398 SPLIT verts
     
     linesegs = 1 # switch to turn on/off line-segments

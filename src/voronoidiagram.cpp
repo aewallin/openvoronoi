@@ -362,8 +362,10 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
     if (step==current_step) return false; current_step++;
 
     augment_vertex_set( pos_site ); // it should not matter if we use pos_site or neg_site here
-    //std::cout << "   delete-set is("<< v0.size() <<"): "; print_vertices(v0);
-    
+    if (debug) {
+        std::cout << " delete-set is("<< v0.size() <<"): "; 
+        print_vertices(v0);
+    }
     if (step==current_step) return false; current_step++;
 
     // todo(?) sanity checks:
@@ -921,10 +923,13 @@ void VoronoiDiagram::add_vertices( Site* new_site ) {
         modified_vertices.insert(q);
         Solution sl = vpos->position( q_edges[m], new_site );
         if ( vpos->dist_error( q_edges[m], sl, new_site) > 1e-9 ) {
-            std::cout << "position new vertex " << g[q].index << " on ";
-            std::cout <<  g[ g.source(q_edges[m])].index << "(t=" << g[ g.source(q_edges[m])].dist() << ")-"; 
-            std::cout << g[ g.target(q_edges[m])].index << "(t=" << g[ g.target(q_edges[m])].dist() << ")";
-            std::cout <<  " , type=" << g[q_edges[m]].type << "\n";
+            HEVertex src = g.source(q_edges[m]);
+            HEVertex trg = g.target(q_edges[m]);
+            std::cout << "ERROR while positioning new vertex " << g[q].index << " on edge\n";
+            std::cout << g[ src ].index << "[" << g[ src ].type << "]" << "{" << g[ src ].status << "}" << "(t=" << g[ src ].dist() << ")";
+            std::cout <<  " -[" << g[q_edges[m]].type << "]- "; 
+            std::cout << g[ trg ].index << "[" << g[ trg ].type << "]" << "{" << g[ trg ].status << "}" << "(t=" << g[ trg ].dist() << ")";
+            
             std::cout <<  "     derr =" << vpos->dist_error( q_edges[m], sl, new_site) << "\n";
         }
         
@@ -1498,7 +1503,7 @@ void VoronoiDiagram::print_edges(EdgeVector& q) {
 
 void VoronoiDiagram::print_vertices(VertexVector& q) {
     BOOST_FOREACH( HEVertex v, q) {
-        std::cout << g[v].index << " ";
+        std::cout << g[v].index << "["<< g[v].type << "]" << " ";
     }
     std::cout << std::endl;
 }

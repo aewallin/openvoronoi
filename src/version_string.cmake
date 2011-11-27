@@ -23,9 +23,11 @@ else()
     message( WARNING "Git not found. Build will not contain git revision info." )
 endif()
 
+message( STATUS "build type = " ${CMAKE_BUILD_TYPE})
+
 set( vstring "//version_string.hpp - written by cmake. changes will be lost!\n"
              "#ifndef VERSION_STRING\n"
-             "#define VERSION_STRING \"${GIT_COMMIT_ID}\"\n"
+             "#define VERSION_STRING \"${GIT_COMMIT_ID}"\ ("${CMAKE_BUILD_TYPE}")"\"\n"
              "#endif\n"
 )
 

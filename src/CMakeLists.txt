@@ -91,8 +91,9 @@ set( CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR} ) # Findqd.cmake is in this d
 find_package( qd REQUIRED )
 include_directories(${QD_INCLUDE_DIR})
 
+message( STATUS "build type = " ${CMAKE_BUILD_TYPE})
 
-################ create version_string.hpp, http://stackoverflow.com/questions/3780667
+#### create version_string.hpp, http://stackoverflow.com/questions/3780667
 # include the output directory, where the version_string.hpp file is generated
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 # a custom target that is always built
@@ -104,7 +105,7 @@ add_custom_target(
 # creates version_string.hpp using cmake script
 add_custom_command(
     OUTPUT ver_string ${CMAKE_CURRENT_BINARY_DIR}/version_string.hpp
-    COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}
+    COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                                             -P ${CMAKE_CURRENT_SOURCE_DIR}/version_string.cmake
 )
 # version_string.hpp is a generated file
@@ -113,7 +114,7 @@ set_source_files_properties(
     PROPERTIES GENERATED TRUE
     HEADER_FILE_ONLY TRUE
 )
-################ end create version_string.hpp
+#### end create version_string.hpp
 
 
 # this defines the source-files

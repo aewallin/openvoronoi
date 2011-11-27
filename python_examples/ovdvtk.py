@@ -385,14 +385,14 @@ class VD:
         self.setVDText()
         self.setGenerators()
         #self.setFar(vd)
-        #self.setVertices()
+        self.setVertices()
         self.setEdgesPolydata()
         #self.setEdges()
         
 
 def drawOCLtext(myscreen, rev_text=" "):
     t = Text()
-    t.SetPos( (myscreen.width-200, myscreen.height-70) )
+    t.SetPos( (myscreen.width-250, myscreen.height-70) )
     date_text = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     t.SetText( "OpenVoronoi\n" + rev_text + "\n" + date_text )
     myscreen.addActor(t)

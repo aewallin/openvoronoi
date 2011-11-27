@@ -54,47 +54,23 @@ if __name__ == "__main__":
     # for vtk visualization
     vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
     vod.drawFarCircle()
-    vod.textScale = 0.002
-    vod.vertexRadius = 0.00031
-    vod.drawVertices=0
-    vod.drawVertexIndex=0
-    vod.drawGenerators=0
+    vod.textScale = 0.02
+    vod.vertexRadius = 0.0031
+    vod.drawVertices=1
+    vod.drawVertexIndex=1
+    vod.drawGenerators=1
     
-    # Nmax = 128
-    # Nmax = 256
-    Nmax = 512
-    # Nmax = 1024
-    # Nmax = 2048
-    # Nmax = 4096
-    # Nmax = 8192
-    # Nmax = 16384
-    # Nmax = 32768
-    # 1024, 1.247sec, 398 SPLIT verts
     
     linesegs = 1 # switch to turn on/off line-segments
     
-    """
-    print "waiting for ",Nmax," segments..",
-    sys.stdout.flush()
-    t_before = time.time()
-    #segs = gens.randomSegments(far,Nmax)
-    filename = "data/randomsegments_{0}.pickle.gz".format(Nmax)
-    f = gzip.open(filename, 'rb')
-    pstring = f.read()
-    segs = pickle.loads( pstring )
-    f.close()
-    """
-    
+    segs = []
     s1 = [ovd.Point(-0.5,-0.7) , ovd.Point(-0.5,+0.7) ]
     s2 = [ovd.Point(+0.5,-0.7) , ovd.Point(+0.5,+0.7) ]
-    segs = [s1, s2]
-
-    """    
-    print "waiting for ",Nmax," segments..",
-    sys.stdout.flush()
-    t_before = time.time()
-    segs = gens.randomSegments2(1,Nmax,1)
-    """
+    s3 = [ovd.Point(+0.4,+0.0) , ovd.Point(-0.4,+0.0) ]
+    segs.append(s1)
+    segs.append(s2)
+    segs.append(s3)
+    
     
     #t_after = time.time()
     #print ".done in {0:.3f} s.".format( t_after-t_before )
@@ -116,16 +92,18 @@ if __name__ == "__main__":
     times.append( t_after-t_before )
     #exit()
     
-    print "   ",2*Nmax," point-sites sites took {0:.3f}".format(times[0])," seconds, {0:.2f}".format( 1e6*float( times[0] )/(float(2*Nmax)*float(math.log10(2*Nmax))) ) ,"us/n*log(n)"
-     
-    nsegs = Nmax
-    #nsegs = 183 #Nmax
+    #print "   ",2*Nmax," point-sites sites took {0:.3f}".format(times[0])," seconds, {0:.2f}".format( 1e6*float( times[0] )/(float(2*Nmax)*float(math.log10(2*Nmax))) ) ,"us/n*log(n)"
+    print "all point sites inserted."
+    vd.check()
+    
+    #nsegs = Nmax
+    nsegs = 2 #Nmax
     n=1
     t_before = time.time()
     for s in id_list:
         if n<= nsegs and linesegs==1:
             vd.addLineSite(s[0],s[1])
-            #print n," added line-segment"
+            print n," added line-segment"
         n=n+1
     t_after = time.time()
     line_time = t_after-t_before
@@ -135,9 +113,9 @@ if __name__ == "__main__":
     
     vd.check()
     
-    #s = id_list[nsegs]
-    #vd.debug_on()
-    #vd.addLineSite( s[0], s[1], 5) 
+    s = id_list[nsegs]
+    vd.debug_on()
+    vd.addLineSite( s[0], s[1], 5) 
     #seg = id_list[nsegs]
     #vd.addLineSite(seg[0],seg[1],10)
     # 4 delete-tree
@@ -147,9 +125,6 @@ if __name__ == "__main__":
     # 8 add new edges
     # 9 delete delete-tree edges
     # 10 reset status
-    print "Summary:"
-    print "   ",2*Nmax," point-sites sites took {0:.3f}".format(times[0])," seconds, {0:.2f}".format( 1e6*float( times[0] )/(float(2*Nmax)*float(math.log10(2*Nmax))) ) ,"us/n*log(n)"
-    print "   ",Nmax," line-sites sites took {0:.3f}".format(times[1])," seconds, {0:.2f}".format( 1e6*float( times[1] )/(float(Nmax)*float(math.log10(Nmax))) ) ,"us/n*log(n)"
             
     vod.setVDText2(times)
     
@@ -169,17 +144,17 @@ if __name__ == "__main__":
 
     
     calctime = t_after-t_before
-    if Nmax==0:
-        Nmax=1
-    print " VD done in ", calctime," s, ", calctime/Nmax," s per generator"
+    #if Nmax==0:
+    #    Nmax=1
+    #print " VD done in ", calctime," s, ", calctime/Nmax," s per generator"
     
     vod.setAll()
         
     print "PYTHON All DONE."
 
     myscreen.render()   
-    w2if.Modified()
-    lwr.SetFileName("{0}.png".format(Nmax))
-    lwr.Write()
+    #w2if.Modified()
+    #lwr.SetFileName("{0}.png".format(Nmax))
+    #lwr.Write()
      
     myscreen.iren.Start()

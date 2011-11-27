@@ -68,9 +68,8 @@ if __name__ == "__main__":
     s2 = [ovd.Point(+0.5,-0.7) , ovd.Point(+0.5,+0.7) ]
     s3 = [ovd.Point(+0.4,+0.0) , ovd.Point(-0.4,+0.0) ]
     segs.append(s1)
-    segs.append(s2)
+    segs.append(s2)    
     segs.append(s3)
-    
     
     #t_after = time.time()
     #print ".done in {0:.3f} s.".format( t_after-t_before )

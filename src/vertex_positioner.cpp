@@ -200,7 +200,15 @@ bool VertexPositioner::solution_on_edge(Solution& s) {
     double limit = 9E-4;
     if ( err>=limit ) {
         std::cout << "solution_on_edge() ERROR err= " << err << "\n";
-        std::cout << " edge: " << vd->g[ vd->g.source(edge) ].index << " - " << vd->g[ vd->g.target(edge) ].index << "\n";
+        std::cout << " solution edge: " << vd->g[ vd->g.source(edge) ].index << "[" << vd->g[ vd->g.source(edge) ].type<<"]{" << vd->g[ vd->g.source(edge) ].status<<"}";
+        std::cout << " -[" << vd->g[edge].type << "]- ";
+        std::cout << vd->g[ vd->g.target(edge) ].index << "[" << vd->g[ vd->g.target(edge) ].type << "]{" << vd->g[ vd->g.target(edge) ].status<<"}\n";
+
+
+        std::cout << " edge: " << vd->g[ vd->g.source(edge) ].index << "(t=" << vd->g[ vd->g.source(edge) ].dist() << ")"; 
+        std::cout << " - " << vd->g[ vd->g.target(edge) ].index << "(t=" << vd->g[ vd->g.target(edge) ].dist() << ")\n";
+        std::cout << " edge: " << vd->g[ vd->g.source(edge) ].position << " - " << vd->g[ vd->g.target(edge) ].position << "\n";
+        std::cout << " solution: " << s.p << " t=" << s.t << "\n";
     }
     return (err<limit);
 }

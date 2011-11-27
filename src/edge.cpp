@@ -61,9 +61,10 @@ Point EdgeProps::point(double t) const {
         double xc = x[0] - x[1] - x[2]*t + psig * x[3] * sqrt( discr1 );
         double yc = y[0] - y[1] - y[2]*t + nsig * y[3] * sqrt( discr2 );
         if (xc!=xc) { // test for NaN!
-            std::cout << xc << " , " << yc << " t=" << t << "\n";
+            std::cout << "Edge::point() ERROR: " << xc << " , " << yc << " t=" << t << "\n";
             print_params();
             assert(0);
+            return Point(0,0);
         }
         return Point(xc,yc);
     } else {
@@ -210,12 +211,36 @@ void EdgeProps::set_ll_parameters(Site* s1, Site* s2) {  // Held thesis p96
     //sign = true; //sign does not matter because there is no sqrt()?        
     
     double delta =  s1->a()*s2->b() - s1->b()*s2->a() ;
-    assert( delta != 0 );
-       
+    
+    if ( delta==0 ) { // parallel(?) line segments
+        std::cout << " ll_parameters delta==0!\n";
+        x[0]=0;
+        x[1]=0;
+        x[2]=0;
+        x[3]=0;  
+        x[4]=0;
+        x[5]=0;
+        x[6]=0;
+        x[7]=0;
+        y[0]=0;
+        y[1]=0;
+        y[2]=0;
+        y[3]=0; 
+        y[4]=0;
+        y[5]=0;
+        y[6]=0;
+        y[7]=0;
+        return;
+    }
+
+    assert( delta != 0 );       
     double alfa1 = ( s1->b()*s2->c()-s2->b()*s1->c() ) / delta;
     double alfa2 = ( s2->a()*s1->c()-s1->a()*s2->c() ) / delta;
     double alfa3 = -( s2->b()-s1->b() ) / delta;
     double alfa4 = -( s1->a()-s2->a() ) / delta;
+    
+    // point (alfa1,alfa2) is the intersection point between the line-segments
+    // vector (-alfa3,-alfa4) is the direction/tangent of the bisector
     x[0]= alfa1;  
     x[2]= -alfa3; 
     y[0]= alfa2;         

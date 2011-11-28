@@ -315,7 +315,11 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
     g[start].zero_dist();
     g[end].zero_dist();
     
-    if (step==current_step) return false; current_step++;
+    if (step==current_step) {
+        std::cout << step << " : startvert=" << g[start].index << " endvert=" << g[end].index << "\n";
+        return false; 
+    }
+    current_step++;
     
     // create a point which is left of src->trg
     // determine k (offset-dir) for this point
@@ -441,7 +445,8 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
 // 
 void VoronoiDiagram::add_separator(HEFace f, HEVertex endp, Site* s1, Site* s2) {
     EdgeVector out_edges = g.out_edges(endp);
-    assert( out_edges.size() == 1);
+    assert( out_edges.size() == 1); // one out-edge if the endpoint is new
+    
     HEEdge segment_e = out_edges[0];
     HEEdge segment_tw = g[segment_e].twin;
     

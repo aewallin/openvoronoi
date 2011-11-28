@@ -256,6 +256,10 @@ bool VertexPositioner::check_dist(HEEdge e, const Solution& sl, Site* s3) {
         std::cout << "  d1= " << d1 << "\n"; 
         std::cout << "  d2= " << d2 << "\n";
         std::cout << "  d3= " << d3 << "\n";
+        std::cout << " solution edge: " << vd->g[ vd->g.source(edge) ].index << "[" << vd->g[ vd->g.source(edge) ].type<<"]{" << vd->g[ vd->g.source(edge) ].status<<"}";
+        std::cout << " -[" << vd->g[edge].type << "]- ";
+        std::cout << vd->g[ vd->g.target(edge) ].index << "[" << vd->g[ vd->g.target(edge) ].type << "]{" << vd->g[ vd->g.target(edge) ].status<<"}\n";
+    
         return false;
     }
     return true;
@@ -284,6 +288,8 @@ double VertexPositioner::dist_error(HEEdge e, const Solution& sl, Site* s3) {
 
 bool VertexPositioner::equal(double d1, double d2) {
     bool tol = 1e-3;
+    if ( fabs(d1-d2) < 1e-15 )
+        return true;
     if ( fabs(d1-d2) > tol*std::max(d1,d2) )
         return false;
     return true;

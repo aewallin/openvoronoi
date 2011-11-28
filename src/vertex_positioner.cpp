@@ -172,6 +172,8 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
         std::cout << " min<t<max=" << ((s.t>=t_min) && (s.t<=t_max));
         std::cout << " s3.in_region=" << s3->in_region(s.p);
         std::cout <<  " region-t=" << s3->in_region_t(s.p) << "\n";
+        std::cout <<  " t - t_min= " << s.t - t_min << "\n";
+        std::cout <<  " t_max - t= " << t_max - s.t << "\n";
         //std::cout << std::scientific;
     }
 

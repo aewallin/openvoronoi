@@ -24,7 +24,6 @@
 
 #include "graph.hpp"
 #include "vertex.hpp"
-// #include "solvers/solver.hpp"
 #include "solvers/solution.hpp"
 
 namespace ovd {
@@ -37,7 +36,13 @@ class Solver;
 struct t_filter {
     t_filter(double tmin, double tmax): tmin_(tmin),tmax_(tmax) {}
     bool operator()(Solution s) { 
-        return (s.t<tmin_) || (s.t>tmax_); 
+        double eps=1e-9;
+        double tround=s.t;
+        if ( fabs(s.t-tmin_) < eps )
+            tround=tmin_;
+        else if (fabs(s.t-tmax_)<eps)
+            tround=tmax_;
+        return (tround<tmin_) || (tround>tmax_); // these points rejected!
     }
 private:
     double tmin_;
@@ -78,7 +83,6 @@ private:
                Site* s3, double k3, std::vector<Solution>& slns ); 
         
 // geometry-checks
-    //double edge_error(HEEdge e, Solution& s );
     bool solution_on_edge(Solution& s);
     bool check_far_circle(Solution& s);
     bool check_dist(HEEdge e, const Solution& s, Site* s3);

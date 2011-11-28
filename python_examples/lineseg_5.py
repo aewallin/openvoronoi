@@ -66,10 +66,16 @@ if __name__ == "__main__":
     segs = []
     s1 = [ovd.Point(-0.5,-0.7) , ovd.Point(-0.5,+0.7) ]
     s2 = [ovd.Point(+0.5,-0.7) , ovd.Point(+0.5,+0.7) ]
-    s3 = [ovd.Point(+0.4,+0.0) , ovd.Point(-0.4,+0.0) ]
+    s3 = [ovd.Point(+0.4,-0.7) , ovd.Point(+0.4,+0.7) ]
+    s4 = [ovd.Point(-0.3,-0.7) , ovd.Point(-0.3,+0.7) ]
+    s5 = [ovd.Point(+0.3,-0.7) , ovd.Point(+0.3,+0.7) ]
+    
+    #s3 = [ovd.Point(+0.4,+0.0) , ovd.Point(-0.4,+0.0) ]
     segs.append(s1)
     segs.append(s2)    
     segs.append(s3)
+    segs.append(s4)
+    segs.append(s5)
     
     #t_after = time.time()
     #print ".done in {0:.3f} s.".format( t_after-t_before )
@@ -92,11 +98,11 @@ if __name__ == "__main__":
     #exit()
     
     #print "   ",2*Nmax," point-sites sites took {0:.3f}".format(times[0])," seconds, {0:.2f}".format( 1e6*float( times[0] )/(float(2*Nmax)*float(math.log10(2*Nmax))) ) ,"us/n*log(n)"
-    print "all point sites inserted."
+    print "all point sites inserted. ",
     vd.check()
     
     #nsegs = Nmax
-    nsegs = 2 #Nmax
+    nsegs = 5 #Nmax
     n=1
     t_before = time.time()
     for s in id_list:
@@ -112,9 +118,9 @@ if __name__ == "__main__":
     
     vd.check()
     
-    s = id_list[nsegs]
-    vd.debug_on()
-    vd.addLineSite( s[0], s[1], 10) 
+    #s = id_list[nsegs]
+    #vd.debug_on()
+    #vd.addLineSite( s[0], s[1], 10) 
     #seg = id_list[nsegs]
     #vd.addLineSite(seg[0],seg[1],10)
     # 4 delete-tree

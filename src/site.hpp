@@ -226,9 +226,10 @@ public:
         _end = s.end();
     }
     ~LineSite() {}
+    /*
     virtual void set_c(const Point& p) {
         eq.c = -( eq.a * p.x + eq.b * p.y );
-    }
+    }*/
     /// closest point on start-end segment to given point.
     /// project onto line and return either the projected point
     /// or one endpoint of the linesegment

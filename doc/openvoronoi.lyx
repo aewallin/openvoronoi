@@ -658,11 +658,11 @@ Point-Point Edge
 \end_layout
 
 \begin_layout Standard
-The edge between point site 
+The edge between two point sites 
 \begin_inset Formula $p_{1}=(x_{1},y_{1})$
 \end_inset
 
- and point site 
+ and 
 \begin_inset Formula $p_{2}=(x_{2},y_{2})$
 \end_inset
 
@@ -674,7 +674,7 @@ The edge between point site
 \begin_layout Standard
 \begin_inset Formula 
 \[
-e_{PP}(t)=p_{mid}\pm tv
+e_{PP}(t)=p_{mid}\pm v(t)
 \]
 
 \end_inset
@@ -687,11 +687,11 @@ where
 \begin_inset Formula $p_{mid}=\tfrac{1}{2}(p_{1}+p_{2})$
 \end_inset
 
- and the direction vector 
-\begin_inset Formula $v$
+ and the vector 
+\begin_inset Formula $v(t)$
 \end_inset
 
- is normalized 
+ is 
 \end_layout
 
 \begin_layout Subsection

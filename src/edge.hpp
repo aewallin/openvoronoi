@@ -27,6 +27,7 @@
 
 #include "common/point.hpp"
 #include "site.hpp"
+#include "solvers/solution.hpp"
 
 namespace ovd {
 
@@ -46,12 +47,14 @@ typedef boost::adjacency_list_traits<OUT_EDGE_CONTAINER,
                                      
 typedef unsigned int HEFace;
 
-enum VoronoiEdgeType {LINE, LINELINE, OUTEDGE, PARABOLA, ELLIPSE, HYPERBOLA, SEPARATOR, LINESITE};
+enum VoronoiEdgeType {LINE, LINELINE, PARA_LINELINE, OUTEDGE, PARABOLA, ELLIPSE, HYPERBOLA, SEPARATOR, LINESITE};
+
 
 /// properties of an edge in the voronoi diagram
 /// each edge stores a pointer to the next HEEdge 
 /// and the HEFace to which this HEEdge belongs
-struct EdgeProps {
+class EdgeProps {
+public:
     EdgeProps();
     EdgeProps(HEEdge n, HEFace f): next(n), face(f) {}
     /// create edge with given next, twin, and face
@@ -69,16 +72,21 @@ struct EdgeProps {
     bool sign; // choose either +/- in front of sqrt()
     
     Point point(double t) const; 
+    
+    double error(Solution& sl) const;
     double minimum_t( Site* s1, Site* s2);
+    void copy_parameters(EdgeProps& other);   
+    void set_parameters(Site* s1, Site* s2, bool sig);
+    void set_sep_parameters(Point& endp, Point& p);
+private:
+    Point projection_point(Solution& sl) const;
     double minimum_pp_t(Site* s1, Site* s2);
     double minimum_pl_t(Site* s1, Site* s2);
 
-    void copy_parameters(EdgeProps& other);   
-    void set_parameters(Site* s1, Site* s2, bool sig);
     void set_pp_parameters(Site* s1, Site* s2);
     void set_pl_parameters(Site* s1, Site* s2);
     void set_ll_parameters(Site* s1, Site* s2);
-    void set_sep_parameters(Point& endp, Point& p);
+    void set_ll_para_parameters(Site* s1, Site* s2);
     void print_params() const;
     
 

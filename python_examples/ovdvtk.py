@@ -245,15 +245,12 @@ class VD:
         self.colorLUT = vtk.vtkUnsignedCharArray()
         self.colorLUT.SetNumberOfComponents(3)
         self.colorLUT.SetName("Colors")
-        #self.colorLUT.SetNumberOfTableValues(idx)
-        #self.colorLUT.Build()
         # go through edges once more and set colors
         m=0
         for e in vd_edges:
             src_status = e[2] # src status
             trg_status = e[3] # trg status
             ecolor = self.edgeTypeColor( e[1], e[2], e[3] ) 
-            #print ecolor
             for dummy in e[0]: # go through all the points
                 self.colorLUT.InsertNextTuple3( 255*ecolor[0], 255*ecolor[1], 255*ecolor[2])
                 m=m+1
@@ -264,19 +261,12 @@ class VD:
         linePolyData.GetPointData().SetScalars(self.colorLUT)
         linePolyData.Modified() 
         linePolyData.Update()
-        
         mapper = vtk.vtkPolyDataMapper()
         mapper.SetInput(linePolyData)
-        #mapper.SetScalarRange(0, idx-1)
-        #mapper.SetLookupTable(self.colorLUT)
-        #mapper.Update()
-        
         self.edge_actor = vtk.vtkActor()
         self.edge_actor.SetMapper(mapper)
-        #self.edge_actor.GetProperty().SetColor( cyan )
         self.myscreen.addActor( self.edge_actor )
         self.edges.append(self.edge_actor)
-        #self.myscreen.render() 
         
     def edgeStatusColor(self, src_status, trg_status, default_color):
         
@@ -307,6 +297,8 @@ class VD:
         #print " edgeStatusColor edgeType= ",edgeType
         if (edgeType == ovd.VoronoiEdgeType.LINELINE):
             return self.edgeStatusColor(src_status,trg_status,lblue)
+        if (edgeType == ovd.VoronoiEdgeType.PARA_LINELINE):
+            return self.edgeStatusColor(src_status,trg_status,blue)
         if (edgeType == ovd.VoronoiEdgeType.LINE):
             return  self.edgeStatusColor(src_status,trg_status,cyan)
         if (edgeType == ovd.VoronoiEdgeType.OUTEDGE):

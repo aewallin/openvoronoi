@@ -114,7 +114,7 @@ if __name__ == "__main__":
     
     s = id_list[nsegs]
     vd.debug_on()
-    vd.addLineSite( s[0], s[1], 5) 
+    vd.addLineSite( s[0], s[1], 10) 
     #seg = id_list[nsegs]
     #vd.addLineSite(seg[0],seg[1],10)
     # 4 delete-tree

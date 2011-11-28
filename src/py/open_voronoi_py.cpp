@@ -77,6 +77,7 @@ BOOST_PYTHON_MODULE(openvoronoi) {
     bp::enum_<VoronoiEdgeType>("VoronoiEdgeType")
         .value("LINE", LINE)
         .value("LINELINE", LINELINE)
+        .value("PARA_LINELINE", PARA_LINELINE)
         .value("OUTEDGE", OUTEDGE)
         .value("PARABOLA", PARABOLA)
         .value("ELLIPSE", ELLIPSE)

@@ -124,7 +124,7 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
         Solution min_solution(Point(0,0),0,0);
         //std::cout << " edge_error filter: \n";
         BOOST_FOREACH(Solution s, solutions) {
-            double err = edge_error(edge,s);
+            double err = vd->g[edge].error(s);
             //std::cout << s.p << " k3=" << s.k3 << " t=" <<  s.t << " err=" << err << "\n";
             if ( err < min_error) {
                 min_solution = s;
@@ -168,7 +168,7 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
 
     std::cout << " The failing solutions are: \n";
     BOOST_FOREACH(Solution s, solutions2 ) {
-        std::cout << s.p << " t=" << s.t << " k3=" << s.k3  << " e_err=" << edge_error(edge,s) <<"\n";
+        std::cout << s.p << " t=" << s.t << " k3=" << s.k3  << " e_err=" << vd->g[edge].error(s) <<"\n";
         std::cout << " min<t<max=" << ((s.t>=t_min) && (s.t<=t_max));
         std::cout << " s3.in_region=" << s3->in_region(s.p);
         std::cout <<  " region-t=" << s3->in_region_t(s.p) << "\n";
@@ -181,7 +181,7 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     Point p_mid = vd->g[edge].point(t_mid);
     Solution desp( p_mid, t_mid, 1 );
     std::cout << " Returning desperate solution: \n";
-    std::cout << desp.p << " t=" << desp.t << " k3=" << desp.k3  << " e_err=" << edge_error(edge,desp) <<"\n";
+    std::cout << desp.p << " t=" << desp.t << " k3=" << desp.k3  << " e_err=" << vd->g[edge].error(desp) <<"\n";
     return desp;
 }
 
@@ -196,7 +196,7 @@ int VertexPositioner::solver_dispatch(Site* s1, double k1, Site* s2, double k2, 
 }
 
 bool VertexPositioner::solution_on_edge(Solution& s) {
-    double err = edge_error(edge,s);
+    double err = vd->g[edge].error(s);
     double limit = 9E-4;
     if ( err>=limit ) {
         std::cout << "solution_on_edge() ERROR err= " << err << "\n";
@@ -213,10 +213,12 @@ bool VertexPositioner::solution_on_edge(Solution& s) {
     return (err<limit);
 }
 
+// calculate the distance from the solution-point to the corresponding point on the edge.
+/*
 double VertexPositioner::edge_error(HEEdge e, Solution& s) {
-    Point ep = vd->g[e].point( s.t );
+    Point ep = vd->g[e].point( s.t, s );
     return (ep-s.p).norm();
-}
+}*/
 
 // new vertices should lie within the far_radius
 bool VertexPositioner::check_far_circle(Solution& s) {
@@ -257,6 +259,11 @@ bool VertexPositioner::check_dist(HEEdge e, const Solution& sl, Site* s3) {
     return true;
 }
 
+// new vertices should be equidistant to the three adjacent sites that define the vertex
+// we here calculate the distances d1, d2, d3 from the Solution to the three sites s1, s2, s3
+// and return the max deviation from the solution t-value.
+// this works as a sanity check for the solver.
+// a high error value here is also an indication of numerical instability in the solver
 double VertexPositioner::dist_error(HEEdge e, const Solution& sl, Site* s3) {
     HEFace face = vd->g[e].face;     
     HEEdge tw_edge = vd->g[e].twin;

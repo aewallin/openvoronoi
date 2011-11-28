@@ -78,7 +78,7 @@ private:
                Site* s3, double k3, std::vector<Solution>& slns ); 
         
 // geometry-checks
-    double edge_error(HEEdge e, Solution& s );
+    //double edge_error(HEEdge e, Solution& s );
     bool solution_on_edge(Solution& s);
     bool check_far_circle(Solution& s);
     bool check_dist(HEEdge e, const Solution& s, Site* s3);

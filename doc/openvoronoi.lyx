@@ -622,13 +622,108 @@ Solvers
 \end_layout
 
 \begin_layout Standard
-Solvers calculate the position of new vertices in the diagram.
+Solvers calculate the position of a new vertex in the diagram.
  The input for a solver consist the three sites that are adjacent to the
  new vertex, and the three offset-directions from the sites.
+ The new vertex should be positioned so that it is equidistant from all
+ three sites.
+\end_layout
+
+\begin_layout Subsection
+Point-Point-Point Solver
+\end_layout
+
+\begin_layout Subsection
+Line-Line-Line Solver
 \end_layout
 
 \begin_layout Section
 Edges
+\end_layout
+
+\begin_layout Standard
+Edges (or bisectors) in the diagram are defined by their two adjacent (and
+ equidistant) sites.
+ For offset-generation it is useful to parametrize the edges by the offset-dista
+nce (or clearance-disk radius).
+ Edges are split by apex-vertices so that the offset-distance 
+\begin_inset Formula $t$
+\end_inset
+
+ is either monotonically increasing or decreasing along the edge.
+\end_layout
+
+\begin_layout Subsection
+Point-Point Edge
+\end_layout
+
+\begin_layout Standard
+The edge between point site 
+\begin_inset Formula $p_{1}=(x_{1},y_{1})$
+\end_inset
+
+ and point site 
+\begin_inset Formula $p_{2}=(x_{2},y_{2})$
+\end_inset
+
+ is a line with its apex at the mid-point between the sites, and a direction
+ perpendicular to a line connecting the sites.
+ A point on the edge is given by
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+e_{PP}(t)=p_{mid}\pm tv
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $p_{mid}=\tfrac{1}{2}(p_{1}+p_{2})$
+\end_inset
+
+ and the direction vector 
+\begin_inset Formula $v$
+\end_inset
+
+ is normalized 
+\end_layout
+
+\begin_layout Subsection
+Point-Line Edge
+\end_layout
+
+\begin_layout Standard
+The edge between a point site 
+\begin_inset Formula $p_{1}=(x_{1},y_{1})$
+\end_inset
+
+ and a line site 
+\begin_inset Formula $l_{2}=\left\{ (x,y)\left|a_{2}x+b_{2}y+c_{2}=0\right.\right\} $
+\end_inset
+
+ is a parabola.
+\end_layout
+
+\begin_layout Subsection
+Line-Line Edge
+\end_layout
+
+\begin_layout Standard
+The edge between two line sites 
+\begin_inset Formula $l_{1}=\left\{ (x,y)\left|a_{1}x+b_{1}y+c_{1}=0\right.\right\} $
+\end_inset
+
+ and 
+\begin_inset Formula $l_{2}=\left\{ (x,y)\left|a_{2}x+b_{2}y+c_{2}=0\right.\right\} $
+\end_inset
+
+ is a line.
 \end_layout
 
 \end_body

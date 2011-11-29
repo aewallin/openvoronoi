@@ -11,6 +11,7 @@ add_custom_target(
 add_custom_command(
     OUTPUT pp_edge.eps
     COMMAND asy ${CMAKE_CURRENT_SOURCE_DIR}/pp_edge.asy 
+    DEPENDS pp_edge.asy
 )
 
 

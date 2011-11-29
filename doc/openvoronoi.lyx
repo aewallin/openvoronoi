@@ -674,7 +674,7 @@ The edge between two point sites
 \begin_layout Standard
 \begin_inset Formula 
 \[
-e_{PP}(t)=p_{mid}\pm v(t)
+e_{PP}^{\pm}(t)=p_{A}\pm\hat{v}\sqrt{t^{2}-t_{min}^{2}}
 \]
 
 \end_inset
@@ -683,15 +683,31 @@ e_{PP}(t)=p_{mid}\pm v(t)
 \end_layout
 
 \begin_layout Standard
-where 
-\begin_inset Formula $p_{mid}=\tfrac{1}{2}(p_{1}+p_{2})$
+where the apex point is 
+\begin_inset Formula 
+\[
+p_{A}=\tfrac{1}{2}(p_{1}+p_{2})
+\]
+
 \end_inset
 
- and the vector 
-\begin_inset Formula $v(t)$
+ the minimum offset distance is 
+\begin_inset Formula $t_{min}=\tfrac{1}{2}\left|p_{1}-p_{2}\right|$
+\end_inset
+
+, and the unit vector 
+\begin_inset Formula $\hat{v}$
 \end_inset
 
  is 
+\begin_inset Formula 
+\[
+\hat{v}=\frac{(p_{1}-p_{2})}{\left|p_{1}-p_{2}\right|}
+\]
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -718,10 +734,6 @@ Point-Point edge.
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Plain Layout
 
 \end_layout
 

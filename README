@@ -37,11 +37,28 @@ src/py      has python wrapping code
 src/common  has common classes not specific to voronoi diagrams
 
 Other voronoi-diagram codes
-CGAL.
-Boost/Sweepline. This was a Google Summer of Code 2010 project.
+
+CGAL
+http://www.cgal.org/Manual/latest/doc_html/cgal_manual/Voronoi_diagram_2/Chapter_main.html
+
+LEDA
+http://www.algorithmic-solutions.info/leda_guide/geo_algs/voronoi.html
+
+Boost/Sweepline. This was a Google Summer of Code 2010 project, meant for inclusion in Boost.Polygon.
+Integer input coordinates. Exact geometric predicates through geometric filtering. 
+Uses Fortune's sweepline algorithm.
+https://svn.boost.org/svn/boost/sandbox/SOC/2010/sweepline
+or perhaps https://svn.boost.org/svn/boost/sandbox/gtl/
+
 Boostcon video:
+"Sweep-Line Algorithm for Voronoi Diagrams of Points, Line Segments and Medial Axis of Polygons in the Plane"
+http://blip.tv/boostcon/sweep-line-algorithm-for-voronoi-diagrams-of-points-line-segments-and-medial-axis-of-polygons-in-the-plane-5368229
+
 VRONI/Martin Held. This code is commercial and not available, as far as
-we know.
+we know. 
+http://www.cosy.sbg.ac.at/~held/projects/vroni/vroni.html
+Patel (see References) seems to have independently implemented the
+same algorithm, we don't know where this code is or under what license it is.
 
 References
 
@@ -73,5 +90,9 @@ A smooth spiral tool path for high speed machining of 2D pockets
 Computer-Aided Design, Volume 41, Issue 7, July 2009, Pages 539-550
 Martin Held, Christian Spielberger
 http://dx.doi.org/10.1016/j.cad.2009.04.002
+
+Nirav B. Patel, "Voronoi diagrams, robust and efficient implementation", Binghamton
+University, State University of New York, 2005, MSc thesis. (this thesis is not
+accompanied by code, or much implementation detail)
 
 todo: Burnikel-papers? 

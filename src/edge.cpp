@@ -290,8 +290,8 @@ void EdgeProps::set_ll_para_parameters(Site* s1, Site* s2) {
     Point v(-s2->b(),s2->a());
     double t = (p1-p2).dot(v) / v.dot(v);
     Point p1_proj = p2+t*v;
-    double d = (p1-p1_proj).norm();
-    assert( d > 0 );
+
+    assert( (p1-p1_proj).norm() > 0 );
     
     // from this point, go a distance d/2 in the direction of the normal
     // to find a point through which the bisector passes

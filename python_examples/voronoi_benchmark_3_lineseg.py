@@ -57,11 +57,15 @@ def timeVoronoiSegs(Nmax, segtype=1):
     t_after = time.time()
     line_site_time = (t_after - t_before)
     return [point_site_time , line_site_time]
+
+def log2(x):
+    return math.log10(x)/math.log10(2)
     
 if __name__ == "__main__":  
+    print ovd.revision()
     far = 1
     Nmax_exp_start = 13
-    Nmax_exp_end = 24
+    Nmax_exp_end = 20
     # 10 -> 32 linesites
     # 14 -> 128
     # 18 -> 512
@@ -90,10 +94,13 @@ if __name__ == "__main__":
         Nmax=case[1]
         #times = timeVoronoiPoints(Nmax)
         times = timeVoronoiSegs(Nmax,segtype=1)
-        print n," voronoi-diagram for ",Nmax," sites took {0:.3f}".format(sum(times)) ," seconds, {0:.2f}".format( 1e6*float( sum(times) )/(float(Nmax)*float(math.log10(Nmax))) ) ,"us/n*log(n)"
+        print n," voronoi-diagram for ",Nmax," sites took {0:.3f}".format(sum(times)) ,
+        print " seconds, {0:.2f}".format( 1e6*float( sum(times) )/(float(Nmax)*float(log2(Nmax))) ) ,"us/n*log2(n)"
+
+        
         if len(times)==2:
-            print "   ",2*Nmax," point-sites sites took {0:.3f}".format(times[0])," seconds, {0:.2f}".format( 1e6*float( times[0] )/(float(2*Nmax)*float(math.log10(2*Nmax))) ) ,"us/n*log(n)"
-            print "   ",Nmax," line-sites sites took {0:.3f}".format(times[1])," seconds, {0:.2f}".format( 1e6*float( times[1] )/(float(Nmax)*float(math.log10(Nmax))) ) ,"us/n*log(n)"
+            print "   ",2*Nmax," point-sites sites took {0:.3f}".format(times[0])," seconds, {0:.2f}".format( 1e6*float( times[0] )/(float(2*Nmax)*float(log2(2*Nmax))) ) ,"us/n*log2(n)"
+            print "   ",Nmax," line-sites sites took {0:.3f}".format(times[1])," seconds, {0:.2f}".format( 1e6*float( times[1] )/(float(Nmax)*float(log2(Nmax))) ) ,"us/n*log2(n)"
         row = []
         row.append(Nmax)
         for t in times:

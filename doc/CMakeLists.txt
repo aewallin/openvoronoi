@@ -2,36 +2,42 @@ cmake_minimum_required(VERSION 2.6)
  
 PROJECT(openvoronoi_documentation)
 
+set( ASY_FIGURES
+    pp_edge
+    p_site
+)
+
+FOREACH(ASYFIG ${ASY_FIGURES})
+    set(ASY_FILES ${ASY_FILES} ";" ${ASYFIG}.asy) 
+    set(ASY_EPS_FILES ${ASY_EPS_FILES} ";" ${ASYFIG}.eps) 
+ENDFOREACH(ASYFIG)
 
 add_custom_target(
-    pp_edge_fig 
+    figures
     ALL
-    DEPENDS pp_edge.eps 
-)
-add_custom_command(
-    OUTPUT pp_edge.eps
-    COMMAND asy ${CMAKE_CURRENT_SOURCE_DIR}/pp_edge.asy 
-    DEPENDS pp_edge.asy
+    DEPENDS 
+    ${ASY_EPS_FILES}
 )
 
+FOREACH(ASYFIG ${ASY_FIGURES})
+    message( STATUS "figure: " ${ASYFIG} )
+    add_custom_command(
+        OUTPUT ${ASYFIG}.eps
+        COMMAND asy ${CMAKE_CURRENT_SOURCE_DIR}/${ASYFIG}.asy 
+        DEPENDS ${ASYFIG}.asy
+    )
+ENDFOREACH(ASYFIG)
 
 add_custom_target(
     pdf_doc
     ALL
     DEPENDS 
+    ${ASY_EPS_FILES}
     openvoronoi.pdf
-    pp_edge.eps
 )
-
 
 add_custom_command(
     OUTPUT openvoronoi.pdf
     COMMAND lyx --export pdf ${CMAKE_CURRENT_SOURCE_DIR}/openvoronoi.lyx
-    DEPENDS pp_edge.eps
-
+    DEPENDS openvoronoi.lyx
 )
-
-# ADD_EXECUTABLE(diangle_test diangle_test.cpp)
-
-
-

@@ -546,7 +546,12 @@ void VoronoiDiagram::add_separator(HEFace f, HEVertex endp, Site* s1, Site* s2) 
     g[e2_tw].set_sep_parameters( g[endp].position, g[v2].position );
     
     g[f].status = NONINCIDENT; // face is "done"
-    
+    if (debug) {
+        std::cout << "added separators: \n";
+        std::cout << "v1 separator: " << g[endp].index << " - " << g[v1].index << "\n";
+        std::cout << "v2 separator: " << g[endp].index << " - " << g[v2].index << "\n";
+
+    }
     assert( vd_checker->check_edge(e1) );
     assert( vd_checker->check_edge(e2) );
     assert( vd_checker->check_edge(e1_tw) );
@@ -942,6 +947,11 @@ void VoronoiDiagram::add_vertices( Site* new_site ) {
         g[q].k3 = sl.k3;
         g[q].init_dist( new_site->apex_point( g[q].position ) ); // set initial clearance-disk
         add_vertex_in_edge(q, q_edges[m] );
+        if (debug) {
+            HEVertex src = g.source(q_edges[m]);
+            HEVertex trg = g.target(q_edges[m]);
+            std::cout << "NEW vertex " << g[q].index << " on edge " << g[src].index << " - " << g[trg].index << "\n";
+        }
     }
 }
 

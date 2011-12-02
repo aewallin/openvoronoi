@@ -17,14 +17,14 @@ pair pa = 0.5*(p1+p2);
 // so normal is
 // dx = +0.6
 // dy = 1
-size(500,200);
+size(400,200);
 
 pair n1 = (+0.6, 1);
 pair pos_edge = pa+0.8*n1;
 pair neg_edge = pa-0.8*n1;
 
 picture pic1;
-real size1=200;
+real size1=180;
 size(pic1,size1);
 label(pic1,"a)" ,(-0.6,1) ,   black);
 
@@ -55,14 +55,14 @@ draw(pic1, pa+ofs*t1--ep+ofs*t1,blue,Arrows,PenMargins);
 label(pic1, "${\sqrt{t^2-t_{min}^2}}$", pa+ofs*t1--ep+ofs*t1 , NW, blue);
 
 
-dot(pic1,"$p_1$" ,p1 , NE,  red);
+dot(pic1,"$p_1$" ,p1 , S,  red);
 dot(pic1,"$p_2$" ,p2 ,NE,red);
 dot(pic1,"$p_A$" ,pa , W,  black);
 
 
 // second picture
 picture pic2;
-real size2=200;
+real size2=180;
 size(pic2,size2);
 
 label(pic2,"b)" ,(-0.6,1) ,   black);
@@ -78,4 +78,4 @@ dot(pic2,"$p_2$" ,p2 ,NE,red);
 dot(pic2,"$p_A$" ,pa ,   black);
 
 add( pic1.fit(),(0,0), W);
-add( pic2.fit(),(250,0), E);
+add( pic2.fit(),(200,0), E);

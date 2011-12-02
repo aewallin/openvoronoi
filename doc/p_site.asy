@@ -20,7 +20,7 @@ pair p0=(0,0);
 dot("$p$" ,p0 , NE,  black);
 path g = unitcircle;
 draw(unitcircle,  dashed+red );
-label("$O_P(t)^+$" ,unitcircle ,   NE,black);
+label("$O_P^+(t)$" ,unitcircle ,   NE,red);
 
 path radiusarrow = (0,0)--(-sqrt(2)/2,sqrt(2)/2);
 draw( radiusarrow,blue,Arrows,PenMargin(5,5));

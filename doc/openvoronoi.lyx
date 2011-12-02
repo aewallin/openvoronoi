@@ -117,6 +117,42 @@ where
 .
 \end_layout
 
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename p_site.eps
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Point site.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Subsection
 Line site
 \end_layout
@@ -170,6 +206,42 @@ where
 \end_inset
 
 .
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename l_site.eps
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Line site
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection
@@ -667,14 +739,21 @@ The edge between two point sites
 \end_inset
 
  is a line with its apex at the mid-point between the sites, and a direction
- perpendicular to a line connecting the sites.
+ perpendicular to a line connecting the sites (
+\begin_inset CommandInset ref
+LatexCommand formatted
+reference "fig:pp-edge"
+
+\end_inset
+
+).
  A point on the edge is given by
 \end_layout
 
 \begin_layout Standard
 \begin_inset Formula 
 \[
-e_{PP}^{\pm}(t)=p_{A}\pm\hat{v}\sqrt{t^{2}-t_{min}^{2}}
+e_{PP}^{\pm}(t)=p_{A}\pm\hat{v}\sqrt{t^{2}-t_{min}^{2}},
 \]
 
 \end_inset
@@ -686,7 +765,7 @@ e_{PP}^{\pm}(t)=p_{A}\pm\hat{v}\sqrt{t^{2}-t_{min}^{2}}
 where the apex point is 
 \begin_inset Formula 
 \[
-p_{A}=\tfrac{1}{2}(p_{1}+p_{2})
+p_{A}=\tfrac{1}{2}(p_{1}+p_{2}),
 \]
 
 \end_inset
@@ -702,12 +781,20 @@ p_{A}=\tfrac{1}{2}(p_{1}+p_{2})
  is 
 \begin_inset Formula 
 \[
-\hat{v}=\frac{(p_{1}-p_{2})}{\left|p_{1}-p_{2}\right|}
+\hat{v}=\frac{(p_{1}-p_{2})^{P}}{\left|p_{1}-p_{2}\right|},
 \]
 
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $v^{P}=(v_{x},v_{y})^{P}=(-v_{y},v_{x})$
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -729,7 +816,22 @@ status open
 \begin_inset Caption
 
 \begin_layout Plain Layout
-Point-Point edge.
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:pp-edge"
+
+\end_inset
+
+Point-Point edge between point sites 
+\begin_inset Formula $p_{1}$
+\end_inset
+
+and 
+\begin_inset Formula $p_{2}$
+\end_inset
+
+.
+ 
 \end_layout
 
 \end_inset

@@ -5,6 +5,7 @@ PROJECT(openvoronoi_documentation)
 set( ASY_FIGURES
     pp_edge
     p_site
+    l_site
 )
 
 FOREACH(ASYFIG ${ASY_FIGURES})
@@ -21,6 +22,8 @@ add_custom_target(
 
 FOREACH(ASYFIG ${ASY_FIGURES})
     message( STATUS "figure: " ${ASYFIG} )
+    message( STATUS "CMAKE_CURRENT_SOURCE_DIR: " ${CMAKE_CURRENT_SOURCE_DIR} )
+    message( STATUS "CMAKE_CURRENT_BINARY_DIR: " ${CMAKE_CURRENT_BINARY_DIR} )
     add_custom_command(
         OUTPUT ${ASYFIG}.eps
         COMMAND asy ${CMAKE_CURRENT_SOURCE_DIR}/${ASYFIG}.asy 
@@ -36,8 +39,18 @@ add_custom_target(
     openvoronoi.pdf
 )
 
-add_custom_command(
-    OUTPUT openvoronoi.pdf
-    COMMAND lyx --export pdf ${CMAKE_CURRENT_SOURCE_DIR}/openvoronoi.lyx
-    DEPENDS openvoronoi.lyx
+ADD_CUSTOM_COMMAND(
+   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/openvoronoi.pdf
+   COMMAND ${CMAKE_COMMAND} -E create_symlink
+       ${CMAKE_CURRENT_SOURCE_DIR}/openvoronoi.lyx
+       ${CMAKE_CURRENT_BINARY_DIR}/openvoronoi.lyx
+   COMMAND lyx --export pdf ${CMAKE_CURRENT_BINARY_DIR}/openvoronoi.lyx
+   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/openvoronoi.lyx
+   ${ASY_EPS_FILES}
 )
+
+# add_custom_command(
+#     OUTPUT openvoronoi.pdf
+#     COMMAND lyx --export pdf ${CMAKE_CURRENT_SOURCE_DIR}/openvoronoi.lyx
+#     DEPENDS openvoronoi.lyx
+# )

@@ -71,7 +71,7 @@ if __name__ == "__main__":
 
     Nmax=100000
     max_seed = 100
-    for s in range(max_seed,20*max_seed):
+    for s in range(0,20*max_seed):
         d = getVoronoiStats(Nmax,s)
         print "seed= ",s," Nmax=",Nmax
         writeResults(s,Nmax,d)

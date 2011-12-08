@@ -46,7 +46,7 @@ pn.append( [19, 8.7983e-12, 0.0013e-12] )
 pn.append( [20, 4.6314e-13, 0.0004e-12] )
 
 def loadData(seed):
-    filename = "poisson/data1/N100000_S{0}.pickle.gz".format(seed)
+    filename = "poisson/data2/N100000_S{0}.pickle.gz".format(seed)
     f = gzip.open(filename, 'rb')
     pstring = f.read()
     data = pickle.loads( pstring )
@@ -86,24 +86,22 @@ def loadDatas(slist):
 if __name__ == "__main__":  
     
     #data=loadData(0)
-    max_seed=340
+    max_seed=202
     data=loadDatas(range(max_seed))
     print " merged ",len(data), " sum=",sum(data.values())
     
     print data
-    #print data
+
     
-    P.figure()
+    
     data2 = sortedDict(data)
     
-    #labels=[]
     n=[]
     f=[]
     error=[]
     fsum=0
     for row in data2:
         #print row[0], " = ", row[1]
-        #labels.append( "{0}".format(row[0]) )
         n.append(row[0])
         f.append( row[1] )
         fsum = fsum+row[1]
@@ -113,7 +111,7 @@ if __name__ == "__main__":
     fnorm=[]
     enorm_pos=[]
     enorm_neg=[]
-    y_neg_limit = 1e-16
+    y_neg_limit = 1e-15
     for m in range(len(f)):
         fn = float(f[m])/float(fsum)
         fnorm.append( fn )
@@ -140,9 +138,11 @@ if __name__ == "__main__":
     print "psum= ",psum
     print "n_mean= ",n_mean
     
-    P.text(5,0.0001,"$\sum{p_n}=1.0$ " )
+    P.figure()
     
-    P.semilogy(n,fnorm,'ro',label="OpenVoronoi 11.10-170")
+    #P.text(5,0.0001,"$\sum{p_n}=1.0$ " )
+    
+    P.semilogy(n,fnorm,'ro',label="OpenVoronoi 11.10-171")
     P.errorbar(n,fnorm,yerr=[enorm_neg,enorm_pos],fmt='ro')
     
     pn_x=[]
@@ -157,17 +157,15 @@ if __name__ == "__main__":
     P.plot(pn_x,pn_y,'g-',label="Hilhorst 2007")
     P.plot(pn_x,pn_pos_err,'g--')
     P.plot(pn_x,pn_neg_err,'g--')
-    #P.yticks(range(0, 8))
-    #P.xticks(xlocations+ width/2, labels)
-    P.xlim(2, max(n)+1)
-    P.ylim(1e-8, 1)
+
+    P.xlim(2, 20)
+    P.ylim(1e-12, 1)
     P.title("Probability $p_n$ for a face with $n$ edges in a Poisson Voronoi diagram.")
     P.xlabel("n")
     P.ylabel("$p_n$")
     P.text(40,1e-7,"2011 December\nanders.e.e.wallin 'at' gmail.com\ngithub.com/aewallin/openvoronoi")
     P.legend()
-    #P.gca().get_xaxis().tick_bottom()
-    #P.gca().get_yaxis().tick_left()
+
 
     P.show()
 

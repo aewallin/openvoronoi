@@ -42,8 +42,12 @@ def histogram(L):
     return d
 
 if __name__ == "__main__":  
-    #print ocl.revision()
-    myscreen = ovdvtk.VTKScreen(width=1024, height=720) #(width=1920, height=1080)
+
+    width=1920
+    height=1080
+    width=2500
+    height=1500
+    myscreen = ovdvtk.VTKScreen(width, height)
     ovdvtk.drawOCLtext(myscreen)
     
     w2if = vtk.vtkWindowToImageFilter()
@@ -70,7 +74,13 @@ if __name__ == "__main__":
     # for vtk visualization
     vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
     vod.drawFarCircle()
-    Nmax = 4000
+    vod.textScale = 0.02
+    vod.vertexRadius = 0.0031
+    vod.drawVertices=0
+    vod.drawVertexIndex=0
+    vod.drawGenerators=0
+    
+    Nmax = 100000
     plist = randomGenerators(far, Nmax)    
     t_before = time.time() 
     n=0

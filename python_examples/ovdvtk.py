@@ -61,6 +61,7 @@ class VD:
         
         self.vdtext2  = Text()
         self.vdtext2.SetPos( (myscreen.width-500, 50) ) 
+        self.vdtext2.SetText( " " )
         myscreen.addActor(self.vdtext2)
         self.actors.append( self.vdtext2 )
         
@@ -72,7 +73,7 @@ class VD:
         
         self.N_pointgen = 0
         self.N_linegen = 0
-        self.vdtext_text = ""
+        self.vdtext_text = " "
         self.setVDText()
         self.drawClearanceDisk = 0
         self.textScale = textscale

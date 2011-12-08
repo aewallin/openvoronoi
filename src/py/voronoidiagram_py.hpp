@@ -210,12 +210,17 @@ public:
 
     boost::python::list getFaceStats()  {
         boost::python::list stats;
+        const double radius_limit = 0.7;
         for(HEFace f=0 ; f < g.num_faces() ; f++ ) {
-            boost::python::list data;
-            data.append( f );
-            data.append( g[f].site->position() );  
-            data.append( num_face_edges(f) );
-            stats.append(data);
+            // only accept if site is within radius
+            Point pt = g[f].site->position();
+            if ( pt.norm() < radius_limit ) {
+                boost::python::list data;
+                data.append( f );
+                data.append( g[f].site->position() );  
+                data.append( num_face_edges(f) );
+                stats.append(data);
+            }
         }
         return stats;
     }

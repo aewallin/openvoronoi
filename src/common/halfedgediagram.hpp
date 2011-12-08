@@ -198,21 +198,22 @@ VertexVector face_vertices(Face face_idx) const {
     verts.push_back(start_target);
     Edge current = g[startedge].next;
     int count=0;
-    EdgeVector face_edges; // for debug.
-    face_edges.push_back(current);
+    EdgeVector f_edges; // for debug.
+    f_edges.push_back(current);
     do {
         Vertex current_target = boost::target( current, g ); 
         //assert( current_target != start_target );
         verts.push_back(current_target);
-        face_edges.push_back(current);
+        f_edges.push_back(current);
         assert( g[current].face == g[ g[current].next ].face );
         current = g[current].next;
         
         if (count >= 3000000 ) {
             std::cout << " ERROR too many vertices on face! count=" << count << "\n";
-            std::cout << " verts.size() = " << verts.size() << " edges.size()=" << face_edges.size() <<"\n";
+            std::cout << " verts.size() = " << verts.size();
+            std::cout << " edges.size()=" << f_edges.size() <<"\n";
             for (unsigned int n=0;n<verts.size()-10;n++) {
-                std::cout << n << "   : " << g[ verts[n] ].index << "\n"; //" e=" << edges[n] << "\n";
+                std::cout << n << "   : " << g[ verts[n] ].index << "\n"; 
             }
         }
         assert( count < 3000000 ); // stop at some max limit
@@ -220,6 +221,26 @@ VertexVector face_vertices(Face face_idx) const {
     } while ( current != startedge );
     return verts;
 }
+
+/// return edges of face f
+
+EdgeVector face_edges( Face f) {
+    Edge start_edge = faces[f].edge;
+    Edge current_edge = start_edge;
+    EdgeVector out;
+    std::cout << " edges on face " << f << " :\n ";
+    do {
+        Vertex src = source(current_edge);
+        Vertex trg = target(current_edge);
+           std::cout << out.size() << " " << g[src].index << "[" << g[src].type <<"]";
+           std::cout << " - " << g[trg].index << "[" << g[trg].type <<"]" <<"\n ";
+        out.push_back(current_edge);
+        current_edge = g[current_edge].next;
+    } while( current_edge != start_edge );
+    return out;
+}
+
+
 
 /// return degree of given vertex
 unsigned int degree( Vertex v)  { 
@@ -229,6 +250,15 @@ unsigned int degree( Vertex v)  {
 /// return number of vertices in graph
 unsigned int num_vertices() const { 
     return boost::num_vertices( g ); 
+}
+
+unsigned int num_edges() const { 
+    return boost::num_edges( g ); 
+}
+
+unsigned int num_edges(Face f) { 
+    EdgeVector ev = face_edges(f);
+    return ev.size(); 
 }
 
 /// return out_edges of given vertex
@@ -256,21 +286,7 @@ EdgeVector edges() {
 }
         
         
-/// return edges of face f
-/*
-template <class BGLGraph>
-typename std::vector< typename boost::graph_traits< BGLGraph >::edge_descriptor  > face_edges( unsigned int f, BGLGraph& g) {
-    typedef typename boost::graph_traits< BGLGraph >::edge_descriptor  HEEdge;
-    typedef typename std::vector< HEEdge > EdgeVector;
-    HEEdge start_edge = g[f].edge;
-    HEEdge current_edge = start_edge;
-    EdgeVector out;
-    do {
-        out.push_back(current_edge);
-        current_edge = g[current_edge].next;
-    } while( current_edge != start_edge );
-    return out;
-}*/
+
 
 
 /// return the previous edge. traverses all edges in face until previous found.
@@ -326,9 +342,10 @@ unsigned int num_faces() const {
 }
 
 /// return number of edges in graph
+/*
 unsigned int num_edges() const { 
     return boost::num_edges( g ); 
-}
+}*/
 
 /// inserts given vertex into edge e, and into the twin edge e_twin
 void insert_vertex_in_edge(Vertex v, Edge e ) {

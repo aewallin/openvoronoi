@@ -21,6 +21,7 @@
 
 
 #include "voronoidiagram.hpp"
+#include "vertex.hpp"
 #include "facegrid.hpp"
 #include "common/numeric.hpp"
 
@@ -188,6 +189,36 @@ public:
         return output;
     }
     void set_edge_points(int n) { _edge_points=n; }
+
+    // count edges, counting apex-split edges as one
+    unsigned int num_face_edges( HEFace f) {
+        HEEdge start_edge = g[f].edge;
+        HEEdge current_edge = start_edge;
+        EdgeVector out;
+        //std::cout << " edges on face " << f << " :\n ";
+        do {
+            //Vertex src = source(current_edge);
+            HEVertex trg = g.target(current_edge);
+            //   std::cout << out.size() << " " << g[src].index << "[" << g[src].type <<"]";
+            //   std::cout << " - " << g[trg].index << "[" << g[trg].type <<"]" <<"\n ";
+            if (g[trg].type != APEX )
+                out.push_back(current_edge);
+            current_edge = g[current_edge].next;
+        } while( current_edge != start_edge );
+        return out.size();
+    }    
+
+    boost::python::list getFaceStats()  {
+        boost::python::list stats;
+        for(HEFace f=0 ; f < g.num_faces() ; f++ ) {
+            boost::python::list data;
+            data.append( f );
+            data.append( g[f].site->position() );  
+            data.append( num_face_edges(f) );
+            stats.append(data);
+        }
+        return stats;
+    }
 private:
     int _edge_points; // number of points to plot on quadratic edges
         

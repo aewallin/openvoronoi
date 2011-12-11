@@ -19,9 +19,7 @@ def writeFrame( w2if, lwr, n ):
     current_dir = os.getcwd()
     filename = current_dir + "/frames/vd500_zoomout"+ ('%05d' % n)+".png"
     lwr.SetFileName( filename )
-    #lwr.Write()
-
-
+    lwr.Write()
 
 def randomGenerators(far, Nmax):
     pradius = (1.0/math.sqrt(2))*far
@@ -45,8 +43,9 @@ if __name__ == "__main__":
 
     width=1920
     height=1080
-    width=2500
-    height=1500
+    pixmult=1
+    width=pixmult*2500
+    height=pixmult*1600
     myscreen = ovdvtk.VTKScreen(width, height)
     ovdvtk.drawOCLtext(myscreen)
     
@@ -80,7 +79,7 @@ if __name__ == "__main__":
     vod.drawVertexIndex=0
     vod.drawGenerators=0
     
-    Nmax = 100000
+    Nmax = 10000
     plist = randomGenerators(far, Nmax)    
     t_before = time.time() 
     n=0
@@ -101,11 +100,11 @@ if __name__ == "__main__":
         #print s
     hist = histogram(data)
     print hist
-
+    
     vod.setAll()
     myscreen.render()
             
-
+    writeFrame( w2if, lwr, 2 )
         
     print "PYTHON All DONE."
 

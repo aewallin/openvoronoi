@@ -14,6 +14,16 @@ import os
 def drawLine(myscreen, p1, p2):
     myscreen.addActor( ovdvtk.Line( p1 = (p1.x,p1.y,0), p2=(p2.x,p2.y,0), color = ovdvtk.yellow ) )
 
+def writeLargeFrame( myscreen, w2if, lwr, n , zoom=1):
+    renderlarge = vtk.vtkRenderLargeImage()
+    renderlarge.SetInput( myscreen.ren )
+    renderlarge.SetMagnification(zoom)
+    writer = vtk.vtkPNGWriter()
+    writer.SetFileName("large_frame.png")
+    writer.SetInputConnection( renderlarge.GetOutputPort() )
+    writer.Write()
+    print "Wrote large frame!"
+
 def writeFrame( w2if, lwr, n ):
     w2if.Modified() 
     current_dir = os.getcwd()
@@ -44,8 +54,8 @@ if __name__ == "__main__":
     width=1920
     height=1080
     pixmult=1
-    width=pixmult*2500
-    height=pixmult*1600
+    width=pixmult*1024
+    height=pixmult*1024
     myscreen = ovdvtk.VTKScreen(width, height)
     ovdvtk.drawOCLtext(myscreen)
     
@@ -79,7 +89,7 @@ if __name__ == "__main__":
     vod.drawVertexIndex=0
     vod.drawGenerators=0
     
-    Nmax = 10000
+    Nmax = 1000
     plist = randomGenerators(far, Nmax)    
     t_before = time.time() 
     n=0
@@ -104,8 +114,8 @@ if __name__ == "__main__":
     vod.setAll()
     myscreen.render()
             
-    writeFrame( w2if, lwr, 2 )
-        
+    #writeFrame(  w2if, lwr, 2 )
+    writeLargeFrame( myscreen, w2if, lwr, 2 , zoom=20)
     print "PYTHON All DONE."
 
     myscreen.render()    

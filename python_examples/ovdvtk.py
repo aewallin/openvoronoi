@@ -58,13 +58,13 @@ class VD:
         self.vdtext.SetPos( (50, myscreen.height-70) )
         myscreen.addActor(self.vdtext)
         self.actors.append( self.vdtext )
-        
+        """
         self.vdtext2  = Text()
         self.vdtext2.SetPos( (myscreen.width-500, 50) ) 
-        self.vdtext2.SetText( " " )
+        self.vdtext2.SetText( "--" )
         myscreen.addActor(self.vdtext2)
         self.actors.append( self.vdtext2 )
-        
+        """
         self.gittext  = Text()
         self.gittext.SetPos( (50, 50) )
         self.gittext_text = "github.com/aewallin"
@@ -73,7 +73,7 @@ class VD:
         
         self.N_pointgen = 0
         self.N_linegen = 0
-        self.vdtext_text = " "
+        self.vdtext_text = "CPU Time:"
         self.setVDText()
         self.drawClearanceDisk = 0
         self.textScale = textscale
@@ -389,6 +389,7 @@ def drawOCLtext(myscreen, rev_text=" "):
     t = Text()
     t.SetPos( (myscreen.width-250, myscreen.height-70) )
     date_text = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    #rev_text = ovd.version()
     t.SetText( "OpenVoronoi\n" + rev_text + "\n" + date_text )
     myscreen.addActor(t)
 

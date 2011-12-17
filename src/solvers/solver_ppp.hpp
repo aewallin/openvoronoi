@@ -56,6 +56,7 @@ struct scalar_pt {
 };
 
 // with the qd_real number-type we need to_double() to get the solution coordinates as double type.
+
 template<>
 struct scalar_pt<qd_real> {
     scalar_pt<qd_real>() : x(qd_real(0)), y(qd_real(0)) {}
@@ -63,7 +64,7 @@ struct scalar_pt<qd_real> {
     
     qd_real x;
     qd_real y;
-        double getx() {
+    double getx() {
         return to_double(x);
     }
     double gety() {
@@ -74,7 +75,6 @@ struct scalar_pt<qd_real> {
         y = p.y;
         return *this;
     }
-
 };
 
 

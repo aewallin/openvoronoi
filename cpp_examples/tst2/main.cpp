@@ -40,7 +40,7 @@ int main(int argc,char *argv[]) {
     int bins = (int)sqrt(nmax);
     ovd::VoronoiDiagram* vd = new ovd::VoronoiDiagram(1,10*bins);
     
-    std::cout << vd->version() << "\n";
+    std::cout << "version: " << vd->version() << "\n";
     
     boost::mt19937 rng(42);
     boost::uniform_01<boost::mt19937> rnd(rng);

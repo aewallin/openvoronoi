@@ -7,11 +7,12 @@ if (CMAKE_BUILD_TOOL MATCHES "make")
 endif (CMAKE_BUILD_TOOL MATCHES "make")
 
 # find BOOST and boost-python
-find_package( Boost )
+find_package( Boost COMPONENTS program_options)
 if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
     MESSAGE(STATUS "found Boost: " ${Boost_LIB_VERSION})
     MESSAGE(STATUS "boost-incude dirs are: " ${Boost_INCLUDE_DIRS})
+    MESSAGE(STATUS "linking with boost: " ${Boost_LIBRARIES})
 endif()
 
 

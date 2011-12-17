@@ -130,19 +130,30 @@ set(OVD_SRC
 )
 
 set( OVD_INCLUDE_FILES
-    ${OpenVoronoi_SOURCE_DIR}/common/numeric.hpp  
-    ${OpenVoronoi_SOURCE_DIR}/common/point.hpp
-    ${OpenVoronoi_SOURCE_DIR}/common/halfedgediagram.hpp
     ${OpenVoronoi_SOURCE_DIR}/graph.hpp
     ${OpenVoronoi_SOURCE_DIR}/voronoidiagram.hpp
     ${OpenVoronoi_SOURCE_DIR}/vertex.hpp
     ${OpenVoronoi_SOURCE_DIR}/edge.hpp
+    ${OpenVoronoi_SOURCE_DIR}/site.hpp
     ${OpenVoronoi_SOURCE_DIR}/checker.hpp
     ${OpenVoronoi_SOURCE_DIR}/vertex_positioner.hpp
     ${OpenVoronoi_SOURCE_DIR}/facegrid.hpp
     ${CMAKE_CURRENT_BINARY_DIR}/version_string.hpp
 )
 
+set( OVD_INCLUDE_COMMON_FILES
+    ${OpenVoronoi_SOURCE_DIR}/common/numeric.hpp  
+    ${OpenVoronoi_SOURCE_DIR}/common/point.hpp
+    ${OpenVoronoi_SOURCE_DIR}/common/halfedgediagram.hpp
+)
+
+set( OVD_INCLUDE_SOLVERS_FILES
+    ${OpenVoronoi_SOURCE_DIR}/solvers/solution.hpp  
+    ${OpenVoronoi_SOURCE_DIR}/solvers/solver.hpp
+    ${OpenVoronoi_SOURCE_DIR}/solvers/solver_lll.hpp
+    ${OpenVoronoi_SOURCE_DIR}/solvers/solver_ppp.hpp
+    ${OpenVoronoi_SOURCE_DIR}/solvers/solver_qll.hpp
+)
 
 # include directories
 include_directories( ${OpenVoronoi_SOURCE_DIR} )
@@ -202,6 +213,16 @@ if (BUILD_CXX_LIB)
     install(
         FILES ${OVD_INCLUDE_FILES}
         DESTINATION include/openvoronoi
+        PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
+    )
+    install(
+        FILES ${OVD_INCLUDE_COMMON_FILES}
+        DESTINATION include/openvoronoi/common
+        PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
+    )
+    install(
+        FILES ${OVD_INCLUDE_SOLVERS_FILES}
+        DESTINATION include/openvoronoi/solvers
         PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
     )
 endif (BUILD_CXX_LIB)

@@ -46,7 +46,7 @@ pn.append( [19, 8.7983e-12, 0.0013e-12] )
 pn.append( [20, 4.6314e-13, 0.0004e-12] )
 
 def loadData(seed):
-    filename = "poisson/data2/N100000_S{0}.pickle.gz".format(seed)
+    filename = "poisson/N100000_S{0}.pickle.gz".format(seed)
     f = gzip.open(filename, 'rb')
     pstring = f.read()
     data = pickle.loads( pstring )
@@ -86,7 +86,7 @@ def loadDatas(slist):
 if __name__ == "__main__":  
     
     #data=loadData(0)
-    max_seed=202
+    max_seed=10
     data=loadDatas(range(max_seed))
     print " merged ",len(data), " sum=",sum(data.values())
     
@@ -138,13 +138,27 @@ if __name__ == "__main__":
     print "psum= ",psum
     print "n_mean= ",n_mean
     
+    # calculate asymptotic approximation pn0
+    dx=0.1
+    naxis = [x*dx for x in range(0,int(20/dx))]
+    pn0=[]
+    for nv in naxis:
+        a=1/(4*math.pi*math.pi)
+        b=math.pow((8*math.pi*math.pi),nv)
+        c=math.gamma( 2*nv+1)
+        pn0.append(a*b/c)
+        
+    print len(naxis)
+    print len(pn0)
+    #exit()
     P.figure()
     
     #P.text(5,0.0001,"$\sum{p_n}=1.0$ " )
     
-    P.semilogy(n,fnorm,'ro',label="OpenVoronoi 11.10-171")
+    P.plot(n,fnorm,'ro',label="OpenVoronoi 11.10-171")
+    #P.semilogy(n,fnorm,'ro',label="OpenVoronoi 11.10-171")
     P.errorbar(n,fnorm,yerr=[enorm_neg,enorm_pos],fmt='ro')
-    
+    #P.plot(naxis,pn0,'b',label="pn0")
     pn_x=[]
     pn_y=[]
     pn_pos_err=[]
@@ -159,7 +173,7 @@ if __name__ == "__main__":
     P.plot(pn_x,pn_neg_err,'g--')
 
     P.xlim(2, 20)
-    P.ylim(1e-12, 1)
+    P.ylim(0, 0.4)
     P.title("Probability $p_n$ for a face with $n$ edges in a Poisson Voronoi diagram.")
     P.xlabel("n")
     P.ylabel("$p_n$")

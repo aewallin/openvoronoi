@@ -70,8 +70,8 @@ def writeResults(seed,Nmax,data):
 if __name__ == "__main__":  
 
     Nmax=100000
-    max_seed = 100
-    for s in range(0,20*max_seed):
+    max_seed = 10
+    for s in range(0,max_seed):
         d = getVoronoiStats(Nmax,s)
         print "seed= ",s," Nmax=",Nmax
         writeResults(s,Nmax,d)

@@ -1525,7 +1525,11 @@ void VoronoiDiagram::print_vertices(VertexVector& q) {
 
 std::string VoronoiDiagram::print() const {
     std::ostringstream o;
-    o << "VoronoiDiagram (nVerts="<< g.num_vertices() << " , nEdges="<< g.num_edges() <<"\n";
+    o << "VoronoiDiagram \n";
+    o << " num_vertices    = "<< g.num_vertices() << "\n";
+    o << " num_edges       = "<< g.num_edges() <<"\n";
+    o << " num_point_sites = "<< num_point_sites() <<"\n";
+    o << " num_line_sites  = "<< num_line_sites() <<"\n";
     return o.str();
 }
 

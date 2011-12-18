@@ -1471,14 +1471,16 @@ bool VoronoiDiagram::predicate_c4(HEVertex v) {
 // predicate C5 i.e. "connectedness"  from Sugihara&Iri 1992 "one million" paper
 bool VoronoiDiagram::predicate_c5(HEVertex v) {
     if (g[v].type == APEX || g[v].type == SPLIT ) { return true; } // ?
-    
-    FaceVector adj_faces = g.adjacent_faces(v);   
-    assert( adj_faces.size() == 3 );    
-    FaceVector adjacent_incident_faces; // find the ajacent incident faces
-    BOOST_FOREACH( HEFace f, adj_faces ) {
+    FaceVector adjacent_incident_faces;
+    typedef HEGraph::OutEdgeItr OutEdgeItr;
+    OutEdgeItr itr, itr_end;
+    boost::tie( itr, itr_end) = g.out_edge_itr(v);
+    for ( ; itr!=itr_end ; ++itr ) {
+        HEFace f = g[*itr].face;
         if ( g[f].status == INCIDENT )
             adjacent_incident_faces.push_back( f );
     }
+
     assert( !adjacent_incident_faces.empty() );
     
     bool all_found = true;

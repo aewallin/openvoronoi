@@ -561,12 +561,14 @@ void VoronoiDiagram::add_separator(HEFace f, HEVertex endp, Site* s1, Site* s2) 
 
 // find amount of clearance-disk violation on all face vertices and return vertex with the largest violation
 HEVertex VoronoiDiagram::find_seed_vertex(HEFace f, Site* site) const {
-    VertexVector face_verts = g.face_vertices(f);
-    assert( face_verts.size() >= 3 );
     double minPred( 0.0 ); 
     HEVertex minimalVertex = HEVertex();
     bool first( true );
-    BOOST_FOREACH( HEVertex q, face_verts) { // go thorugh all the vertices and find the one with smallest detH
+    
+    HEEdge current = g[f].edge;
+    HEEdge start = current;
+    do {
+        HEVertex q = g.target(current);
         if ( (g[q].status != OUT) && (g[q].type == NORMAL) ) {
             double h = g[q].in_circle( site->apex_point( g[q].position ) ); 
             if ( first || ( (h<minPred) && (site->in_region(g[q].position) ) ) ) {
@@ -575,7 +577,8 @@ HEVertex VoronoiDiagram::find_seed_vertex(HEFace f, Site* site) const {
                 first = false;
             }
         }
-    }
+        current = g[current].next;
+    } while(current!=start);  
     assert( minPred < 0 );
     // FIXME not using Point p anymore: assert( vd_checker->inCircle_is_negative( p, f, minimalVertex ) );
     return minimalVertex;
@@ -1383,12 +1386,16 @@ void VoronoiDiagram::repair_face( HEFace f ) {
         HEVertex current_target = g.target( current_edge ); // an edge on the new face
         HEVertex current_source = g.source( current_edge );
         bool found_next_edge= false;
-        BOOST_FOREACH( HEEdge edge, g.out_edges( current_target ) ) { // loop through potential "next" candidates
-            HEVertex out_target = g.target( edge );
-            if ( ( (g[out_target].status == NEW) || (g[out_target].type == ENDPOINT) ) && (g[edge].face == f) ) { 
+        
+        typedef HEGraph::OutEdgeItr OutEdgeItr;
+        OutEdgeItr it, it_end;
+        boost::tie( it, it_end ) = g.out_edge_itr( current_target );
+        for ( ; it != it_end ; ++it ) {
+            HEVertex out_target = g.target( *it );
+            if ( ( (g[out_target].status == NEW) || (g[out_target].type == ENDPOINT) ) && (g[*it].face == f) ) { 
                 // the next vertex along the face should be "NEW"
                 if ( out_target != current_source ) { // but not where we came from
-                    g[current_edge].next = edge; // this is the edge we want to take
+                    g[current_edge].next = *it; // this is the edge we want to take
                     found_next_edge = true;
                     assert( vd_checker->current_face_equals_next_face( current_edge ) );
                 }
@@ -1487,6 +1494,7 @@ bool VoronoiDiagram::predicate_c5(HEVertex v) {
                 face_ok=true;
             current = g[current].next;
         } while(current!=start);  
+        
         if (!face_ok)
             all_found=false;
     }

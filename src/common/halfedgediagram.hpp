@@ -91,6 +91,7 @@ public:
     typedef typename boost::graph_traits< BGLGraph >::edge_descriptor   Edge;
     typedef typename boost::graph_traits< BGLGraph >::vertex_descriptor Vertex;
     typedef typename boost::graph_traits< BGLGraph >::vertex_iterator   VertexItr;
+    typedef typename boost::graph_traits< BGLGraph >::out_edge_iterator OutEdgeItr;
     
     typedef std::vector<Vertex> VertexVector;
     typedef std::vector<Face>   FaceVector;
@@ -271,6 +272,10 @@ EdgeVector out_edges( Vertex v) {
         ev.push_back(*it);
     }
     return ev;
+}
+
+std::pair<OutEdgeItr, OutEdgeItr> out_edge_itr( Vertex v ) {
+    return boost::out_edges( v, g );
 }
 
 /// return all edges

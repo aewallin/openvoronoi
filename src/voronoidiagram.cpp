@@ -1437,14 +1437,48 @@ EdgeVector VoronoiDiagram::find_in_out_edges() {
 
 // number of IN vertices adjacent to given vertex v
 // predicate C4 i.e. "adjacent in-count" from Sugihara&Iri 1992 "one million" paper
+/*
 bool VoronoiDiagram::predicate_c4(HEVertex v) {
     int in_count=0;
     BOOST_FOREACH( HEVertex w, g.adjacent_vertices(v) ) {
         if ( g[w].status == IN )
             in_count++;
+        if (in_count >= 2)
+            return true;
     }
-    return (in_count >= 2); // two or more adjacent IN-vertices might create a loop
+    return false; // two or more adjacent IN-vertices might create a loop
+}*/
+
+bool VoronoiDiagram::predicate_c4(HEVertex v) {
+    int in_count=0;
+    typedef HEGraph::OutEdgeItr OutEdgeItr;
+    //EdgeVector ev;
+    OutEdgeItr it, it_end;
+    boost::tie( it, it_end ) = g.out_edge_itr( v );
+    for ( ; it != it_end ; ++it ) {
+        HEVertex w = g.target( *it );
+        if ( g[w].status == IN )
+            in_count++;
+        if (in_count >= 2)
+            return true;
+    }
+    return false;
+    /*
+    return ev;
+    
+    BOOST_FOREACH( HEVertex w, g.adjacent_vertices(v) ) {
+        if ( g[w].status == IN )
+            in_count++;
+        if (in_count >= 2)
+            return true;
+    }
+    return false; // two or more adjacent IN-vertices might create a loop
+    */
 }
+
+
+    
+    
 
 // do any of the three faces that are adjacent to the given IN-vertex v have an IN-vertex ?
 // predicate C5 i.e. "connectedness"  from Sugihara&Iri 1992 "one million" paper

@@ -89,7 +89,7 @@ if __name__ == "__main__":
     vod.drawVertexIndex=0
     vod.drawGenerators=0
     
-    Nmax = 1000
+    Nmax = 10000
     plist = randomGenerators(far, Nmax)    
     t_before = time.time() 
     n=0
@@ -102,7 +102,7 @@ if __name__ == "__main__":
     calctime = t_after-t_before
     if Nmax==0:
         Nmax=1
-    print " VD done in ", calctime," s, ", calctime/Nmax," s per generator"
+    #print " VD done in ", calctime," s, ", 1e6*calctime/float(Nmax)*(math.log(Nmax)/math.log(2.0))," us per n*log2(n)"
     stat = vd.getFaceStats()
     data=[]
     for s in stat:
@@ -115,7 +115,7 @@ if __name__ == "__main__":
     myscreen.render()
             
     #writeFrame(  w2if, lwr, 2 )
-    writeLargeFrame( myscreen, w2if, lwr, 2 , zoom=20)
+    #writeLargeFrame( myscreen, w2if, lwr, 2 , zoom=20)
     print "PYTHON All DONE."
 
     myscreen.render()    

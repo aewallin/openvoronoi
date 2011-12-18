@@ -131,7 +131,7 @@ if __name__ == "__main__":
     # 9 delete delete-tree edges
     # 10 reset status
             
-    vod.setVDText2(times)
+    #vod.setVDText2(times)
     
     err = vd.getStat()
     #print err 

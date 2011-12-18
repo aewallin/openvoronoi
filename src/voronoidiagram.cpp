@@ -651,15 +651,17 @@ void VoronoiDiagram::mark_vertex(HEVertex& v,  Site* site) {
 // and push them to the incident_faces queue
 void VoronoiDiagram::mark_adjacent_faces( HEVertex v, Site* site) {
     assert( g[v].status == IN );
-    FaceVector new_adjacent_faces = g.adjacent_faces( v ); 
-    
+    /* // old sanity check for number of adjacent faces
     assert( 
         (g[v].type == APEX && new_adjacent_faces.size()==2 ) ||
         (g[v].type == SPLIT && new_adjacent_faces.size()==2 ) ||
         new_adjacent_faces.size()==3
-    );
-
-    BOOST_FOREACH( HEFace adj_face, new_adjacent_faces ) {
+    ); */
+    typedef HEGraph::OutEdgeItr OutEdgeItr;
+    OutEdgeItr it, it_end;
+    boost::tie( it, it_end ) = g.out_edge_itr( v );
+    for ( ; it != it_end ; ++it ) {
+        HEFace adj_face = g[*it].face;
         if ( g[adj_face].status  != INCIDENT ) {
             if ( site->isLine() )
                 add_split_vertex(adj_face, site);
@@ -668,6 +670,7 @@ void VoronoiDiagram::mark_adjacent_faces( HEVertex v, Site* site) {
             incident_faces.push_back(adj_face);
         }
     }
+
 }
 
 // walk around the face f

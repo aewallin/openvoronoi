@@ -1296,14 +1296,19 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
 }
 
 // count number of NEW vertices on the given face
+// do this faster by walking along edges(?)
 int VoronoiDiagram::new_vertex_count(HEFace f) {
-    VertexVector face_verts = g.face_vertices(f);
+    HEEdge current = g[f].edge;
+    HEEdge start = current;
     int count=0;
-    BOOST_FOREACH(HEVertex v, face_verts) {
+    do {
+        HEVertex v = g.target(current);
         if (g[v].status == NEW)
             count++;
-    }    
+        current = g[current].next;
+    } while(current!=start);  
     return count;
+    
 }
 
 // on a face which has IN and OUT-vertices, find the sequence

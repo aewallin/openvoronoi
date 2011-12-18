@@ -1002,8 +1002,10 @@ void VoronoiDiagram::add_vertex_in_edge( HEVertex v, HEEdge e) {
         std::cout <<  (twin_source==target) << "\n";
     }*/
     HEEdge e_twin = g[e].twin;
+    
     assert( vd_checker->check_edge(e) && vd_checker->check_edge(e_twin) );
     assert( e_twin != HEEdge() );
+    
     HEVertex source = g.source(e); 
     HEVertex target = g.target(e); 
     HEVertex twin_source = g.source(e_twin); 
@@ -1429,10 +1431,12 @@ EdgeVector VoronoiDiagram::find_in_out_edges() {
     EdgeVector output; // new vertices generated on these edges
     BOOST_FOREACH( HEVertex v, v0 ) {                                   
         assert( g[v].status == IN ); // all verts in v0 are IN
-        BOOST_FOREACH( HEEdge edge, g.out_edges( v ) ) {
-            HEVertex adj_vertex = g.target( edge );
-            if ( g[adj_vertex].status == OUT ) 
-                output.push_back(edge); // this is an IN-OUT edge
+        typedef HEGraph::OutEdgeItr OutEdgeItr;
+        OutEdgeItr it, it_end;
+        boost::tie( it, it_end ) = g.out_edge_itr( v );
+        for ( ; it != it_end ; ++it ) {
+            if ( g[ g.target( *it ) ].status == OUT ) 
+                output.push_back(*it); // this is an IN-OUT edge
         }
     }
     assert( !output.empty() );

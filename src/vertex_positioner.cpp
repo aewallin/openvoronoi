@@ -34,8 +34,8 @@ using namespace ovd::numeric; // sq() chop()
 namespace ovd {
 
 VertexPositioner::VertexPositioner(VoronoiDiagram* vodi): vd(vodi) {
-    //ppp_solver = new PPPSolver<qd_real>();
-    ppp_solver = new PPPSolver<double>(); // faster, but inaccurate
+    ppp_solver = new PPPSolver<qd_real>();
+    //ppp_solver = new PPPSolver<double>(); // faster, but inaccurate
     lll_solver = new LLLSolver();
     qll_solver = new QLLSolver();
     errstat.clear();
@@ -100,7 +100,10 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     solver_dispatch(s1,k1,s2,k2,s3,+1, solutions);
     if (!s3->isPoint()) // for points k3=+1 allways
         solver_dispatch(s1,k1,s2,k2,s3,-1, solutions); // for lineSite or ArcSite we try k3=-1 also    
-
+    
+    if (solutions.empty() ) 
+        std::cout << "WARNING empty solution set!!\n";
+        
     if ( solutions.size() == 1 && (t_min<=solutions[0].t) && (t_max>=solutions[0].t) && (s3->in_region( solutions[0].p)) )
         return solutions[0];
     
@@ -167,7 +170,7 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     if (!s3->isPoint()) // for points k3=+1 allways
         solver_dispatch(s1,k1,s2,k2,s3,-1, solutions2); // for lineSite or ArcSite we try k3=-1 also    
 
-    std::cout << " The failing solutions are: \n";
+    std::cout << " The failing " << solutions2.size() << " solutions are: \n";
     BOOST_FOREACH(Solution s, solutions2 ) {
         std::cout << s.p << " t=" << s.t << " k3=" << s.k3  << " e_err=" << vd->g[edge].error(s) <<"\n";
         std::cout << " min<t<max=" << ((s.t>=t_min) && (s.t<=t_max));

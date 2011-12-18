@@ -649,16 +649,11 @@ void VoronoiDiagram::mark_vertex(HEVertex& v,  Site* site) {
 
 // IN-Vertex v has three adjacent faces, mark nonincident faces incident
 // and push them to the incident_faces queue
+/*
 void VoronoiDiagram::mark_adjacent_faces( HEVertex v, Site* site) {
     assert( g[v].status == IN );
-    /* // old sanity check for number of adjacent faces
-    assert( 
-        (g[v].type == APEX && new_adjacent_faces.size()==2 ) ||
-        (g[v].type == SPLIT && new_adjacent_faces.size()==2 ) ||
-        new_adjacent_faces.size()==3
-    ); */
-    typedef HEGraph::OutEdgeItr OutEdgeItr;
-    OutEdgeItr it, it_end;
+
+    HEGraph::OutEdgeItr it, it_end;
     boost::tie( it, it_end ) = g.out_edge_itr( v );
     for ( ; it != it_end ; ++it ) {
         HEFace adj_face = g[*it].face;
@@ -671,7 +666,29 @@ void VoronoiDiagram::mark_adjacent_faces( HEVertex v, Site* site) {
         }
     }
 
+}*/
+
+void VoronoiDiagram::mark_adjacent_faces( HEVertex v, Site* site) {
+    assert( g[v].status == IN );
+    FaceVector new_adjacent_faces = g.adjacent_faces( v );
+    
+    assert(
+        (g[v].type == APEX && new_adjacent_faces.size()==2 ) ||
+        (g[v].type == SPLIT && new_adjacent_faces.size()==2 ) ||
+        new_adjacent_faces.size()==3
+    );
+
+    BOOST_FOREACH( HEFace adj_face, new_adjacent_faces ) {
+        if ( g[adj_face].status != INCIDENT ) {
+            if ( site->isLine() )
+                add_split_vertex(adj_face, site);
+
+            g[adj_face].status = INCIDENT;
+            incident_faces.push_back(adj_face);
+        }
+    }
 }
+
 
 // walk around the face f
 // return edges whose endpoints are on separate sides of pt1-pt2 line
@@ -1410,6 +1427,7 @@ void VoronoiDiagram::repair_face( HEFace f ) {
          
         current_edge = g[current_edge].next; // jump to the next edge
     } while (g[current_edge].next != start_edge);
+    //} while ( current_edge != start_edge);
 }
 
 void VoronoiDiagram::remove_vertex_set() {
@@ -1441,8 +1459,7 @@ EdgeVector VoronoiDiagram::find_in_out_edges() {
     EdgeVector output; // new vertices generated on these edges
     BOOST_FOREACH( HEVertex v, v0 ) {                                   
         assert( g[v].status == IN ); // all verts in v0 are IN
-        typedef HEGraph::OutEdgeItr OutEdgeItr;
-        OutEdgeItr it, it_end;
+        HEGraph::OutEdgeItr it, it_end;
         boost::tie( it, it_end ) = g.out_edge_itr( v );
         for ( ; it != it_end ; ++it ) {
             if ( g[ g.target( *it ) ].status == OUT ) 
@@ -1457,17 +1474,16 @@ EdgeVector VoronoiDiagram::find_in_out_edges() {
 // predicate C4 i.e. "adjacent in-count" from Sugihara&Iri 1992 "one million" paper
 bool VoronoiDiagram::predicate_c4(HEVertex v) {
     int in_count=0;
-    typedef HEGraph::OutEdgeItr OutEdgeItr;
-    OutEdgeItr it, it_end;
+    HEGraph::OutEdgeItr it, it_end;
     boost::tie( it, it_end ) = g.out_edge_itr( v );
     for ( ; it != it_end ; ++it ) {
         HEVertex w = g.target( *it );
         if ( g[w].status == IN )
             in_count++;
-        if (in_count >= 2)
-            return true;
+        //if (in_count >= 2)
+        //    return true;
     }
-    return false;
+    return (in_count >= 2);
 }
 
 // do any of the three faces that are adjacent to the given IN-vertex v have an IN-vertex ?
@@ -1475,8 +1491,8 @@ bool VoronoiDiagram::predicate_c4(HEVertex v) {
 bool VoronoiDiagram::predicate_c5(HEVertex v) {
     if (g[v].type == APEX || g[v].type == SPLIT ) { return true; } // ?
     FaceVector adjacent_incident_faces;
-    typedef HEGraph::OutEdgeItr OutEdgeItr;
-    OutEdgeItr itr, itr_end;
+   
+    HEGraph::OutEdgeItr itr, itr_end;
     boost::tie( itr, itr_end) = g.out_edge_itr(v);
     for ( ; itr!=itr_end ; ++itr ) {
         HEFace f = g[*itr].face;

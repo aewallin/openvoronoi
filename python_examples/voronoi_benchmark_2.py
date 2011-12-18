@@ -36,15 +36,16 @@ def timeVoronoi_batch(Nmax):
 
 if __name__ == "__main__":  
     far = 1
-    Nmax_exp = 30
+    Nmax_exp = 40
     exp_list = [0.5*x for x in range(5,Nmax_exp)]
+    
     Nmax_list=[]
     for e in exp_list:
         Nmax_list.append( int( math.floor( (math.pow(2,e) ) ) ) )
 
     print Nmax_list
-    #exit()
-    csvWriter = csv.writer(open('results_rand_opt.csv', 'wb'), delimiter=',' )
+    exit()
+    csvWriter = csv.writer(open('results_rand_189.csv', 'wb'), delimiter=',' )
     for Nmax in Nmax_list:
         t = timeVoronoi(Nmax)
         print Nmax," gens took ", t ," seconds, ", 1e6*float(t)/(float(Nmax)*float(math.log10(Nmax)/math.log10(2)))," us/n*log(n)"

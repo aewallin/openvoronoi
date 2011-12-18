@@ -175,8 +175,7 @@ add_library(
     MODULE
     py/open_voronoi_py.cpp
 )
-# MESSAGE(STATUS "linking python binary with boost: " ${Boost_PYTHON_LIBRARY})
-target_link_libraries(openvoronoi libopenvoronoi ${Boost_LIBRARIES} ${QD_LIBRARY}) #${Boost_PYTHON_LIBRARY})
+target_link_libraries(openvoronoi libopenvoronoi ${Boost_LIBRARIES} ${QD_LIBRARY}) 
 set_target_properties(openvoronoi PROPERTIES PREFIX "") 
 
 

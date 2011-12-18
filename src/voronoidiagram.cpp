@@ -627,9 +627,13 @@ void VoronoiDiagram::mark_vertex(HEVertex& v,  Site* site) {
     g[v].status = IN;
     v0.push_back( v );
     mark_adjacent_faces( v, site );
-    
+
     // push the v-adjacent vertices onto the queue
-    BOOST_FOREACH( HEVertex w, g.adjacent_vertices(v) ) {
+    typedef HEGraph::OutEdgeItr OutEdgeItr;
+    OutEdgeItr it, it_end;
+    boost::tie( it, it_end ) = g.out_edge_itr( v );
+    for ( ; it != it_end ; ++it ) {
+        HEVertex w = g.target( *it );
         if ( (g[w].status == UNDECIDED) && (!g[w].in_queue) ) {
                 // when pushing onto queue we also evaluate in_circle predicate so that we process vertices in the correct order
                 vertexQueue.push( VertexDetPair(w , g[w].in_circle(site->apex_point(g[w].position)) ) ); 
@@ -1471,29 +1475,14 @@ bool VoronoiDiagram::predicate_c5(HEVertex v) {
         bool face_ok=false;
         HEEdge current = g[f].edge;
         HEEdge start = current;
-        //int count=0;
         do {
             HEVertex w = g.target(current);
             if ( w != v && g[w].status == IN && g.has_edge(w,v) )  // v should be adjacent to an IN vertex on the face
                 face_ok = true;
             else if ( w!=v && ( g[w].type == ENDPOINT || g[w].type == APEX  || g[w].type == SPLIT) ) // if we are next to an ENDPOINT, then ok(?)
                 face_ok=true;
-                
-            //HEVertex v = g.target(current);
-            //if (g[v].status == NEW)
-            //    count++;
             current = g[current].next;
         } while(current!=start);  
-        //return count;
-        
-        /*
-        BOOST_FOREACH( HEVertex w, g.face_vertices(f) ) { 
-            if ( w != v && g[w].status == IN && g.has_edge(w,v) )  // v should be adjacent to an IN vertex on the face
-                face_ok = true;
-            else if ( w!=v && ( g[w].type == ENDPOINT || g[w].type == APEX  || g[w].type == SPLIT) ) // if we are next to an ENDPOINT, then ok(?)
-                face_ok=true;
-        
-        }*/
         if (!face_ok)
             all_found=false;
     }

@@ -100,7 +100,7 @@ int main(int argc,char *argv[]) {
     if (vm.count("n")) 
         nmax = vm["n"].as<int>();
     
-    std::cout << "Number of points: " << nmax << ".\n";
+    std::cout << "Number of random line segments: " << nmax << ".\n";
     int bins = (int)sqrt(nmax);
     ovd::VoronoiDiagram* vd = new ovd::VoronoiDiagram(1,10*bins);
     
@@ -108,14 +108,17 @@ int main(int argc,char *argv[]) {
     
     boost::mt19937 rng(42);
     boost::uniform_01<boost::mt19937> rnd(rng);
-    
+    std::cout << "Waiting for " << nmax << " random line segments..."<< std::flush;
+    boost::timer tmr;
     std::vector<segment> segs = random_segments(1,nmax);
+    std::cout << "done in " << tmr.elapsed() << " seconds\n" << std::flush;
 
     typedef std::pair<int,int> IdSeg;
     typedef std::vector< IdSeg > IdSegments;
     IdSegments segment_ids;
     
-    boost::timer tmr;
+    
+    tmr.restart();
     BOOST_FOREACH(segment s, segs ) {
         IdSeg id;
         id.first = vd->insert_point_site(s.first);

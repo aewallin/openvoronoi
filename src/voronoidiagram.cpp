@@ -649,6 +649,8 @@ void VoronoiDiagram::mark_vertex(HEVertex& v,  Site* site) {
 
 // IN-Vertex v has three adjacent faces, mark nonincident faces incident
 // and push them to the incident_faces queue
+
+// NOTE!! this fails because add_split_vertex() invalidates the iterators (!?)
 /*
 void VoronoiDiagram::mark_adjacent_faces( HEVertex v, Site* site) {
     assert( g[v].status == IN );

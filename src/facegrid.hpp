@@ -40,7 +40,11 @@ typedef unsigned int HEFace;
 
 /// this class is used to quickly find the nearest neighbor among the 
 /// existing generators when adding a new generator to a VoronoiDiagram
-/// the neighbor-search algorithm is a grid-search
+/// the nearest-neighbor search algorithm is a grid-search
+/// a) find the grid-cell that is closest to the the new point
+/// b) starting at the closest cell, search for a neighbor
+/// c) when one neighbor is found, add points from all cells that are closer or at same distance as found point
+/// d) among the found cells, do a brute-force search for the nearest neighbor 
 class FaceGrid {
     public:
         FaceGrid();

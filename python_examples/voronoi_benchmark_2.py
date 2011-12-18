@@ -47,7 +47,7 @@ if __name__ == "__main__":
     csvWriter = csv.writer(open('results_rand_opt.csv', 'wb'), delimiter=',' )
     for Nmax in Nmax_list:
         t = timeVoronoi(Nmax)
-        print Nmax," gens took ", t ," seconds, ", 1e6*float(t)/(float(Nmax)*float(math.log10(Nmax)))," us/n*log(n)"
+        print Nmax," gens took ", t ," seconds, ", 1e6*float(t)/(float(Nmax)*float(math.log10(Nmax)/math.log10(2)))," us/n*log(n)"
         csvWriter.writerow( [ Nmax, t ] )
         
 

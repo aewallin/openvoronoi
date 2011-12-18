@@ -326,9 +326,8 @@ typename boost::graph_traits< BGLGraph >::edge_descriptor edge(
 
 /// return adjacent faces to the given vertex
 FaceVector adjacent_faces( Vertex q ) {
-    typedef typename boost::graph_traits< BGLGraph >::out_edge_iterator  HEOutEdgeItr;
-    std::set<unsigned int> face_set;
-    HEOutEdgeItr itr, itr_end;
+    std::set<Face> face_set;
+    OutEdgeItr itr, itr_end;
     boost::tie( itr, itr_end) = boost::out_edges(q, g);
     for ( ; itr!=itr_end ; ++itr ) {
         face_set.insert( g[*itr].face );

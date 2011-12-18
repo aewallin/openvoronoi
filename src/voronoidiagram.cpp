@@ -1437,22 +1437,9 @@ EdgeVector VoronoiDiagram::find_in_out_edges() {
 
 // number of IN vertices adjacent to given vertex v
 // predicate C4 i.e. "adjacent in-count" from Sugihara&Iri 1992 "one million" paper
-/*
-bool VoronoiDiagram::predicate_c4(HEVertex v) {
-    int in_count=0;
-    BOOST_FOREACH( HEVertex w, g.adjacent_vertices(v) ) {
-        if ( g[w].status == IN )
-            in_count++;
-        if (in_count >= 2)
-            return true;
-    }
-    return false; // two or more adjacent IN-vertices might create a loop
-}*/
-
 bool VoronoiDiagram::predicate_c4(HEVertex v) {
     int in_count=0;
     typedef HEGraph::OutEdgeItr OutEdgeItr;
-    //EdgeVector ev;
     OutEdgeItr it, it_end;
     boost::tie( it, it_end ) = g.out_edge_itr( v );
     for ( ; it != it_end ; ++it ) {
@@ -1463,22 +1450,7 @@ bool VoronoiDiagram::predicate_c4(HEVertex v) {
             return true;
     }
     return false;
-    /*
-    return ev;
-    
-    BOOST_FOREACH( HEVertex w, g.adjacent_vertices(v) ) {
-        if ( g[w].status == IN )
-            in_count++;
-        if (in_count >= 2)
-            return true;
-    }
-    return false; // two or more adjacent IN-vertices might create a loop
-    */
 }
-
-
-    
-    
 
 // do any of the three faces that are adjacent to the given IN-vertex v have an IN-vertex ?
 // predicate C5 i.e. "connectedness"  from Sugihara&Iri 1992 "one million" paper
@@ -1497,12 +1469,31 @@ bool VoronoiDiagram::predicate_c5(HEVertex v) {
     bool all_found = true;
     BOOST_FOREACH( HEFace f, adjacent_incident_faces ) { // check each adjacent face f for an IN-vertex
         bool face_ok=false;
+        HEEdge current = g[f].edge;
+        HEEdge start = current;
+        //int count=0;
+        do {
+            HEVertex w = g.target(current);
+            if ( w != v && g[w].status == IN && g.has_edge(w,v) )  // v should be adjacent to an IN vertex on the face
+                face_ok = true;
+            else if ( w!=v && ( g[w].type == ENDPOINT || g[w].type == APEX  || g[w].type == SPLIT) ) // if we are next to an ENDPOINT, then ok(?)
+                face_ok=true;
+                
+            //HEVertex v = g.target(current);
+            //if (g[v].status == NEW)
+            //    count++;
+            current = g[current].next;
+        } while(current!=start);  
+        //return count;
+        
+        /*
         BOOST_FOREACH( HEVertex w, g.face_vertices(f) ) { 
             if ( w != v && g[w].status == IN && g.has_edge(w,v) )  // v should be adjacent to an IN vertex on the face
                 face_ok = true;
             else if ( w!=v && ( g[w].type == ENDPOINT || g[w].type == APEX  || g[w].type == SPLIT) ) // if we are next to an ENDPOINT, then ok(?)
                 face_ok=true;
-        }
+        
+        }*/
         if (!face_ok)
             all_found=false;
     }

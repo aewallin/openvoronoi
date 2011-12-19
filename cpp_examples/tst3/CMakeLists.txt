@@ -17,9 +17,10 @@ endif()
 
 
 find_library(OVD_LIBRARY 
-            NAMES openvoronoi
+            NAMES libopenvoronoi openvoronoi
             PATHS /usr/local/lib/openvoronoi
             DOC "openvoronoi"
+            REQUIRED
 )
 MESSAGE(STATUS "OVD_LIBRARY is now: " ${OVD_LIBRARY})
 include_directories( /usr/local/include/openvoronoi )

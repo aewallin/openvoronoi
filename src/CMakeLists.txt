@@ -161,14 +161,17 @@ include_directories( ${OpenVoronoi_SOURCE_DIR} )
 # the pure c++ shared library
 add_library(
     libopenvoronoi
-    STATIC
+    SHARED
     ${OVD_SRC}
 )
 add_dependencies( 
     libopenvoronoi
     version_string 
 )
-set_target_properties(libopenvoronoi PROPERTIES PREFIX "") 
+set_target_properties(libopenvoronoi PROPERTIES PREFIX "")
+# todo: figure out the git-tag automatically and use it as the version/suffix
+set_target_properties(libopenvoronoi PROPERTIES VERSION "11.10") 
+
 # this makes the Python module
 add_library(
     openvoronoi

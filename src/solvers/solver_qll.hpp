@@ -61,28 +61,20 @@ int solve( Site* s1, double k1,
     }
     assert( lins.size() == 2);  // At this point, we should have exactly two linear equations.
    
-    // TODO:  pick the solution appraoch with the best numerical stability.
+    // TODO:  pick the solution appraoch with the best numerical stability.    
+    // call all three permutations
     // index shuffling determines if we solve:
     // x and y in terms of t
     // y and t in terms of x
     // t and x in terms of y
-    /*
-    int scount = qll_solver( lins, 0, 1, 2, quads[0], kk3, solns);
-    if (scount <= 0) { // negative scount when discriminant is zero, so shuffle around coord-indexes:
-        scount = qll_solver(lins, 2, 0, 1, quads[0], kk3, solns);
-        if (scount <= 0) {
-            scount = qll_solver(lins, 1, 2, 0, quads[0], kk3, solns);
-        }
-    }*/
-    
-    // call all three permutations
     qll_solver( lins, 0, 1, 2, quads[0], k3, solns);
     qll_solver( lins, 2, 0, 1, quads[0], k3, solns);
     qll_solver( lins, 1, 2, 0, quads[0], k3, solns);
     
-    //std::cout << " solver() found " << scount << " roots\n";
     return solns.size();
 }
+
+
 private:
 // l0 first linear eqn
 // l1 second linear eqn
@@ -163,16 +155,16 @@ int qll_solve( qd_real a0, qd_real b0, qd_real c0, qd_real d0,
     qd_real c = a0*(b1*b1) + c0*(b2*b2) + b0*b1 + b2*d0 + g0;
     std::vector<qd_real> roots = quadratic_roots(a, b, c); // solves a*w^2 + b*w + c = 0
     if ( roots.empty() ) { // No roots, no solutions
-        //std::cout << " qll_solve no w roots. no solutions.\n";
         return 0;
+    } else {
+        for (unsigned int i=0; i<roots.size(); i++) {
+            qd_real w = roots[i];
+            soln[i][0] = a1*w + b1; // u
+            soln[i][1] = a2*w + b2; // v
+            soln[i][2] = w;         // t
+        }
+        return roots.size();
     }
-    for (unsigned int i=0; i<roots.size(); i++) {
-        qd_real w = roots[i];
-        soln[i][0] = a1*w + b1; // u
-        soln[i][1] = a2*w + b2; // v
-        soln[i][2] = w;         // t
-    }
-    return roots.size();
 }
 
 };

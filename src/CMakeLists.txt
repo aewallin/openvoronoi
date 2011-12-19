@@ -172,13 +172,25 @@ set_target_properties(libopenvoronoi PROPERTIES PREFIX "")
 # todo: figure out the git-tag automatically and use it as the version/suffix
 set_target_properties(libopenvoronoi PROPERTIES VERSION "11.10") 
 
+# the pure c++ shared library
+add_library(
+    openvoronoi_static
+    STATIC
+    ${OVD_SRC}
+)
+add_dependencies( 
+    openvoronoi_static
+    version_string 
+)
+
 # this makes the Python module
 add_library(
     openvoronoi
     MODULE
     py/open_voronoi_py.cpp
 )
-target_link_libraries(openvoronoi libopenvoronoi ${Boost_LIBRARIES} ${QD_LIBRARY}) 
+# libopenvoronoi
+target_link_libraries(openvoronoi openvoronoi_static ${Boost_LIBRARIES} ${QD_LIBRARY}) 
 set_target_properties(openvoronoi PROPERTIES PREFIX "") 
 
 
@@ -228,3 +240,26 @@ if (BUILD_CXX_LIB)
         PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
     )
 endif (BUILD_CXX_LIB)
+
+
+# "make package" stuff
+ 
+execute_process(
+    COMMAND dpkg --print-architecture
+    OUTPUT_VARIABLE DEB_ARCHITECTURE
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+set(CPACK_GENERATOR "DEB")
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "anders.e.e.wallin@gmail.com")
+set(CPACK_PACKAGE_NAME "OpenVoronoi")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "2D voronoi diagram algorithm")
+set(CPACK_DEBIAN_PACKAGE_SECTION "science")
+set(CPACK_DEBIAN_PACKAGE_VERSION "")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "python, libboost-python-dev, libqd" )
+set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE ${DEB_ARCHITECTURE})
+SET(CPACK_PACKAGE_VERSION_MAJOR "11") # todo: find the version automatically from the git-tag
+SET(CPACK_PACKAGE_VERSION_MINOR "10")
+set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}")
+
+include(CPack) # this should be last

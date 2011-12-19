@@ -31,8 +31,8 @@
 
 namespace ovd {
 
-//#define OUT_EDGE_CONTAINER boost::listS 
-#define OUT_EDGE_CONTAINER boost::vecS 
+#define OUT_EDGE_CONTAINER boost::listS 
+//#define OUT_EDGE_CONTAINER boost::vecS 
 
 
 // note: cannot use vecS since remove_vertex invalidates iterators/edge_descriptors (?)

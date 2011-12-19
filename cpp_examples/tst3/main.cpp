@@ -139,7 +139,7 @@ int main(int argc,char *argv[]) {
     
     std::cout << "Points: " << t_points << " seconds \n";
     std::cout << "Lines: " << t_lines << " seconds \n";
-    double norm = nmax*log((double)nmax)/log(2.0);
+    double norm = 2*nmax*log(2*(double)nmax)/log(2.0);
     std::cout << "Points: " << 1e6*t_points/norm << " us * n*log2(n)\n";
     std::cout << "Lines: " << 1e6*t_lines/norm << " us * n*log2(n)\n";
     std::cout << vd->print();

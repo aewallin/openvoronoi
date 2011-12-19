@@ -16,7 +16,7 @@ namespace po = boost::program_options;
 // random points
 int main(int argc,char *argv[]) {
     // Declare the supported options.
-    po::options_description desc("Allowed options");
+    po::options_description desc("This program calculates a poisson voronoi diagram\n Allowed options");
     desc.add_options()
         ("help", "produce help message")
         ("n", po::value<int>(), "set number of points")

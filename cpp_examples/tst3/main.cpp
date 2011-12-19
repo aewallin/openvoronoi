@@ -80,7 +80,7 @@ std::vector<segment> random_segments(double far,int Nmax) {
 // random points
 int main(int argc,char *argv[]) {
     // Declare the supported options.
-    po::options_description desc("Allowed options");
+    po::options_description desc("This program calculates the voronoi diagram for n random non-intersecting line-segments\nAllowed options");
     desc.add_options()
         ("help", "produce help message")
         ("n", po::value<int>(), "set number of points")
@@ -99,12 +99,15 @@ int main(int argc,char *argv[]) {
 
     if (vm.count("n")) 
         nmax = vm["n"].as<int>();
-    
-    std::cout << "Number of random line segments: " << nmax << ".\n";
+    else {
+        std::cout << desc << "\n";
+        return 1;
+    }
+    std::cout << "Number of random line segments: " << nmax << "\n";
     int bins = (int)sqrt(nmax);
     ovd::VoronoiDiagram* vd = new ovd::VoronoiDiagram(1,10*bins);
     
-    std::cout << "version: " << vd->version() << "\n";
+    std::cout << "OpenVoronoi version: " << vd->version() << "\n";
     
     boost::mt19937 rng(42);
     boost::uniform_01<boost::mt19937> rnd(rng);

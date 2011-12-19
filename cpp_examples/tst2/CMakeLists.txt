@@ -6,8 +6,8 @@ if (CMAKE_BUILD_TOOL MATCHES "make")
     add_definitions(-Wall -Werror -Wno-deprecated -pedantic-errors)
 endif (CMAKE_BUILD_TOOL MATCHES "make")
 
-# find BOOST and boost-python
-find_package( Boost COMPONENTS program_options)
+# find BOOST
+find_package( Boost COMPONENTS program_options REQUIRED)
 if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
     MESSAGE(STATUS "found Boost: " ${Boost_LIB_VERSION})

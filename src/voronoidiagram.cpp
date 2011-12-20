@@ -629,7 +629,10 @@ void VoronoiDiagram::augment_vertex_set(  Site* site ) {
 void VoronoiDiagram::mark_vertex(HEVertex& v,  Site* site) {
     g[v].status = IN;
     v0.push_back( v );
-    mark_adjacent_faces( v, site );
+    if (site->isPoint())
+        mark_adjacent_faces_p(v,site);
+    else
+        mark_adjacent_faces( v, site );
 
     // push the v-adjacent vertices onto the queue
     typedef HEGraph::OutEdgeItr OutEdgeItr;
@@ -650,9 +653,8 @@ void VoronoiDiagram::mark_vertex(HEVertex& v,  Site* site) {
 // IN-Vertex v has three adjacent faces, mark nonincident faces incident
 // and push them to the incident_faces queue
 
-// NOTE!! this fails because add_split_vertex() invalidates the iterators (!?)
-/*
-void VoronoiDiagram::mark_adjacent_faces( HEVertex v, Site* site) {
+// NOTE: call this only when inserting point-sites
+void VoronoiDiagram::mark_adjacent_faces_p( HEVertex v, Site* site) {
     assert( g[v].status == IN );
 
     HEGraph::OutEdgeItr it, it_end;
@@ -660,15 +662,12 @@ void VoronoiDiagram::mark_adjacent_faces( HEVertex v, Site* site) {
     for ( ; it != it_end ; ++it ) {
         HEFace adj_face = g[*it].face;
         if ( g[adj_face].status  != INCIDENT ) {
-            if ( site->isLine() )
-                add_split_vertex(adj_face, site);
-
             g[adj_face].status = INCIDENT; 
             incident_faces.push_back(adj_face);
         }
     }
 
-}*/
+}
 
 void VoronoiDiagram::mark_adjacent_faces( HEVertex v, Site* site) {
     assert( g[v].status == IN );

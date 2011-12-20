@@ -36,8 +36,8 @@ def timeVoronoi_batch(Nmax):
 
 if __name__ == "__main__":  
     far = 1
-    # Nmax_exp = 40
-    Nmax_exp = 30
+    Nmax_exp = 35
+    # Nmax_exp = 30
     exp_list = [0.5*x for x in range(5,Nmax_exp)]
     
     Nmax_list=[]

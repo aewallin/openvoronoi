@@ -20,6 +20,7 @@ int main(int argc,char *argv[]) {
     desc.add_options()
         ("help", "produce help message")
         ("n", po::value<int>(), "set number of points")
+        ("b", po::value<int>(), "set bin-count multiplier")
     ;
 
     po::variables_map vm;
@@ -32,13 +33,15 @@ int main(int argc,char *argv[]) {
     }
     
     unsigned int nmax = 100;
-
+    unsigned int binmult = 10;
     if (vm.count("n")) 
         nmax = vm["n"].as<int>();
-    
+    if (vm.count("b")) 
+        binmult = vm["b"].as<int>();
+        
     std::cout << "Number of points: " << nmax << ".\n";
     int bins = (int)sqrt(nmax);
-    ovd::VoronoiDiagram* vd = new ovd::VoronoiDiagram(1,10*bins);
+    ovd::VoronoiDiagram* vd = new ovd::VoronoiDiagram(1,binmult*bins);
     
     std::cout << "version: " << vd->version() << "\n";
     

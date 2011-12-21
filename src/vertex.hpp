@@ -58,10 +58,7 @@ public:
     VoronoiVertex( Point p, VoronoiVertexStatus st);
     /// vertex with given position, status, and type
     VoronoiVertex( Point p, VoronoiVertexStatus st, VoronoiVertexType t);
-    virtual ~VoronoiVertex() {
-        //if (site)
-        //    delete site;
-    }
+    virtual ~VoronoiVertex() {}
     void init();
     /// reset status
     void reset();
@@ -75,9 +72,7 @@ public:
     double dist() const { return r; }
     /// in-circle predicate 
     double in_circle(const Point& p) const { return dist(p) - r; }
-    static void reset_count() {
-        count = 0;
-    }
+    static void reset_count() { count = 0; }
 // DATA
     int index;
     /// vertex status. when the incremental algorithm runs
@@ -87,9 +82,8 @@ public:
     bool in_queue;
     /// the position of the vertex
     Point position;
-    /// if this vertex is a PointSite, then we store a pointer to the site here.
-    Site* site;
-    double k3; // the offset-direction to the newly inserted site.
+
+    double k3; // the offset-direction {-1,+1} to the newly inserted site.
 protected:
     /// global vertex count
     static int count;

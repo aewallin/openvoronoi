@@ -33,8 +33,8 @@ int VoronoiVertex::count = 0;
 VertexDegreeMap VoronoiVertex::expected_degree = boost::assign::map_list_of 
     (OUTER,4)     // special outer vertices
     (NORMAL,6)    // normal vertex in the graph
-    (POINTSITE,0) // point site
-    (ENDPOINT,6)  // end-point of line or arc
+    (POINTSITE,2) // point site
+    (ENDPOINT,8)  // end-point of line or arc
     (SPLIT,4)     // split point, to avoid loops in delete-tree
     (APEX,4) ;    // apex point on quadratic bisector
 
@@ -61,7 +61,6 @@ VoronoiVertex::VoronoiVertex( Point p, VoronoiVertexStatus st, VoronoiVertexType
 
 /// set index, increase count, initialize in_queue to false.
 void VoronoiVertex::init() {
-    site = 0;
     index = count;
     count++;
     in_queue = false;

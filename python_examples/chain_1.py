@@ -57,8 +57,16 @@ if __name__ == "__main__":
     linesegs = 1 # switch to turn on/off line-segments
     
     segs = []
-    pts = [ovd.Point(-0.1,-0.2) , ovd.Point(0.2,0.1), ovd.Point(-0.2,0.3)]
-    
+    #ovd.Point(1,1)
+    eps=0.9
+    p1=ovd.Point(-0.1,-0.2)
+    p2=ovd.Point(0.2,0.1)
+    p2=p1+eps*(p2-p1)
+    p3=ovd.Point(0.2,0.11)
+    p4=ovd.Point(-0.2,0.3)
+    p3=p4+eps*(p3-p4)
+    #pts = [ovd.Point(-0.1,-0.2) , ovd.Point(0.2,0.1), ovd.Point(0.21,0.11), ovd.Point(-0.2,0.3)]
+    pts = [p1,p2,p3,p4]
     
     #t_after = time.time()
     #print ".done in {0:.3f} s.".format( t_after-t_before )
@@ -88,7 +96,7 @@ if __name__ == "__main__":
     vd.addLineSite( id_list[0], id_list[1] )
     vd.check()
     vd.debug_on()
-    vd.addLineSite( id_list[1], id_list[2],4)
+    vd.addLineSite( id_list[2], id_list[3])
     #for s in id_list:
     #    if n<= nsegs and linesegs==1:
     #        vd.addLineSite(s[0],s[1])

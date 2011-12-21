@@ -58,13 +58,13 @@ class VD:
         self.vdtext.SetPos( (50, myscreen.height-70) )
         myscreen.addActor(self.vdtext)
         self.actors.append( self.vdtext )
-        """
+        
         self.vdtext2  = Text()
         self.vdtext2.SetPos( (myscreen.width-500, 50) ) 
         self.vdtext2.SetText( "--" )
         myscreen.addActor(self.vdtext2)
         self.actors.append( self.vdtext2 )
-        """
+        
         self.gittext  = Text()
         self.gittext.SetPos( (50, 50) )
         self.gittext_text = "github.com/aewallin"

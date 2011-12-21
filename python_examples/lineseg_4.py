@@ -60,9 +60,9 @@ if __name__ == "__main__":
     vod.drawVertexIndex=0
     vod.drawGenerators=0
     
-    # Nmax = 128
+    Nmax = 128
     # Nmax = 256
-    Nmax = 512
+    # Nmax = 512
     # Nmax = 1024
     # Nmax = 2048
     # Nmax = 4096

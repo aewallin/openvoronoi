@@ -125,10 +125,7 @@ struct FaceProps {
     FaceProps() {
         site = 0;
     }
-    virtual ~FaceProps() {
-        //if (site)
-        //    delete site;
-    }
+    virtual ~FaceProps() {}
     /// create face with given edge, generator, and type
     FaceProps( HEEdge e , Site* s, VoronoiFaceStatus st) : edge(e), site(s), status(st) {}
     /// operator for sorting faces

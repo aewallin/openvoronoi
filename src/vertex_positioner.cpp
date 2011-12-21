@@ -34,8 +34,8 @@ using namespace ovd::numeric; // sq() chop()
 namespace ovd {
 
 VertexPositioner::VertexPositioner(VoronoiDiagram* vodi): vd(vodi) {
-    //ppp_solver = new PPPSolver<qd_real>();
-    ppp_solver = new PPPSolver<double>(); // faster, but inaccurate
+    ppp_solver = new PPPSolver<qd_real>();
+    //ppp_solver = new PPPSolver<double>(); // faster, but inaccurate
     lll_solver = new LLLSolver();
     qll_solver = new QLLSolver();
     errstat.clear();

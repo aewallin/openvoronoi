@@ -144,7 +144,7 @@ public:
                     }
                     
                 } else {
-                    assert(0);
+                    //assert(0);
                 } 
                 edge_data.append( point_list );
                 edge_data.append( g[edge].type );

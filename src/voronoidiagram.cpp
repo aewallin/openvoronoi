@@ -75,7 +75,11 @@ void VoronoiDiagram::initialize() {
     g[g1] = VoronoiVertex( gen1 , OUT, POINTSITE);
     g[g2] = VoronoiVertex( gen2 , OUT, POINTSITE);
     g[g3] = VoronoiVertex( gen3 , OUT, POINTSITE);
-
+    HEEdge ge1 = g.add_edge(g1,g1);
+    HEEdge ge2 = g.add_edge(g2,g2);
+    HEEdge ge3 = g.add_edge(g3,g3);
+    
+    
     // APEX 1
     Point apex1 = 0.5*(gen2+gen3);
     HEVertex a1 = g.add_vertex();
@@ -116,7 +120,9 @@ void VoronoiDiagram::initialize() {
     g[e2].next = e3_1;
     g[e3_1].next = e3_2;
     g[e3_2].next = e1_1;
-
+    
+    g[ge3].face = f1;
+    
     // add face 2: v0-v02-v03 which encloses gen1
     HEEdge e4_1 = g.add_edge( v00, a2  );
     HEEdge e4_2 = g.add_edge( a2, v02 );
@@ -141,6 +147,8 @@ void VoronoiDiagram::initialize() {
     g[e6_1].next = e6_2;
     g[e6_2].next = e4_1;
     
+    g[ge1].face = f2;
+    
     // add face 3: v0-v3-v1 which encloses gen2
     HEEdge e7_1 = g.add_edge( v00, a3 );  
     HEEdge e7_2 = g.add_edge( a3 , v03 );   
@@ -163,7 +171,9 @@ void VoronoiDiagram::initialize() {
     g[e8].next = e9_1;
     g[e9_1].next = e9_2;
     g[e9_2].next = e7_1;
-
+    
+    g[ge2].face = f3;
+    
     // set type. (note that edge-params x[8] and y[8] are not set!
     g[e1_1].type = LINE;  g[e1_1].set_parameters(g[f1].site, g[f3].site, false);
     g[e1_2].type = LINE;  g[e1_2].set_parameters(g[f1].site, g[f3].site, true);
@@ -251,27 +261,38 @@ int VoronoiDiagram::insert_point_site(const Point& p, int step) {
     g[new_vert].position=p; 
     g[new_vert].type=POINTSITE; 
     g[new_vert].status=OUT; 
-    g[new_vert].site = new PointSite(p);
+    //g[new_vert].site = new PointSite(p);
+    
+    
+    //g[p_edge].face =;
+    Site* new_site =  new PointSite(p);
+    
     vertex_map.insert( std::pair<int,HEVertex>(g[new_vert].index,new_vert) );
     
     HEFace closest_face = fgrid->grid_find_closest_face( p ); 
-    HEVertex v_seed = find_seed_vertex(closest_face, g[new_vert].site ) ;
+    HEVertex v_seed = find_seed_vertex(closest_face, new_site); //g[new_vert].site ) ;
     
-    mark_vertex( v_seed, g[new_vert].site );
+    mark_vertex( v_seed, new_site );
     modified_vertices.insert( v_seed );
     
 if (step==current_step) return -1; current_step++;
 
-    augment_vertex_set( g[new_vert].site );
+    augment_vertex_set( new_site );
     
 if (step==current_step) return -1; current_step++;
 
-    add_vertices( g[new_vert].site );    
+    add_vertices( new_site );    
     
 if (step==current_step) return -1; current_step++;
 
-    HEFace newface = add_face( g[new_vert].site );
-      
+    HEFace newface = add_face( new_site );
+    HEEdge p_edge = g.add_edge(new_vert,new_vert);
+    g[p_edge].face = newface;
+    g[p_edge].next = p_edge;
+    
+    //g[newface].site = new_site;new Point
+    
+    
     BOOST_FOREACH( HEFace f, incident_faces ) {
         add_edges(newface, f); // no newface2 parameter given!
     }
@@ -350,13 +371,18 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
     assert( vd_checker->check_edge(pos_edge) );
     assert( vd_checker->check_edge(neg_edge) );
     
-    // seed-face is face of start-point
-    HEFace start_face = g[start].site->face; 
-    HEFace   end_face = g[end  ].site->face;
+    EdgeVector start_edges = g.out_edges(start);
+    HEEdge start_edge = start_edges[0];
+    HEFace start_face = g[start_edge].face;
+    //HEFace start_face = g[start].site->face; 
+    EdgeVector end_edges = g.out_edges(end);
+    HEEdge end_edge = end_edges[0];
+    HEFace end_face = g[end_edge].face;
+    //HEFace   end_face = g[end  ].site->face;
     
     if (step==current_step) return false; current_step++;
     
-    // seed 
+    // seed-face is face of start-point
     HEVertex v_seed = find_seed_vertex(start_face, pos_site ) ;
     mark_vertex( v_seed, pos_site );
     modified_vertices.insert( v_seed );
@@ -445,9 +471,13 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
 // 
 void VoronoiDiagram::add_separator(HEFace f, HEVertex endp, Site* s1, Site* s2) {
     EdgeVector out_edges = g.out_edges(endp);
-    assert( out_edges.size() == 1); // one out-edge if the endpoint is new
+    //assert( out_edges.size() == 1); // one out-edge if the endpoint is new
     
-    HEEdge segment_e = out_edges[0];
+    HEEdge segment_e;
+    BOOST_FOREACH(HEEdge e, out_edges ) {
+        if (g[e].type == LINESITE)
+            segment_e = e;
+    }
     HEEdge segment_tw = g[segment_e].twin;
     
     assert( vd_checker->check_edge(segment_e)  && vd_checker->check_edge(segment_tw) );

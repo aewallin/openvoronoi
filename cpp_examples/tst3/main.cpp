@@ -133,7 +133,6 @@ int main(int argc,char *argv[]) {
     tmr.restart();
     BOOST_FOREACH(IdSeg id, segment_ids ) {
         vd->insert_line_site(id.first,id.second);
-        //vd->insert_point_site(s.second);
     }
     double t_lines = tmr.elapsed();
     

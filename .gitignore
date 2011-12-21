@@ -43,3 +43,8 @@ bld/
 
 # lyx backup
 *.lyx~
+
+# python script output files etc
+python_examples/frames
+python_examples/*.csv
+python_examples/tile_test

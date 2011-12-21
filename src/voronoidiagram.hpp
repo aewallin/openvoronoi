@@ -143,6 +143,7 @@ class VoronoiDiagram {
     // DATA
         /// the half-edge diagram of the vd
         HEGraph g;
+        //typedef HEGraph::face_edge_iterator FaceEdItr;
         /// the voronoi diagram is constructed for sites within a circle with radius far_radius
         double far_radius;
         /// the number of point sites

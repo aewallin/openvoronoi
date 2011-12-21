@@ -143,7 +143,7 @@ if __name__ == "__main__":
     print "   ",2*Nmax," point-sites sites took {0:.3f}".format(times[0])," seconds, {0:.2f}".format( 1e6*float( times[0] )/(float(2*Nmax)*float(math.log10(2*Nmax))/float(math.log10(2))   ) ) ,"us/n*log2(n)"
     print "   ",Nmax," line-sites sites took {0:.3f}".format(times[1])," seconds, {0:.2f}".format( 1e6*float( times[1] )/(float(Nmax)*float(math.log10(Nmax))/float(math.log10(2))) ) ,"us/n*log2(n)"
             
-    #vod.setVDText2(times)
+    vod.setVDText2(times)
     
     err = vd.getStat()
     #print err 

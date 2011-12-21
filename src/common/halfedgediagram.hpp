@@ -3,18 +3,18 @@
  *  
  *  This file is part of OpenVoronoi.
  *
- *  OpenCAMlib is free software: you can redistribute it and/or modify
+ *  OpenVoronoi is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  OpenCAMlib is distributed in the hope that it will be useful,
+ *  OpenVoronoi is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with OpenCAMlib.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with OpenVoronoi.  If not, see <http://www.gnu.org/licenses/>.
 */
 #ifndef HEDI_H
 #define HEDI_H
@@ -24,6 +24,7 @@
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/foreach.hpp> 
+#include <boost/iterator/iterator_facade.hpp>
 
 // bundled BGL properties, see: http://www.boost.org/doc/libs/1_44_0/libs/graph/doc/bundles.html
 
@@ -92,6 +93,7 @@ public:
     typedef typename boost::graph_traits< BGLGraph >::vertex_descriptor Vertex;
     typedef typename boost::graph_traits< BGLGraph >::vertex_iterator   VertexItr;
     typedef typename boost::graph_traits< BGLGraph >::out_edge_iterator OutEdgeItr;
+    typedef typename boost::graph_traits< BGLGraph >::edge_iterator     EdgeItr; 
     
     typedef std::vector<Vertex> VertexVector;
     typedef std::vector<Face>   FaceVector;
@@ -117,12 +119,11 @@ Vertex add_vertex() {
     return boost::add_vertex( g );
 }
 
-/*
+
 /// add a vertex with given properties, return vertex descriptor
-template < class FVertexProperty>
-typename boost::graph_traits< BGLGraph >::vertex_descriptor add_vertex(typedef const FVertexProperty& prop) {
+Vertex add_vertex(const TVertexProperties& prop) {
     return boost::add_vertex( prop, g );
-}*/
+}
 
 /// add an edge between vertices v1-v2
 Edge add_edge(Vertex v1, Vertex v2) {
@@ -133,18 +134,12 @@ Edge add_edge(Vertex v1, Vertex v2) {
 }
 
 /// add an edge with given properties between vertices v1-v2
-//template < class EdgeProperty>
-/*
-typename boost::graph_traits< BGLGraph >::edge_descriptor add_edge( 
-                                                       typename boost::graph_traits< BGLGraph >::vertex_descriptor v1, 
-                                                       typename boost::graph_traits< BGLGraph >::vertex_descriptor v2, 
-                                                       typename  TEdgeProperties prop
-                                                       ) {
-    typename boost::graph_traits< BGLGraph >::edge_descriptor e;
+Edge add_edge( Vertex v1, Vertex  v2, const TEdgeProperties& prop ) {
+    Edge e;
     bool b;
     boost::tie( e , b ) = boost::add_edge( v1, v2, prop, g);
     return e;
-}*/
+}
 
 /// make e1 the twin of e2 (and vice versa)
 void twin_edges( Edge e1, Edge e2 ) {
@@ -156,6 +151,14 @@ void twin_edges( Edge e1, Edge e2 ) {
 Face add_face() {
     TFaceProperties f_prop;
     faces.push_back( f_prop); 
+    Face index = faces.size()-1;
+    faces[index].idx = index;
+    return index;    
+}
+
+/// add a face 
+Face add_face(const TFaceProperties& prop) {
+    faces.push_back( prop); 
     Face index = faces.size()-1;
     faces[index].idx = index;
     return index;    
@@ -264,9 +267,8 @@ unsigned int num_edges(Face f) {
 
 /// return out_edges of given vertex
 EdgeVector out_edges( Vertex v) { 
-    typedef typename boost::graph_traits< BGLGraph >::out_edge_iterator  HEOutEdgeItr;
     EdgeVector ev;
-    HEOutEdgeItr it, it_end;
+    OutEdgeItr it, it_end;
     boost::tie( it, it_end ) = boost::out_edges( v, g );
     for ( ; it != it_end ; ++it ) {
         ev.push_back(*it);
@@ -280,9 +282,8 @@ std::pair<OutEdgeItr, OutEdgeItr> out_edge_itr( Vertex v ) {
 
 /// return all edges
 EdgeVector edges() {
-    typedef typename boost::graph_traits< BGLGraph >::edge_iterator      HEEdgeItr; 
     EdgeVector ev;
-    HEEdgeItr it, it_end;
+    EdgeItr it, it_end;
     boost::tie( it, it_end ) = boost::edges( g );
     for ( ; it != it_end ; ++it ) {
         ev.push_back(*it);
@@ -488,7 +489,42 @@ void remove_edge( Vertex v1, Vertex v2) {
     boost::remove_edge( result.first , g );
 }
 
-}; // end class definition
+// see http://www.boost.org/doc/libs/1_48_0/libs/iterator/doc/iterator_facade.htm
+
+/*
+class face_edge_iterator : public boost::iterator_facade<
+               face_edge_iterator,
+               Edge,
+               boost::forward_traversal_tag> 
+{
+public:
+    face_edge_iterator(): m_edge( 0 ) {}
+    explicit face_edge_iterator(BGLGraph* g, Edge* e): m_edge(e), gp(g)  {}
+private:
+    friend class boost::iterator_core_access;
+    void increment() { m_edge = &( (*gp)[*m_edge].next ); } 
+    bool equal(face_edge_iterator const& other) const {
+        return *(this->m_edge) == *(other.m_edge);
+    }
+    Edge& dereference() const { return *m_edge; } // dummy
+    
+    Edge* m_edge;
+    BGLGraph* gp;
+}; // end face_edge_iterator
+
+
+std::pair<face_edge_iterator, face_edge_iterator> face_edges_itr(Face f) {
+    Edge e = faces[f].edge;
+    face_edge_iterator itr( &g, &e );
+    std::pair<face_edge_iterator,face_edge_iterator> itr_pair(itr,itr); 
+    return itr_pair;
+}*/
+
+
+}; // end HEDIGraph class definition
+
+
+
 
 } // end hedi namespace
 

@@ -26,6 +26,7 @@
 #include "voronoidiagram.hpp"
 #include "facegrid.hpp"
 #include "checker.hpp"
+#include "common/numeric.hpp" // for diangle
 
 namespace ovd {
 
@@ -77,9 +78,9 @@ void VoronoiDiagram::initialize() {
     HEEdge ge1 = g.add_edge(g1,g1); // null edges!
     HEEdge ge2 = g.add_edge(g2,g2);
     HEEdge ge3 = g.add_edge(g3,g3);
-    g[ge1].type = NULLEDGE;
-    g[ge2].type = NULLEDGE;
-    g[ge3].type = NULLEDGE;
+    g[ge1].type = NULLEDGE; g[ge1].next = ge1;
+    g[ge2].type = NULLEDGE; g[ge2].next = ge2;
+    g[ge3].type = NULLEDGE; g[ge3].next = ge3;
     
     // APEX 1
     Point apex1 = 0.5*(gen2+gen3);
@@ -312,14 +313,22 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
     end = it_end->second;
     if (debug)
         std::cout << " insert_line_site " << g[start].index << " - " << g[end].index << "\n";
-        
+    
+    Point start_dir = g[end].position - g[start].position;
+    g[start    ].set_alfa( start_dir*(-1) );
+    g[end    ].set_alfa( start_dir );
+    
     EdgeVector  start_out_edges = g.out_edges(start);
     assert(start_out_edges.size()==1);
-    HEEdge start_edge = start_out_edges[0];
-    
+    HEEdge null_edge = start_out_edges[0];
+    HEEdge start_edge = find_null_edge(null_edge , numeric::diangle(start_dir.x,start_dir.y) );
+    if (debug)
+        std::cout << " insert_line_site: start_edge " << g[g.source(start_edge) ].index <<  " - " << g[g.target(start_edge) ].index<< "\n";
+        
     EdgeVector  end_out_edges = g.out_edges(end);
     assert(end_out_edges.size()==1);
-    HEEdge end_edge = end_out_edges[0];
+    HEEdge null_edge2 = end_out_edges[0];
+    HEEdge end_edge = find_null_edge(null_edge2 , numeric::diangle(-start_dir.x,-start_dir.y) );
     
     HEVertex seg_start = g.add_vertex( VoronoiVertex(g[start].position,OUT,ENDPOINT) );
     g[seg_start].zero_dist();
@@ -330,24 +339,15 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
     add_vertex_in_half_edge(seg_end,end_edge); 
     
     // set alfa values
-    Point start_dir = g[end].position - g[start].position;
     g[seg_start].set_alfa( start_dir );
-    g[start    ].set_alfa( start_dir*(-1) );
-    
     g[seg_end].set_alfa( start_dir*(-1) );
-    g[end    ].set_alfa( start_dir );
     
     if (debug) {
         std::cout << " seg_start " << g[seg_start].index << " alfa= " << g[seg_start].alfa << "\n";
         std::cout << " seg_end   " << g[seg_end].index << " alfa= " << g[seg_end].alfa << "\n";
     }
-        
-    //g[start].type=ENDPOINT; 
     g[start].status=OUT; 
-    
-    //g[end].type=ENDPOINT; 
-    g[end].status=OUT; 
-    
+    g[end].status=OUT;     
     g[start].zero_dist();
     g[end].zero_dist();
     
@@ -602,8 +602,8 @@ HEVertex VoronoiDiagram::find_seed_vertex(HEFace f, Site* site)  {
     HEVertex minimalVertex = HEVertex();
     bool first( true );
     
-    #define FOREACH
-    //#define DOWHILE
+    //#define FOREACH // this only works in Debug mode!
+    #define DOWHILE
     
     #ifdef FOREACH
     BOOST_FOREACH(HEEdge& e, g.face_edges_itr(f)) {
@@ -641,6 +641,30 @@ HEVertex VoronoiDiagram::find_seed_vertex(HEFace f, Site* site)  {
     assert( minPred < 0 );
     // FIXME not using Point p anymore: assert( vd_checker->inCircle_is_negative( p, f, minimalVertex ) );
     return minimalVertex;
+}
+
+HEEdge VoronoiDiagram::find_null_edge(HEEdge e, double a) {
+    HEEdge current = e;
+    HEEdge out = HEEdge();
+    bool found = false;
+    do {
+        assert( g[current].type = NULLEDGE );
+        HEVertex trg = g.target(e);
+        HEVertex src = g.source(e);
+        if (debug) {
+            std::cout << " insert_line_site: start_edge " << g[g.source(current) ].index <<  " - " << g[g.target(current) ].index<< "\n";
+            std::cout << " src alfa = " <<  g[src].alfa << "\n";
+            std::cout << " a   alfa = " <<  a << "\n";
+            std::cout << " trg alfa = " <<  g[trg].alfa << "\n";
+        }
+        if ( numeric::diangle_bracket(g[src].alfa , a, g[trg].alfa) ) {
+            out = current;
+            found = true;
+        }
+        current = g[e].next;
+    }while( !found && (current!=e) );
+    assert(out!=HEEdge());
+    return out;
 }
 
 // growing the v0/delete-tree of "IN" vertices by "weighted breadth-first search"

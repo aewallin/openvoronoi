@@ -81,6 +81,13 @@ namespace numeric {
         return roots;
     }
     
+    
+    double diangle(double x, double y);
+    double diangle_x(double a);
+    double diangle_y(double a);
+    std::pair<double,double> diangle_xy(double a);
+    bool diangle_bracket(double less, double a, double more);
+    
 } // numeric
 } // ovd
 

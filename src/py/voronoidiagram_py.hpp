@@ -42,11 +42,13 @@ class VoronoiDiagram_py : public VoronoiDiagram {
 public:
     VoronoiDiagram_py() : VoronoiDiagram() {
         _edge_points=40;
+        null_edge_offset=0.01;
     }
     /// create diagram with given far-radius and number of bins
     VoronoiDiagram_py(double far, unsigned int n_bins) 
         : VoronoiDiagram( far, n_bins) {
         _edge_points=40;
+        null_edge_offset=0.01;
     }
     
     int insert_point_site1(const Point& p) {
@@ -62,7 +64,9 @@ public:
     bool insert_line_site3(int idx1, int idx2, int step) {
         return insert_line_site( idx1, idx2, step);
     }
-    
+    void set_null_edge_offset(double ofs) {
+        null_edge_offset=ofs;
+    }
     /// return list of generators to python
     boost::python::list getGenerators()  {
         boost::python::list plist;
@@ -133,9 +137,6 @@ public:
                     double t_trg = g[v2].dist();
                     double t_min = std::min(t_src,t_trg);
                     double t_max = std::max(t_src,t_trg);
-                    
-                    
-            
                     for (int n=0;n< _edge_points;n++) {
                         //double t = t_min + n*(t_max-t_min)/(_edge_points-1); // linear
                         double t = t_min + ((t_max-t_min)/sq(_edge_points-1))*sq(n);
@@ -154,6 +155,55 @@ public:
         }
         return edge_list;
     }
+    
+    boost::python::list getVoronoiEdgesOffset()  {
+        boost::python::list edge_list;
+        BOOST_FOREACH( HEEdge edge, g.edges() ) { // loop through each edge
+                boost::python::list edge_data;
+                boost::python::list point_list; // the endpoints of each edge
+                HEVertex v1 = g.source( edge );
+                HEVertex v2 = g.target( edge );
+                // these edge-types are drawn as a single line from source to target.
+                if ( (g[edge].type == SEPARATOR) || (g[edge].type == LINE) || 
+                     (g[edge].type == LINESITE) || (g[edge].type == OUTEDGE) || 
+                     (g[edge].type == LINELINE)  || (g[edge].type == PARA_LINELINE) || (g[edge].type == NULLEDGE)) {
+                    Point v1_offset(0,0);
+                    Point v2_offset(0,0);
+                    //double ofs= 0.01;
+                    if ( (g[v1].alfa!=-1) ) { // || (g[v2].alfa!=-1) ) {
+                        v1_offset.x = null_edge_offset*numeric::diangle_x( g[v1].alfa );
+                        v1_offset.y = null_edge_offset*numeric::diangle_y( g[v1].alfa );
+                    }
+                    if ( (g[v2].alfa!=-1) ) { // || (g[v2].alfa!=-1) ) {
+                        v2_offset.x = null_edge_offset*numeric::diangle_x( g[v2].alfa );
+                        v2_offset.y = null_edge_offset*numeric::diangle_y( g[v2].alfa );
+                    }
+                    point_list.append( g[v1].position + v1_offset );
+                    point_list.append( g[v2].position + v2_offset );
+                } else if ( g[edge].type == PARABOLA ) { // these edge-types are drawn as polylines with edge_points number of points
+                    double t_src = g[v1].dist();
+                    double t_trg = g[v2].dist();
+                    double t_min = std::min(t_src,t_trg);
+                    double t_max = std::max(t_src,t_trg);
+                    for (int n=0;n< _edge_points;n++) {
+                        //double t = t_min + n*(t_max-t_min)/(_edge_points-1); // linear
+                        double t = t_min + ((t_max-t_min)/sq(_edge_points-1))*sq(n);
+                        Point pt = g[edge].point(t);
+                        point_list.append(pt);
+                    }
+                    
+                } else {
+                    //assert(0);
+                } 
+                edge_data.append( point_list );
+                edge_data.append( g[edge].type );
+                edge_data.append( g[v1].status ); // source status
+                edge_data.append( g[v2].status ); // target status
+                edge_list.append( edge_data );
+        }
+        return edge_list;
+    }
+    
     /// return edges and generators to python
     boost::python::list getEdgesGenerators()  {
         boost::python::list edge_list;
@@ -226,7 +276,7 @@ public:
     }
 private:
     int _edge_points; // number of points to plot on quadratic edges
-        
+    double null_edge_offset;
 };
 
 

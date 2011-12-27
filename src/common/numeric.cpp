@@ -21,6 +21,7 @@
 
 #include <qd/qd_real.h> 
 #include <cmath>
+#include <cassert>
 
 namespace ovd {
 
@@ -57,6 +58,43 @@ namespace numeric {
             return val;
     }
 
+
+    double diangle(double x, double y) {
+        if (y >= 0)
+            return (x >= 0 ? y/(x+y) : 1-x/(-x+y));
+        else
+            return (x < 0 ? 2-y/(-x-y) : 3+x/(x-y));
+    }
+    double diangle_x(double a) {
+        return (a < 2 ? 1-a : a-3);
+    }
+    double diangle_y(double a) {
+        return (a < 3 ? ((a > 1) ? 2-a : a) : a-4);
+    }
+    std::pair<double,double> diangle_xy(double a) {
+        double x = diangle_x(a);
+        double y = diangle_y(a);
+        double norm = sqrt(x*x+y*y);
+        return std::make_pair(x/norm,y/norm);
+    }
+    // return true if a lies in [less,more]
+    bool diangle_bracket(double less, double a, double more) {
+        if (less==more) {
+            return true;
+        }else if (less<=more) {
+            if ( (less<=a) && (a<=more) )
+                return true;
+        } else if (less>more) {
+            if ( ((less<=a) && (a<=0)) || ((0<=a) && (a<=more)) )
+                return true;
+        } else {
+            assert(0);
+            return false;
+        }
+        
+        return false;
+    }
+    
 } // numeric
 } // ovd
 

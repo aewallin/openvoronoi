@@ -80,6 +80,7 @@ class VD:
         self.drawVertexIndex=1
         self.drawVertices=1
         self.drawGenerators=1
+        self.offsetEdges = 0
         
     def getActors(self):
         acts=[]
@@ -217,7 +218,12 @@ class VD:
         self.colorLUT = vtk.vtkLookupTable()
         idx = 0
         last_idx = 0
-        vd_edges = self.vd.getVoronoiEdges()
+        vd_edges=[]
+        if self.offsetEdges == 0:
+            vd_edges = self.vd.getVoronoiEdges()
+        else:
+            vd_edges = self.vd.getVoronoiEdgesOffset()
+            
         for e in vd_edges:
             epts  = e[0]  # points
             etype = e[1]  # type

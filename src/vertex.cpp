@@ -22,7 +22,7 @@
 #include <boost/assign.hpp>
 
 #include "vertex.hpp"
-#include "common/diangle.hpp"
+#include "common/numeric.hpp"
 
 namespace ovd {
 
@@ -65,6 +65,7 @@ void VoronoiVertex::init() {
     index = count;
     count++;
     in_queue = false;
+    alfa=-1; // invalid/non-initialized alfa value
 }
 /// set in_queue false, and status to UNDECIDED
 void VoronoiVertex::reset() {

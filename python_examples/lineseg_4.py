@@ -59,6 +59,8 @@ if __name__ == "__main__":
     vod.drawVertices=0
     vod.drawVertexIndex=0
     vod.drawGenerators=0
+    vod.offsetEdges = 1
+    vd.setEdgeOffset(0.001)
     
     Nmax = 128
     # Nmax = 256

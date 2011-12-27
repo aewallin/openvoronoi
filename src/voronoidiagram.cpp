@@ -566,14 +566,32 @@ void VoronoiDiagram::add_separator(HEFace f, HEVertex endp, Site* s1, Site* s2) 
 }
 
 // find amount of clearance-disk violation on all face vertices and return vertex with the largest violation
-HEVertex VoronoiDiagram::find_seed_vertex(HEFace f, Site* site) const {
+HEVertex VoronoiDiagram::find_seed_vertex(HEFace f, Site* site)  {
     double minPred( 0.0 ); 
     HEVertex minimalVertex = HEVertex();
     bool first( true );
     
+    #define FOREACH
+    //#define DOWHILE
+    
+    #ifdef FOREACH
+    BOOST_FOREACH(HEEdge& e, g.face_edges_itr(f)) {
+        HEVertex q = g.target(e);
+        if ( (g[q].status != OUT) && (g[q].type == NORMAL) ) {
+            double h = g[q].in_circle( site->apex_point( g[q].position ) ); 
+            if ( first || ( (h<minPred) && (site->in_region(g[q].position) ) ) ) {
+                minPred = h;
+                minimalVertex = q;
+                first = false;
+            }
+        }
+    }
+    #endif
+    
+    #ifdef DOWHILE
     HEEdge current = g[f].edge;
     HEEdge start = current;
-    do {
+    do {        
         HEVertex q = g.target(current);
         if ( (g[q].status != OUT) && (g[q].type == NORMAL) ) {
             double h = g[q].in_circle( site->apex_point( g[q].position ) ); 
@@ -585,6 +603,10 @@ HEVertex VoronoiDiagram::find_seed_vertex(HEFace f, Site* site) const {
         }
         current = g[current].next;
     } while(current!=start);  
+    #endif
+    
+    
+
     assert( minPred < 0 );
     // FIXME not using Point p anymore: assert( vd_checker->inCircle_is_negative( p, f, minimalVertex ) );
     return minimalVertex;

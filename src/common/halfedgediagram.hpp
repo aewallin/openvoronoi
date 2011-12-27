@@ -490,35 +490,41 @@ void remove_edge( Vertex v1, Vertex v2) {
 }
 
 // see http://www.boost.org/doc/libs/1_48_0/libs/iterator/doc/iterator_facade.htm
-
-/*
-class face_edge_iterator : public boost::iterator_facade<
-               face_edge_iterator,
+//template<class Graph>
+class edge_iterator : public boost::iterator_facade<
+               edge_iterator ,
                Edge,
                boost::forward_traversal_tag> 
 {
 public:
-    face_edge_iterator(): m_edge( 0 ) {}
-    explicit face_edge_iterator(BGLGraph* g, Edge* e): m_edge(e), gp(g)  {}
-private:
+    edge_iterator(): m_edge(Edge()), m_inc(false)  { }
+    explicit edge_iterator(BGLGraph& g, Edge e): m_edge(e), m_g(g), m_inc(false)  {}
+protected:
     friend class boost::iterator_core_access;
-    void increment() { m_edge = &( (*gp)[*m_edge].next ); } 
-    bool equal(face_edge_iterator const& other) const {
-        return *(this->m_edge) == *(other.m_edge);
+    void increment() { 
+        m_edge = ( m_g[m_edge].next ); 
+        if(!m_inc) m_inc = true;
+    } 
+    bool equal( edge_iterator const& other) const {
+        return (((m_edge) == (other.m_edge)) && m_inc);
     }
-    Edge& dereference() const { return *m_edge; } // dummy
+    Edge& dereference() const { 
+        Edge cpy(m_edge);
+        Edge&  e = cpy; 
+        return e; 
+    } 
     
-    Edge* m_edge;
-    BGLGraph* gp;
-}; // end face_edge_iterator
+    Edge m_edge;
+    BGLGraph& m_g;
+    bool m_inc;
+};
 
 
-std::pair<face_edge_iterator, face_edge_iterator> face_edges_itr(Face f) {
-    Edge e = faces[f].edge;
-    face_edge_iterator itr( &g, &e );
-    std::pair<face_edge_iterator,face_edge_iterator> itr_pair(itr,itr); 
-    return itr_pair;
-}*/
+std::pair<edge_iterator , edge_iterator  > face_edges_itr(Face f) {
+    edge_iterator  itr1( g, faces[f].edge );
+    edge_iterator  itr2( g, faces[f].edge );
+    return std::make_pair(itr1,itr2); ;
+}
 
 
 }; // end HEDIGraph class definition

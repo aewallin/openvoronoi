@@ -77,10 +77,9 @@ class VoronoiDiagram {
         VoronoiDiagram(double far, unsigned int n_bins);
         /// dtor
         virtual ~VoronoiDiagram();
-        /// insert a point site into the diagram 
-        /// returns an integer handle to the inserted point. use this integer when inserting lines/arcs
+
         int insert_point_site(const Point& p, int step=0);
-        /// insert a line-segment site into the diagram
+
         bool insert_line_site(int idx1, int idx2, int step=10);
         /// return the far radius
         double get_far_radius() const {return far_radius;}
@@ -120,6 +119,7 @@ class VoronoiDiagram {
         void   add_edges(HEFace new_f1, HEFace f, HEFace new_f2 = 0);
         void   add_edge(EdgeData ed, HEFace new1, HEFace new2=0);
         void   add_vertex_in_edge(HEVertex v, HEEdge e);
+        void   add_vertex_in_half_edge( HEVertex v, HEEdge e);
         void   add_separator(HEFace f, HEVertex endp, Site* s1, Site* s2);
         void   add_split_vertex(HEFace f, Site* s);
         

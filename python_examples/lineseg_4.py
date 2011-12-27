@@ -112,8 +112,9 @@ if __name__ == "__main__":
     
     print "   ",2*Nmax," point-sites sites took {0:.3f}".format(times[0])," seconds, {0:.2f}".format( 1e6*float( times[0] )/(float(2*Nmax)*float(math.log10(2*Nmax))) ) ,"us/n*log(n)"
     vd.check()
-    
+    vd.debug_on()
     nsegs = Nmax
+    #nsegs = 1
     #nsegs = 10478 #Nmax
     n=1
     t_before = time.time()

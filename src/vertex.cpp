@@ -22,6 +22,7 @@
 #include <boost/assign.hpp>
 
 #include "vertex.hpp"
+#include "common/diangle.hpp"
 
 namespace ovd {
 
@@ -70,6 +71,8 @@ void VoronoiVertex::reset() {
     in_queue = false;
     status = UNDECIDED;
 }
-
+void VoronoiVertex::set_alfa(const Point& dir) {
+    alfa = numeric::diangle(dir.x,dir.y);
+}
 
 } // end ocl namespace

@@ -82,8 +82,9 @@ public:
     bool in_queue;
     /// the position of the vertex
     Point position;
-
+    void set_alfa(const Point& dir);
     double k3; // the offset-direction {-1,+1} to the newly inserted site.
+    double alfa;
 protected:
     /// global vertex count
     static int count;
@@ -91,6 +92,7 @@ protected:
     static VertexDegreeMap expected_degree;
     /// clearance-disk radius, i.e. the closest site is at this distance
     double r;
+    
 };
 
 } // end ocl namespace

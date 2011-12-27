@@ -36,7 +36,7 @@ namespace numeric {
     template<class Scalar>
     Scalar sq( Scalar x) {return x*x;}
     
-    /// solves: a*x*x + b*x + c = 0
+    /// solve quadratic eqn: a*x*x + b*x + c = 0
     /// returns real roots (0, 1, or 2) as vector
     template<class Scalar>
     std::vector<Scalar>  quadratic_roots(Scalar a, Scalar b, Scalar c) {

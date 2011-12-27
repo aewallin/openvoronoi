@@ -47,7 +47,7 @@ typedef boost::adjacency_list_traits<OUT_EDGE_CONTAINER,
                                      
 typedef unsigned int HEFace;
 
-enum VoronoiEdgeType {LINE, LINELINE, PARA_LINELINE, OUTEDGE, PARABOLA, ELLIPSE, HYPERBOLA, SEPARATOR, LINESITE};
+enum VoronoiEdgeType {LINE, LINELINE, PARA_LINELINE, OUTEDGE, PARABOLA, ELLIPSE, HYPERBOLA, SEPARATOR, NULLEDGE, LINESITE};
 
 
 /// properties of an edge in the voronoi diagram

@@ -145,7 +145,7 @@ set( OVD_INCLUDE_COMMON_FILES
     ${OpenVoronoi_SOURCE_DIR}/common/numeric.hpp  
     ${OpenVoronoi_SOURCE_DIR}/common/point.hpp
     ${OpenVoronoi_SOURCE_DIR}/common/halfedgediagram.hpp
-    ${OpenVoronoi_SOURCE_DIR}/common/diangle.hpp
+    # ${OpenVoronoi_SOURCE_DIR}/common/diangle.hpp
 )
 
 set( OVD_INCLUDE_SOLVERS_FILES

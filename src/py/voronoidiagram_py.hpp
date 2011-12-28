@@ -71,9 +71,17 @@ public:
     boost::python::list getGenerators()  {
         boost::python::list plist;
         BOOST_FOREACH( HEVertex v, g.vertices() ) {
-            if ( g[v].type == POINTSITE || g[v].type == ENDPOINT ) {
+            if ( g[v].type == POINTSITE ) {
                 boost::python::list pd;
-                pd.append( g[v].position );
+                Point offset(0,0);
+                //double ofs= 0.01;
+                if ( (g[v].alfa!=-1) ) { 
+                    boost::tie(offset.x, offset.y )  = numeric::diangle_xy( g[v].alfa );
+                    //offset.x = null_edge_offset*numeric::diangle_x( g[v].alfa );
+                    //offset.y = null_edge_offset*numeric::diangle_y( g[v].alfa );
+                }
+                    
+                pd.append( g[v].position+offset*null_edge_offset );
                 pd.append( g[v].dist() );
                 pd.append( g[v].status );
                 pd.append( g[v].index );
@@ -94,9 +102,17 @@ public:
     boost::python::list getVoronoiVertices()  {
         boost::python::list plist;
         BOOST_FOREACH( HEVertex v, g.vertices() ) {
-            if ( g[v].type == NORMAL  || g[v].type == APEX || g[v].type == OUTER || g[v].type == SPLIT) {
+            if ( g[v].type == NORMAL || g[v].type == ENDPOINT || g[v].type == APEX || g[v].type == OUTER || g[v].type == SPLIT) {
                 boost::python::list pd;
-                pd.append( g[v].position );
+                Point offset(0,0);
+                //double ofs= 0.01;
+                if ( (g[v].alfa!=-1) ) {
+                    boost::tie(offset.x, offset.y )  = numeric::diangle_xy( g[v].alfa ); 
+                    //offset.x = null_edge_offset*numeric::diangle_x( g[v].alfa );
+                    //offset.y = null_edge_offset*numeric::diangle_y( g[v].alfa );
+                }
+                
+                pd.append( g[v].position+offset*null_edge_offset );
                 pd.append( g[v].dist() );
                 pd.append( g[v].status );
                 pd.append( g[v].index );
@@ -166,10 +182,26 @@ public:
                 // these edge-types are drawn as a single line from source to target.
                 if ( (g[edge].type == SEPARATOR) || (g[edge].type == LINE) || 
                      (g[edge].type == LINESITE) || (g[edge].type == OUTEDGE) || 
-                     (g[edge].type == LINELINE)  || (g[edge].type == PARA_LINELINE) || (g[edge].type == NULLEDGE)) {
+                     (g[edge].type == LINELINE)  || (g[edge].type == PARA_LINELINE)  ) {
                     Point v1_offset(0,0);
                     Point v2_offset(0,0);
                     //double ofs= 0.01;
+                    if ( (g[v1].alfa!=-1) ) { // || (g[v2].alfa!=-1) ) {
+                        boost::tie(v1_offset.x, v1_offset.y )  = numeric::diangle_xy( g[v1].alfa );
+                        //v1_offset.y = null_edge_offset*numeric::diangle_y( g[v1].alfa );
+                    }
+                    if ( (g[v2].alfa!=-1) ) { // || (g[v2].alfa!=-1) ) {
+                        boost::tie(v2_offset.x, v2_offset.y ) = numeric::diangle_xy( g[v2].alfa );
+                        //= null_edge_offset*numeric::diangle_y( g[v2].alfa );
+                    }
+                    point_list.append( g[v1].position + v1_offset*null_edge_offset );
+                    point_list.append( g[v2].position + v2_offset*null_edge_offset );
+                } else if ((g[edge].type == NULLEDGE)) {
+                    // arc from src to trg
+                    //Point v1_offset(0,0);
+                    //Point v2_offset(0,0);
+                    //double ofs= 0.01;
+                    /*
                     if ( (g[v1].alfa!=-1) ) { // || (g[v2].alfa!=-1) ) {
                         v1_offset.x = null_edge_offset*numeric::diangle_x( g[v1].alfa );
                         v1_offset.y = null_edge_offset*numeric::diangle_y( g[v1].alfa );
@@ -178,8 +210,22 @@ public:
                         v2_offset.x = null_edge_offset*numeric::diangle_x( g[v2].alfa );
                         v2_offset.y = null_edge_offset*numeric::diangle_y( g[v2].alfa );
                     }
-                    point_list.append( g[v1].position + v1_offset );
-                    point_list.append( g[v2].position + v2_offset );
+                    Point src = g[v1].position + v1_offset;
+                    Point trg = g[v2].position + v2_offset;
+                    Point cen = g[v1].position;
+                    */
+                    int nmax=20;
+                    if ( g[v1].alfa < g[v2].alfa ) {// the normal case
+                        for(int n=0;n<nmax;n++) {
+                            double alfa = g[v1].alfa + n*(g[v2].alfa-g[v1].alfa)/(nmax-1);
+                            Point offset(0,0);
+                            boost::tie(offset.x,offset.y) = numeric::diangle_xy( alfa );
+                            point_list.append( g[v1].position + offset*null_edge_offset );
+                        }
+                    }
+                    //point_list.append( g[v1].position + v1_offset );
+                    //point_list.append( g[v2].position + v2_offset );
+                    
                 } else if ( g[edge].type == PARABOLA ) { // these edge-types are drawn as polylines with edge_points number of points
                     double t_src = g[v1].dist();
                     double t_trg = g[v2].dist();

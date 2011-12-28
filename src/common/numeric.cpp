@@ -71,6 +71,8 @@ namespace numeric {
     double diangle_y(double a) {
         return (a < 3 ? ((a > 1) ? 2-a : a) : a-4);
     }
+
+
     std::pair<double,double> diangle_xy(double a) {
         double x = diangle_x(a);
         double y = diangle_y(a);

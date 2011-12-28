@@ -98,10 +98,10 @@ if __name__ == "__main__":
     vod.drawFarCircle()
     
     #vod.textScale = 0.002
-    #vod.vertexRadius = 0.00031
-    vod.drawVertices=0
+    vod.vertexRadius = 0.0031
+    vod.drawVertices=1
     #vod.drawVertexIndex=0
-    vod.drawGenerators=0
+    vod.drawGenerators=1
     
     vod.offsetEdges = 1
     vd.setEdgeOffset(0.05)
@@ -139,7 +139,7 @@ if __name__ == "__main__":
     print "add segment ",id1, " to ", id2
     vd.debug_on()
     #vd.addLineSite( id1, id2 )
-    vd.addLineSite( id1, id2 , 7)
+    vd.addLineSite( id1, id2 ,6)
     #vd.addLineSite3( id3, id4 )
     t_after = time.time()
     calctime = t_after-t_before

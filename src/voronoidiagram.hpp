@@ -121,7 +121,7 @@ class VoronoiDiagram {
         void   add_edge(EdgeData ed, HEFace new1, HEFace new2=0);
         void   add_vertex_in_edge(HEVertex v, HEEdge e);
         void   add_vertex_in_half_edge( HEVertex v, HEEdge e);
-        void   add_separator(HEFace f, HEVertex endp, Site* s1, Site* s2);
+        void   add_separator(HEFace f, HEFace nf, HEVertex endp, Site* s1, Site* s2);
         void   add_split_vertex(HEFace f, Site* s);
         
         boost::tuple<HEVertex,HEFace,HEVertex,HEVertex>

@@ -404,7 +404,7 @@ if (step==current_step) return false; current_step++;
 
     augment_vertex_set( pos_site ); // it should not matter if we use pos_site or neg_site here
     if (debug) {
-        std::cout << " delete-set is("<< v0.size() <<"): "; 
+        std::cout << " delete-set |v0|="<< v0.size() <<" : "; 
         print_vertices(v0);
     }
     
@@ -434,8 +434,7 @@ if (step==current_step) return false; current_step++;
         add_separator(start_face, start_null_face, neg_sep_start, pos_site, neg_site);
     
     g[start_face].status = NONINCIDENT; // face is now done.
-    
-    assert( vd_checker->face_ok( start_face, debug ) );
+    assert( vd_checker->face_ok( start_face ) );
     
 if (step==current_step) return false; current_step++;
 
@@ -446,6 +445,7 @@ if (step==current_step) return false; current_step++;
     
     if ( neg_sep_end != HEVertex() )
         add_separator(end_face, end_null_face, neg_sep_end, pos_site, neg_site);
+    
     g[end_face].status = NONINCIDENT;
     assert( vd_checker->face_ok( end_face ) );
     
@@ -520,12 +520,9 @@ VoronoiDiagram::find_null_face(HEVertex start) {
         start_null_face = g.add_face(); //  this face to the left of start->end edge    
         std::cout << " creating new start_null_face " << start_null_face << "\n";
         seg_start = g.add_vertex( VoronoiVertex(g[start].position,OUT,ENDPOINT) );
-        //g[seg_start].set_alfa( start_dir*(-1) );
         g[seg_start].zero_dist();
         pos_sep_start = g.add_vertex( VoronoiVertex(g[start].position,OUT,SEPPOINT) );
-        //g[pos_sep_start].set_alfa( g[seg_start].alfa+1 );
         neg_sep_start = g.add_vertex( VoronoiVertex(g[start].position,OUT,SEPPOINT) );
-        //g[neg_sep_start].set_alfa( g[seg_start].alfa-1 );
         
         HEEdge e1,e1_tw;
         boost::tie(e1,e1_tw) = g.add_twin_edges(seg_start,neg_sep_start);
@@ -556,8 +553,6 @@ VoronoiDiagram::find_null_face(HEVertex start) {
 /// s1 and s2 are the pos and neg LineSites
 ///
 void VoronoiDiagram::add_separator(HEFace f, HEFace null_face, HEVertex endp, Site* s1, Site* s2) {
-    //if (debug) std::cout << BOOST_CURRENT_FUNCTION << "\n";
-    
     HEEdge current = g[null_face].edge;
     assert( current != HEEdge() );
     HEEdge start = current;
@@ -644,28 +639,6 @@ void VoronoiDiagram::add_separator(HEFace f, HEFace null_face, HEVertex endp, Si
         g[endp_prev].next = e2; 
         g[e2].next = v_next;
     }
-    
-    // next-pointers for endpoint-face
-    //g[v3_prev].next = e1_tw;
-    //g[e1_tw].next = e2;
-    //g[e2].next = v2_next;
-    //g[endp_prev].next = e2;
-    //g[e2].next = v_next;
-    
-    // next-pointers for segment face(s)
-    //g[v2_previous].next = e2_tw;
-    //g[e2_tw].next = segment_e; 
-    //g[segment_tw].next = e1;
-    //g[e1].next = v1_next;
-    
-    // set edge-parameters e1,e1_tw, e2, e2_tw
-    // e2:  endp -> v2
-    // e2_tw: v2 -> endp
-    // e1: endp -> v1
-    // e1_tw: v1 -> endp
-    //g[e1].set_sep_parameters( g[endp].position, g[v1].position );
-    //g[e1_tw].set_sep_parameters( g[endp].position, g[v1].position );
-    
     g[e2].set_sep_parameters( g[endp].position, g[v_target].position );
     g[e2_tw].set_sep_parameters( g[endp].position, g[v_target].position );
         
@@ -673,11 +646,8 @@ void VoronoiDiagram::add_separator(HEFace f, HEFace null_face, HEVertex endp, Si
         std::cout << "added separator: ";
         std::cout << g[endp].index << " - " << g[v_target].index << "\n";
     }
-    //assert( vd_checker->check_edge(e1) );
     assert( vd_checker->check_edge(e2) );
-    //assert( vd_checker->check_edge(e1_tw) );
     assert( vd_checker->check_edge(e2_tw) );
-    //assert( vd_checker->face_ok( f ) ); // check that the old face is OK
 }
 
 // find amount of clearance-disk violation on all face vertices and return vertex with the largest violation
@@ -720,8 +690,6 @@ HEVertex VoronoiDiagram::find_seed_vertex(HEFace f, Site* site)  {
     } while(current!=start);  
     #endif
     
-    
-
     assert( minPred < 0 );
     // FIXME not using Point p anymore: assert( vd_checker->inCircle_is_negative( p, f, minimalVertex ) );
     return minimalVertex;
@@ -1638,14 +1606,14 @@ void VoronoiDiagram::repair_face( HEFace f ) {
         HEVertex current_source = g.source( current_edge );
         bool found_next_edge= false;
         if (debug) { 
-            std::cout << " edge " << g[ g.source(current_edge) ].index << " - ";
-            std::cout <<  g[ g.target(current_edge) ].index << "\n";
+            //std::cout << " edge " << g[ g.source(current_edge) ].index << " - ";
+            //std::cout <<  g[ g.target(current_edge) ].index << "\n";
         }
         BOOST_FOREACH(HEEdge e, g.out_edge_itr(current_target)){
             HEVertex out_target = g.target( e );
             if(debug) {
-                std::cout << "     candidate: " << g[ g.source(e) ].index << " - ";
-                std::cout << g[ g.target(e) ].index << " f= "<< g[e].face << " \n";
+                //std::cout << "     candidate: " << g[ g.source(e) ].index << " - ";
+                //std::cout << g[ g.target(e) ].index << " f= "<< g[e].face << " \n";
             }
             if ( ( (g[out_target].status == NEW) || (g[out_target].type == ENDPOINT) || (g[out_target].type == SEPPOINT) ) && (g[e].face == f) ) { 
                 // the next vertex along the face should be "NEW"
@@ -1653,8 +1621,8 @@ void VoronoiDiagram::repair_face( HEFace f ) {
                     g[current_edge].next = e; // this is the edge we want to take
                     found_next_edge = true;
                     if(debug) {
-                        std::cout << "         next: " << g[ g.source(e) ].index << " - ";
-                        std::cout << g[ g.target(e) ].index << "\n";
+                        //std::cout << "         next: " << g[ g.source(e) ].index << " - ";
+                        //std::cout << g[ g.target(e) ].index << "\n";
                     }
                     assert( vd_checker->current_face_equals_next_face( current_edge ) );
                 }

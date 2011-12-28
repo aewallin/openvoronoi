@@ -197,34 +197,33 @@ public:
                     point_list.append( g[v1].position + v1_offset*null_edge_offset );
                     point_list.append( g[v2].position + v2_offset*null_edge_offset );
                 } else if ((g[edge].type == NULLEDGE)) {
-                    // arc from src to trg
-                    //Point v1_offset(0,0);
-                    //Point v2_offset(0,0);
-                    //double ofs= 0.01;
-                    /*
-                    if ( (g[v1].alfa!=-1) ) { // || (g[v2].alfa!=-1) ) {
-                        v1_offset.x = null_edge_offset*numeric::diangle_x( g[v1].alfa );
-                        v1_offset.y = null_edge_offset*numeric::diangle_y( g[v1].alfa );
-                    }
-                    if ( (g[v2].alfa!=-1) ) { // || (g[v2].alfa!=-1) ) {
-                        v2_offset.x = null_edge_offset*numeric::diangle_x( g[v2].alfa );
-                        v2_offset.y = null_edge_offset*numeric::diangle_y( g[v2].alfa );
-                    }
-                    Point src = g[v1].position + v1_offset;
-                    Point trg = g[v2].position + v2_offset;
-                    Point cen = g[v1].position;
-                    */
-                    int nmax=20;
+                    //int nmax=20;
+                    double dalfa = 0.1;
                     if ( g[v1].alfa < g[v2].alfa ) {// the normal case
+                        int nmax = (int)((g[v2].alfa-g[v1].alfa)/dalfa);
                         for(int n=0;n<nmax;n++) {
                             double alfa = g[v1].alfa + n*(g[v2].alfa-g[v1].alfa)/(nmax-1);
                             Point offset(0,0);
                             boost::tie(offset.x,offset.y) = numeric::diangle_xy( alfa );
                             point_list.append( g[v1].position + offset*null_edge_offset );
                         }
+                    } else {
+                        // go via zero
+                        int nmax = std::max( (int)((4-g[v1].alfa)/dalfa), 5 ); // from v1 to zero
+                        for(int n=0;n<nmax;n++) {
+                            double alfa = g[v1].alfa + n*(4-g[v1].alfa)/(nmax-1);
+                            Point offset(0,0);
+                            boost::tie(offset.x,offset.y) = numeric::diangle_xy( alfa );
+                            point_list.append( g[v1].position + offset*null_edge_offset );
+                        }
+                        nmax = std::max( (int)((g[v2].alfa-0)/dalfa), 5 );
+                        for(int n=0;n<nmax;n++) { // from zero to v2
+                            double alfa = 0 + n*(g[v2].alfa-0)/(nmax-1);
+                            Point offset(0,0);
+                            boost::tie(offset.x,offset.y) = numeric::diangle_xy( alfa );
+                            point_list.append( g[v1].position + offset*null_edge_offset );
+                        }
                     }
-                    //point_list.append( g[v1].position + v1_offset );
-                    //point_list.append( g[v2].position + v2_offset );
                     
                 } else if ( g[edge].type == PARABOLA ) { // these edge-types are drawn as polylines with edge_points number of points
                     double t_src = g[v1].dist();

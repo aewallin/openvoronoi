@@ -23,6 +23,8 @@
 #include <map>
 #include <cmath>
 
+#include <boost/graph/adjacency_list.hpp>
+
 #include "common/point.hpp"
 #include "site.hpp"
 
@@ -48,7 +50,8 @@ enum VoronoiVertexType {OUTER, NORMAL, POINTSITE, ENDPOINT, APEX, SPLIT};
 /// have the expected (correct) degree (i.e. number of edges)
 typedef std::map<VoronoiVertexType, unsigned int> VertexDegreeMap;
 
-
+typedef unsigned int HEFace;
+                                     
 /// A vertex in the voronoi diagram
 /// an object of this type is held in the BGL-graph for each vertex.
 class VoronoiVertex {
@@ -83,8 +86,11 @@ public:
     /// the position of the vertex
     Point position;
     void set_alfa(const Point& dir);
+    //Site* site; // pointSite, if this is a point-site (required??)
     double k3; // the offset-direction {-1,+1} to the newly inserted site.
-    double alfa;
+    double alfa; // angle for a null-vertex
+    HEFace null_face;
+    HEFace face;
 protected:
     /// global vertex count
     static int count;

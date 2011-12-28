@@ -319,6 +319,7 @@ class VD:
         if (edgeType == ovd.VoronoiEdgeType.PARABOLA):
             return self.edgeStatusColor(src_status,trg_status, blue2)
         else:
+            #print "UNKOWN edge type = ", edgeType
             return white
             
     def setEdges(self):

@@ -67,6 +67,7 @@ public:
     HEFace face; // each face corresponds to an input Site/generator
     double k; // offset-direction from the adjacent site, either +1 or -1
     VoronoiEdgeType type;
+    
     boost::array<double,8> x;
     boost::array<double,8> y;
     bool sign; // choose either +/- in front of sqrt()

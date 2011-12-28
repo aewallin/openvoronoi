@@ -124,6 +124,9 @@ class VoronoiDiagram {
         void   add_separator(HEFace f, HEVertex endp, Site* s1, Site* s2);
         void   add_split_vertex(HEFace f, Site* s);
         
+        boost::tuple<HEVertex,HEFace,HEVertex,HEVertex>
+            find_null_face(HEVertex start);
+        
         void repair_face( HEFace f );
         void remove_vertex_set();
         void remove_split_vertex(HEFace f);

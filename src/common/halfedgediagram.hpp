@@ -133,6 +133,15 @@ Edge add_edge(Vertex v1, Vertex v2) {
     return e;
 }
 
+std::pair<Edge,Edge> add_twin_edges(Vertex v1, Vertex v2) {
+    Edge e1,e2;
+    bool b;
+    boost::tie( e1 , b ) = boost::add_edge( v1, v2, g);
+    boost::tie( e2 , b ) = boost::add_edge( v2, v1, g);
+    twin_edges(e1,e2);
+    return std::make_pair(e1,e2);
+}
+
 /// add an edge with given properties between vertices v1-v2
 Edge add_edge( Vertex v1, Vertex  v2, const TEdgeProperties& prop ) {
     Edge e;

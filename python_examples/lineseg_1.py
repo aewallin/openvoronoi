@@ -70,7 +70,7 @@ def circleGenerators(far, Nmax):
 if __name__ == "__main__":  
     #print ocl.revision()
     myscreen = ovdvtk.VTKScreen(width=1024, height=720) #(width=1920, height=1080)
-    ovdvtk.drawOCLtext(myscreen)
+    ovdvtk.drawOCLtext(myscreen, rev_text=ovd.revision() )
     
     w2if = vtk.vtkWindowToImageFilter()
     w2if.SetInput(myscreen.renWin)
@@ -97,6 +97,14 @@ if __name__ == "__main__":
     vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
     vod.drawFarCircle()
     
+    #vod.textScale = 0.002
+    #vod.vertexRadius = 0.00031
+    vod.drawVertices=0
+    #vod.drawVertexIndex=0
+    vod.drawGenerators=0
+    
+    vod.offsetEdges = 1
+    vd.setEdgeOffset(0.05)
     
     Nmax = 4
     
@@ -112,7 +120,7 @@ if __name__ == "__main__":
     #+ regularGridGenerators(far, Nmax) + circleGenerators(far, Nmax)
 
     #plist = [ovd.Point(0,0)]
-    
+    times=[]
     t_before = time.time() 
     n=0
     id_list=[]
@@ -120,19 +128,27 @@ if __name__ == "__main__":
         print n," adding ",p
         id_list.append( vd.addVertexSite( p ) )
         n=n+1
+    t_after = time.time()
+    calctime = t_after-t_before
+    times.append(calctime)
+    
     id1 = id_list[0]
     id2 = id_list[1]
     #id3 = id_list[2]
     #id4 = id_list[3]
     print "add segment ",id1, " to ", id2
-    vd.addLineSite( id1, id2 )
-    
+    vd.debug_on()
+    #vd.addLineSite( id1, id2 )
+    vd.addLineSite( id1, id2 , 5)
     #vd.addLineSite3( id3, id4 )
     t_after = time.time()
     calctime = t_after-t_before
+    times.append(calctime)
     if Nmax==0:
         Nmax=1
     print " VD done in ", calctime," s, ", calctime/Nmax," s per generator"
+    
+    vod.setVDText2(times)
     
     vod.setAll()
     myscreen.render()

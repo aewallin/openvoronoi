@@ -57,7 +57,7 @@ if __name__ == "__main__":
     width=pixmult*1024
     height=pixmult*1024
     myscreen = ovdvtk.VTKScreen(width, height)
-    ovdvtk.drawOCLtext(myscreen)
+    ovdvtk.drawOCLtext(myscreen, rev_text=ovd.revision() )
     
     w2if = vtk.vtkWindowToImageFilter()
     w2if.SetInput(myscreen.renWin)
@@ -89,8 +89,9 @@ if __name__ == "__main__":
     vod.drawVertexIndex=0
     vod.drawGenerators=0
     
-    Nmax = 10000
+    Nmax = 100
     plist = randomGenerators(far, Nmax)    
+    times=[]
     t_before = time.time() 
     n=0
     id_list=[]
@@ -100,6 +101,7 @@ if __name__ == "__main__":
         n=n+1
     t_after = time.time()
     calctime = t_after-t_before
+    times.append(calctime)
     if Nmax==0:
         Nmax=1
     #print " VD done in ", calctime," s, ", 1e6*calctime/float(Nmax)*(math.log(Nmax)/math.log(2.0))," us per n*log2(n)"
@@ -110,7 +112,8 @@ if __name__ == "__main__":
         #print s
     hist = histogram(data)
     print hist
-    
+    times.append(0)
+    vod.setVDText2(times)
     vod.setAll()
     myscreen.render()
             

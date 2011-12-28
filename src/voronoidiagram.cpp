@@ -18,6 +18,7 @@
 */
 
 #include <cassert>
+#include <limits>
 
 #include <boost/foreach.hpp>
 #include <boost/math/tools/roots.hpp> // for toms748
@@ -70,17 +71,10 @@ void VoronoiDiagram::initialize() {
     g[v01].init_dist( gen3 );
     g[v02].init_dist( gen1 );
     g[v03].init_dist( gen2 );
-    // add initial sites to graph
-    HEVertex g1 = g.add_vertex( VoronoiVertex( gen1 , OUT, POINTSITE) );
-    HEVertex g2 = g.add_vertex( VoronoiVertex( gen2 , OUT, POINTSITE) );
-    HEVertex g3 = g.add_vertex( VoronoiVertex( gen3 , OUT, POINTSITE) );
-
-    HEEdge ge1 = g.add_edge(g1,g1); // null edges!
-    HEEdge ge2 = g.add_edge(g2,g2);
-    HEEdge ge3 = g.add_edge(g3,g3);
-    g[ge1].type = NULLEDGE; g[ge1].next = ge1;
-    g[ge2].type = NULLEDGE; g[ge2].next = ge2;
-    g[ge3].type = NULLEDGE; g[ge3].next = ge3;
+    // add initial sites to graph (if vertex_descriptors not held, why do we do this??)
+    g.add_vertex( VoronoiVertex( gen1 , OUT, POINTSITE) );
+    g.add_vertex( VoronoiVertex( gen2 , OUT, POINTSITE) );
+    g.add_vertex( VoronoiVertex( gen3 , OUT, POINTSITE) );
     
     // APEX 1
     Point apex1 = 0.5*(gen2+gen3);
@@ -105,6 +99,7 @@ void VoronoiDiagram::initialize() {
     g[f1].edge = e2;
     g[f1].site = new PointSite(gen3,f1);
     g[f1].status = NONINCIDENT;
+    //g[g3].site = g[f1].site;
     
     fgrid->add_face( g[f1] );
     g[e1_1].face = f1;
@@ -118,8 +113,6 @@ void VoronoiDiagram::initialize() {
     g[e3_1].next = e3_2;
     g[e3_2].next = e1_1;
     
-    g[ge3].face = f1;
-    
     // add face 2: v0-v02-v03 which encloses gen1
     HEEdge e4_1 = g.add_edge( v00, a2  );
     HEEdge e4_2 = g.add_edge( a2, v02 );
@@ -131,6 +124,7 @@ void VoronoiDiagram::initialize() {
     g[f2].edge = e5;
     g[f2].site = new PointSite(gen1,f2);
     g[f2].status = NONINCIDENT;
+    //g[g1].site = g[f2].site;
     
     fgrid->add_face( g[f2] );
     g[e4_1].face = f2;
@@ -144,8 +138,6 @@ void VoronoiDiagram::initialize() {
     g[e6_1].next = e6_2;
     g[e6_2].next = e4_1;
     
-    g[ge1].face = f2;
-    
     // add face 3: v0-v3-v1 which encloses gen2
     HEEdge e7_1 = g.add_edge( v00, a3 );  
     HEEdge e7_2 = g.add_edge( a3 , v03 );   
@@ -157,6 +149,8 @@ void VoronoiDiagram::initialize() {
     g[f3].edge = e8;
     g[f3].site = new PointSite(gen2,f3);
     g[f3].status = NONINCIDENT;
+    //g[g2].site = g[f3].site;
+    
     fgrid->add_face( g[f3] );
     g[e7_1].face = f3;
     g[e7_2].face = f3;
@@ -169,7 +163,6 @@ void VoronoiDiagram::initialize() {
     g[e9_1].next = e9_2;
     g[e9_2].next = e7_1;
     
-    g[ge2].face = f3;
     
     // set type. (note that edge-params x[8] and y[8] are not set!
     g[e1_1].type = LINE;  g[e1_1].set_parameters(g[f1].site, g[f3].site, false);
@@ -254,6 +247,7 @@ int VoronoiDiagram::insert_point_site(const Point& p, int step) {
     HEVertex new_vert = g.add_vertex( VoronoiVertex(p,OUT,POINTSITE) );
     Site* new_site =  new PointSite(p);
     
+    
     vertex_map.insert( std::pair<int,HEVertex>(g[new_vert].index,new_vert) );
     
     HEFace closest_face = fgrid->grid_find_closest_face( p ); 
@@ -273,10 +267,7 @@ if (step==current_step) return -1; current_step++;
 if (step==current_step) return -1; current_step++;
 
     HEFace newface = add_face( new_site );
-    HEEdge p_edge = g.add_edge(new_vert,new_vert); // NULLEDGE!
-    g[p_edge].face = newface;
-    g[p_edge].next = p_edge;
-    g[p_edge].type = NULLEDGE;
+    g[new_vert].face = newface;
     
     BOOST_FOREACH( HEFace f, incident_faces ) {
         add_edges(newface, f); // no newface2 parameter given!
@@ -285,7 +276,11 @@ if (step==current_step) return -1; current_step++;
 if (step==current_step) return -1; current_step++;
 
     repair_face( newface );
-    //std::cout << " new face: "; print_face( newface );
+    if (debug) { 
+        std::cout << " new face: "; 
+        print_face( newface );
+    }
+    
     remove_vertex_set();
     
 if (step==current_step) return -1; current_step++;
@@ -303,6 +298,7 @@ if (step==current_step) return -1; current_step++;
 bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
     num_lsites++;
     int current_step=1;
+    
     // find the vertices corresponding to idx1 and idx2
     HEVertex start=HEVertex(), end=HEVertex();    
     std::map<int,HEVertex>::iterator it_start, it_end;
@@ -314,42 +310,67 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
     if (debug)
         std::cout << " insert_line_site " << g[start].index << " - " << g[end].index << "\n";
     
-    Point start_dir = g[end].position - g[start].position;
-    g[start    ].set_alfa( start_dir*(-1) );
-    g[end    ].set_alfa( start_dir );
-    
-    EdgeVector  start_out_edges = g.out_edges(start);
-    assert(start_out_edges.size()==1);
-    HEEdge null_edge = start_out_edges[0];
-    HEEdge start_edge = find_null_edge(null_edge , numeric::diangle(start_dir.x,start_dir.y) );
-    if (debug)
-        std::cout << " insert_line_site: start_edge " << g[g.source(start_edge) ].index <<  " - " << g[g.target(start_edge) ].index<< "\n";
-        
-    EdgeVector  end_out_edges = g.out_edges(end);
-    assert(end_out_edges.size()==1);
-    HEEdge null_edge2 = end_out_edges[0];
-    HEEdge end_edge = find_null_edge(null_edge2 , numeric::diangle(-start_dir.x,-start_dir.y) );
-    
-    HEVertex seg_start = g.add_vertex( VoronoiVertex(g[start].position,OUT,ENDPOINT) );
-    g[seg_start].zero_dist();
-    add_vertex_in_half_edge(seg_start,start_edge); 
-    
-    HEVertex seg_end = g.add_vertex( VoronoiVertex(g[end].position,OUT,ENDPOINT) );
-    g[seg_end].zero_dist();
-    add_vertex_in_half_edge(seg_end,end_edge); 
-    
-    // set alfa values
-    g[seg_start].set_alfa( start_dir );
-    g[seg_end].set_alfa( start_dir*(-1) );
-    
-    if (debug) {
-        std::cout << " seg_start " << g[seg_start].index << " alfa= " << g[seg_start].alfa << "\n";
-        std::cout << " seg_end   " << g[seg_end].index << " alfa= " << g[seg_end].alfa << "\n";
-    }
     g[start].status=OUT; 
     g[end].status=OUT;     
     g[start].zero_dist();
     g[end].zero_dist();
+    
+    
+    Point start_dir = (g[end].position - g[start].position)*(-1);
+
+    HEVertex seg_start, seg_end; //, seg_end; // new end-point vertices
+    
+    HEFace start_null_face, end_null_face; // either existing or new null-faces at endpoints
+    
+    HEVertex pos_sep_start = HEVertex(); // optional separator endpoints at start
+    HEVertex neg_sep_start = HEVertex();
+    
+    HEVertex pos_sep_end = HEVertex(); // optional separator endpoints at end
+    HEVertex neg_sep_end = HEVertex();
+
+    
+    boost::tie(seg_start,start_null_face, pos_sep_start,neg_sep_start)
+     = find_null_face(start);
+    
+    boost::tie(seg_end,end_null_face, pos_sep_end,neg_sep_end)
+     = find_null_face(end);
+    
+    g[seg_start].set_alfa( start_dir*(-1) );
+    g[neg_sep_start].set_alfa( start_dir.xy_perp()*(-1) );
+    g[pos_sep_start].set_alfa( start_dir.xy_perp());
+    
+    g[seg_end].set_alfa( start_dir );
+    g[neg_sep_end].set_alfa( start_dir.xy_perp()*(+1) );
+    g[pos_sep_end].set_alfa( start_dir.xy_perp()*(-1) );
+    
+    if (debug) {
+        std::cout << " start null face : "; print_face(start_null_face);
+        std::cout << " end null face : "; print_face(end_null_face);
+    }
+    HEEdge start_null_edge = g[start_null_face].edge;
+    HEEdge end_null_edge = g[end_null_face].edge;
+    
+    //assert(0);
+    
+    //EdgeVector  start_out_edges = g.out_edges(start);
+    //assert(start_out_edges.size()==1);
+    //HEEdge null_edge = start_out_edges[0];
+    //HEEdge start_edge = find_null_edge(start_null_edge , numeric::diangle(start_dir.x,start_dir.y) );
+    //if (debug)
+    //    std::cout << " insert_line_site: start_edge " << g[g.source(start_edge) ].index <<  " - " << g[g.target(start_edge) ].index<< "\n";
+    
+    //EdgeVector  end_out_edges = g.out_edges(end);
+    //assert(end_out_edges.size()==1);
+    //HEEdge null_edge2 = end_out_edges[0];
+    //HEEdge end_edge = find_null_edge(null_edge2 , numeric::diangle(-start_dir.x,-start_dir.y) );
+    
+
+    
+    //HEVertex seg_end = g.add_vertex( VoronoiVertex(g[end].position,OUT,ENDPOINT) );
+    //g[seg_end].zero_dist();
+    //add_vertex_in_half_edge(seg_end,end_edge); 
+    
+
     
     if (step==current_step) {
         std::cout << step << " : startvert=" << g[start].index << " endvert=" << g[end].index << "\n";
@@ -384,12 +405,16 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
     g[neg_edge].k = -1;
     g.twin_edges(pos_edge,neg_edge);
     assert( vd_checker->check_edge(pos_edge) && vd_checker->check_edge(neg_edge) );
-    
-    HEFace start_face = g[start_edge].face;
-    HEFace end_face = g[end_edge].face;
+    if (debug)
+        std::cout << " created pos/neg LineSite \n";
+        
+    HEFace start_face = g[ g[start_null_edge].twin ].face;
+    HEFace end_face = g[ g[end_null_edge].twin ].face;
 
     if (step==current_step) return false; current_step++;
-    
+    if (debug)
+        std::cout << " start/end face = " << start_face << " " << end_face << "\n";
+        
     // on the face of start-point, find the seed vertex
     HEVertex v_seed = find_seed_vertex(start_face, pos_site ) ;
     mark_vertex( v_seed, pos_site );
@@ -459,6 +484,10 @@ if (step==current_step) return false; current_step++;
     if (debug) {
         std::cout << "faces " << start_face << " " << end_face << " " << pos_face << " " << neg_face << " repaired \n";
         std::cout << "insert_line_site(" << g[start].index << "-"<< g[end].index << ") done.\n";
+        print_face(start_face);
+        print_face(end_face);
+        print_face(pos_face);
+        print_face(neg_face);
     }
     assert( vd_checker->face_ok( start_face ) );
     assert( vd_checker->face_ok( end_face ) );
@@ -466,6 +495,51 @@ if (step==current_step) return false; current_step++;
     assert( vd_checker->face_ok( neg_face ) );    
     assert( vd_checker->is_valid() );
     return true; 
+}
+
+boost::tuple<HEVertex,HEFace,HEVertex,HEVertex>
+VoronoiDiagram::find_null_face(HEVertex start) {
+    HEVertex seg_start = HEVertex(); // new end-point vertices
+    HEFace start_null_face; // either existing or new null-faces at endpoints
+    HEVertex pos_sep_start = HEVertex(); // optional separator endpoints at start
+    HEVertex neg_sep_start = HEVertex();
+    // find start null face, if it exists.
+    if (g[start].null_face != std::numeric_limits<HEFace>::quiet_NaN() ) {
+        std::cout << " existing start_null_face : " << g[start].null_face << "\n";
+        start_null_face = g[start].null_face;
+        // find out if we can add pos/neg separators (or regular verts?) to the null face?
+        
+    } else {
+        // create a null face at start
+        start_null_face = g.add_face(); //  this face to the left of start->end edge    
+        std::cout << " creating new start_null_face " << start_null_face << "\n";
+        seg_start = g.add_vertex( VoronoiVertex(g[start].position,OUT,ENDPOINT) );
+        //g[seg_start].set_alfa( start_dir*(-1) );
+        g[seg_start].zero_dist();
+        pos_sep_start = g.add_vertex( VoronoiVertex(g[start].position,OUT,NORMAL) );
+        //g[pos_sep_start].set_alfa( g[seg_start].alfa+1 );
+        neg_sep_start = g.add_vertex( VoronoiVertex(g[start].position,OUT,NORMAL) );
+        //g[neg_sep_start].set_alfa( g[seg_start].alfa-1 );
+        
+        HEEdge e1,e1_tw;
+        boost::tie(e1,e1_tw) = g.add_twin_edges(seg_start,neg_sep_start);
+        HEEdge e2,e2_tw;
+        boost::tie(e2,e2_tw) = g.add_twin_edges(neg_sep_start,pos_sep_start);
+        HEEdge e3,e3_tw;
+        boost::tie(e3,e3_tw) = g.add_twin_edges(pos_sep_start,seg_start);
+        g[start_null_face].edge = e1;
+        
+        g[e1].next = e2; g[e2].next = e3; g[e3].next = e1;
+        g[e1_tw].next = e3_tw; g[e3_tw].next = e2_tw; g[e2_tw].next = e1_tw;
+        g[e1].face = start_null_face; g[e2].face = start_null_face; g[e3].face = start_null_face;
+        g[e1_tw].face = g[start].face; g[e3_tw].face = g[start].face; g[e2_tw].face = g[start].face;
+        
+        g[e1].type = NULLEDGE; g[e2].type = NULLEDGE; g[e3].type = NULLEDGE;
+        g[e1_tw].type = NULLEDGE; g[e3_tw].type = NULLEDGE; g[e2_tw].type = NULLEDGE;
+        
+        g[start].null_face = start_null_face;
+    }
+    return boost::make_tuple(seg_start,start_null_face,pos_sep_start,neg_sep_start);
 }
 
 /// add separator on the face f, which contains the endpoint

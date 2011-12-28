@@ -18,6 +18,7 @@
 */
 
 #include <cassert>
+#include <limits>
 
 #include <boost/assign.hpp>
 
@@ -34,7 +35,7 @@ int VoronoiVertex::count = 0;
 VertexDegreeMap VoronoiVertex::expected_degree = boost::assign::map_list_of 
     (OUTER,4)     // special outer vertices
     (NORMAL,6)    // normal vertex in the graph
-    (POINTSITE,2) // point site
+    (POINTSITE,0) // point site
     (ENDPOINT,8)  // end-point of line or arc
     (SPLIT,4)     // split point, to avoid loops in delete-tree
     (APEX,4) ;    // apex point on quadratic bisector
@@ -66,6 +67,8 @@ void VoronoiVertex::init() {
     count++;
     in_queue = false;
     alfa=-1; // invalid/non-initialized alfa value
+    null_face = std::numeric_limits<HEFace>::quiet_NaN();
+    
 }
 /// set in_queue false, and status to UNDECIDED
 void VoronoiVertex::reset() {

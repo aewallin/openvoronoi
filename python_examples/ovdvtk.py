@@ -32,6 +32,7 @@ blue= (0,0,1)
 lblue= ( float(125)/255,float(191)/255,float(255)/255 )
 blue2= ( float(0)/255,float(188)/255,float(255)/255 )
 cyan=  (0,1,1)
+mag2 =( float(123)/255 , float(35)/255 , float(251)/255  )
 magenta = ( float(153)/255 , float(42)/255 , float(165)/255  )
 
 
@@ -48,7 +49,7 @@ class VD:
         self.edges =[]
         self.gens =[]
         self.actors=[]
-        self.pointsiteColor = orange
+        self.pointsiteColor = yellow
         self.generatorColor = yellow
         self.vertexColor = blue
         self.seedColor = pink
@@ -314,7 +315,7 @@ class VD:
         if (edgeType == ovd.VoronoiEdgeType.OUTEDGE):
             return pink
         if (edgeType == ovd.VoronoiEdgeType.SEPARATOR):
-            return self.edgeStatusColor(src_status,trg_status, orange)
+            return self.edgeStatusColor(src_status,trg_status, mag2)
         if (edgeType == ovd.VoronoiEdgeType.LINESITE):
             return yellow
         if (edgeType == ovd.VoronoiEdgeType.PARABOLA):

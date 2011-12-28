@@ -190,17 +190,36 @@ bool VoronoiDiagramChecker::all_faces_ok() {
     return true;
 }
 
-bool VoronoiDiagramChecker::face_ok(HEFace f) {
+bool VoronoiDiagramChecker::face_ok(HEFace f, bool debug) {
     HEEdge current_edge = vd->g[f].edge;
+    //std::cout << " face_ok( " << f << " )\n";
+    
     HEEdge start_edge= current_edge;
     double k = vd->g[current_edge].k;
-    assert( (k==1) || (k==-1) );
-    if ( vd->g[f].site->isPoint() ) {
-        if ( !(k==1) )
-            return false;
+    if ( !((k==1) || (k==-1)) ) {
+        std::cout << " face_ok " << f << " ERROR:\n";
+        std::cout << " illegal k-value for edge:";
+        std::cout << vd->g[ vd->g.source(current_edge)].index << " - "; 
+        std::cout <<  vd->g[ vd->g.target(current_edge)].index  ;
+        std::cout << " k= " << k << "\n";
+        return false;
+    }
+    if (vd->g[f].site!=0) { // guard against null-faces that dont have Site
+        if ( vd->g[f].site->isPoint() ) {
+            if ( !(k==1) )
+                return false;
+        }
     }
     int n=0;
+    if (debug) std::cout << " checking face " << f << "\n";
     do {
+        if(debug) {
+            std::cout << " edge: " << vd->g[ vd->g.source(current_edge)].index << " - "; 
+            std::cout <<  vd->g[ vd->g.target(current_edge)].index  ;
+            std::cout << " edge.face= " << vd->g[ current_edge ].face;
+            std::cout << " edge.k= " << vd->g[ current_edge ].k;
+            std::cout << "\n";
+        }
         if (vd->g[current_edge].k != k ) // all edges should have the same k-value
             return false;
         if ( !current_face_equals_next_face(current_edge) ) // all edges should have the same face

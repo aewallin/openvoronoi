@@ -80,7 +80,7 @@ class VoronoiDiagram {
 
         int insert_point_site(const Point& p, int step=0);
 
-        bool insert_line_site(int idx1, int idx2, int step=10);
+        bool insert_line_site(int idx1, int idx2, int step=13);
         /// return the far radius
         double get_far_radius() const {return far_radius;}
         /// return number of point sites in diagram
@@ -120,12 +120,13 @@ class VoronoiDiagram {
         void   add_edges(HEFace new_f1, HEFace f, HEFace new_f2 = 0);
         void   add_edge(EdgeData ed, HEFace new1, HEFace new2=0);
         void   add_vertex_in_edge(HEVertex v, HEEdge e);
-        void   add_vertex_in_half_edge( HEVertex v, HEEdge e);
+        //void   add_vertex_in_half_edge( HEVertex v, HEEdge e);
         void   add_separator(HEFace f, HEFace nf, HEVertex endp, Site* s1, Site* s2);
         void   add_split_vertex(HEFace f, Site* s);
         
         boost::tuple<HEVertex,HEFace,HEVertex,HEVertex>
             find_null_face(HEVertex start);
+        boost::tuple<HEEdge,HEVertex,HEEdge,bool> find_separator_target(HEFace f, HEVertex endp);
         
         void repair_face( HEFace f );
         void remove_vertex_set();

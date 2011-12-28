@@ -53,7 +53,7 @@ public:
     bool incidentFaceVerticesConnected(  VoronoiVertexStatus Vtype );
     bool in_circle_is_negative( const Point& p, HEVertex minimalVertex );
     bool current_face_equals_next_face( HEEdge e); 
-    bool face_ok(HEFace f);
+    bool face_ok(HEFace f, bool debug=false);
     bool all_faces_ok();
     bool check_edge(HEEdge e) const ;
     

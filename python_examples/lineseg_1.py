@@ -7,9 +7,6 @@ import math
 import random
 import os
 
-
-
-
 def drawLine(myscreen, p1, p2):
     myscreen.addActor( ovdvtk.Line( p1 = (p1.x,p1.y,0), p2=(p2.x,p2.y,0), color = ovdvtk.yellow ) )
 
@@ -97,7 +94,7 @@ if __name__ == "__main__":
     vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
     vod.drawFarCircle()
     
-    #vod.textScale = 0.002
+    vod.textScale = 0.02
     vod.vertexRadius = 0.0031
     vod.drawVertices=1
     #vod.drawVertexIndex=0
@@ -134,13 +131,13 @@ if __name__ == "__main__":
     
     id1 = id_list[0]
     id2 = id_list[1]
-    #id3 = id_list[2]
-    #id4 = id_list[3]
+    id3 = id_list[2]
+    id4 = id_list[3]
     print "add segment ",id1, " to ", id2
     vd.debug_on()
     #vd.addLineSite( id1, id2 )
-    vd.addLineSite( id1, id2 ,6)
-    #vd.addLineSite3( id3, id4 )
+    vd.addLineSite( id1, id2 )
+    vd.addLineSite( id3, id4 )
     t_after = time.time()
     calctime = t_after-t_before
     times.append(calctime)

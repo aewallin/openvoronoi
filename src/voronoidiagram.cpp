@@ -328,18 +328,22 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
 
     
     boost::tie(seg_start, start_null_face, pos_sep_start, neg_sep_start)
-     = find_null_face(start);
+     = find_null_face(start, end);
     
     boost::tie(seg_end, end_null_face, pos_sep_end, neg_sep_end)
-     = find_null_face(end);
+     = find_null_face(end, start);
     
     g[seg_start].set_alfa( start_dir*(-1) );
-    g[neg_sep_start].set_alfa( start_dir.xy_perp()*(-1) );
-    g[pos_sep_start].set_alfa( start_dir.xy_perp() );
+    if (neg_sep_start != HEVertex() )
+        g[neg_sep_start].set_alfa( start_dir.xy_perp()*(-1) );
+    if (pos_sep_start != HEVertex() )
+        g[pos_sep_start].set_alfa( start_dir.xy_perp() );
     
     g[seg_end].set_alfa( start_dir );
-    g[neg_sep_end].set_alfa( start_dir.xy_perp()*(+1) );
-    g[pos_sep_end].set_alfa( start_dir.xy_perp()*(-1) );
+    if (neg_sep_end != HEVertex() )
+        g[neg_sep_end].set_alfa( start_dir.xy_perp()*(+1) );
+    if (pos_sep_end != HEVertex() )
+        g[pos_sep_end].set_alfa( start_dir.xy_perp()*(-1) );
     
     if (debug) {
         std::cout << " start null face : "; print_face(start_null_face);
@@ -347,8 +351,6 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
     }
     HEEdge start_null_edge = g[start_null_face].edge;
     HEEdge   end_null_edge = g[end_null_face  ].edge;
-    
-    //assert(0);
         
     if (step==current_step) {
         std::cout << step << " : startvert=" << g[start].index << " endvert=" << g[end].index << "\n";
@@ -395,10 +397,11 @@ if (step==current_step) return false; current_step++;
         
     // on the face of start-point, find the seed vertex
     HEVertex v_seed = find_seed_vertex(start_face, pos_site ) ;
+    if (debug)
+        std::cout << " start face seed  = " << g[v_seed].index << "\n";
     mark_vertex( v_seed, pos_site );
     modified_vertices.insert( v_seed );
-    if (debug)
-        std::cout << " start face seed  = " << g[v_seed].index << " " << g[v_seed].position << "\n";
+
     
 if (step==current_step) return false; current_step++;
 
@@ -504,21 +507,72 @@ if (step==current_step) return false; current_step++;
 }
 
 boost::tuple<HEVertex,HEFace,HEVertex,HEVertex>
-VoronoiDiagram::find_null_face(HEVertex start) {
+VoronoiDiagram::find_null_face(HEVertex start, HEVertex other) {
     HEVertex seg_start = HEVertex(); // new end-point vertices
     HEFace start_null_face; // either existing or new null-faces at endpoints
     HEVertex pos_sep_start = HEVertex(); // optional separator endpoints at start
     HEVertex neg_sep_start = HEVertex();
-    // find start null face, if it exists.
+    
     if (g[start].null_face != std::numeric_limits<HEFace>::quiet_NaN() ) {
-        std::cout << " existing start_null_face : " << g[start].null_face << "\n";
+        // there is an existing null face
+        if (debug) std::cout << " endp= " << g[start].index << " existing null_face : " << g[start].null_face << "\n";
         start_null_face = g[start].null_face;
+        seg_start = g.add_vertex( VoronoiVertex(g[start].position,OUT,ENDPOINT) );
+        g[seg_start].zero_dist();
+        
+        
+
+        // find the edge on the null-face where we insert seg_start
+        HEEdge current = g[start_null_face].edge;
+        HEEdge start_edge = current;
+        Point dir = g[other].position - g[start].position;
+        double alfa = numeric::diangle( dir.x, dir.y );
+        HEEdge insert_edge= HEEdge();
+        bool found = false;
+        do {
+            HEVertex src = g.source(current);
+            HEVertex trg = g.target(current);
+            if ( numeric::diangle_bracket( g[src].alfa, alfa, g[trg].alfa ) ) {
+                    insert_edge = current;
+                    found = true;
+            }
+            current = g[current].next;
+        } while (current!=start_edge && !found);
+        assert( insert_edge != HEEdge() );
+        add_vertex_in_edge(seg_start,insert_edge);
+        
+        // delete/contract everything until separator.alfa OR endpoint reached
+        //
+        // insert seppoint or normal vertex
+        
         // find out if we can add pos/neg separators (or regular verts?) to the null face?
+        current = g[start_null_face].edge;
+        start_edge = current;
+        found = false;
+        std::cout << "inserting frwd vertex/seppoint: ";
+        std::cout << " endp= " << g[seg_start].index << " alfa= " << alfa << "\n";
+        Point neg_sep_dir = dir.xy_perp();
+        double neg_sep_alfa = numeric::diangle( neg_sep_dir.x, neg_sep_dir.y );
+        std::cout << " neg_sep_alfa = " << neg_sep_alfa << "\n";
+        do { // "forward" loop from seg_start
+            HEVertex src = g.source(current);
+            HEVertex trg = g.target(current);
+            if ( src == seg_start ) {
+                std::cout << " trg= " << g[trg].index << " alfa = " << g[trg].alfa << "\n";
+                if ( numeric::diangle_bracket( g[src].alfa, neg_sep_alfa, g[trg].alfa) ) {
+                    
+                    neg_sep_start = g.add_vertex( VoronoiVertex(g[start].position,OUT,SEPPOINT) );
+                    std::cout << " adding neg_sep " << g[neg_sep_start].index << "\n";
+                    add_vertex_in_edge(neg_sep_start,current);
+                }
+            }
+            current=g[current].next;
+        } while (current!=start_edge && !found);
         
     } else {
-        // create a null face at start
+        // create a new null face at start
         start_null_face = g.add_face(); //  this face to the left of start->end edge    
-        std::cout << " creating new start_null_face " << start_null_face << "\n";
+        std::cout << " endp= " << g[start].index <<  " creating new null_face " << start_null_face << "\n";
         seg_start = g.add_vertex( VoronoiVertex(g[start].position,OUT,ENDPOINT) );
         g[seg_start].zero_dist();
         pos_sep_start = g.add_vertex( VoronoiVertex(g[start].position,OUT,SEPPOINT) );
@@ -545,6 +599,7 @@ VoronoiDiagram::find_null_face(HEVertex start) {
         
         g[start].null_face = start_null_face;
     }
+    //if (debug) std::cout << " find_null_face() DONE\n";
     return boost::make_tuple(seg_start,start_null_face,pos_sep_start,neg_sep_start);
 }
 

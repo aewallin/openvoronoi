@@ -47,11 +47,16 @@ if __name__ == "__main__":
     # for vtk visualization
     vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
     vod.drawFarCircle()
+
+    
     vod.textScale = 0.02
     vod.vertexRadius = 0.0031
     vod.drawVertices=1
-    vod.drawVertexIndex=1
+    #vod.drawVertexIndex=0
     vod.drawGenerators=1
+    
+    vod.offsetEdges = 1
+    vd.setEdgeOffset(0.05)
     
     
     linesegs = 1 # switch to turn on/off line-segments
@@ -61,12 +66,12 @@ if __name__ == "__main__":
     eps=0.9
     p1=ovd.Point(-0.1,-0.2)
     p2=ovd.Point(0.2,0.1)
-    p2=p1+eps*(p2-p1)
-    p3=ovd.Point(0.2,0.11)
-    p4=ovd.Point(-0.2,0.3)
-    p3=p4+eps*(p3-p4)
+    #p2=p1+eps*(p2-p1)
+    #p3=ovd.Point(0.2,0.11)
+    p4=ovd.Point(0.4,0.2)
+    #p3=p4+eps*(p3-p4)
     #pts = [ovd.Point(-0.1,-0.2) , ovd.Point(0.2,0.1), ovd.Point(0.21,0.11), ovd.Point(-0.2,0.3)]
-    pts = [p1,p2,p3,p4]
+    pts = [p1,p2,p4]
     
     #t_after = time.time()
     #print ".done in {0:.3f} s.".format( t_after-t_before )
@@ -96,7 +101,7 @@ if __name__ == "__main__":
     vd.addLineSite( id_list[0], id_list[1] )
     vd.check()
     vd.debug_on()
-    vd.addLineSite( id_list[2], id_list[3])
+    vd.addLineSite( id_list[1], id_list[2],9)
     #for s in id_list:
     #    if n<= nsegs and linesegs==1:
     #        vd.addLineSite(s[0],s[1])
@@ -120,11 +125,13 @@ if __name__ == "__main__":
     # 3 identify seed-vertex
     # 4 create delete-tree
     # 5 create new vertices
-    # 6 add startpoint separator
-    # 7 add endpoint separator
-    # 8 add new edges
-    # 9 delete delete-tree edges
-    # 10 reset status
+    # 6 add startpoint pos separator
+    # 7 add startoiubt neg separator
+    # 8 add end-point pos separator
+    # 9 add end-point neg separator
+    # 10 add new edges
+    # 11 delete delete-tree edges
+    # 12 reset status
             
     vod.setVDText2(times)
     

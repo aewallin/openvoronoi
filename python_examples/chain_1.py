@@ -101,7 +101,7 @@ if __name__ == "__main__":
     vd.addLineSite( id_list[0], id_list[1] )
     vd.check()
     vd.debug_on()
-    vd.addLineSite( id_list[1], id_list[2],9)
+    vd.addLineSite( id_list[1], id_list[2],5)
     #for s in id_list:
     #    if n<= nsegs and linesegs==1:
     #        vd.addLineSite(s[0],s[1])

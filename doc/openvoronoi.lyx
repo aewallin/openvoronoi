@@ -130,7 +130,7 @@ Point sites are defined by their xy-coordinates
 \begin_layout Standard
 \begin_inset Formula 
 \begin{equation}
-x_{C}^{2}+y_{C}^{2}=t^{2}\label{eq:pointOffset}
+\left(x-x_{C}\right)^{2}+\left(y-y_{C}\right)^{2}=t^{2}\label{eq:pointOffset}
 \end{equation}
 
 \end_inset
@@ -885,21 +885,10 @@ reference "eq:line-edge-vector"
 \begin_inset Formula 
 \[
 \begin{array}{c}
-x_{PP}^{\pm}(t)=\tfrac{x_{1}+x_{2}}{2}\pm d_{y}\sqrt{t^{2}-\nicefrac{d^{2}}{4}}\\
-y_{PP}^{\pm}(t)=\tfrac{y_{1}+y_{2}}{2}\mp d_{x}\sqrt{t^{2}-\nicefrac{d^{2}}{4}}
+x_{PP}^{\pm}(t)=\tfrac{x_{1}+x_{2}}{2}\pm\left(-d_{y}\right)\sqrt{t^{2}-\frac{d^{2}}{4}}\\
+y_{PP}^{\pm}(t)=\tfrac{y_{1}+y_{2}}{2}\pm d_{x}\sqrt{t^{2}-\frac{d^{2}}{4}}
 \end{array}
 \]
-
-\end_inset
-
-
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-should signs be opposite? i.e.
- minus-plus for x-coord, and plus-minus for y-coord?
-\end_layout
 
 \end_inset
 

@@ -188,7 +188,7 @@ void EdgeProps::set_pl_parameters(Site* s1, Site* s2) {
     
     type = PARABOLA;
     double alfa3 = s2->a()*s1->x() + s2->b()*s1->y() + s2->c();
-    // figure out k, i.e. offset-direction for LineSite
+    // figure out kk, i.e. offset-direction for LineSite
     double kk = 1.0;
     if (alfa3>0.0) {
         kk = -1.0;
@@ -198,16 +198,16 @@ void EdgeProps::set_pl_parameters(Site* s1, Site* s2) {
     
     x[0]=s1->x();       // xc1
     x[1]=s2->a()*alfa3; // alfa1*alfa3
-    x[2]=s2->a()*kk;      // -alfa1 = - a2 * k2?
+    x[2]=s2->a()*kk;    // -alfa1 = - a2 * k2?
     x[3]=s2->b();       // alfa2 = b2
     x[4]=0;             // alfa4 = r1 
     x[5]=+1;            // lambda1 (allways positive offset from PointSite?)
-    x[6]=alfa3;        // alfa3= a2*xc1+b2*yc1+d2?
+    x[6]=alfa3;         // alfa3= a2*xc1+b2*yc1+d2?
     x[7]=kk;            // -1 = k2 side of line??
 
     y[0]=s1->y();       // yc1
     y[1]=s2->b()*alfa3; // alfa2*alfa3
-    y[2]=s2->b()*kk;      // -alfa2 = -b2
+    y[2]=s2->b()*kk;    // -alfa2 = -b2
     y[3]=s2->a();       // alfa1 = a2
     y[4]=0;             // alfa4 = r1
     y[5]=+1;            // lambda1 (allways positive offset from PointSite?)

@@ -68,7 +68,24 @@ Anders Wallin (anders.e.e.wallin@gmail.com)
 \end_layout
 
 \begin_layout Standard
-Notes on positioning vertices and edge-parametrization for 2D voronoi diagrams.
+Notes on positioning vertices and edge-parametrization for 2D voronoi diagrams
+ with point, line-segment, and circular-arc sites.
+\end_layout
+
+\begin_layout Standard
+These notes should describe the reasoning behind OpenVoronoi, available
+ at 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://github.com/aewallin/openvoronoi
+\end_layout
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Section
@@ -680,10 +697,6 @@ General offset equation parameters.
 
 \end_layout
 
-\begin_layout Plain Layout
-
-\end_layout
-
 \end_inset
 
 
@@ -716,8 +729,8 @@ Edges
 \begin_layout Standard
 Edges (or bisectors) in the diagram are defined by their two adjacent (and
  equidistant) sites.
- For offset-generation it is useful to parametrize the edges by the offset-dista
-nce (or clearance-disk radius).
+ For offset-generation it is useful to parametrize an edge by the offset-distanc
+e (or clearance-disk radius).
  Edges are split by apex-vertices so that the offset-distance 
 \begin_inset Formula $t$
 \end_inset
@@ -790,7 +803,11 @@ p_{A}=\tfrac{1}{2}(p_{1}+p_{2}),
 \end_layout
 
 \begin_layout Standard
-where 
+where a perpendicular vector to 
+\begin_inset Formula $v$
+\end_inset
+
+ is denoted by 
 \begin_inset Formula $v^{P}=(v_{x},v_{y})^{P}=(-v_{y},v_{x})$
 \end_inset
 
@@ -822,7 +839,11 @@ name "fig:pp-edge"
 
 \end_inset
 
-Point-Point edge between point sites 
+Point-Point edge 
+\begin_inset Formula $e_{PP}(t)$
+\end_inset
+
+ between point sites 
 \begin_inset Formula $p_{1}$
 \end_inset
 
@@ -874,6 +895,104 @@ The edge between two line sites
 \end_inset
 
  is a line.
+ We solve
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\left\{ \begin{array}{c}
+a_{1}x+b_{1}y+c_{1}+k_{1}t=0\\
+a_{2}x+b_{2}y+c_{2}+k_{2}t=0
+\end{array}\right.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The apex 
+\begin_inset Formula $p_{A}$
+\end_inset
+
+ is located at the intersection point between 
+\begin_inset Formula $l_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $l_{2}$
+\end_inset
+
+.
+ Thus 
+\begin_inset Formula $t_{min}=0$
+\end_inset
+
+.
+ The case where 
+\begin_inset Formula $l_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $l_{2}$
+\end_inset
+
+ do not intersect is a special case which must be handled separately.
+ The direction 
+\begin_inset Formula $\hat{v}$
+\end_inset
+
+ of the edge is along the average of the tangents to 
+\begin_inset Formula $l_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $l_{2}$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Subsection
+Point-Arc Edge
+\end_layout
+
+\begin_layout Subsection
+Line-Arc Edge
+\end_layout
+
+\begin_layout Subsection
+Arc-Arc Edge
+\end_layout
+
+\begin_layout Subsection
+A General Edge representation
+\end_layout
+
+\begin_layout Standard
+Held's thesis introduces the following general edge parametrisation, which
+ can be used to represent all edge-types presented above:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\left\{ \begin{array}{c}
+x^{\pm}(t)=x_{1}-x_{2}+x_{3}t\pm x_{4}\sqrt{\left(x_{5}+x_{6}t\right)^{2}-\left(x_{7}+x_{8}t\right)^{2}}\\
+y^{\pm}(t)=y_{1}-y_{2}+y_{3}t\pm y_{4}\sqrt{\left(y_{5}+y_{6}t\right)^{2}-\left(y_{7}+y_{8}t\right)^{2}}
+\end{array}\right.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Where the parameters are given by:
 \end_layout
 
 \end_body

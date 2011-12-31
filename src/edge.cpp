@@ -383,6 +383,7 @@ double EdgeProps::minimum_pl_t(Site* , Site* ) {
     return mint;
 }
 
+
 void EdgeProps::print_params() const {
     std::cout << "x-params: ";
     for (int m=0;m<8;m++)

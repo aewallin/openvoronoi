@@ -87,6 +87,7 @@ namespace numeric {
     double diangle_y(double a);
     std::pair<double,double> diangle_xy(double a);
     bool diangle_bracket(double less, double a, double more);
+    double diangle_mid(double alfa1, double alfa2);
     
 } // numeric
 } // ovd

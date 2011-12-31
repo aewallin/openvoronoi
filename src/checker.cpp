@@ -255,6 +255,7 @@ bool VoronoiDiagramChecker::current_face_equals_next_face( HEEdge e) {
         std::cout << "   current.face = " << vd->g[e].face << " IS NOT next_face = " << vd->g[ vd->g[e].next ].face << std::endl;
         HEVertex c_trg = vd->g.target( e );
         HEVertex c_src = vd->g.source( e );
+
         HEVertex n_trg = vd->g.target( vd->g[e].next );
         HEVertex n_src = vd->g.source( vd->g[e].next );
         

@@ -152,6 +152,9 @@ Edge add_edge( Vertex v1, Vertex  v2, const TEdgeProperties& prop ) {
 
 /// make e1 the twin of e2 (and vice versa)
 void twin_edges( Edge e1, Edge e2 ) {
+    assert( target(e1) == source(e2) );
+    assert( source(e1) == target(e2) );
+    
     g[e1].twin = e2;
     g[e2].twin = e1;
 }
@@ -528,6 +531,19 @@ protected:
     bool m_inc;
 };
 
+void set_next(Edge e1, Edge e2) {
+    if (target(e1) != source(e2) ){
+        std::cout << " ERROR target(e1) = " << g[target(e1)].index << " source(e2)= " << g[source(e2)].index << "\n"; 
+    }
+    assert( target(e1) == source(e2) );
+    g[e1].next = e2;
+}
+
+void set_next_cycle(Edge e1, Edge e2, Edge e3) {
+    set_next(e1,e2);
+    set_next(e2,e3);
+    set_next(e3,e1);
+}
 
 std::pair<edge_iterator , edge_iterator  > face_edges_itr(Face f) {
     edge_iterator  itr1( g, faces[f].edge );

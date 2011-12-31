@@ -79,6 +79,7 @@ public:
     void copy_parameters(EdgeProps& other);   
     void set_parameters(Site* s1, Site* s2, bool sig);
     void set_sep_parameters(Point& endp, Point& p);
+    //void set_next(HEEdge n);
 private:
     Point projection_point(Solution& sl) const;
     double minimum_pp_t(Site* s1, Site* s2);

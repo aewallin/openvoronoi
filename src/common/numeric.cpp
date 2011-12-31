@@ -96,7 +96,19 @@ namespace numeric {
         
         return false;
     }
-    
+    // return average of input angles
+    double diangle_mid(double alfa1, double alfa2) {
+        if (alfa1<=alfa2)
+            return (alfa1+alfa2)/2;
+        else {
+            double opposite_mid = alfa2 + (alfa1-alfa2)/2;
+            double mid = opposite_mid + 2;
+            if (mid>4)
+                mid=mid-4;
+            assert( (0<=mid) && (mid<=4) );
+            return mid;
+        }
+    }
 } // numeric
 } // ovd
 

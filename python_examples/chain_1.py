@@ -97,11 +97,11 @@ if __name__ == "__main__":
     #nsegs = 5 #Nmax
     #n=1
     t_before = time.time()
-    
-    vd.addLineSite( id_list[0], id_list[1] )
-    vd.check()
     vd.debug_on()
-    vd.addLineSite( id_list[1], id_list[2],5)
+    vd.addLineSite( id_list[0], id_list[1], 12)
+    #vd.check()
+    
+    #vd.addLineSite( id_list[1], id_list[2],10)
     #for s in id_list:
     #    if n<= nsegs and linesegs==1:
     #        vd.addLineSite(s[0],s[1])

@@ -124,9 +124,18 @@ class VoronoiDiagram {
         void   add_split_vertex(HEFace f, Site* s);
         
         boost::tuple<HEVertex,HEFace,HEVertex,HEVertex>
-            find_null_face(HEVertex start, HEVertex other);
+            find_null_face(HEVertex start, HEVertex other, Point l);
         boost::tuple<HEEdge,HEVertex,HEEdge,bool> find_separator_target(HEFace f, HEVertex endp);
+        std::pair<HEEdge,HEEdge> find_next_prev(HEFace null_face, HEVertex endp);
+        HEVertex process_next_null(Point dir, HEEdge next_edge );
+        HEVertex process_prev_null(Point dir, HEEdge prev_edge );
         
+        HEVertex insert_sep_point(HEVertex endp, HEEdge edge, Point sep_dir);
+
+        //void process_prev_null(Point dir, HEEdge prev_edge );
+        //void convert_vertex(HEEdge prev, HEEdge next);
+
+
         void repair_face( HEFace f );
         void remove_vertex_set();
         void remove_split_vertex(HEFace f);
@@ -137,6 +146,7 @@ class VoronoiDiagram {
         void print_face(HEFace f);
         void print_vertices(VertexVector& q);
         void print_edges(EdgeVector& q);
+        void print_edge(HEEdge e);
     // HELPER-CLASSES
         /// sanity-checks on the diagram are done by this helper class
         VoronoiDiagramChecker* vd_checker;
@@ -165,6 +175,9 @@ class VoronoiDiagram {
         VertexQueue vertexQueue; 
         std::map<int,HEVertex> vertex_map;
         bool debug;
+        HEFace null_face1;
+        HEFace null_face2;
+        
 };
 
 // class for passing to numerical boost::toms748 root-finding algorithm

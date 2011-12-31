@@ -668,6 +668,10 @@ HEVertex VoronoiDiagram::process_prev_null(Point dir, HEEdge prev_edge , bool k3
             std::cout << "process_prev_null()  trg=(ENDPOINT) e="; print_edge(prev_edge);
         }
         if ( numeric::diangle_bracket( g[src].alfa, pos_sep_alfa, g[trg].alfa ) ) {
+            std::cout << " src " << g[src].index << " a= " << g[src].alfa << "\n"; 
+            std::cout << " trg " << g[trg].index << " a= " << g[trg].alfa << "\n"; 
+            std::cout << " pos_sep_alfa =  " << pos_sep_alfa << "\n";
+            
             assert(0); 
             // will this ever happen??   NEW_ENDP -> ENDP  AND we have room for a separator?
         }

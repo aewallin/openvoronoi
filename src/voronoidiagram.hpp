@@ -127,8 +127,8 @@ class VoronoiDiagram {
             find_null_face(HEVertex start, HEVertex other, Point l);
         boost::tuple<HEEdge,HEVertex,HEEdge,bool> find_separator_target(HEFace f, HEVertex endp);
         std::pair<HEEdge,HEEdge> find_next_prev(HEFace null_face, HEVertex endp);
-        HEVertex process_next_null(Point dir, HEEdge next_edge );
-        HEVertex process_prev_null(Point dir, HEEdge prev_edge );
+        HEVertex process_next_null(Point dir, HEEdge next_edge , bool k3);
+        HEVertex process_prev_null(Point dir, HEEdge prev_edge , bool k3);
         
         HEVertex insert_sep_point(HEVertex endp, HEEdge edge, Point sep_dir);
 
@@ -175,8 +175,12 @@ class VoronoiDiagram {
         VertexQueue vertexQueue; 
         std::map<int,HEVertex> vertex_map;
         bool debug;
+        
+        // these are used for guiding repair_face()
         HEFace null_face1;
         HEFace null_face2;
+        HEVertex segment_start;
+        HEVertex segment_end;
         
 };
 

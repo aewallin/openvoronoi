@@ -343,6 +343,9 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
     // these are used by repair_face() to avoid taking null-face edges
     null_face1=start_null_face;
     null_face2=end_null_face;
+    segment_start = seg_start;
+    segment_end = seg_end;
+    
     
     if (debug) {
         std::cout << " start null face : "; print_face(start_null_face);
@@ -548,12 +551,12 @@ std::pair<HEEdge,HEEdge> VoronoiDiagram::find_next_prev(HEFace null_face, HEVert
 // it is OK if either:
 // - the target is an ENDPOINT
 // - the target alfa is larger than the separator.alfa for seg_start
-HEVertex VoronoiDiagram::process_next_null(Point dir, HEEdge next_edge ) {
+HEVertex VoronoiDiagram::process_next_null(Point dir, HEEdge next_edge , bool k3) {
     HEVertex trg = g.target(next_edge);
     HEVertex src = g.source(next_edge);
     assert( g[src].type == ENDPOINT );
     HEVertex sep_point = HEVertex();
-    Point neg_sep_dir = dir.xy_perp();
+    Point neg_sep_dir = dir.xy_perp(); // call this pos?
     double neg_sep_alfa = numeric::diangle(neg_sep_dir.x,neg_sep_dir.y);
     
     if ( g[trg].type == ENDPOINT ) { // target is endpoint
@@ -561,10 +564,15 @@ HEVertex VoronoiDiagram::process_next_null(Point dir, HEEdge next_edge ) {
             std::cout << "process_next_null()  trg=(ENDPOINT) e="; print_edge(next_edge);
         }
         if ( numeric::diangle_bracket( g[src].alfa, neg_sep_alfa, g[trg].alfa ) ) {
+            assert(0);
             if (debug) {
                 std::cout << "process_next_null() inserting SEPPOINT"; print_edge(next_edge);
             }
             sep_point = insert_sep_point(src, next_edge, neg_sep_dir);
+            if (k3)
+                g[sep_point].k3=+1;
+            else
+                g[sep_point].k3=-1;
         }
     } else {
         if ( numeric::diangle_bracket( g[src].alfa, neg_sep_alfa, g[trg].alfa ) ) {
@@ -572,6 +580,11 @@ HEVertex VoronoiDiagram::process_next_null(Point dir, HEEdge next_edge ) {
                 std::cout << "process_next_null() inserting SEPPOINT in edge: "; print_edge(next_edge);
             }
             sep_point = insert_sep_point(src, next_edge, neg_sep_dir);
+            if (k3)
+                g[sep_point].k3=+1;
+            else
+                g[sep_point].k3=-1;
+
         } else {
             // target is not endpoint, and no room for separator, so we push it and convert it
             HEEdge next_next = g[next_edge].next;
@@ -580,22 +593,31 @@ HEVertex VoronoiDiagram::process_next_null(Point dir, HEEdge next_edge ) {
             g[trg].alfa = mid;
             g[trg].type = NORMAL;
             g[trg].status = NEW;
+            modified_vertices.insert(trg);
             if (debug) {
                 std::cout << "process_next_null()  push + convert v=" << g[trg].index << "\n"; 
                 std::cout << " position at mid of " << g[src].index << " and " << g[next_trg].index << "\n";
             }
+            if (k3)
+                g[trg].k3=+1;
+            else
+                g[trg].k3=-1;
+
         }
     }
     return sep_point;
 }
 
-HEVertex VoronoiDiagram::process_prev_null(Point dir, HEEdge prev_edge ) {
+HEVertex VoronoiDiagram::process_prev_null(Point dir, HEEdge prev_edge , bool k3) {
     HEVertex trg = g.target(prev_edge);
-    HEVertex src = g.source(prev_edge);
+    HEVertex src = g.source(prev_edge); // prev_edge is on null-face !
     assert( g[trg].type == ENDPOINT );
     
     HEVertex sep_point = HEVertex();
-    Point pos_sep_dir = dir.xy_perp()*(-1);
+    //int mult = -1;
+    //if (!k3)
+    //    mult = +1;
+    Point pos_sep_dir = dir.xy_perp()*(-1); //mult; // call this neg?
     double pos_sep_alfa = numeric::diangle(pos_sep_dir.x,pos_sep_dir.y);
     
     if ( g[src].type == ENDPOINT ) { //  endpoint
@@ -603,12 +625,20 @@ HEVertex VoronoiDiagram::process_prev_null(Point dir, HEEdge prev_edge ) {
             std::cout << "process_prev_null()  trg=(ENDPOINT) e="; print_edge(prev_edge);
         }
         if ( numeric::diangle_bracket( g[src].alfa, pos_sep_alfa, g[trg].alfa ) ) {
+            assert(0); 
             // will this ever happen??   NEW_ENDP -> ENDP  AND we have room for a separator?
             if (debug) {
                 std::cout << "process_prev_null() inserting SEPPOINT"; print_edge(prev_edge);
             }
             sep_point = insert_sep_point(src, prev_edge, pos_sep_dir);
+            if (k3)
+                g[sep_point].k3=-1;
+            else
+                g[sep_point].k3=+1;
+
         }
+        // insert normal NEW vertex here!
+        
     } else {
         if ( numeric::diangle_bracket( g[src].alfa, pos_sep_alfa, g[trg].alfa ) ) {
             if (debug) {
@@ -618,7 +648,20 @@ HEVertex VoronoiDiagram::process_prev_null(Point dir, HEEdge prev_edge ) {
                 std::cout << " pos_sep_alfa =  " << pos_sep_alfa << "\n";
             }
             sep_point = insert_sep_point(src, prev_edge, pos_sep_dir);
+            if (k3)
+                g[sep_point].k3=-1;
+            else
+                g[sep_point].k3=+1;
+
         } else {
+            if (debug) {
+                std::cout << "process_prev_null() no room for  SEPPOINT in edge "; print_edge(prev_edge);
+                std::cout << " src.alfa = " << g[src].alfa << "\n";
+                std::cout << " sep alfa = " << pos_sep_alfa << "\n";
+                std::cout << " trg.alfa = " << g[trg].alfa << "\n";
+
+            }
+
             // target is not endpoint, and no room for separator, so we push it and convert it
             HEEdge prev_prev = g.previous_edge(prev_edge);
             HEVertex prev_src = g.source(prev_prev);
@@ -626,6 +669,7 @@ HEVertex VoronoiDiagram::process_prev_null(Point dir, HEEdge prev_edge ) {
             g[src].alfa = mid;
             g[src].type = NORMAL;
             g[src].status = NEW;
+            modified_vertices.insert(src);
             // how to set k3 value??
             if (debug) {
                 std::cout << "process_prev_null()  push + convert v=" << g[src].index << "\n"; 
@@ -634,6 +678,11 @@ HEVertex VoronoiDiagram::process_prev_null(Point dir, HEEdge prev_edge ) {
                 std::cout << " trg " << g[trg].index << " a= " << g[trg].alfa << "\n"; 
                 std::cout << "  mid =  " << mid << "\n";
             }
+            if (k3)
+                g[src].k3=-1;
+            else
+                g[src].k3=+1;
+
         }
     }
     return sep_point;
@@ -660,6 +709,7 @@ VoronoiDiagram::find_null_face(HEVertex start, HEVertex other, Point left) {
     HEVertex neg_sep_start = HEVertex();
     Point dir = g[other].position - g[start].position;
     double alfa = numeric::diangle( dir.x, dir.y );
+    bool k3_sign = left.is_right( g[start].position , g[other].position); // this is used below and in find_null_face()
         
     if (g[start].null_face != std::numeric_limits<HEFace>::quiet_NaN() ) {
         // there is an existing null face
@@ -689,77 +739,20 @@ VoronoiDiagram::find_null_face(HEVertex start, HEVertex other, Point left) {
         // insert endpoint in null-edge
         add_vertex_in_edge(seg_start,insert_edge);
         
-        
-        
         if (debug) {
             std::cout << " null_face before sep/new vertices:\n";
             print_face(start_null_face);
         }
-        
         // delete/contract everything until separator.alfa OR endpoint reached
         
         HEEdge next_edge, prev_edge;
         boost::tie(next_edge,prev_edge) = find_next_prev(start_null_face, seg_start);
         assert( g[prev_edge].next == next_edge );
         
-        neg_sep_start = process_next_null(dir,next_edge);
+        neg_sep_start = process_next_null(dir,next_edge, k3_sign);
         
-        pos_sep_start = process_prev_null(dir,prev_edge);
-        
-        // process_prev_null(dir,prev_edge);
-        
-        /*
-        bool next_ok=false;
-        bool prev_ok=false;
-        do {  
-            
-            if ( next_null_ok( dir, next_edge ) )
-                next_ok = true;
-            else {
-                convert_vertex( g.previous_edge(next_edge), next_edge );
-            }
-            
-            if ( prev_null_ok( dir, prev_edge ) )
-                prev_ok = true;
-            else {
-                convert_vertex( g.previous_edge(prev_edge), prev_edge );
-            }
-            assert(0);
-        } while ( !next_ok || !prev_ok );
-        */
-        
-        
-        //
-        // insert seppoint or normal vertex
-        
-        // add one edge to next/prev.
-        // if there is space, add a seppoint for a separator
-        // if not, add a regular vertex 
-        
-        /*
-        current = g[start_null_face].edge;
-        start_edge = current;
-        found = false;
-        std::cout << "inserting frwd vertex/seppoint: ";
-        std::cout << " endp= " << g[seg_start].index << " alfa= " << alfa << "\n";
-        Point neg_sep_dir = dir.xy_perp();
-        double neg_sep_alfa = numeric::diangle( neg_sep_dir.x, neg_sep_dir.y );
-        std::cout << " neg_sep_alfa = " << neg_sep_alfa << "\n";
-        do { // "forward" loop around null-face from seg_start
-            HEVertex src = g.source(current);
-            HEVertex trg = g.target(current);
-            if ( src == seg_start ) {
-                std::cout << " trg= " << g[trg].index << " alfa = " << g[trg].alfa << "\n";
-                if ( numeric::diangle_bracket( g[src].alfa, neg_sep_alfa, g[trg].alfa) ) {
-                    neg_sep_start = g.add_vertex( VoronoiVertex(g[start].position,OUT,SEPPOINT) );
-                    std::cout << " adding neg_sep " << g[neg_sep_start].index << "\n";
-                    add_vertex_in_edge(neg_sep_start,current);
-                }
-            }
-            current=g[current].next;
-        } while (current!=start_edge && !found);
-        */
-        
+        pos_sep_start = process_prev_null(dir,prev_edge, k3_sign);
+
     } else {
         // create a new null face at start
         //
@@ -776,28 +769,20 @@ VoronoiDiagram::find_null_face(HEVertex start, HEVertex other, Point left) {
         
         g[pos_sep_start].zero_dist();
         g[neg_sep_start].zero_dist();
-
-        Point src_se = g[start].position;
-        Point trg_se = g[other].position;
-        // Point left = 0.5*(src_se+trg_se) + (trg_se-src_se).xy_perp();
-        bool linesite_k_sign = left.is_right(src_se,trg_se); // this is used below and in find_null_face()
     
-        if (linesite_k_sign) {
+        if (k3_sign) {
             g[pos_sep_start].k3 = +1; // works for start?
             g[neg_sep_start].k3 = -1;
-            //g[neg_sep_start].set_alfa( dir.xy_perp()*(+1) );
-            //g[pos_sep_start].set_alfa( dir.xy_perp()*(-1) );
-        } else {
-            
+        } else {            
             g[pos_sep_start].k3 = -1; // works for start?
             g[neg_sep_start].k3 = +1;
         }
         
+        g[pos_sep_start].set_alfa( dir.xy_perp()*(+1) );        
         g[neg_sep_start].set_alfa( dir.xy_perp()*(-1) );
-        g[pos_sep_start].set_alfa( dir.xy_perp()*(+1) );
         
         if (debug) {
-            std::cout << " linesite_sign = " << linesite_k_sign <<"\n"; 
+            std::cout << " k3_sign = " << k3_sign <<"\n"; 
             std::cout << " sep1 = " << g[pos_sep_start].index << " k3=" << g[pos_sep_start].k3 << "\n";
             std::cout << " sep2 = " << g[neg_sep_start].index << " k3=" << g[neg_sep_start].k3 << "\n";
         }
@@ -834,6 +819,8 @@ VoronoiDiagram::find_null_face(HEVertex start, HEVertex other, Point left) {
 /// s1 and s2 are the pos and neg LineSites
 void VoronoiDiagram::add_separator(HEFace f, HEFace null_face, HEVertex endp, Site* s1, Site* s2) {
     if (debug) std::cout << "add_separator() f="<<f<<" endp=" << g[endp].index << "\n";
+    assert( (g[endp].k3==1) || (g[endp].k3==-1) );    
+    
     HEEdge current = g[null_face].edge;
     assert( current != HEEdge() );
     HEEdge start = current;
@@ -1917,18 +1904,34 @@ void VoronoiDiagram::repair_face( HEFace f ) {
                 std::cout << "     candidate: " << g[ g.source(e) ].index << " - ";
                 std::cout << g[ g.target(e) ].index << " f= "<< g[e].face << " \n";
             }
-            if ( ( (g[out_target].status == NEW)    || 
+            if ( (out_target != current_source) && 
+                 ( (g[out_target].status == NEW)    || 
                    (g[out_target].type == ENDPOINT) || 
                    (g[out_target].type == SEPPOINT) ) ) { // these are the possible vertices we want to go to
-                /*
-                if ( (g[e].type == NULLEDGE) && (g[e].face!=null_face1) && (g[e].face!=null_face2) ) {
-                    //avoid taking edges of null-face
+                
+                
+                // special cases where we do a brute-force face-assignment for a null-edge
+                if ( (g[e].type == NULLEDGE) &&
+                     (
+                       // from sep to end
+                       ( (g[current_target].type==SEPPOINT) && (g[out_target].type == ENDPOINT) ) ||
+                       // or from end -> end to sep
+                       ( (g[current_source].type == ENDPOINT) && (g[current_target].type==ENDPOINT)  )
+                       ||
+                       (out_target == segment_start)
+                       ||
+                       (out_target == segment_end) 
+                     ) &&
+                     (g[e].face!=null_face1) && // not along a null-face edge!
+                     (g[e].face!=null_face2) ) {
+                         
                     g[e].face = f; // override face-assignment!
-                }*/
+                    g[e].k=g[current_edge].k; // override k-assignment!
+                }
                     
                 // the next vertex should not where we came from
                 // and it should be on the same face.
-                if ( (out_target != current_source) && (g[e].face == f) ) {  
+                if (  (g[e].face == f) ) {  
                     g[current_edge].next = e; // this is the edge we want to take
                     found_next_edge = true;
                     if(debug) {

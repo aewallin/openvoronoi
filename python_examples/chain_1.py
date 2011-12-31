@@ -66,12 +66,11 @@ if __name__ == "__main__":
     eps=0.9
     p1=ovd.Point(-0.1,-0.2)
     p2=ovd.Point(0.2,0.1)
-    #p2=p1+eps*(p2-p1)
-    #p3=ovd.Point(0.2,0.11)
-    p4=ovd.Point(0.4,0.2)
-    #p3=p4+eps*(p3-p4)
-    #pts = [ovd.Point(-0.1,-0.2) , ovd.Point(0.2,0.1), ovd.Point(0.21,0.11), ovd.Point(-0.2,0.3)]
-    pts = [p1,p2,p4]
+    p3=ovd.Point(0.4,0.2)
+    p4=ovd.Point(0.6,0.6)
+    p5=ovd.Point(-0.6,0.3)
+
+    pts = [p1,p2,p3,p4,p5]
     
     #t_after = time.time()
     #print ".done in {0:.3f} s.".format( t_after-t_before )
@@ -97,23 +96,28 @@ if __name__ == "__main__":
     #nsegs = 5 #Nmax
     #n=1
     t_before = time.time()
-    vd.debug_on()
-    vd.addLineSite( id_list[0], id_list[1], 12)
-    #vd.check()
+    #vd.debug_on()
+    vd.addLineSite( id_list[0], id_list[1])
+    vd.check()
     
-    #vd.addLineSite( id_list[1], id_list[2],10)
-    #for s in id_list:
-    #    if n<= nsegs and linesegs==1:
-    #        vd.addLineSite(s[0],s[1])
-    #        print n," added line-segment"
-    #    n=n+1
+    vd.addLineSite( id_list[1], id_list[2])
+    
+    vd.check()
+    
+    
+    vd.addLineSite( id_list[2], id_list[3])
+    
+    vd.check()
+    
+    vd.debug_on()
+    
+    #vd.addLineSite( id_list[3], id_list[4],5)
+    
     t_after = time.time()
     line_time = t_after-t_before
     if line_time < 1e-3:
         line_time = 1
     times.append( line_time )
-    
-    
     
     #s = id_list[nsegs]
     #vd.debug_on()
@@ -144,16 +148,10 @@ if __name__ == "__main__":
         print "min error= ",minerr
         print "max error= ",maxerr
     
-    print "num vertices: ",vd.numVertices() # Nmax=200 gives 1856(187)
+    print "num vertices: ",vd.numVertices() 
     print "num SPLIT vertices: ",vd.numSplitVertices() 
-    # nmax= 20 gives 175(13)
-    
-
-    
+        
     calctime = t_after-t_before
-    #if Nmax==0:
-    #    Nmax=1
-    #print " VD done in ", calctime," s, ", calctime/Nmax," s per generator"
     
     vod.setAll()
         

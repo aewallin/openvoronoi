@@ -83,11 +83,11 @@ namespace numeric {
     bool diangle_bracket(double less, double a, double more) {
         if (less==more) {
             return true;
-        }else if (less<=more) {
+        }else if (less<=more) { // normal case..
             if ( (less<=a) && (a<=more) )
                 return true;
-        } else if (less>more) {
-            if ( ((less<=a) && (a<=0)) || ((0<=a) && (a<=more)) )
+        } else if (less>more) { // we cross zero
+            if ( ((less<=a) && (a<=4)) || ((0<=a) && (a<=more)) )
                 return true;
         } else {
             assert(0);

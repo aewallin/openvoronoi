@@ -25,22 +25,8 @@ using namespace ovd::numeric;
 namespace ovd {
 
 EdgeProps::EdgeProps() {
-    x[0] = 0;
-    x[1] = 0;
-    x[2] = 0;
-    x[3] = 0;
-    x[4] = 0;
-    x[5] = 0;
-    x[6] = 0;        
-    x[7] = 0;
-    y[0] = 0;
-    y[1] = 0;
-    y[2] = 0;
-    y[3] = 0;
-    y[4] = 0;
-    y[5] = 0;
-    y[6] = 0;        
-    y[7] = 0;
+    x[0]=0;x[1]=0;x[2]=0;x[3]=0;x[4]=0;x[5]=0;x[6]=0;x[7]=0;
+    y[0]=0;y[1]=0;y[2]=0;y[3]=0;y[4]=0;y[5]=0;y[6]=0;y[7]=0;
 }
 
 /*
@@ -227,18 +213,8 @@ void EdgeProps::set_sep_parameters(Point& endp, Point& p) {
     y[0]=endp.y;
     y[2]=-dy/d;
     
-    x[1]=0;
-    x[3]=0;
-    x[4]=0;
-    x[5]=0;
-    x[6]=0;
-    x[7]=0;
-    y[1]=0;
-    y[3]=0;
-    y[4]=0;
-    y[5]=0;
-    y[6]=0;
-    y[7]=0;
+    x[1]=0;x[3]=0;x[4]=0;x[5]=0;x[6]=0;x[7]=0;
+    y[1]=0;y[3]=0;y[4]=0;y[5]=0;y[6]=0;y[7]=0;
 }
 
 void EdgeProps::set_ll_para_parameters(Site* s1, Site* s2) {
@@ -302,21 +278,10 @@ void EdgeProps::set_ll_para_parameters(Site* s1, Site* s2) {
 
     x[0]=  x1;
     x[1]= -s1->b();
-    x[2]=0;
-    x[3]=0;  
-    x[4]=0;
-    x[5]=0;
-    x[6]=0;
-    x[7]=0;
+    x[2]=0;x[3]=0;x[4]=0;x[5]=0;x[6]=0;x[7]=0;
     y[0]= y1;
     y[1]= s1->a();
-    y[2]=0;
-    y[3]=0; 
-    y[4]=0;
-    y[5]=0;
-    y[6]=0;
-    y[7]=0;
-
+    y[2]=0;y[3]=0;y[4]=0;y[5]=0;y[6]=0;y[7]=0;
 }
 
 // line(s1)-line(s2) edge
@@ -341,18 +306,8 @@ void EdgeProps::set_ll_parameters(Site* s1, Site* s2) {  // Held thesis p96
     y[0]=  alfa2;         
     y[2]= -alfa4;  
 
-    x[1]=0;
-    x[3]=0;  
-    x[4]=0;
-    x[5]=0;
-    x[6]=0;
-    x[7]=0;
-    y[1]=0;
-    y[3]=0; 
-    y[4]=0;
-    y[5]=0;
-    y[6]=0;
-    y[7]=0;
+    x[1]=0;x[3]=0;x[4]=0;x[5]=0;x[6]=0;x[7]=0;
+    y[1]=0;y[3]=0;y[4]=0;y[5]=0;y[6]=0;y[7]=0;
 }
 
 double EdgeProps::minimum_t( Site* s1, Site* s2) {

@@ -61,6 +61,8 @@ public:
     VoronoiVertex( Point p, VoronoiVertexStatus st);
     /// vertex with given position, status, and type
     VoronoiVertex( Point p, VoronoiVertexStatus st, VoronoiVertexType t);
+    VoronoiVertex( Point pos, VoronoiVertexStatus st, VoronoiVertexType t, Point initDist);
+
     virtual ~VoronoiVertex() {}
     void init();
     /// reset status

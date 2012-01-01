@@ -170,7 +170,7 @@ Face add_face() {
 
 /// add a face 
 Face add_face(const TFaceProperties& prop) {
-    faces.push_back( prop); 
+    faces.push_back( prop ); 
     Face index = faces.size()-1;
     faces[index].idx = index;
     return index;    
@@ -544,6 +544,31 @@ void set_next_cycle(Edge e1, Edge e2, Edge e3) {
     set_next(e2,e3);
     set_next(e3,e1);
 }
+
+//template <class Container>
+void set_next_cycle( std::list<Edge> list, Face f, double k) {
+    typename std::list<Edge>::iterator begin,it,nxt,end;
+    it= list.begin();
+    begin = it;
+    end= list.end();
+    for( ; it!=end ; it++ ) {
+        nxt = it;
+        nxt++;
+        if ( nxt != end )
+            set_next(*it,*nxt);
+        else
+            set_next(*it,*begin);
+//            g[*it].next = *begin;
+            
+        g[*it].face = f;
+        g[*it].k = k;
+    }
+//    BOOST_FOREACH( Edge e , list ) {
+//        std::cout << e << " " << f << "\n";
+        
+//    }
+}
+    //g.set_next_cycle( boost::assign::list_of(e1_1)(e1_2)(e2)(e3_1)(e3_2), f );
 
 std::pair<edge_iterator , edge_iterator  > face_edges_itr(Face f) {
     edge_iterator  itr1( g, faces[f].edge );

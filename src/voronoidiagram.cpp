@@ -24,6 +24,7 @@
 #include <boost/math/tools/roots.hpp> // for toms748
 #include <boost/current_function.hpp>
 #include <boost/tuple/tuple.hpp>
+#include <boost/assign/list_of.hpp>
 
 #include "voronoidiagram.hpp"
 #include "facegrid.hpp"
@@ -52,118 +53,135 @@ VoronoiDiagram::~VoronoiDiagram() {
 
 // add one vertex at origo and three vertices at 'infinity' and their associated edges
 void VoronoiDiagram::initialize() {
-    // add init vertices
-    HEVertex v00 = g.add_vertex();
-    HEVertex v01 = g.add_vertex();
-    HEVertex v02 = g.add_vertex();
-    HEVertex v03 = g.add_vertex();
-    double far_multiplier = 6;
-    g[v01] = VoronoiVertex(Point(             0                 , -3.0*far_radius*far_multiplier    )               , OUT, OUTER);
-    g[v02] = VoronoiVertex(Point(  +3.0*sqrt(3.0)*far_radius*far_multiplier/2.0, +3.0*far_radius*far_multiplier/2.0), OUT, OUTER);
-    g[v03] = VoronoiVertex(Point(  -3.0*sqrt(3.0)*far_radius*far_multiplier/2.0, +3.0*far_radius*far_multiplier/2.0), OUT, OUTER);
 
-    // the locations of the initial generators:
+    double far_multiplier = 6;
+    // initial generators/sites:
     Point gen1 = Point( 0, 3.0*far_radius);
     Point gen2 = Point( -3.0*sqrt(3.0)*far_radius/2.0, -3.0*far_radius/2.0 );
     Point gen3 = Point( +3.0*sqrt(3.0)*far_radius/2.0, -3.0*far_radius/2.0 );
-    g[v00].position = Point(0,0);    // OR we could run vpos->position( gen1, gen2, gen3 );
-    
-    g[v00].init_dist( gen1 );
-    g[v01].init_dist( gen3 );
-    g[v02].init_dist( gen1 );
-    g[v03].init_dist( gen2 );
+    // initial vd-vertices
+    Point vd1 = Point(             0                 , -3.0*far_radius*far_multiplier    );
+    Point vd2 = Point(  +3.0*sqrt(3.0)*far_radius*far_multiplier/2.0, +3.0*far_radius*far_multiplier/2.0);
+    Point vd3 = Point(  -3.0*sqrt(3.0)*far_radius*far_multiplier/2.0, +3.0*far_radius*far_multiplier/2.0);
+    // add init vertices
+    HEVertex v00 = g.add_vertex( VoronoiVertex( Point(0,0), UNDECIDED, NORMAL, gen1 ) );
+    HEVertex v01 = g.add_vertex( VoronoiVertex( vd1, OUT, OUTER, gen3) );
+    HEVertex v02 = g.add_vertex( VoronoiVertex( vd2, OUT, OUTER, gen1) );
+    HEVertex v03 = g.add_vertex( VoronoiVertex( vd3, OUT, OUTER, gen2) );
     // add initial sites to graph (if vertex_descriptors not held, why do we do this??)
     g.add_vertex( VoronoiVertex( gen1 , OUT, POINTSITE) );
     g.add_vertex( VoronoiVertex( gen2 , OUT, POINTSITE) );
     g.add_vertex( VoronoiVertex( gen3 , OUT, POINTSITE) );
+
+    /*
+    g[v00] = ;
+    g[v01] = ;
+    g[v02] = ;
+    g[v03] = ;
+    */
+    // the locations of the initial generators:
+    //g[v00].position = Point(0,0);    // OR we could run vpos->position( gen1, gen2, gen3 );
+    
+    //g[v00].init_dist( gen1 );
+    //g[v01].init_dist( gen3 );
+    //g[v02].init_dist( gen1 );
+    //g[v03].init_dist( gen2 );
     
     // APEX 1
-    Point apex1 = 0.5*(gen2+gen3);
-    HEVertex a1 = g.add_vertex( VoronoiVertex( apex1, UNDECIDED, APEX ) );
-    g[a1].init_dist(gen2);
+    HEVertex a1 = g.add_vertex( VoronoiVertex( 0.5*(gen2+gen3), UNDECIDED, APEX, gen2 ) );
     // APEX 2
-    Point apex2 = 0.5*(gen1+gen3);
-    HEVertex a2 = g.add_vertex( VoronoiVertex( apex2, UNDECIDED, APEX ) );
-    g[a2].init_dist(gen3);   
+    HEVertex a2 = g.add_vertex( VoronoiVertex( 0.5*(gen1+gen3), UNDECIDED, APEX, gen3 ) );
     // APEX 3
-    Point apex3 = 0.5*(gen1+gen2);
-    HEVertex a3 = g.add_vertex( VoronoiVertex( apex3, UNDECIDED, APEX ) );
-    g[a3].init_dist(gen1);   
+    HEVertex a3 = g.add_vertex( VoronoiVertex( 0.5*(gen1+gen2), UNDECIDED, APEX, gen1 ) );
 
     // add face 1: v0-v1-v2 which encloses gen3
-    HEEdge e1_1 =  g.add_edge( v00 , a1 ); //v01 );   
-    HEEdge e1_2 =  g.add_edge( a1 , v01); //v01 );  
-    HEEdge e2 =  g.add_edge( v01, v02 );
-    HEEdge e3_1 =  g.add_edge( v02, a2 ); 
+    HEEdge e1_1 =  g.add_edge( v00 , a1 );    
+    HEEdge e1_2 =  g.add_edge( a1 , v01 );   
+    HEEdge e2   =  g.add_edge( v01, v02 );
+    HEEdge e3_1 =  g.add_edge( v02, a2  ); 
     HEEdge e3_2 =  g.add_edge( a2 , v00 ); 
     HEFace f1 =  g.add_face(); 
     g[f1].edge = e2;
     g[f1].site = new PointSite(gen3,f1);
     g[f1].status = NONINCIDENT;
-    //g[g3].site = g[f1].site;
+    fgrid->add_face( g[f1] ); // for grid search
     
-    fgrid->add_face( g[f1] );
+    /*
     g[e1_1].face = f1;
     g[e1_2].face = f1;
     g[e2].face = f1;
     g[e3_1].face = f1;
     g[e3_2].face = f1;
+    */
+    g.set_next_cycle( boost::assign::list_of(e1_1)(e1_2)(e2)(e3_1)(e3_2) , f1 ,1);
+    
+    // form face: f1 (5 edges)
+    // e1_1 -> e1_2 -> e2 -> e3_1 -> e3_2 
+    /*
     g[e1_1].next = e1_2;
     g[e1_2].next = e2;
     g[e2].next = e3_1;
     g[e3_1].next = e3_2;
     g[e3_2].next = e1_1;
+    */
     
     // add face 2: v0-v02-v03 which encloses gen1
     HEEdge e4_1 = g.add_edge( v00, a2  );
     HEEdge e4_2 = g.add_edge( a2, v02 );
-
     HEEdge e5 = g.add_edge( v02, v03  );
     HEEdge e6_1 = g.add_edge( v03, a3 );
     HEEdge e6_2 = g.add_edge( a3, v00 ); 
     HEFace f2 =  g.add_face();
     g[f2].edge = e5;
     g[f2].site = new PointSite(gen1,f2);
-    g[f2].status = NONINCIDENT;
-    //g[g1].site = g[f2].site;
-    
+    g[f2].status = NONINCIDENT;    
     fgrid->add_face( g[f2] );
+    /*
     g[e4_1].face = f2;
     g[e4_2].face = f2;
     g[e5].face = f2;
     g[e6_1].face = f2;
     g[e6_2].face = f2;
+    */
+    g.set_next_cycle( boost::assign::list_of(e4_1)(e4_2)(e5)(e6_1)(e6_2) , f2 ,1 );
+
+    // face f2
+    // e4_1 -> e4_2 -> e5 -> e6_1 -> e6_2 
+    /*
     g[e4_1].next = e4_2;
     g[e4_2].next = e5;
     g[e5].next = e6_1;
     g[e6_1].next = e6_2;
     g[e6_2].next = e4_1;
-    
+    */
     // add face 3: v0-v3-v1 which encloses gen2
     HEEdge e7_1 = g.add_edge( v00, a3 );  
     HEEdge e7_2 = g.add_edge( a3 , v03 );   
-    HEEdge e8 = g.add_edge( v03, v01 );
+    HEEdge e8   = g.add_edge( v03, v01 );
     HEEdge e9_1 = g.add_edge( v01, a1  ); 
     HEEdge e9_2 = g.add_edge( a1 , v00 ); 
 
     HEFace f3 =  g.add_face();
     g[f3].edge = e8;
-    g[f3].site = new PointSite(gen2,f3);
-    g[f3].status = NONINCIDENT;
-    //g[g2].site = g[f3].site;
-    
+    g[f3].site = new PointSite(gen2,f3); // this constructor needs f3...
+    g[f3].status = NONINCIDENT;    
     fgrid->add_face( g[f3] );
+    /*
     g[e7_1].face = f3;
     g[e7_2].face = f3;
     g[e8].face = f3;
     g[e9_1].face = f3;
     g[e9_2].face = f3;
+    */
+    g.set_next_cycle( boost::assign::list_of(e7_1)(e7_2)(e8)(e9_1)(e9_2) , f3 , 1 );    
+    // f3:  e7_1 -> e7_2 -> e8 -> e9_1 -> e9_2
+    /*
     g[e7_1].next = e7_2;
     g[e7_2].next = e8;
     g[e8].next = e9_1;
     g[e9_1].next = e9_2;
     g[e9_2].next = e7_1;
-    
+    */
     
     // set type. (note that edge-params x[8] and y[8] are not set!
     g[e1_1].type = LINE;  g[e1_1].set_parameters(g[f1].site, g[f3].site, false);
@@ -184,47 +202,37 @@ void VoronoiDiagram::initialize() {
     
     // twin edges
     g.twin_edges(e1_1,e9_2);
-    assert( vd_checker->check_edge(e1_1) );
     g.twin_edges(e1_2,e9_1);
-    assert( vd_checker->check_edge(e1_2) );
-
     g[e2].twin = HEEdge(); // the outermost edges have invalid twins
     g[e5].twin = HEEdge();
     g[e8].twin = HEEdge();
-    assert( vd_checker->check_edge(e2) );
-    assert( vd_checker->check_edge(e5) );
-    assert( vd_checker->check_edge(e8) );
-    
     g.twin_edges(e3_1, e4_2);
-    assert( vd_checker->check_edge(e3_1) );
-    assert( vd_checker->check_edge(e4_2) );
     g.twin_edges(e3_2, e4_1);
-    assert( vd_checker->check_edge(e3_2) );
-    assert( vd_checker->check_edge(e4_1) );
     g.twin_edges(e6_1, e7_2);
-    assert( vd_checker->check_edge(e6_1) );
-    assert( vd_checker->check_edge(e7_2) );
     g.twin_edges(e6_2, e7_1);
-    assert( vd_checker->check_edge(e6_2) );
-    assert( vd_checker->check_edge(e7_1) );
 
     // k-values all positive for PointSite generators
+    
+    /*
     g[e1_1].k = 1.0;
     g[e1_2].k = 1.0;
     g[e2].k = 1.0;
     g[e3_1].k = 1.0;
     g[e3_2].k = 1.0;
+    
     g[e4_1].k = 1.0;
     g[e4_2].k = 1.0;
     g[e5].k = 1.0;
     g[e6_1].k = 1.0;
     g[e6_2].k = 1.0;
+    
     g[e7_1].k = 1.0;
     g[e7_2].k = 1.0;
     g[e8].k = 1.0;
     g[e9_1].k = 1.0;
     g[e9_2].k = 1.0;
-
+    */
+    
     assert( vd_checker->is_valid() );
 }
 

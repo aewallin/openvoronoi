@@ -48,22 +48,24 @@ if __name__ == "__main__":
     # for vtk visualization
     vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
     vod.drawFarCircle()
-
-    
     vod.textScale = 0.02
     vod.vertexRadius = 0.0031
     vod.drawVertices=1
     #vod.drawVertexIndex=0
     vod.drawGenerators=1
-    
     vod.offsetEdges = 1
     vd.setEdgeOffset(0.05)
-    
-    
     linesegs = 1 # switch to turn on/off line-segments
     
-    Npts = 4
-    poly = rpg.rpg(Npts)
+    Npts = 3
+    poly = rpg.rpg(Npts, 45)
+    # N=3 working seeds: 41-42
+    
+    
+    n_problem=Npts # go all the way to the end
+    n_problem=2
+    n_step=9
+    
     pts=[]
     for p in poly:
         pts.append( ovd.Point( p[0], p[1] ) )
@@ -86,15 +88,27 @@ if __name__ == "__main__":
     
     print "all point sites inserted. ",
     vd.check()
-    
+    vd.debug_on()
+
     t_before = time.time()
     if linesegs==1:
         for n in range(len(id_list)):
             n_nxt = n+1
             if n==(len(id_list)-1):
                 n_nxt=0
-            vd.addLineSite( id_list[n], id_list[n_nxt])
-        
+            if n == n_problem:
+                vd.addLineSite( id_list[n], id_list[n_nxt],n_step)
+                
+                t_after = time.time()
+                line_time = t_after-t_before
+                times.append( max(line_time,0.1) )
+                vod.setVDText2(times)
+                vod.setAll()
+                myscreen.render()
+                myscreen.iren.Start()
+                raw_input("Press ENTER to exit")
+            else:
+                vd.addLineSite( id_list[n], id_list[n_nxt])
     vd.check()
     
     

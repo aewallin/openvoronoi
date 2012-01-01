@@ -976,7 +976,59 @@ The edge between two line sites
 \end_inset
 
  is a line.
- We solve
+ The edge is given by
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+e_{LL}^{\pm}(t)=\left(x_{LL}^{\pm}(t),y_{LL}^{\pm}(t)\right)=p_{A}\pm\hat{vt},\label{eq:line-lne-edge-1}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+whe the apex 
+\begin_inset Formula $p_{A}$
+\end_inset
+
+ is located at the intersection point between 
+\begin_inset Formula $l_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $l_{2}$
+\end_inset
+
+, and the direction 
+\begin_inset Formula $v$
+\end_inset
+
+ is is along the average of the tangents to 
+\begin_inset Formula $l_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $l_{2}$
+\end_inset
+
+.
+ The case where 
+\begin_inset Formula $l_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $l_{2}$
+\end_inset
+
+ do not intersect is a special case which must be handled separately.
+\end_layout
+
+\begin_layout Standard
+This may also be found by solving:
 \end_layout
 
 \begin_layout Standard
@@ -994,47 +1046,47 @@ a_{2}x+b_{2}y+c_{2}+k_{2}t=0
 \end_layout
 
 \begin_layout Standard
-The apex 
-\begin_inset Formula $p_{A}$
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename ll_edge.eps
+
 \end_inset
 
- is located at the intersection point between 
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Line-Line edge between line sites 
 \begin_inset Formula $l_{1}$
 \end_inset
 
  and 
-\begin_inset Formula $l_{2}$
+\begin_inset Formula $l_{2}.$
 \end_inset
 
-.
- Thus 
-\begin_inset Formula $t_{min}=0$
+
+\end_layout
+
 \end_inset
 
-.
- The case where 
-\begin_inset Formula $l_{1}$
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
 \end_inset
 
- and 
-\begin_inset Formula $l_{2}$
-\end_inset
 
- do not intersect is a special case which must be handled separately.
- The direction 
-\begin_inset Formula $\hat{v}$
-\end_inset
-
- of the edge is along the average of the tangents to 
-\begin_inset Formula $l_{1}$
-\end_inset
-
- and 
-\begin_inset Formula $l_{2}$
-\end_inset
-
-.
- 
 \end_layout
 
 \begin_layout Subsection

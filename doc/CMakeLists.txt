@@ -6,6 +6,7 @@ set( ASY_FIGURES
     pp_edge
     p_site
     l_site
+    ll_edge
 )
 
 FOREACH(ASYFIG ${ASY_FIGURES})

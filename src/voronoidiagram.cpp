@@ -507,11 +507,11 @@ HEVertex VoronoiDiagram::process_next_null(Point dir, HEEdge next_edge , bool k3
             assert(0);
         }
         // insert a normal vertex instead.
-        HEVertex new_v = g.add_vertex( VoronoiVertex(g[src].position,NEW,NORMAL) );
+        HEVertex new_v = g.add_vertex( VoronoiVertex(g[src].position,NEW,NORMAL,g[src].position) );
         double mid = numeric::diangle_mid( g[src].alfa, g[trg].alfa  );
         g[new_v].alfa = mid;
         modified_vertices.insert(new_v);
-        add_vertex_in_edge(new_v,next_edge);
+        add_vertex_in_edge( new_v, next_edge);
         if (k3)
             g[new_v].k3=+1;
         else
@@ -522,7 +522,11 @@ HEVertex VoronoiDiagram::process_next_null(Point dir, HEEdge next_edge , bool k3
             print_edge(next_edge);
         }
     } else {
-        if ( numeric::diangle_bracket( g[src].alfa, neg_sep_alfa, g[trg].alfa ) ) {
+        // not ENDPOINT. add SEPPOINT if there is room, and PointSite
+        HEFace next_face = g[ g[next_edge].twin ].face;
+        Site* next_edge_site = g[next_face].site;
+        
+        if ( numeric::diangle_bracket( g[src].alfa, neg_sep_alfa, g[trg].alfa ) && next_edge_site->isPoint() ) {
             if (debug) {
                 std::cout << "process_next_null() inserting SEPPOINT in edge: "; print_edge(next_edge);
             }
@@ -937,30 +941,6 @@ HEVertex VoronoiDiagram::find_seed_vertex(HEFace f, Site* site)  {
     return minimalVertex;
 }
 
-/*
-HEEdge VoronoiDiagram::find_null_edge(HEEdge e, double a) {
-    HEEdge current = e;
-    HEEdge out = HEEdge();
-    bool found = false;
-    do {
-        assert( g[current].type = NULLEDGE );
-        HEVertex trg = g.target(e);
-        HEVertex src = g.source(e);
-        if (debug) {
-            std::cout << " insert_line_site: start_edge " << g[g.source(current) ].index <<  " - " << g[g.target(current) ].index<< "\n";
-            std::cout << " src alfa = " <<  g[src].alfa << "\n";
-            std::cout << " a   alfa = " <<  a << "\n";
-            std::cout << " trg alfa = " <<  g[trg].alfa << "\n";
-        }
-        if ( numeric::diangle_bracket(g[src].alfa , a, g[trg].alfa) ) {
-            out = current;
-            found = true;
-        }
-        current = g[e].next;
-    }while( !found && (current!=e) );
-    assert(out!=HEEdge());
-    return out;
-}*/
 
 // growing the v0/delete-tree of "IN" vertices by "weighted breadth-first search"
 // we start at the seed and add vertices with detH<0 provided that:
@@ -1165,6 +1145,8 @@ void VoronoiDiagram::add_split_vertex(HEFace f, Site* s) {
             // and minimum distance to the pt1-pt2 line
         #define TOMS748
         
+        Point split_pt_pos;
+        
         #ifdef TOMS748
             HEVertex split_src = g.source(split_edge);
             HEVertex split_trg = g.target(split_edge);
@@ -1184,7 +1166,7 @@ void VoronoiDiagram::add_split_vertex(HEFace f, Site* s) {
                 return;
                 
             Result r1 = boost::math::tools::toms748_solve(errFunctr, min_t, max_t, tol, max_iter);
-            Point split_pt = g[split_edge].point( r1.first ); 
+            split_pt_pos = g[split_edge].point( r1.first ); 
         #endif
         
             // alternative SPLIT-vertex positioning:
@@ -1194,19 +1176,10 @@ void VoronoiDiagram::add_split_vertex(HEFace f, Site* s) {
             Site* vs = new LineSite(*s);
             vs->set_c( fs->position() ); // modify the line-equation so that the line goes trough fs->position()
             Solution sl = vpos->position( split_edge, vs );
+            split_pt_pos = sl.p;
         #endif
         
-            HEVertex v = g.add_vertex();
-            g[v].type = SPLIT;
-            g[v].status = UNDECIDED;
-        #ifndef TOMS748
-            g[v].position = sl.p;
-        #endif
-        
-        #ifdef TOMS748
-            g[v].position = split_pt;
-        #endif
-            g[v].init_dist( fs->position() );
+            HEVertex v = g.add_vertex( VoronoiVertex(split_pt_pos, UNDECIDED, SPLIT, fs->position() ) );
             
         #ifndef TOMS748
             delete vs;
@@ -1497,11 +1470,11 @@ HEFace VoronoiDiagram::add_face(Site* s) {
 // by adding a NEW-NEW edge, split the face f into one part which is newface, and the other part is the old f
 // for linesegment or arc sites we pass in both the k=+1 face newface and the k=-1 face newface2
 void VoronoiDiagram::add_edges(HEFace newface, HEFace f, HEFace newface2) {
-    int new_count = new_vertex_count(f);
+    int new_count = num_new_vertices(f);
     if (debug) std::cout << " add_edges() on f=" << f << " with " << new_count << " NEW verts.\n";
     assert( new_count > 0 );
     assert( (new_count % 2) == 0 );
-    int new_pairs = new_count / 2;
+    int new_pairs = new_count / 2; // we add one NEW-NEW edge for each pair found
     VertexVector startverts;
     for (int m=0;m<new_pairs;m++) {
         EdgeData ed = find_edge_data(f, startverts);
@@ -1678,30 +1651,20 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
 }
 
 // count number of NEW vertices on the given face
-int VoronoiDiagram::new_vertex_count(HEFace f) {
+int VoronoiDiagram::num_new_vertices(HEFace f) {
     // /*
     HEEdge current = g[f].edge;
     HEEdge start = current;
     int count=0;
-    int num_e=0;
+    //int num_e=0;
     do {
         HEVertex v = g.target(current);
         if ( (g[v].status == NEW) && (g[v].type != SEPPOINT) )
             count++;
-        num_e++;
-        assert( num_e <30);
+        //num_e++;
+        //assert( num_e <3000);
         current = g[current].next;
     } while(current!=start);  
-    // */
-    
-    // new style, with iterators...
-    /*
-    int count=0;
-    BOOST_FOREACH( HEEdge e, g.face_edges_itr(f) ) {
-        HEVertex v = g.target(e);
-        if (g[v].status == NEW)
-            count++;
-    }*/
     
     return count;
     

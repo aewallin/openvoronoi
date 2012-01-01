@@ -82,12 +82,12 @@ namespace numeric {
     // return true if a lies in [less,more]
     bool diangle_bracket(double less, double a, double more) {
         if (less==more) {
-            return true;
+            return false;
         }else if (less<=more) { // normal case..
-            if ( (less<=a) && (a<=more) )
+            if ( (less<=a) && (a<more) )
                 return true;
         } else if (less>more) { // we cross zero
-            if ( ((less<=a) && (a<=4)) || ((0<=a) && (a<=more)) )
+            if ( ((less<=a) && (a<=4)) || ((0<=a) && (a<more)) )
                 return true;
         } else {
             assert(0);

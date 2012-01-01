@@ -43,7 +43,6 @@ VertexDegreeMap VoronoiVertex::expected_degree = boost::assign::map_list_of
 
 VoronoiVertex::VoronoiVertex() {
     init();
-    //type = NORMAL;
 }
 
 /// construct vertex at position p with type t
@@ -53,18 +52,10 @@ VoronoiVertex::VoronoiVertex( Point p, VoronoiVertexStatus st) {
     
 VoronoiVertex::VoronoiVertex( Point p, VoronoiVertexStatus st, VoronoiVertexType t) {
     init(p,st,t);
-    //position=p;
-    //status=st;
-    //type=t;
 }
 VoronoiVertex::VoronoiVertex( Point p, VoronoiVertexStatus st, VoronoiVertexType t, Point initDist) 
 {
     init(p,st,t,initDist);
-    //init();
-    //position=p;
-    //status=st;
-    //type=t;
-    //init_dist(initDist);
 }
 
 VoronoiVertex::VoronoiVertex( Point p, VoronoiVertexStatus st, VoronoiVertexType t, Point initDist, double lk3) 

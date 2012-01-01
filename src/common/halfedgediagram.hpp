@@ -152,6 +152,11 @@ Edge add_edge( Vertex v1, Vertex  v2, const TEdgeProperties& prop ) {
 
 /// make e1 the twin of e2 (and vice versa)
 void twin_edges( Edge e1, Edge e2 ) {
+    if (target(e1) != source(e2)) {
+        std::cout << " error target(e1)= " << g[target(e1)].index << " != " << g[source(e2)].index << " = source(e2) \n";
+        std::cout << "target(e1) = " << target(e1) << "\n";
+        std::cout << "source(e2) = " << source(e2) << "\n";
+    }
     assert( target(e1) == source(e2) );
     assert( source(e1) == target(e2) );
     
@@ -531,6 +536,14 @@ protected:
     bool m_inc;
 };
 
+// EXPERIMENTAL! seems to work in debug-mode but not with a Release build!
+std::pair<edge_iterator , edge_iterator  > face_edges_itr(Face f) {
+    edge_iterator  itr1( g, faces[f].edge );
+    edge_iterator  itr2( g, faces[f].edge );
+    return std::make_pair(itr1,itr2); ;
+}
+
+
 void set_next(Edge e1, Edge e2) {
     if (target(e1) != source(e2) ){
         std::cout << " ERROR target(e1) = " << g[target(e1)].index << " source(e2)= " << g[source(e2)].index << "\n"; 
@@ -539,17 +552,14 @@ void set_next(Edge e1, Edge e2) {
     g[e1].next = e2;
 }
 
-void set_next_cycle(Edge e1, Edge e2, Edge e3) {
-    set_next(e1,e2);
-    set_next(e2,e3);
-    set_next(e3,e1);
-}
-
-//template <class Container>
+// form a face from the edge-list:
+// e1->e2->...->e1
+// for all edges, set edge.face=f, and edge.k=k
 void set_next_cycle( std::list<Edge> list, Face f, double k) {
     typename std::list<Edge>::iterator begin,it,nxt,end;
     it= list.begin();
     begin = it;
+    faces[f].edge = *it;
     end= list.end();
     for( ; it!=end ; it++ ) {
         nxt = it;
@@ -558,24 +568,42 @@ void set_next_cycle( std::list<Edge> list, Face f, double k) {
             set_next(*it,*nxt);
         else
             set_next(*it,*begin);
-//            g[*it].next = *begin;
             
         g[*it].face = f;
         g[*it].k = k;
     }
-//    BOOST_FOREACH( Edge e , list ) {
-//        std::cout << e << " " << f << "\n";
-        
-//    }
-}
-    //g.set_next_cycle( boost::assign::list_of(e1_1)(e1_2)(e2)(e3_1)(e3_2), f );
-
-std::pair<edge_iterator , edge_iterator  > face_edges_itr(Face f) {
-    edge_iterator  itr1( g, faces[f].edge );
-    edge_iterator  itr2( g, faces[f].edge );
-    return std::make_pair(itr1,itr2); ;
 }
 
+void set_next_chain( std::list<Edge> list, Face f, double k) {
+    typename std::list<Edge>::iterator it,nxt,end;
+    it= list.begin();
+    faces[f].edge = *it;
+    //set_next_chain(list);
+    //begin = it;    
+    end= list.end();
+    for( ; it!=end ; it++ ) {
+        nxt = it;
+        nxt++;
+        if ( nxt != end )
+            set_next(*it,*nxt);
+            
+        g[*it].face = f;
+        g[*it].k = k;
+    }
+}
+
+void set_next_chain( std::list<Edge> list ) {
+    typename std::list<Edge>::iterator it,nxt,end;
+    it= list.begin();
+    //begin = it;
+    end= list.end();
+    for( ; it!=end ; it++ ) {
+        nxt = it;
+        nxt++;
+        if ( nxt != end )
+            set_next(*it,*nxt);
+    }
+}
 
 }; // end HEDIGraph class definition
 

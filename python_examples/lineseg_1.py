@@ -89,6 +89,8 @@ if __name__ == "__main__":
     
     vd = ovd.VoronoiDiagram(far,120)
     print vd.version()
+    vd.check()
+    print "created."
     
     # for vtk visualization
     vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
@@ -121,6 +123,7 @@ if __name__ == "__main__":
     t_before = time.time() 
     n=0
     id_list=[]
+    vd.debug_on()
     for p in plist: 
         print n," adding ",p
         id_list.append( vd.addVertexSite( p ) )

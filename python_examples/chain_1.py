@@ -96,11 +96,13 @@ if __name__ == "__main__":
     #nsegs = 5 #Nmax
     #n=1
     t_before = time.time()
+    
     #vd.debug_on()
     vd.addLineSite( id_list[0], id_list[1])
     
     
     vd.check()
+    
     #vd.debug_on()
     vd.addLineSite( id_list[1], id_list[2])
     vd.check()

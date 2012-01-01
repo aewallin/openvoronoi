@@ -43,30 +43,33 @@ VertexDegreeMap VoronoiVertex::expected_degree = boost::assign::map_list_of
 
 VoronoiVertex::VoronoiVertex() {
     init();
-    status = UNDECIDED;
-    type = NORMAL;
+    //type = NORMAL;
 }
 
 /// construct vertex at position p with type t
 VoronoiVertex::VoronoiVertex( Point p, VoronoiVertexStatus st) {
-    init();
-    position=p;
-    status=st;
-    type = NORMAL;
+    init(p,st);
 }
     
 VoronoiVertex::VoronoiVertex( Point p, VoronoiVertexStatus st, VoronoiVertexType t) {
-    init();
-    position=p;
-    status=st;
-    type=t;
+    init(p,st,t);
+    //position=p;
+    //status=st;
+    //type=t;
 }
-VoronoiVertex::VoronoiVertex( Point p, VoronoiVertexStatus st, VoronoiVertexType t, Point initDist) {
-    init();
-    position=p;
-    status=st;
-    type=t;
-    init_dist(initDist);
+VoronoiVertex::VoronoiVertex( Point p, VoronoiVertexStatus st, VoronoiVertexType t, Point initDist) 
+{
+    init(p,st,t,initDist);
+    //init();
+    //position=p;
+    //status=st;
+    //type=t;
+    //init_dist(initDist);
+}
+
+VoronoiVertex::VoronoiVertex( Point p, VoronoiVertexStatus st, VoronoiVertexType t, Point initDist, double lk3) 
+{   
+    init(p,st,t,initDist,lk3);
 }
 
 /// set index, increase count, initialize in_queue to false.
@@ -75,9 +78,33 @@ void VoronoiVertex::init() {
     count++;
     in_queue = false;
     alfa=-1; // invalid/non-initialized alfa value
-    null_face = std::numeric_limits<HEFace>::quiet_NaN();
-    
+    null_face = std::numeric_limits<HEFace>::quiet_NaN();    
+    type = NORMAL;
+    //status = UNDECIDED;
 }
+
+void VoronoiVertex::init(Point p, VoronoiVertexStatus st) {
+    init();
+    position=p;
+    status=st;
+}
+
+void VoronoiVertex::init(Point p, VoronoiVertexStatus st, VoronoiVertexType t) {
+    init(p,st);
+    type = t;
+}
+
+void VoronoiVertex::init(Point p, VoronoiVertexStatus st, VoronoiVertexType t, Point initDist) {
+    init(p,st,t);
+    init_dist(initDist);
+}
+
+void VoronoiVertex::init(Point p, VoronoiVertexStatus st, VoronoiVertexType t, Point initDist, double lk3) {
+    init(p,st,t,initDist);
+    k3 = lk3;
+}
+
+
 /// set in_queue false, and status to UNDECIDED
 void VoronoiVertex::reset() {
     in_queue = false;

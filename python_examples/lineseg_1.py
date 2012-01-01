@@ -135,8 +135,8 @@ if __name__ == "__main__":
     id4 = id_list[3]
     print "add segment ",id1, " to ", id2
     vd.debug_on()
-    #vd.addLineSite( id1, id2 )
     vd.addLineSite( id1, id2 )
+    #vd.addLineSite( id1, id2 )
     vd.addLineSite( id3, id4 )
     t_after = time.time()
     calctime = t_after-t_before

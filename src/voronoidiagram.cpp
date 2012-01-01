@@ -53,7 +53,6 @@ VoronoiDiagram::~VoronoiDiagram() {
 
 // add one vertex at origo and three vertices at 'infinity' and their associated edges
 void VoronoiDiagram::initialize() {
-
     double far_multiplier = 6;
     // initial generators/sites:
     Point gen1 = Point( 0, 3.0*far_radius);
@@ -72,26 +71,10 @@ void VoronoiDiagram::initialize() {
     g.add_vertex( VoronoiVertex( gen1 , OUT, POINTSITE) );
     g.add_vertex( VoronoiVertex( gen2 , OUT, POINTSITE) );
     g.add_vertex( VoronoiVertex( gen3 , OUT, POINTSITE) );
-
-    /*
-    g[v00] = ;
-    g[v01] = ;
-    g[v02] = ;
-    g[v03] = ;
-    */
-    // the locations of the initial generators:
-    //g[v00].position = Point(0,0);    // OR we could run vpos->position( gen1, gen2, gen3 );
     
-    //g[v00].init_dist( gen1 );
-    //g[v01].init_dist( gen3 );
-    //g[v02].init_dist( gen1 );
-    //g[v03].init_dist( gen2 );
-    
-    // APEX 1
+    // apex-points on the three edges: 
     HEVertex a1 = g.add_vertex( VoronoiVertex( 0.5*(gen2+gen3), UNDECIDED, APEX, gen2 ) );
-    // APEX 2
     HEVertex a2 = g.add_vertex( VoronoiVertex( 0.5*(gen1+gen3), UNDECIDED, APEX, gen3 ) );
-    // APEX 3
     HEVertex a3 = g.add_vertex( VoronoiVertex( 0.5*(gen1+gen2), UNDECIDED, APEX, gen1 ) );
 
     // add face 1: v0-v1-v2 which encloses gen3
@@ -105,25 +88,7 @@ void VoronoiDiagram::initialize() {
     g[f1].site = new PointSite(gen3,f1);
     g[f1].status = NONINCIDENT;
     fgrid->add_face( g[f1] ); // for grid search
-    
-    /*
-    g[e1_1].face = f1;
-    g[e1_2].face = f1;
-    g[e2].face = f1;
-    g[e3_1].face = f1;
-    g[e3_2].face = f1;
-    */
     g.set_next_cycle( boost::assign::list_of(e1_1)(e1_2)(e2)(e3_1)(e3_2) , f1 ,1);
-    
-    // form face: f1 (5 edges)
-    // e1_1 -> e1_2 -> e2 -> e3_1 -> e3_2 
-    /*
-    g[e1_1].next = e1_2;
-    g[e1_2].next = e2;
-    g[e2].next = e3_1;
-    g[e3_1].next = e3_2;
-    g[e3_2].next = e1_1;
-    */
     
     // add face 2: v0-v02-v03 which encloses gen1
     HEEdge e4_1 = g.add_edge( v00, a2  );
@@ -136,24 +101,8 @@ void VoronoiDiagram::initialize() {
     g[f2].site = new PointSite(gen1,f2);
     g[f2].status = NONINCIDENT;    
     fgrid->add_face( g[f2] );
-    /*
-    g[e4_1].face = f2;
-    g[e4_2].face = f2;
-    g[e5].face = f2;
-    g[e6_1].face = f2;
-    g[e6_2].face = f2;
-    */
     g.set_next_cycle( boost::assign::list_of(e4_1)(e4_2)(e5)(e6_1)(e6_2) , f2 ,1 );
 
-    // face f2
-    // e4_1 -> e4_2 -> e5 -> e6_1 -> e6_2 
-    /*
-    g[e4_1].next = e4_2;
-    g[e4_2].next = e5;
-    g[e5].next = e6_1;
-    g[e6_1].next = e6_2;
-    g[e6_2].next = e4_1;
-    */
     // add face 3: v0-v3-v1 which encloses gen2
     HEEdge e7_1 = g.add_edge( v00, a3 );  
     HEEdge e7_2 = g.add_edge( a3 , v03 );   
@@ -166,22 +115,7 @@ void VoronoiDiagram::initialize() {
     g[f3].site = new PointSite(gen2,f3); // this constructor needs f3...
     g[f3].status = NONINCIDENT;    
     fgrid->add_face( g[f3] );
-    /*
-    g[e7_1].face = f3;
-    g[e7_2].face = f3;
-    g[e8].face = f3;
-    g[e9_1].face = f3;
-    g[e9_2].face = f3;
-    */
     g.set_next_cycle( boost::assign::list_of(e7_1)(e7_2)(e8)(e9_1)(e9_2) , f3 , 1 );    
-    // f3:  e7_1 -> e7_2 -> e8 -> e9_1 -> e9_2
-    /*
-    g[e7_1].next = e7_2;
-    g[e7_2].next = e8;
-    g[e8].next = e9_1;
-    g[e9_1].next = e9_2;
-    g[e9_2].next = e7_1;
-    */
     
     // set type. (note that edge-params x[8] and y[8] are not set!
     g[e1_1].type = LINE;  g[e1_1].set_parameters(g[f1].site, g[f3].site, false);
@@ -210,28 +144,6 @@ void VoronoiDiagram::initialize() {
     g.twin_edges(e3_2, e4_1);
     g.twin_edges(e6_1, e7_2);
     g.twin_edges(e6_2, e7_1);
-
-    // k-values all positive for PointSite generators
-    
-    /*
-    g[e1_1].k = 1.0;
-    g[e1_2].k = 1.0;
-    g[e2].k = 1.0;
-    g[e3_1].k = 1.0;
-    g[e3_2].k = 1.0;
-    
-    g[e4_1].k = 1.0;
-    g[e4_2].k = 1.0;
-    g[e5].k = 1.0;
-    g[e6_1].k = 1.0;
-    g[e6_2].k = 1.0;
-    
-    g[e7_1].k = 1.0;
-    g[e7_2].k = 1.0;
-    g[e8].k = 1.0;
-    g[e9_1].k = 1.0;
-    g[e9_2].k = 1.0;
-    */
     
     assert( vd_checker->is_valid() );
 }
@@ -255,31 +167,27 @@ int VoronoiDiagram::insert_point_site(const Point& p, int step) {
     
     HEVertex new_vert = g.add_vertex( VoronoiVertex(p,OUT,POINTSITE) );
     Site* new_site =  new PointSite(p);
-    
-    
-    vertex_map.insert( std::pair<int,HEVertex>(g[new_vert].index,new_vert) );
-    
+    vertex_map.insert( std::pair<int,HEVertex>(g[new_vert].index,new_vert) ); // so that we can find the descriptor later based on its index
     HEFace closest_face = fgrid->grid_find_closest_face( p ); 
-    HEVertex v_seed = find_seed_vertex(closest_face, new_site); //g[new_vert].site ) ;
-    
+    HEVertex v_seed = find_seed_vertex(closest_face, new_site); 
     mark_vertex( v_seed, new_site );
-    modified_vertices.insert( v_seed );
+    //modified_vertices.insert( v_seed );
     
 if (step==current_step) return -1; current_step++;
 
-    augment_vertex_set( new_site );
+    augment_vertex_set( new_site ); // grow the tree to maximum size
     
 if (step==current_step) return -1; current_step++;
 
-    add_vertices( new_site );    
+    add_vertices( new_site );  // insert new vertices on IN-OUT edges
     
 if (step==current_step) return -1; current_step++;
 
     HEFace newface = add_face( new_site );
     g[new_vert].face = newface;
     
-    BOOST_FOREACH( HEFace f, incident_faces ) {
-        add_edges(newface, f); // no newface2 parameter given!
+    BOOST_FOREACH( HEFace f, incident_faces ) { // add NEW-NEW edges on all INCIDENT faces
+        add_edges(newface, f); // (note: no newface2 parameter given!)
     }
 
 if (step==current_step) return -1; current_step++;
@@ -290,11 +198,11 @@ if (step==current_step) return -1; current_step++;
         print_face( newface );
     }
     
-    remove_vertex_set();
+    remove_vertex_set(); // remove all IN vertices
     
 if (step==current_step) return -1; current_step++;
 
-    reset_status();
+    reset_status(); // reset all vertices to UNDECIDED
     
     assert( vd_checker->face_ok( newface ) );
     assert( vd_checker->is_valid() );
@@ -568,7 +476,7 @@ if (step==current_step) return false; current_step++;
 }
 
 std::pair<HEEdge,HEEdge> VoronoiDiagram::find_next_prev(HEFace null_face, HEVertex endp) {
-    // on the null-face, search for the left/right edge from seg_endpoint
+    // on a null-face, search and return the left/right edge from endp
     HEEdge current = g[null_face].edge;
     HEEdge start_edge = current;
     HEEdge next_edge = HEEdge();
@@ -873,19 +781,19 @@ VoronoiDiagram::find_null_face(HEVertex start, HEVertex other, Point left) {
         boost::tie(e3,e3_tw) = g.add_twin_edges(neg_sep_start,seg_start);
         g[start_null_face].edge = e1;
         
-        // e1  ->  e2  ->  e3
-        // e1t <-  e2t <-  e3t
-        g.set_next_cycle(e1,e2,e3);
-        g.set_next_cycle(e3_tw, e2_tw, e1_tw);
+        // e1  ->  e2  ->  e3     on start_null_face, k=1
+        // e1t <-  e2t <-  e3t   on g[start].face, k=1
+        g.set_next_cycle( boost::assign::list_of(e1)(e2)(e3) , start_null_face, 1);
+        g.set_next_cycle( boost::assign::list_of(e3_tw)(e2_tw)(e1_tw), g[start].face, 1);
         
-        g[e1].face = start_null_face; g[e2].face = start_null_face; g[e3].face = start_null_face;
-        g[e1_tw].face = g[start].face; g[e3_tw].face = g[start].face; g[e2_tw].face = g[start].face;
+        //g[e1].face = start_null_face; g[e2].face = start_null_face; g[e3].face = start_null_face;
+        //g[e1_tw].face = g[start].face; g[e3_tw].face = g[start].face; g[e2_tw].face = g[start].face;
         
         g[e1].type = NULLEDGE; g[e2].type = NULLEDGE; g[e3].type = NULLEDGE;
         g[e1_tw].type = NULLEDGE; g[e3_tw].type = NULLEDGE; g[e2_tw].type = NULLEDGE;
         
-        g[e1].k = 1; g[e2].k = 1; g[e3].k = 1;
-        g[e1_tw].k = 1; g[e2_tw].k = 1; g[e3_tw].k = 1;
+        //g[e1].k = 1; g[e2].k = 1; g[e3].k = 1;
+        //g[e1_tw].k = 1; g[e2_tw].k = 1; g[e3_tw].k = 1;
         
         g[start].null_face = start_null_face;
     }
@@ -903,23 +811,17 @@ void VoronoiDiagram::add_separator(HEFace f, HEFace null_face,
     }
     assert( (g[sep_endp].k3==1) || (g[sep_endp].k3==-1) );    
     
-    HEEdge current = g[null_face].edge;
-    assert( current != HEEdge() );
-    HEEdge start = current;
+    //HEEdge current = g[null_face].edge;
+    //assert( current != HEEdge() );
+    //HEEdge start = current;
     HEEdge endp_next = HEEdge();
     HEEdge endp_prev = HEEdge();
-    do { // iterate around the null-face to find the next/previous edges
-         // that are adjacent to endp
-        HEVertex src = g.source(current);
-        HEVertex trg = g.target(current);
-        if (src == sep_endp) {
-            endp_prev = g[current].twin; // NOTE twin!
-        }
-        if (trg == sep_endp) {
-            endp_next = g[current].twin; // NOTE twin!
-        }
-        current = g[current].next;
-    } while (current!=start);
+    HEEdge endp_next_tw = HEEdge();
+    HEEdge endp_prev_tw = HEEdge();
+
+    boost::tie( endp_next_tw, endp_prev_tw ) = find_next_prev(null_face, sep_endp);
+    endp_prev = g[endp_next_tw].twin; // NOTE twin!
+    endp_next = g[endp_prev_tw].twin; // NOTE twin!
     assert( endp_next != HEEdge() );
     assert( endp_prev != HEEdge() );
         
@@ -929,7 +831,6 @@ void VoronoiDiagram::add_separator(HEFace f, HEFace null_face,
     HEVertex v_target = boost::get<1>(target) ;
     HEEdge    v_next  = boost::get<2>(target);
     bool out_new_in   = boost::get<3>(target);
-    //boost::tie(v_previous,v_target,v_next, out_new_in) = find_separator_target(f,sep_endp);
 
     assert( (g[v_target].k3==1) || (g[v_target].k3==-1) );    
     assert( g[sep_endp].k3 == g[v_target].k3 );
@@ -943,7 +844,6 @@ void VoronoiDiagram::add_separator(HEFace f, HEFace null_face,
     g[e2].type    = SEPARATOR;
     g[e2_tw].type = SEPARATOR;
     
-
     // there are two cases. depending on how v_target (NEW) is found:
     // OUT-NEW-IN, when out_new_in = true
     // IN-NEW-OUT, when out_new_in = false
@@ -1055,6 +955,7 @@ HEVertex VoronoiDiagram::find_seed_vertex(HEFace f, Site* site)  {
     return minimalVertex;
 }
 
+/*
 HEEdge VoronoiDiagram::find_null_edge(HEEdge e, double a) {
     HEEdge current = e;
     HEEdge out = HEEdge();
@@ -1077,7 +978,7 @@ HEEdge VoronoiDiagram::find_null_edge(HEEdge e, double a) {
     }while( !found && (current!=e) );
     assert(out!=HEEdge());
     return out;
-}
+}*/
 
 // growing the v0/delete-tree of "IN" vertices by "weighted breadth-first search"
 // we start at the seed and add vertices with detH<0 provided that:
@@ -1124,6 +1025,8 @@ void VoronoiDiagram::augment_vertex_set(  Site* site ) {
 void VoronoiDiagram::mark_vertex(HEVertex& v,  Site* site) {
     g[v].status = IN;
     v0.push_back( v );
+    modified_vertices.insert(v);
+    
     if (site->isPoint())
         mark_adjacent_faces_p(v,site);
     else
@@ -1412,10 +1315,10 @@ void VoronoiDiagram::remove_split_vertex(HEFace f) {
         HEEdge new2 = g.add_edge(v2,v1);
         g[new1].face = face1;
         g[new2].face = face2;
-        g[new1].next = v2_next;
-        g[new2].next = v1_next;
-        g[v2_prev].next = new2;
-        g[v1_prev].next = new1;
+        g.set_next(new1,v2_next); //g[new1].next = v2_next;
+        g.set_next(new2,v1_next); //g[new2].next = v1_next;
+        g.set_next(v2_prev,new2); //g[v2_prev].next = new2;
+        g.set_next(v1_prev,new1); //g[v1_prev].next = new1;
         g[face1].edge = new1;
         g[face2].edge = new2;
         
@@ -1448,24 +1351,25 @@ void VoronoiDiagram::add_vertices( Site* new_site ) {
     assert( !v0.empty() );
     EdgeVector q_edges = find_in_out_edges();       // new vertices generated on these IN-OUT edges
     for( unsigned int m=0; m<q_edges.size(); ++m )  {   
-        HEVertex q = g.add_vertex();
-        g[q].status = NEW;
-        modified_vertices.insert(q);
+
         Solution sl = vpos->position( q_edges[m], new_site );
         if ( vpos->dist_error( q_edges[m], sl, new_site) > 1e-9 ) {
             HEVertex src = g.source(q_edges[m]);
             HEVertex trg = g.target(q_edges[m]);
-            std::cout << "ERROR while positioning new vertex " << g[q].index << " on edge\n";
+            std::cout << "ERROR while positioning new vertex  on edge\n";
             std::cout << g[ src ].index << "[" << g[ src ].type << "]" << "{" << g[ src ].status << "}" << "(t=" << g[ src ].dist() << ")";
             std::cout <<  " -[" << g[q_edges[m]].type << "]- "; 
             std::cout << g[ trg ].index << "[" << g[ trg ].type << "]" << "{" << g[ trg ].status << "}" << "(t=" << g[ trg ].dist() << ")";
             
             std::cout <<  "     derr =" << vpos->dist_error( q_edges[m], sl, new_site) << "\n";
         }
-        
-        g[q].position = sl.p; // set position
-        g[q].k3 = sl.k3;
-        g[q].init_dist( new_site->apex_point( g[q].position ) ); // set initial clearance-disk
+        HEVertex q = g.add_vertex( VoronoiVertex( sl.p, NEW, NORMAL, new_site->apex_point( sl.p ), sl.k3 ) );
+        //g[q].status = NEW;
+        modified_vertices.insert(q);
+                
+        //g[q].position = sl.p; // set position
+        //g[q].k3 = sl.k3;
+        //g[q].init_dist( new_site->apex_point( g[q].position ) ); // set initial clearance-disk
         add_vertex_in_edge(q, q_edges[m] );
         if (debug) {
             HEVertex src = g.source(q_edges[m]);

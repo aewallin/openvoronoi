@@ -62,9 +62,9 @@ public:
     /// vertex with given position, status, and type
     VoronoiVertex( Point p, VoronoiVertexStatus st, VoronoiVertexType t);
     VoronoiVertex( Point pos, VoronoiVertexStatus st, VoronoiVertexType t, Point initDist);
-
+    VoronoiVertex( Point pos, VoronoiVertexStatus st, VoronoiVertexType t, Point initDist, double k3);
+    
     virtual ~VoronoiVertex() {}
-    void init();
     /// reset status
     void reset();
     friend class VoronoiDiagramChecker;
@@ -94,6 +94,12 @@ public:
     HEFace null_face;
     HEFace face;
 protected:
+    void init();
+    void init(Point p, VoronoiVertexStatus st);
+    void init(Point p, VoronoiVertexStatus st, VoronoiVertexType t);
+    void init(Point p, VoronoiVertexStatus st, VoronoiVertexType t, Point initDist);
+    void init(Point p, VoronoiVertexStatus st, VoronoiVertexType t, Point initDist, double k3);
+
     /// global vertex count
     static int count;
     /// map for checking topology correctness

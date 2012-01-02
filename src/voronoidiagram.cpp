@@ -157,6 +157,9 @@ void VoronoiDiagram::initialize() {
 /// insert a point site into the diagram 
 /// returns an integer handle to the inserted point. use this integer when inserting lines/arcs
 int VoronoiDiagram::insert_point_site(const Point& p, int step) {
+    segment_start = HEVertex(); // these are used in find_edge_data(), but only required when inserting line-sites
+    segment_end = HEVertex(); // so set them invalid here!
+    
     num_psites++;
     int current_step=1;
     assert( p.norm() < far_radius );     // only add vertices within the far_radius circle
@@ -208,6 +211,7 @@ if (step==current_step) return -1; current_step++;
 /// insert a line-segment site into the diagram
 /// idx1 and idx2 should be int-handles returned from insert_point_site()
 bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
+    
     num_lsites++;
     int current_step=1;
     
@@ -1805,6 +1809,11 @@ EdgeData VoronoiDiagram::find_edge_data(HEFace f, VertexVector startverts)  {
         //count++;
         //assert(count<10000); // some reasonable max number of edges in face, to avoid infinite loop
     } while (current_edge!=start_edge && !found);
+    if (!found) {
+        std::cout << "ERROR: unable to find OUT-NEW-IN vertex on face:\n";
+        print_face(f);
+        std::cout << " The excluded vertices are: (size=" << startverts.size()<<")"; print_vertices(startverts);
+    }
     assert(found);
     if (debug) std::cout << " OUT-NEW-IN = " << g[ed.v1].index << "\n";
 

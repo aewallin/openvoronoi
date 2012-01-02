@@ -46,9 +46,9 @@ def draw_vd(vd):
     vod.textScale = 0.02
     vod.vertexRadius = 0.0031
     vod.drawVertices=0
-    vod.drawVertexIndex=0
+    vod.drawVertexIndex=1
     vod.drawGenerators=0
-    vod.offsetEdges = 0
+    vod.offsetEdges = 1
     vd.setEdgeOffset(0.05)
     times=[]
     times.append( 1 )
@@ -86,8 +86,8 @@ def rpg_vd(Npts, seed, debug):
     m=0
     t_before = time.time()
     for p in pts:
+        print " adding vertex ",m
         id_list.append( vd.addVertexSite( p ) )
-        #print m," added vertex "
         m=m+1
     """
     print "polygon is: "
@@ -108,7 +108,7 @@ def rpg_vd(Npts, seed, debug):
         n_nxt = n+1
         if n==(len(id_list)-1):
             n_nxt=0 # point 0 is the endpoint of the last segment
-            
+        print " adding line-site ", id_list[n]," - ", id_list[n_nxt]
         vd.addLineSite( id_list[n], id_list[n_nxt])
     t_after = time.time()
     times.append( t_after-t_before )
@@ -144,8 +144,7 @@ def single_run(Npts, seed, debug=False):
 if __name__ == "__main__":  
     #loop_run(4,300)
     
-    # s =337 problem!
-    #single_run(3,336,1)
-    vd = single_run(4,int(137))
+    
+    vd = single_run(7,int(137))
     draw_vd(vd)
         

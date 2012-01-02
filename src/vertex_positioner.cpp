@@ -45,6 +45,7 @@ VertexPositioner::~VertexPositioner() {
     delete ppp_solver;
     delete lll_solver;
     delete qll_solver;
+    errstat.clear();
 }
 
 // calculate the position of a new vertex on the given edge e

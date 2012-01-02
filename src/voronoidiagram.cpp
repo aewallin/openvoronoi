@@ -1793,9 +1793,8 @@ EdgeData VoronoiDiagram::find_edge_data(HEFace f, VertexVector startverts)  {
             if (debug) {
                 std::cout << "     " << g[current_vertex].index << "N=" << (g[current_vertex].status == NEW) ;
                 std::cout << " !SEPP=" << (g[current_vertex].type != SEPPOINT) << "\n";
-                //std::cout << " !ed.v1=" << (next_vertex != ed.v1) <<"\n";
             }
-            if ( g[current_vertex].status == NEW &&  not_found && g[current_vertex].type != SEPPOINT) {
+            if (  not_found ) {
                     ed.v1 = current_vertex;
                     ed.v1_prv = current_edge;
                     ed.v1_nxt = g[current_edge].next;

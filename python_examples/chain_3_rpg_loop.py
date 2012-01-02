@@ -12,8 +12,65 @@ import gzip
 import ovdgenerators as gens
 import rpg
 
+def draw_vd(vd):
+    #w=2500
+    #h=1500
+    
+    #w=1920
+    #h=1080
+    w=1024
+    h=1024
+    myscreen = ovdvtk.VTKScreen(width=w, height=h) 
+    ovdvtk.drawOCLtext(myscreen, rev_text=ovd.revision() )
+    
+    w2if = vtk.vtkWindowToImageFilter()
+    w2if.SetInput(myscreen.renWin)
+    lwr = vtk.vtkPNGWriter()
+    lwr.SetInput( w2if.GetOutput() )
+    #w2if.Modified()
+    #lwr.SetFileName("tux1.png")
+    
+    scale=1
+    myscreen.render()
+    far = 1
+    camPos = far
+    zmult = 3
+    # camPos/float(1000)
+    myscreen.camera.SetPosition(0, -camPos/float(1000), zmult*camPos) 
+    myscreen.camera.SetClippingRange(-(zmult+1)*camPos,(zmult+1)*camPos)
+    myscreen.camera.SetFocalPoint(0.0, 0, 0)
+    
+    # for vtk visualization
+    vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
+    vod.drawFarCircle()
+    vod.textScale = 0.02
+    vod.vertexRadius = 0.0031
+    vod.drawVertices=0
+    vod.drawVertexIndex=0
+    vod.drawGenerators=0
+    vod.offsetEdges = 0
+    vd.setEdgeOffset(0.05)
+    times=[]
+    times.append( 1 )
+    times.append( 1 )
+    
+            
+    vod.setVDText2(times)
+    
+    
+    vod.setAll()
+
+    myscreen.render()   
+    #w2if.Modified()
+    #lwr.SetFileName("{0}.png".format(Nmax))
+    #lwr.Write()
+     
+    myscreen.iren.Start()
+
+
 def rpg_vd(Npts, seed, debug):
     far = 1
+    
     vd = ovd.VoronoiDiagram(far,120)
     vd.reset_vertex_count()    
     poly = rpg.rpg(Npts, seed)
@@ -61,7 +118,7 @@ def rpg_vd(Npts, seed, debug):
     is_valid = vd.check()
     #print " vd-check: ", is_valid
     
-    return is_valid
+    return [is_valid, vd]
 
 def loop_run(Npts, max_seed, debug=False, debug_seed=-1):
     #Npts = 3
@@ -74,16 +131,21 @@ def loop_run(Npts, max_seed, debug=False, debug_seed=-1):
             debug2 = True
         result = rpg_vd(Npts,seed,debug2)
         print "N=",Npts," s=",seed, " ok?=",result
-        assert( result == True )
+        assert( result[0] == True )
 
 def single_run(Npts, seed, debug=False):
     result = rpg_vd(Npts,seed,debug)
     print "N=",Npts," s=",seed, " ok?=",result
-    assert( result == True )
+    assert( result[0] == True )
+    return result[1]
+    
 
+    
 if __name__ == "__main__":  
-    loop_run(3,413,False,302)
+    #loop_run(4,300)
     
     # s =337 problem!
     #single_run(3,336,1)
-    #single_run(3,311)
+    vd = single_run(4,int(137))
+    draw_vd(vd)
+        

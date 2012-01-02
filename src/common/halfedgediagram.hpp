@@ -112,7 +112,20 @@ public:
     std::vector< TFaceProperties > faces;
     BGLGraph g;
 
-    virtual ~HEDIGraph(){}
+    virtual ~HEDIGraph(){
+        
+        // sites are associated with faces. go through all faces and delete the site
+        BOOST_FOREACH( TFaceProperties fprop, faces ) {
+            if (fprop.site)
+                delete fprop.site;
+        }
+        g.clear();
+        
+        /*BOOST_FOREACH( Vertex v, boost::vertices(g) ) {
+            boost::clear_vertex(v); // remove all edges incident on the vertex
+            boost::remove_vertex(v);
+        }*/
+    }
     
 /// add a blank vertex and return its descriptor
 Vertex add_vertex() { 

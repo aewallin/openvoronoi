@@ -596,7 +596,7 @@ HEVertex VoronoiDiagram::process_next_null(Point dir, HEEdge next_edge , bool k3
             else
                 g[trg].k3=-1;
 
-            modified_vertices.insert(src);
+            modified_vertices.insert(trg);
             
 
         }

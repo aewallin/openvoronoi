@@ -555,24 +555,6 @@ HEVertex VoronoiDiagram::process_next_null(Point dir, HEEdge next_edge , bool k3
 
         } else {
             // target is not endpoint, and no room for separator, so we push it and convert it
-            /*
-            HEEdge next_next = g[next_edge].next;
-            HEVertex next_trg = g.target(next_next);
-            double mid = numeric::diangle_mid( g[src].alfa, g[next_trg].alfa  );
-            g[trg].alfa = mid;
-            g[trg].type = NORMAL;
-            g[trg].status = NEW;
-            modified_vertices.insert(trg);
-            if (debug) {
-                std::cout << "process_next_null()  push + convert v=" << g[trg].index << "\n"; 
-                std::cout << " position at mid of " << g[src].index << " and " << g[next_trg].index << "\n";
-            }
-            if (k3)
-                g[trg].k3=+1;
-            else
-                g[trg].k3=-1;
-            */
-            // target is not endpoint, and no room for separator, so we push it and convert it
             HEEdge next_next = g[next_edge].next;
             HEVertex next_trg = g.target(next_next);
             double mid = numeric::diangle_mid( g[src].alfa, g[next_trg].alfa  );
@@ -1783,40 +1765,40 @@ EdgeData VoronoiDiagram::find_edge_data(HEFace f, VertexVector startverts)  {
     EdgeData ed;
     ed.f = f;
     if (debug) {
-        std::cout << " find_edge_data():\n";
-        print_face(f);
+        std::cout << "find_edge_data():\n";
+        std::cout << " "; print_face(f);
     }
     HEEdge current_edge = g[f].edge; // start on some edge of the face
     HEEdge start_edge = current_edge;
     bool found = false;
     //int count=0;    
-    if (debug) std::cout << " finding OUT-NEW-IN vertex: \n";                         
+    if (debug) std::cout << "    finding OUT-NEW-IN vertex: \n";                         
     do { // find OUT-NEW-IN vertices in this loop
-        HEVertex current_vertex = g.target( current_edge );
         HEEdge next_edge = g[current_edge].next;
-        HEVertex next_vertex = g.target( next_edge );
-        HEEdge next2_edge = g[next_edge].next;
-        HEVertex next2_vertex = g.target( next2_edge );
         
-        if ( (g[next_vertex].status==NEW) && 
-             (  ((g[current_vertex].status==OUT)  && (current_vertex!=segment_start || current_vertex!=segment_end))  ||
-                ((g[next2_vertex].type==ENDPOINT) && (next2_vertex==segment_start || next2_vertex==segment_end))
+        HEVertex previous_vertex = g.source( current_edge);
+        HEVertex  current_vertex = g.target( current_edge );
+        HEVertex     next_vertex = g.target( next_edge );
+        
+        if ( (g[current_vertex].status==NEW) && (g[current_vertex].type != SEPPOINT) &&
+             (  ((g[previous_vertex].status==OUT)  && (previous_vertex!=segment_start && previous_vertex!=segment_end))  ||
+                ((g[next_vertex].type==ENDPOINT) && (next_vertex==segment_start || next_vertex==segment_end))
              )
            ) {
             bool not_found=true;
             BOOST_FOREACH(HEVertex v, startverts) { // exclude vertices already found
-                if (next_vertex==v)
+                if (current_vertex==v)
                     not_found=false;
             }
             if (debug) {
-                std::cout << g[next_vertex].index << "N=" << (g[next_vertex].status == NEW) ;
-                std::cout << " !SEPP=" << (g[next_vertex].type != SEPPOINT) << "\n";
+                std::cout << "     " << g[current_vertex].index << "N=" << (g[current_vertex].status == NEW) ;
+                std::cout << " !SEPP=" << (g[current_vertex].type != SEPPOINT) << "\n";
                 //std::cout << " !ed.v1=" << (next_vertex != ed.v1) <<"\n";
             }
-            if ( g[next_vertex].status == NEW &&  not_found && g[next_vertex].type != SEPPOINT) {
-                    ed.v1 = next_vertex;
-                    ed.v1_prv = next_edge;
-                    ed.v1_nxt = g[next_edge].next;
+            if ( g[current_vertex].status == NEW &&  not_found && g[current_vertex].type != SEPPOINT) {
+                    ed.v1 = current_vertex;
+                    ed.v1_prv = current_edge;
+                    ed.v1_nxt = g[current_edge].next;
                     found = true;                 
             }
         }
@@ -1825,26 +1807,33 @@ EdgeData VoronoiDiagram::find_edge_data(HEFace f, VertexVector startverts)  {
         //assert(count<10000); // some reasonable max number of edges in face, to avoid infinite loop
     } while (current_edge!=start_edge && !found);
     assert(found);
-    if (debug) std::cout << "OUT-NEW = " << g[ed.v1].index << "\n";
+    if (debug) std::cout << " OUT-NEW-IN = " << g[ed.v1].index << "\n";
 
     // now search for v2
     //count=0; 
     start_edge = current_edge;
     found=false;
+    if (debug) std::cout << "    finding IN-NEW-OUT vertex: \n";   
     do { // find IN-NEW-OUT vertices in this loop
-        HEVertex current_vertex = g.target( current_edge );
-        HEEdge next_edge = g[current_edge].next;
-        HEVertex next_vertex = g.target( next_edge );
-        if ( g[current_vertex].status == IN ) {
+        //HEEdge next_edge = g[current_edge].next;
+        
+        //HEVertex previous_vertex = g.source( current_edge);
+        HEVertex  current_vertex = g.target( current_edge );
+        //HEVertex     next_vertex = g.target( next_edge );
+        
+        //HEVertex current_vertex = g.target( current_edge );
+        //HEEdge next_edge = g[current_edge].next;
+        //HEVertex next_vertex = g.target( next_edge );
+        if ( g[current_vertex].status == NEW && g[current_vertex].type != SEPPOINT ) {
             if (debug) {
-                std::cout << g[next_vertex].index << "N=" << (g[next_vertex].status == NEW) ;
-                std::cout << " !SEPP=" << (g[next_vertex].type != SEPPOINT);
-                std::cout << " !ed.v1=" << (next_vertex != ed.v1) <<"\n";
+                std::cout << "     " << g[current_vertex].index << "N=" << (g[current_vertex].status == NEW) ;
+                std::cout << " !SEPP=" << (g[current_vertex].type != SEPPOINT);
+                std::cout << " !ed.v1=" << (current_vertex != ed.v1) <<"\n";
             }
-            if ( g[next_vertex].status == NEW && g[next_vertex].type != SEPPOINT && next_vertex != ed.v1) { // -IN-NEW(v2)
-                    ed.v2 = next_vertex;
-                    ed.v2_prv = next_edge;
-                    ed.v2_nxt = g[next_edge].next;
+            if (  current_vertex != ed.v1) { // -IN-NEW(v2)
+                    ed.v2     = current_vertex;
+                    ed.v2_prv = current_edge;
+                    ed.v2_nxt = g[current_edge].next;
                     found = true;                 
             }
         }
@@ -1854,9 +1843,9 @@ EdgeData VoronoiDiagram::find_edge_data(HEFace f, VertexVector startverts)  {
     } while (current_edge!=start_edge && !found);
 
     assert(found);
-    if (debug) std::cout << "NEW_2=" << g[ed.v2].index << "\n";
+    if (debug) std::cout << " IN-NEW-OUT=" << g[ed.v2].index << "\n";
 
-    //std::cout << "find_edge_data() NEW-NEW vertex pair: " << g[ed.v1].index << " - " << g[ed.v2].index << "\n";
+    if (debug) std::cout << "find_edge_data() NEW-NEW vertex pair: " << g[ed.v1].index << " - " << g[ed.v2].index << "\n";
     return ed;
 }
 

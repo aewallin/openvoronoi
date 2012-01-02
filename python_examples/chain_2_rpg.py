@@ -50,21 +50,21 @@ if __name__ == "__main__":
     vod.drawFarCircle()
     vod.textScale = 0.02
     vod.vertexRadius = 0.0031
-    vod.drawVertices=1
-    #vod.drawVertexIndex=0
-    vod.drawGenerators=1
-    vod.offsetEdges = 1
+    vod.drawVertices=0
+    vod.drawVertexIndex=0
+    vod.drawGenerators=0
+    vod.offsetEdges = 0
     vd.setEdgeOffset(0.05)
     linesegs = 1 # switch to turn on/off line-segments
     
-    Npts = 3
-    poly = rpg.rpg(Npts, 45)
-    # N=3 working seeds: 41-42
+    Npts = 400
+    poly = rpg.rpg(Npts, 0)
+    # N=3 working seeds: 25-43 45
     
     
     n_problem=Npts # go all the way to the end
-    n_problem=2
-    n_step=9
+    #n_problem=2
+    n_step=10
     
     pts=[]
     for p in poly:

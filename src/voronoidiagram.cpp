@@ -2020,10 +2020,10 @@ int VoronoiDiagram::num_split_vertices()  {
 
 bool VoronoiDiagram::check() {
     if( vd_checker->is_valid() ) {
-        std::cout << "diagram check OK.\n";
+        if (debug) std::cout << "diagram check OK.\n";
         return true;
     } else {
-        std::cout << "diagram check ERROR.\n";
+        if (debug) std::cout << "diagram check ERROR.\n";
         return false;
     }
 }

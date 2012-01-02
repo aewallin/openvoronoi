@@ -1,20 +1,20 @@
 /*  
- *  Copyright 2010-2011 Anders Wallin (anders.e.e.wallin "at" gmail.com)
+ *  Copyright 2010-2012 Anders Wallin (anders.e.e.wallin "at" gmail.com)
  *  
  *  This file is part of OpenVoronoi.
  *
- *  OpenCAMlib is free software: you can redistribute it and/or modify
+ *  OpenVoronoi is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  OpenCAMlib is distributed in the hope that it will be useful,
+ *  OpenVoronoi is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with OpenCAMlib.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with OpenVoronoi.  If not, see <http://www.gnu.org/licenses/>.
 */
 #ifndef VORONOI_DIAGRAM_HPP
 #define VORONOI_DIAGRAM_HPP
@@ -35,6 +35,10 @@ class VoronoiDiagramChecker;
 class FaceGrid;
 
 
+// in augment_vertex_set() we grow the delete-tree by processing vertices
+// one-by-one from a priority_queue. This is the priority_queue sort predicate.
+// We handle vertices with a large fabs( in_circle() ) first, since we 
+// believe their predicate to be more reliable.
 typedef std::pair<HEVertex, double> VertexDetPair;
 class abs_comparison {
 public:
@@ -47,12 +51,14 @@ public:
 // sorted by decreasing fabs() of in_circle-predicate, so that the vertices whose IN/OUT status we are 'most certain' about are processed first
 typedef std::priority_queue< VertexDetPair , std::vector<VertexDetPair>, abs_comparison > VertexQueue;
 
+// this struct used in add_edge() for storing information related to
+// the new edge.
 struct EdgeData {
     HEEdge v1_prv;
-    HEVertex v1;
+    HEVertex v1; // NEW edge source
     HEEdge v1_nxt;
     HEEdge v2_prv;
-    HEVertex v2;
+    HEVertex v2; // NEW edge target
     HEEdge v2_nxt;
     HEFace f;
 };
@@ -107,7 +113,6 @@ class VoronoiDiagram {
         EdgeData   find_edge_data(HEFace f, VertexVector startverts=VertexVector());
         EdgeVector find_split_edges(HEFace f, Point pt1, Point pt2);
         bool find_split_vertex(HEFace f, HEVertex& v);
-        //HEEdge find_null_edge(HEEdge e, double a);
         
         void augment_vertex_set( Site* site);        
         bool predicate_c4(HEVertex v);

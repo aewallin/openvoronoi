@@ -57,7 +57,7 @@ if __name__ == "__main__":
     vd.setEdgeOffset(0.05)
     linesegs = 1 # switch to turn on/off line-segments
     
-    Npts = 400
+    Npts = 100
     poly = rpg.rpg(Npts, 0)
     # N=3 working seeds: 25-43 45
     
@@ -88,7 +88,7 @@ if __name__ == "__main__":
     
     print "all point sites inserted. ",
     vd.check()
-    vd.debug_on()
+    #vd.debug_on()
 
     t_before = time.time()
     if linesegs==1:

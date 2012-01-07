@@ -48,6 +48,39 @@ def translate(segs,x,y):
             #seg2.append(seg[3] + y)
         out.append(seg2)
     return out
+
+def modify_segments(segs):
+    segs_mod =[]
+    for seg in segs:
+        first = seg[0]
+        last = seg[ len(seg)-1 ]
+        assert( first[0]==last[0] and first[1]==last[1] )
+        seg.pop()
+        segs_mod.append(seg)
+        #drawSegment(myscreen, seg)
+    return segs_mod
+
+def draw_ttt(myscreen, text, x,y,scale):
+    wr = ttt.SEG_Writer()
+    wr.arc = False
+    wr.conic = False
+    wr.cubic = False
+    wr.scale = float(1)/float(scale)
+    s3 = ttt.ttt(text,wr) 
+    ext = wr.extents
+    print ext
+    dx = ext[1]-ext[0]
+
+    segs = wr.get_segments()
+    segs = translate(segs, x, y)
+    print "number of polygons: ", len(segs)
+    np = 0
+    for s in segs:
+        print " polygon ",np," has ",len(s)," points"
+        np=np+1        
+    segs = modify_segments(segs)
+    drawLoops(myscreen, segs, ovdvtk.yellow )
+    
     
 if __name__ == "__main__":  
     #w=2500
@@ -82,43 +115,9 @@ if __name__ == "__main__":
     ca = ovdvtk.Circle(center=(0,0,0) , radius=1, color=(0,1,1), resolution=50 )
     myscreen.addActor(ca)   
     
-    
-    wr = ttt.SEG_Writer()
-
-    # wr.scale = 3
-    wr.arc = False
-    wr.conic = False
-    wr.cubic = False
-    wr.scale = float(1)/float(80000)
-    s3 = ttt.ttt("ABCDEFGHIJKLMNOPQRSTUVWXYZ",wr) 
-    ext = wr.extents
-    print ext
-    dx = ext[1]-ext[0]
-    
-    segs = wr.get_segments()
-    segs = translate(segs, -0.5, -0.4)
-
-    #print s
-    #print segs
-    #exit()
-    print "number of polygons: ", len(segs)
-    np = 0
-    for s in segs:
-        print " polygon ",np," has ",len(s)," points"
-        np=np+1
-        
-    segs_mod =[]
-    for seg in segs:
-        first = seg[0]
-        last = seg[ len(seg)-1 ]
-        assert( first[0]==last[0] and first[1]==last[1] )
-        seg.pop()
-        segs_mod.append(seg)
-        #drawSegment(myscreen, seg)
-    segs = segs_mod
-    
-    drawLoops(myscreen, segs, ovdvtk.yellow )
-    
+    draw_ttt(myscreen, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", -0.5,0,80000)
+    draw_ttt(myscreen, "abcdefghijklmnopqrstuvwxyz", -0.5,-0.1,80000)
+    draw_ttt(myscreen, "1234567890*", -0.5,-0.2,80000)
     
     print "PYTHON All DONE."
 

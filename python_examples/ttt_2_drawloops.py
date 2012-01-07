@@ -48,60 +48,6 @@ def translate(segs,x,y):
             #seg2.append(seg[3] + y)
         out.append(seg2)
     return out
-
-def insert_polygon(vd, polygon):
-    pts=[]
-    for p in polygon:
-        pts.append( ovd.Point( p[0], p[1] ) )
-        
-    times=[]
-    id_list = []
-    m=0
-    t_before = time.time()
-    for p in pts:
-        id_list.append( vd.addVertexSite( p ) )
-        print m," added vertex "
-        m=m+1
-    t_after = time.time()
-    times.append( t_after-t_before )
-    
-    print "polygon is: "
-    for idx in id_list:
-        print idx," ",
-    print "."
-    
-
-    
-    print "all point sites inserted. ",
-    vd.check()
-    #vd.debug_on()
-
-    t_before = time.time()
-
-    for n in range(len(id_list)):
-        n_nxt = n+1
-        if n==(len(id_list)-1):
-            n_nxt=0
-        
-        vd.addLineSite( id_list[n], id_list[n_nxt])
-        """
-        if n == n_problem:
-            vd.addLineSite( id_list[n], id_list[n_nxt],n_step)
-            
-            t_after = time.time()
-            line_time = t_after-t_before
-            times.append( max(line_time,0.1) )
-            vod.setVDText2(times)
-            vod.setAll()
-            myscreen.render()
-            myscreen.iren.Start()
-            raw_input("Press ENTER to exit")
-        """
-    t_after = time.time()
-    times.append( t_after-t_before )
-    
-    vd.check()
-    return times
     
 if __name__ == "__main__":  
     #w=2500
@@ -132,6 +78,10 @@ if __name__ == "__main__":
     myscreen.camera.SetClippingRange(-(zmult+1)*camPos,(zmult+1)*camPos)
     myscreen.camera.SetFocalPoint(0.0, 0, 0)
     
+    # draw a unit-circle
+    ca = ovdvtk.Circle(center=(0,0,0) , radius=1, color=(0,1,1), resolution=50 )
+    myscreen.addActor(ca)   
+    
     
     wr = ttt.SEG_Writer()
 
@@ -139,17 +89,24 @@ if __name__ == "__main__":
     wr.arc = False
     wr.conic = False
     wr.cubic = False
-    wr.scale = float(1)/float(4000)
-    s3 = ttt.ttt("S",wr) 
-    # I
-    # IL (src_sign trg_sign warning)
-    # 
-    #print s3
+    wr.scale = float(1)/float(80000)
+    s3 = ttt.ttt("ABCDEFGHIJKLMNOPQRSTUVWXYZ",wr) 
+    ext = wr.extents
+    print ext
+    dx = ext[1]-ext[0]
+    
     segs = wr.get_segments()
     segs = translate(segs, -0.5, -0.4)
+
     #print s
-    print segs
+    #print segs
     #exit()
+    print "number of polygons: ", len(segs)
+    np = 0
+    for s in segs:
+        print " polygon ",np," has ",len(s)," points"
+        np=np+1
+        
     segs_mod =[]
     for seg in segs:
         first = seg[0]
@@ -160,29 +117,8 @@ if __name__ == "__main__":
         #drawSegment(myscreen, seg)
     segs = segs_mod
     
-    #drawLoops(myscreen, segs, ovdvtk.yellow )
+    drawLoops(myscreen, segs, ovdvtk.yellow )
     
-    vd = ovd.VoronoiDiagram(far,120)
-    print vd.version()
-    
-    vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
-    vod.drawFarCircle()
-    vod.textScale = 0.02
-    vod.vertexRadius = 0.0031
-    vod.drawVertices=0
-    vod.drawVertexIndex=0
-    vod.drawGenerators=0
-    vod.offsetEdges = 0
-    vd.setEdgeOffset(0.05)
-    
-    times = [0,0]
-    for polygon in segs:
-        tp = insert_polygon(vd, polygon )
-        times[0] = times[0] + tp[0]
-        times[1] = times[1] + tp[1]
-        
-    vod.setVDText2(times)
-    vod.setAll()
     
     print "PYTHON All DONE."
 

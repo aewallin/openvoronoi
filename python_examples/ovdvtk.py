@@ -159,6 +159,7 @@ class VD:
             if self.drawVertexIndex:
                 id_text = str(idx)
                 factor = FollowerText( text=id_text,center=(p.x,p.y,0), scale = self.textScale, color=self.pointsiteColor)
+                factor = FollowerText( text=id_text,center=(p.x,p.y,0), scale = self.textScale, color=self.pointsiteColor)
                 self.gens.append(factor)
                 self.myscreen.addActor( factor )
 

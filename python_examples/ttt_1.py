@@ -84,24 +84,63 @@ def insert_polygon(vd, polygon):
             n_nxt=0
         
         vd.addLineSite( id_list[n], id_list[n_nxt])
-        """
-        if n == n_problem:
-            vd.addLineSite( id_list[n], id_list[n_nxt],n_step)
-            
-            t_after = time.time()
-            line_time = t_after-t_before
-            times.append( max(line_time,0.1) )
-            vod.setVDText2(times)
-            vod.setAll()
-            myscreen.render()
-            myscreen.iren.Start()
-            raw_input("Press ENTER to exit")
-        """
     t_after = time.time()
     times.append( t_after-t_before )
     
     vd.check()
     return times
+    
+def insert_polygon_points(vd, polygon):
+    pts=[]
+    for p in polygon:
+        pts.append( ovd.Point( p[0], p[1] ) )
+    id_list = []
+    m=0
+    for p in pts:
+        id_list.append( vd.addVertexSite( p ) )
+        print m," added vertex ", id_list[ len(id_list) -1 ]
+        m=m+1    
+    return id_list
+
+def insert_polygon_segments(vd,id_list):
+    for n in range(len(id_list)):
+        n_nxt = n+1
+        if n==(len(id_list)-1):
+            n_nxt=0
+        vd.addLineSite( id_list[n], id_list[n_nxt])
+
+def modify_segments(segs):
+    segs_mod =[]
+    for seg in segs:
+        first = seg[0]
+        last = seg[ len(seg)-1 ]
+        assert( first[0]==last[0] and first[1]==last[1] )
+        seg.pop()
+        segs_mod.append(seg)
+        #drawSegment(myscreen, seg)
+    return segs_mod
+    
+def insert_many_polygons(vd,segs):
+    polygon_ids =[]
+    for poly in segs:
+        poly_id = insert_polygon_points(vd,poly)
+        polygon_ids.append(poly_id)
+    
+    for ids in polygon_ids:
+        insert_polygon_segments(vd,ids)
+
+def ttt_segments(text,scale):
+    wr = ttt.SEG_Writer()
+
+    # wr.scale = 3
+    wr.arc = False
+    wr.conic = False
+    wr.cubic = False
+    wr.scale = float(1)/float(scale)
+    s3 = ttt.ttt(text,wr) 
+    segs = wr.get_segments()
+    return segs
+    
     
 if __name__ == "__main__":  
     #w=2500
@@ -132,35 +171,35 @@ if __name__ == "__main__":
     myscreen.camera.SetClippingRange(-(zmult+1)*camPos,(zmult+1)*camPos)
     myscreen.camera.SetFocalPoint(0.0, 0, 0)
     
-    
+    """
     wr = ttt.SEG_Writer()
 
     # wr.scale = 3
     wr.arc = False
     wr.conic = False
     wr.cubic = False
-    wr.scale = float(1)/float(4000)
-    s3 = ttt.ttt("S",wr) 
-    # I
-    # IL (src_sign trg_sign warning)
-    # 
-    #print s3
+    wr.scale = float(1)/float(32000)
+    s3 = ttt.ttt("ABCDEFGHIJKL",wr) 
     segs = wr.get_segments()
-    segs = translate(segs, -0.5, -0.4)
-    #print s
-    print segs
-    #exit()
-    segs_mod =[]
-    for seg in segs:
-        first = seg[0]
-        last = seg[ len(seg)-1 ]
-        assert( first[0]==last[0] and first[1]==last[1] )
-        seg.pop()
-        segs_mod.append(seg)
-        #drawSegment(myscreen, seg)
-    segs = segs_mod
+    """
+    segs = ttt_segments(  "ABCDEFGHIJKLM", 64000)
+    segs2 = ttt_segments( "NOPQRSTUVWXYZ", 64000)
+    segs3 = ttt_segments( "abcdefghijklm", 64000)
+    segs4 = ttt_segments( "nopqrstuvwxyz", 64000) # NOPQRSTUVWXYZ", 64000)
+    #segs = ttt_segments(  "A", 64000)
+    #segs2 = ttt_segments( "B", 64000)
+    #segs2=[]
+    segs = translate(segs, -0.6, 0.05)
+    segs = modify_segments(segs)
     
-    #drawLoops(myscreen, segs, ovdvtk.yellow )
+    segs2 = translate(segs2, -0.6, -0.05)
+    segs2 = modify_segments(segs2)
+    
+    segs3 = translate(segs3, -0.6, -0.25)
+    segs3 = modify_segments(segs3)
+    
+    segs4 = translate(segs4, -0.6, -0.45)
+    segs4 = modify_segments(segs4)
     
     vd = ovd.VoronoiDiagram(far,120)
     print vd.version()
@@ -175,12 +214,13 @@ if __name__ == "__main__":
     vod.offsetEdges = 0
     vd.setEdgeOffset(0.05)
     
-    times = [0,0]
-    for polygon in segs:
-        tp = insert_polygon(vd, polygon )
-        times[0] = times[0] + tp[0]
-        times[1] = times[1] + tp[1]
-        
+    all_segs=segs+segs2 #+segs3 #+segs4
+    #all_segs=segs3 #+segs4
+    
+    insert_many_polygons(vd,all_segs)
+    #insert_many_polygons(vd,all_segs)
+    
+    times=[1,1]
     vod.setVDText2(times)
     vod.setAll()
     

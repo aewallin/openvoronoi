@@ -95,19 +95,34 @@ def insert_polygon_points(vd, polygon):
     for p in polygon:
         pts.append( ovd.Point( p[0], p[1] ) )
     id_list = []
+    print "inserting ",len(pts)," point-sites:"
     m=0
     for p in pts:
         id_list.append( vd.addVertexSite( p ) )
-        print m," added vertex ", id_list[ len(id_list) -1 ]
+        print " ",m," added vertex ", id_list[ len(id_list) -1 ]
         m=m+1    
     return id_list
 
 def insert_polygon_segments(vd,id_list):
+    j=0
+    print "inserting ",len(id_list)," line-segments:"
     for n in range(len(id_list)):
         n_nxt = n+1
         if n==(len(id_list)-1):
             n_nxt=0
+        print " ",j,"inserting segement ",id_list[n]," - ",id_list[n_nxt]
+        if j == 89:
+            vd.debug_on()
+            vd.addLineSite( id_list[n], id_list[n_nxt],10)
+            times=[1,1]
+            vod.setVDText2(times)
+            vod.setAll()
+            myscreen.render()        
+            myscreen.iren.Start()
+
+            return
         vd.addLineSite( id_list[n], id_list[n_nxt])
+        j=j+1
 
 def modify_segments(segs):
     segs_mod =[]
@@ -185,7 +200,9 @@ if __name__ == "__main__":
     segs = ttt_segments(  "ABCDEFGHIJKLM", 64000)
     segs2 = ttt_segments( "NOPQRSTUVWXYZ", 64000)
     segs3 = ttt_segments( "abcdefghijklm", 64000)
+    segs3 = ttt_segments( "m", 64000)
     segs4 = ttt_segments( "nopqrstuvwxyz", 64000) # NOPQRSTUVWXYZ", 64000)
+    segs4 = ttt_segments( "nopqrst", 64000)
     #segs = ttt_segments(  "A", 64000)
     #segs2 = ttt_segments( "B", 64000)
     #segs2=[]
@@ -206,16 +223,16 @@ if __name__ == "__main__":
     
     vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
     vod.drawFarCircle()
-    vod.textScale = 0.02
-    vod.vertexRadius = 0.0031
+    vod.textScale = 0.000002
+    vod.vertexRadius = 0.0011
     vod.drawVertices=0
-    vod.drawVertexIndex=0
+    vod.drawVertexIndex=1
     vod.drawGenerators=0
-    vod.offsetEdges = 0
-    vd.setEdgeOffset(0.05)
+    vod.offsetEdges = 1
+    vd.setEdgeOffset(0.00001)
     
-    all_segs=segs+segs2 #+segs3 #+segs4
-    #all_segs=segs3 #+segs4
+    #all_segs=segs+segs2 +segs3 #+segs4
+    all_segs=segs3 #+segs4
     
     insert_many_polygons(vd,all_segs)
     #insert_many_polygons(vd,all_segs)

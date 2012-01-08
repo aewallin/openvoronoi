@@ -115,10 +115,10 @@ if __name__ == "__main__":
     ca = ovdvtk.Circle(center=(0,0,0) , radius=1, color=(0,1,1), resolution=50 )
     myscreen.addActor(ca)   
     
-    draw_ttt(myscreen, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", -0.5,0,80000)
-    draw_ttt(myscreen, "abcdefghijklmnopqrstuvwxyz", -0.5,-0.1,80000)
-    draw_ttt(myscreen, "1234567890*", -0.5,-0.2,80000)
-    
+    #draw_ttt(myscreen, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", -0.5,0,80000)
+    #draw_ttt(myscreen, "abcdefghijklmnopqrstuvwxyz", -0.5,-0.1,80000)
+    #draw_ttt(myscreen, "1234567890*", -0.5,-0.2,80000)
+    draw_ttt(myscreen, "m", -0.5,-0.2,80000)
     print "PYTHON All DONE."
 
     myscreen.render()   

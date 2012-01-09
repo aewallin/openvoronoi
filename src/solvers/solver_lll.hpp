@@ -36,42 +36,49 @@ namespace ovd {
 class LLLSolver : public Solver {
 public:
 
+//  a1 x + b1 y + c1 + k1 t = 0
+//  a2 x + b2 y + c2 + k2 t = 0
+//  a3 x + b3 y + c3 + k3 t = 0
+//
+// or in matrix form
+//
+//  ( a1 b1 k1 ) ( x )    ( c1 )
+//  ( a2 b2 k2 ) ( y ) = -( c2 )          Ax = b
+//  ( a3 b3 k3 ) ( t )    ( c3 )
+//
+//  Cramers rule x_i = det(A_i)/det(A)
+//  where A_i is A with column i replaced by b
+//  d = det(A)
+//          a1 b1 -c1      
+// t = det( a2 b2 -c2  ) / d = a1(-b2*c3+b3*c2)-a2(-b1*c3+b3*c1)+a3(-b1*c2+b2*c1)
+//          a3 b3 -c3        = c3(-a1*b2+a2*b1)  + c2(a1*b3-a3*b1) + c1(-a2*b3+a3*b2)
+            
 int solve(Site* s1, double k1, 
                            Site* s2, double k2, 
                            Site* s3, double k3, std::vector<Solution>& slns ) {
     assert( s1->isLine() && s2->isLine() && s3->isLine() );
     
-    
-    
     std::vector< Eq<qd_real> > eq; // equation-parameters, in quad-precision
-    boost::array<Site*,3> sites = {{s1,s2,s3}};
-    
-    // check for equality between any two sites
-    if ( ( sites[0]->eqp() == sites[1]->eqp() ) ||
-          ( sites[1]->eqp() == sites[2]->eqp() ) ||
-          ( sites[0]->eqp() == sites[2]->eqp() ) ) {
-        std::cout << "Warning: LLLSolver: two identical equations!\n";
-    }
+    boost::array<Site*,3> sites = {{s1,s2,s3}};    
     boost::array<double,3> kvals = {{k1,k2,k3}};
     for (unsigned int i=0;i<3;i++)
         eq.push_back( sites[i]->eqp_qd( kvals[i] ) );
     
-    //std::cout << " lll_solver() k3= " << k3 << "\n";
     unsigned int i = 0, j=1, k=2;
-    qd_real d = chop( ( eq[i].a*eq[j].b - eq[j].a*eq[i].b)*eq[k].k + 
-                      (-eq[i].a*eq[k].b + eq[k].a*eq[i].b)*eq[j].k +  
-                      ( eq[j].a*eq[k].b - eq[k].a*eq[j].b)*eq[i].k   ); // determinant
+    qd_real d = chop( numeric::determinant( eq[i].a, eq[i].b, eq[i].k, 
+                                            eq[j].a, eq[j].b, eq[j].k, 
+                                            eq[k].a, eq[k].b, eq[k].k ) ); 
     if (d != 0) {
-        qd_real t = ( (-eq[i].a*eq[j].b + eq[j].a*eq[i].b)*eq[k].c + 
-                      ( eq[i].a*eq[k].b - eq[k].a*eq[i].b)*eq[j].c + 
-                      (-eq[j].a*eq[k].b + eq[k].a*eq[j].b)*eq[i].c   )/d;
+        qd_real t = numeric::determinant( eq[i].a, eq[i].b, -eq[i].c, 
+                                          eq[j].a, eq[j].b, -eq[j].c, 
+                                          eq[k].a, eq[k].b, -eq[k].c ) / d ; 
         if (t >= 0) {
-            qd_real sol_x = ( ( eq[i].b*eq[j].c - eq[j].b*eq[i].c)*eq[k].k + 
-                              (-eq[i].b*eq[k].c + eq[k].b*eq[i].c)*eq[j].k + 
-                              ( eq[j].b*eq[k].c - eq[k].b*eq[j].c)*eq[i].k   )/d;
-            qd_real sol_y = ( (-eq[i].a*eq[j].c + eq[j].a*eq[i].c)*eq[k].k + 
-                              ( eq[i].a*eq[k].c - eq[k].a*eq[i].c)*eq[j].k + 
-                              (-eq[j].a*eq[k].c + eq[k].a*eq[j].c)*eq[i].k   )/d;
+            qd_real sol_x = numeric::determinant( -eq[i].c, eq[i].b, eq[i].k, 
+                                                  -eq[j].c, eq[j].b, eq[j].k, 
+                                                  -eq[k].c, eq[k].b, eq[k].k ) / d ; 
+            qd_real sol_y = numeric::determinant( eq[i].a, -eq[i].c, eq[i].k, 
+                                                  eq[j].a, -eq[j].c, eq[j].k, 
+                                                  eq[k].a, -eq[k].c, eq[k].k ) / d ; 
             slns.push_back( Solution( Point( to_double(sol_x), to_double(sol_y) ), to_double(t), k3 ) ); // kk3 just passes through without any effect!?
             return 1;
         }
@@ -81,9 +88,9 @@ int solve(Site* s1, double k1,
         std::cout << " 1 : " << eq[1].a << " " << eq[1].b << " " << eq[1].c << " " << eq[1].k << "\n";
         std::cout << " 2 : " << eq[2].a << " " << eq[2].b << " " << eq[2].c << " " << eq[2].k << "\n";
         std::cout << " 0==1? " << (eq[0]==eq[1]) << "\n";
-        std::cout << "a" << (eq[0].a-eq[1].a) << "\n";
-        std::cout << "b" << (eq[0].b-eq[1].b) << "\n";
-        std::cout << "c" << (eq[0].c-eq[1].c) << "\n";
+        std::cout << "da = " << (eq[0].a-eq[1].a) << "\n";
+        std::cout << "db = " << (eq[0].b-eq[1].b) << "\n";
+        std::cout << "dc = " << (eq[0].c-eq[1].c) << "\n";
         
     }
     return 0; // no solution if determinant zero, or t-value negative

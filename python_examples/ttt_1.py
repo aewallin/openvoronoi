@@ -202,7 +202,7 @@ if __name__ == "__main__":
     segs = ttt_segments(  "ABCDEFGHIJKLM", 64000)
     segs2 = ttt_segments( "NOPQRSTUVWXYZ", 64000)
     segs3 = ttt_segments( "abcdefghijklm", 64000)
-    segs3 = ttt_segments( "m", 64000)
+    segs3 = ttt_segments( "m", 6400)
     segs4 = ttt_segments( "nopqrstuvwxyz", 64000) # NOPQRSTUVWXYZ", 64000)
     segs4 = ttt_segments( "nopqrst", 64000)
     #segs = ttt_segments(  "A", 64000)
@@ -233,7 +233,8 @@ if __name__ == "__main__":
     vod.offsetEdges = 1
     vd.setEdgeOffset(0.00001)
     
-    #all_segs=segs+segs2 #+segs3 #+segs4
+    all_segs=segs+segs2 #+segs3 #+segs4
+    all_segs=segs
     all_segs=segs3 #+segs4
     
     insert_many_polygons(vd,all_segs)

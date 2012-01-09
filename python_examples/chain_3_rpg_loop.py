@@ -142,9 +142,9 @@ def single_run(Npts, seed, debug=False):
 
     
 if __name__ == "__main__":  
-    #loop_run(4,300)
+    #loop_run(7,300)
     
     
-    vd = single_run(7,int(137))
+    vd = single_run(17,int(137))
     draw_vd(vd)
         

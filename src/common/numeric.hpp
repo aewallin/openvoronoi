@@ -81,6 +81,12 @@ namespace numeric {
         return roots;
     }
     
+    template <class Scalar>
+    inline Scalar determinant( Scalar a, Scalar b, Scalar c,
+                        Scalar d, Scalar e, Scalar f,
+                        Scalar g, Scalar h, Scalar i ) {
+        return a*(e*i-h*f)-b*(d*i-g*f)+c*(d*h-g*e);
+    }
     
     double diangle(double x, double y);
     double diangle_x(double a);

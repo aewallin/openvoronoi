@@ -206,8 +206,11 @@ bool VoronoiDiagramChecker::face_ok(HEFace f, bool debug) {
     }
     if (vd->g[f].site!=0) { // guard against null-faces that dont have Site
         if ( vd->g[f].site->isPoint() ) {
-            if ( !(k==1) )
+            if ( !(k==1) ) {
+                std::cout << " face_ok() pointsite, but k!=1 ! \n";
+                std::cout << " f = " << f << "\n";
                 return false;
+            }
         }
     }
     int n=0;
@@ -220,10 +223,14 @@ bool VoronoiDiagramChecker::face_ok(HEFace f, bool debug) {
             std::cout << " edge.k= " << vd->g[ current_edge ].k;
             std::cout << "\n";
         }
-        if (vd->g[current_edge].k != k ) // all edges should have the same k-value
+        if (vd->g[current_edge].k != k )  { // all edges should have the same k-value
+            std::cout << " face_ok() g[current_edge].k != k ! \n";
             return false;
-        if ( !current_face_equals_next_face(current_edge) ) // all edges should have the same face
+        }
+        if ( !current_face_equals_next_face(current_edge) )  {// all edges should have the same face
+            std::cout << " face_ok() !current_face_equals_next_face(current_edge) ! \n";
             return false;
+        }
         
         if ( !check_edge(current_edge) ) {
             std::cout << " VoronoiDiagramChecker::face_ok() f= " << f << " check_edge ERROR\n";

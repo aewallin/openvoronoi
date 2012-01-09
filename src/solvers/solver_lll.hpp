@@ -66,6 +66,8 @@ int solve(Site* s1, double k1,
             slns.push_back( Solution( Point( to_double(sol_x), to_double(sol_y) ), to_double(t), k3 ) ); // kk3 just passes through without any effect!?
             return 1;
         }
+    } else {
+        std::cout << "WARNING: LLLSolver determinant==0 ! no solutions. d= " << d <<"\n";
     }
     return 0; // no solution if determinant zero, or t-value negative
 }

@@ -102,8 +102,8 @@ if __name__ == "__main__":
     vd.check()
     
     vd.debug_on()
-    vd.addLineSite( id_list[1], id_list[2],)
-    #vd.check()
+    vd.addLineSite( id_list[1], id_list[2])
+    vd.check()
     
 
     

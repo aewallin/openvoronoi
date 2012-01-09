@@ -126,7 +126,10 @@ public:
             boost::remove_vertex(v);
         }*/
     }
-    
+
+Face HFace() {
+    return std::numeric_limits<Face>::quiet_NaN();
+}
 /// add a blank vertex and return its descriptor
 Vertex add_vertex() { 
     return boost::add_vertex( g );

@@ -136,7 +136,7 @@ class VoronoiDiagram {
         HEVertex process_next_null(Point dir, HEEdge next_edge , bool k3);
         HEVertex process_prev_null(Point dir, HEEdge prev_edge , bool k3);
         
-        HEVertex insert_sep_point(HEVertex endp, HEEdge edge, Point sep_dir);
+        HEVertex add_sep_point(HEVertex endp, HEEdge edge, Point sep_dir);
 
         void repair_face( HEFace f );
         void remove_vertex_set();
@@ -183,7 +183,7 @@ class VoronoiDiagram {
         HEFace null_face2;
         HEVertex segment_start;
         HEVertex segment_end;
-        
+        HEFace zero_point_face;
 };
 
 // class for passing to numerical boost::toms748 root-finding algorithm

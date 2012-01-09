@@ -41,8 +41,17 @@ int solve(Site* s1, double k1,
                            Site* s3, double k3, std::vector<Solution>& slns ) {
     assert( s1->isLine() && s2->isLine() && s3->isLine() );
     
+    
+    
     std::vector< Eq<qd_real> > eq; // equation-parameters, in quad-precision
     boost::array<Site*,3> sites = {{s1,s2,s3}};
+    
+    // check for equality between any two sites
+    if ( ( sites[0]->eqp() == sites[1]->eqp() ) ||
+          ( sites[1]->eqp() == sites[2]->eqp() ) ||
+          ( sites[0]->eqp() == sites[2]->eqp() ) ) {
+        std::cout << "Warning: LLLSolver: two identical equations!\n";
+    }
     boost::array<double,3> kvals = {{k1,k2,k3}};
     for (unsigned int i=0;i<3;i++)
         eq.push_back( sites[i]->eqp_qd( kvals[i] ) );

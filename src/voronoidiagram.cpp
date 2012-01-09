@@ -344,21 +344,15 @@ if (step==current_step) return false; current_step++;
     SepTarget pos_start_target, neg_start_target;
     
     // find the pos targets first
-    if ( pos_sep_start != HEVertex() ) {
-        pos_start_target = find_separator_target(start_face, pos_sep_start);
-    }
-    if ( neg_sep_start != HEVertex() ) {
-        neg_start_target = find_separator_target(start_face, neg_sep_start);
-    }
+    pos_start_target = find_separator_target(start_face, pos_sep_start);
+    neg_start_target = find_separator_target(start_face, neg_sep_start);
     
     // then add the separators
-    if ( pos_sep_start != HEVertex() ) {
-        add_separator(start_face, start_null_face, pos_start_target, pos_sep_start, pos_site, neg_site);
-    }
+    add_separator(start_face, start_null_face, pos_start_target, pos_sep_start, pos_site, neg_site);
+    
 if (step==current_step) return false; current_step++;
         
-    if ( neg_sep_start != HEVertex() )
-        add_separator(start_face, start_null_face, neg_start_target, neg_sep_start, pos_site, neg_site);
+    add_separator(start_face, start_null_face, neg_start_target, neg_sep_start, pos_site, neg_site);
     
     g[start_face].status = NONINCIDENT; // face is now done.
     assert( vd_checker->face_ok( start_face ) );
@@ -367,21 +361,15 @@ if (step==current_step) return false; current_step++;
 
     SepTarget pos_end_target, neg_end_target;
     
-    // find the targets first
-    if ( pos_sep_end != HEVertex() ) {
-        pos_end_target = find_separator_target(end_face, pos_sep_end);
-    }
-    if ( neg_sep_end != HEVertex() ) {
-        neg_end_target = find_separator_target(end_face, neg_sep_end);
-    }
-
-    if ( pos_sep_end != HEVertex() )
-        add_separator(end_face, end_null_face, pos_end_target, pos_sep_end, pos_site, neg_site);
+    pos_end_target = find_separator_target(end_face, pos_sep_end);
+    neg_end_target = find_separator_target(end_face, neg_sep_end);
+    
+    add_separator(end_face, end_null_face, pos_end_target, pos_sep_end, pos_site, neg_site);
     
 if (step==current_step) return false; current_step++;
     
-    if ( neg_sep_end != HEVertex() )
-        add_separator(end_face, end_null_face, neg_end_target, neg_sep_end, pos_site, neg_site);
+    
+    add_separator(end_face, end_null_face, neg_end_target, neg_sep_end, pos_site, neg_site);
     
     g[end_face].status = NONINCIDENT;
     assert( vd_checker->face_ok( end_face ) );
@@ -825,6 +813,9 @@ VoronoiDiagram::find_null_face(HEVertex start, HEVertex other, Point left) {
 void VoronoiDiagram::add_separator(HEFace f, HEFace null_face, 
                                    boost::tuple<HEEdge, HEVertex, HEEdge,bool> target,
                                    HEVertex sep_endp, Site* s1, Site* s2) {
+    if ( sep_endp == HEVertex() )
+        return; // do nothing!
+    
     if (debug) {
         std::cout << "add_separator() f="<<f<<" endp=" << g[sep_endp].index << "\n";
     }
@@ -1704,6 +1695,10 @@ int VoronoiDiagram::num_new_vertices(HEFace f) {
 }
 
 boost::tuple<HEEdge,HEVertex,HEEdge,bool> VoronoiDiagram::find_separator_target(HEFace f, HEVertex endp) {
+    
+    if (endp==HEVertex())
+        return boost::make_tuple( HEEdge(), HEVertex(), HEEdge(), false) ;
+    
     HEEdge current_edge = g[f].edge; // start on some edge of the face
     HEEdge start_edge = current_edge;
     bool found = false;

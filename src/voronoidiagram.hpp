@@ -113,6 +113,7 @@ class VoronoiDiagram {
         EdgeData   find_edge_data(HEFace f, VertexVector startverts=VertexVector());
         EdgeVector find_split_edges(HEFace f, Point pt1, Point pt2);
         bool find_split_vertex(HEFace f, HEVertex& v);
+        HEFace find_pointsite_face(HEEdge start_edge);
         
         void augment_vertex_set( Site* site);        
         bool predicate_c4(HEVertex v);

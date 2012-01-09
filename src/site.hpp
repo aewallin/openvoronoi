@@ -69,9 +69,12 @@ struct Eq {
     const Eq<Scalar> operator-(const Eq<Scalar>& other) const {
         return Eq<Scalar>(*this) -= other;
     }
-    bool operator==(const Eq<Scalar>& other) {
+    
+    template <class TScalar>
+    bool operator==(const Eq<TScalar>& other) {
         return ( a==other.a && b==other.b && c==other.c );
     }
+    
     Scalar operator[](int idx) const {
         switch (idx) {
             case 0:

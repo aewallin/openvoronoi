@@ -77,6 +77,14 @@ int solve(Site* s1, double k1,
         }
     } else {
         std::cout << "WARNING: LLLSolver determinant==0 ! no solutions. d= " << d <<"\n";
+        std::cout << " 0 : " << eq[0].a << " " << eq[0].b << " " << eq[0].c << " " << eq[0].k << "\n";
+        std::cout << " 1 : " << eq[1].a << " " << eq[1].b << " " << eq[1].c << " " << eq[1].k << "\n";
+        std::cout << " 2 : " << eq[2].a << " " << eq[2].b << " " << eq[2].c << " " << eq[2].k << "\n";
+        std::cout << " 0==1? " << (eq[0]==eq[1]) << "\n";
+        std::cout << "a" << (eq[0].a-eq[1].a) << "\n";
+        std::cout << "b" << (eq[0].b-eq[1].b) << "\n";
+        std::cout << "c" << (eq[0].c-eq[1].c) << "\n";
+        
     }
     return 0; // no solution if determinant zero, or t-value negative
 }

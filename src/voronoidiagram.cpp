@@ -1130,9 +1130,6 @@ void VoronoiDiagram::add_split_vertex(HEFace f, Site* s) {
     if ( fs->isPoint() && s->isLine() && s->in_region( fs->position() ) ) {
         // 1) find the correct edge
         Point pt1 = fs->position();
-        //Point pt2 = s->apex_point(pt1);       
-        
-        //Point line_dir( new_site->a(), new_site->b() );
         Point pt2 = pt1-Point( s->a(), s->b() ); 
         
         assert( (pt1-pt2).norm() > 0 ); 
@@ -1144,8 +1141,6 @@ void VoronoiDiagram::add_split_vertex(HEFace f, Site* s) {
         BOOST_FOREACH(HEEdge split_edge, split_edges) {
             if ( (g[split_edge].type == SEPARATOR) || (g[split_edge].type == LINESITE) )
                 return; // don't place split points on linesites or separators(?)
-
-            
 
             // find a point = src + u*(trg-src)
             // with min_t < u < max_t
@@ -1199,30 +1194,6 @@ void VoronoiDiagram::add_split_vertex(HEFace f, Site* s) {
                 std::cout << " inserted into edge " << g[split_src].index << "-" << g[split_trg].index  << "\n";
             }
             
-            /*
-            HEEdge split_twin = g[split_edge].twin;
-            
-            if ( split_edge != g[split_twin].twin ) {
-                std::cout << " add_split_vertex() ERROR! found edges not twins! \n";
-            }
-            
-            if ( !(vd_checker->check_edge(split_edge) && vd_checker->check_edge(split_twin) ) ) {
-                
-                HEVertex source = g.source(split_edge); 
-                HEVertex target = g.target(split_edge); 
-                HEVertex twin_source = g.source(split_twin); 
-                HEVertex twin_target = g.target(split_twin);
-                
-                std::cout << " add_split_vertex() ERROR! check_edge(split_edge) \n";
-                std::cout << "    vd_checker->check_edge(split_edge)= " << vd_checker->check_edge(split_edge) << "\n";
-                std::cout << "    vd_checker->check_edge(split_twin)= " << vd_checker->check_edge(split_twin) << "\n";
-                //std::cout << "  while adding vertex type= " << g[v].type << "\n";
-                std::cout << " split_edge: " << g[source].index << " (" << g[source].type<< ") - " << g[target].index << "( " << g[target].type <<" )\n";
-                std::cout << " split_twin: " << g[twin_source].index << " (" << g[twin_source].type<< ") - " << g[twin_target].index << "( " <<g[twin_target].type <<" )\n";
-                //std::cout << " twin: " << g[twin_source].index << " - " << g[twin_target].index << "\n" << std::flush;
-                
-            }*/
-            //assert( vd_checker->check_edge(split_edge) && vd_checker->check_edge(split_twin) );
             assert( vd_checker->check_edge(split_edge) );
             // 3) insert new SPLIT vertex into the edge
             g.add_vertex_in_edge(v, split_edge);
@@ -1297,9 +1268,6 @@ void VoronoiDiagram::add_vertices( Site* new_site ) {
     if (debug) std::cout << "add_vertices() done.\n";
 }
 
-
-
-
 // add a new face corresponding to the new Site
 // call add_new_edge() on all the incident_faces that should be split
 HEFace VoronoiDiagram::add_face(Site* s) { 
@@ -1321,7 +1289,7 @@ void VoronoiDiagram::add_edges(HEFace newface, HEFace f, HEFace newface2) {
     assert( new_count > 0 );
     assert( (new_count % 2) == 0 );
     int new_pairs = new_count / 2; // we add one NEW-NEW edge for each pair found
-    VertexVector startverts;
+    VertexVector startverts; // this holds ed.v1 vertices for edges already added
     for (int m=0;m<new_pairs;m++) {
         EdgeData ed = find_edge_data(f, startverts);
         add_edge( ed, newface, newface2);
@@ -1633,7 +1601,6 @@ void VoronoiDiagram::repair_face( HEFace f ) {
         std::cout << "repair_face ( " << f << " ) null1=" << null_face1 << " null2=" << null_face2 << "\n";
     }
     HEEdge current_edge = g[f].edge;
-    //double k = g[current_edge].k;
     HEEdge start_edge = current_edge;
     do {
         assert( vd_checker->check_edge(current_edge) );
@@ -1756,7 +1723,7 @@ bool VoronoiDiagram::predicate_c4(HEVertex v) {
                 return true;
         }
     }
-    return false; //(in_count >= 2);
+    return false;
 }
 
 // do any of the three faces that are adjacent to the given IN-vertex v have an IN-vertex ?

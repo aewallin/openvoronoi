@@ -66,10 +66,11 @@ if __name__ == "__main__":
     p1=ovd.Point(-0.1,-0.1)
     p2=ovd.Point(0.0,0.0)
     p3=ovd.Point(0.1,0.1)
+    p4=ovd.Point(0.2,0.3)
     #p4=ovd.Point(0.6,0.6)
     #p5=ovd.Point(-0.6,0.3)
 
-    pts = [p1,p2,p3]
+    pts = [p1,p2,p3,p4]
     
     #t_after = time.time()
     #print ".done in {0:.3f} s.".format( t_after-t_before )
@@ -105,7 +106,8 @@ if __name__ == "__main__":
     vd.addLineSite( id_list[1], id_list[2])
     vd.check()
     
-
+    vd.addLineSite( id_list[2], id_list[3],5 )
+    vd.check()
     
     t_after = time.time()
     line_time = t_after-t_before

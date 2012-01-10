@@ -509,17 +509,28 @@ void remove_vertex( Vertex v) {
     boost::remove_vertex( v , g );
 }
 
-/// remove given vertex
+/// remove given edge
 void remove_edge( Edge e) { 
     boost::remove_edge( e , g );
 }
 
-/// remove given vertex
+/// remove given v1-v2 edge
 void remove_edge( Vertex v1, Vertex v2) { 
     assert( has_edge(v1,v2) );
     typedef typename std::pair<Edge, bool> EdgeBool;
     EdgeBool result = boost::edge(v1, v2, g );    
     boost::remove_edge( result.first , g );
+}
+
+/// remove given v1-v2 edge and its twin
+void remove_twin_edges( Vertex v1, Vertex v2) { 
+    assert( has_edge(v1,v2) );
+    assert( has_edge(v2,v1) );
+    typedef typename std::pair<Edge, bool> EdgeBool;
+    EdgeBool result1 = boost::edge(v1, v2, g ); 
+    EdgeBool result2 = boost::edge(v2, v1, g );    
+    boost::remove_edge( result1.first , g );
+    boost::remove_edge( result2.first , g );
 }
 
 // see http://www.boost.org/doc/libs/1_48_0/libs/iterator/doc/iterator_facade.htm

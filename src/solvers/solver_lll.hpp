@@ -27,7 +27,7 @@
 #include "common/point.hpp"
 #include "common/numeric.hpp"
 
-using namespace ovd::numeric; // sq() chop()
+using namespace ovd::numeric; // sq() chop() determinant()
 
 namespace ovd {
 
@@ -48,14 +48,10 @@ public:
 //
 //  Cramers rule x_i = det(A_i)/det(A)
 //  where A_i is A with column i replaced by b
-//  d = det(A)
-//          a1 b1 -c1      
-// t = det( a2 b2 -c2  ) / d = a1(-b2*c3+b3*c2)-a2(-b1*c3+b3*c1)+a3(-b1*c2+b2*c1)
-//          a3 b3 -c3        = c3(-a1*b2+a2*b1)  + c2(a1*b3-a3*b1) + c1(-a2*b3+a3*b2)
             
-int solve(Site* s1, double k1, 
-                           Site* s2, double k2, 
-                           Site* s3, double k3, std::vector<Solution>& slns ) {
+int solve( Site* s1, double k1, 
+           Site* s2, double k2, 
+           Site* s3, double k3, std::vector<Solution>& slns ) {
     assert( s1->isLine() && s2->isLine() && s3->isLine() );
     
     std::vector< Eq<qd_real> > eq; // equation-parameters, in quad-precision
@@ -65,20 +61,20 @@ int solve(Site* s1, double k1,
         eq.push_back( sites[i]->eqp_qd( kvals[i] ) );
     
     unsigned int i = 0, j=1, k=2;
-    qd_real d = chop( numeric::determinant( eq[i].a, eq[i].b, eq[i].k, 
+    qd_real d = chop( determinant( eq[i].a, eq[i].b, eq[i].k, 
                                             eq[j].a, eq[j].b, eq[j].k, 
                                             eq[k].a, eq[k].b, eq[k].k ) ); 
     if (d != 0) {
-        qd_real t = numeric::determinant( eq[i].a, eq[i].b, -eq[i].c, 
-                                          eq[j].a, eq[j].b, -eq[j].c, 
-                                          eq[k].a, eq[k].b, -eq[k].c ) / d ; 
+        qd_real t = determinant(  eq[i].a, eq[i].b, -eq[i].c, 
+                                  eq[j].a, eq[j].b, -eq[j].c, 
+                                  eq[k].a, eq[k].b, -eq[k].c ) / d ; 
         if (t >= 0) {
-            qd_real sol_x = numeric::determinant( -eq[i].c, eq[i].b, eq[i].k, 
-                                                  -eq[j].c, eq[j].b, eq[j].k, 
-                                                  -eq[k].c, eq[k].b, eq[k].k ) / d ; 
-            qd_real sol_y = numeric::determinant( eq[i].a, -eq[i].c, eq[i].k, 
-                                                  eq[j].a, -eq[j].c, eq[j].k, 
-                                                  eq[k].a, -eq[k].c, eq[k].k ) / d ; 
+            qd_real sol_x = determinant(  -eq[i].c, eq[i].b, eq[i].k, 
+                                          -eq[j].c, eq[j].b, eq[j].k, 
+                                          -eq[k].c, eq[k].b, eq[k].k ) / d ; 
+            qd_real sol_y = determinant(  eq[i].a, -eq[i].c, eq[i].k, 
+                                          eq[j].a, -eq[j].c, eq[j].k, 
+                                          eq[k].a, -eq[k].c, eq[k].k ) / d ; 
             slns.push_back( Solution( Point( to_double(sol_x), to_double(sol_y) ), to_double(t), k3 ) ); // kk3 just passes through without any effect!?
             return 1;
         }

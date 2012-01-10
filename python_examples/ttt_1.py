@@ -234,9 +234,9 @@ if __name__ == "__main__":
     vd.setEdgeOffset(0.00001)
     
     all_segs=segs+segs2 #+segs3 #+segs4
-    all_segs=segs
-    all_segs=segs3 #+segs4
-    
+    #all_segs=segs
+    #all_segs=segs3 #+segs4
+    all_segs = segs4
     insert_many_polygons(vd,all_segs)
     #insert_many_polygons(vd,all_segs)
     

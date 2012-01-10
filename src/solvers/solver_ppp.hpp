@@ -34,6 +34,7 @@ using namespace ovd::numeric; // sq() chop()
 
 namespace ovd {
 
+// templated point-class, so we can use qd_real as the coordinate type.
 template<class Scalar>
 struct scalar_pt {
     scalar_pt<Scalar>() : x(0), y(0) {}

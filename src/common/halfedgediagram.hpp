@@ -25,6 +25,7 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/foreach.hpp> 
 #include <boost/iterator/iterator_facade.hpp>
+#include <boost/assign/list_of.hpp>
 
 // bundled BGL properties, see: http://www.boost.org/doc/libs/1_44_0/libs/graph/doc/bundles.html
 
@@ -139,6 +140,53 @@ Vertex add_vertex() {
 /// add a vertex with given properties, return vertex descriptor
 Vertex add_vertex(const TVertexProperties& prop) {
     return boost::add_vertex( prop, g );
+}
+
+
+void add_vertex_in_edge( Vertex v, Edge e) {
+    // the vertex v is inserted into the middle of edge e
+    // edge e and its twin are replaced by four new edges: e1,e2 and their twins te2,te1
+    // before:             face
+    //                      e
+    // previous-> source  ------> target -> next
+    //  tw_next<- tw_trg  <-----  tw_src <- tw_previous
+    //                      twin 
+    //                    twin_face
+    //
+    // after:               face
+    //                    e1   e2
+    // previous-> source  -> v -> target -> next
+    //  tw_next<- tw_trg  <- v <- tw_src <- tw_previous
+    //                    te2  te1
+    //                    twin_face
+    //
+
+    Edge e_twin = g[e].twin;
+    assert( e_twin != Edge() );
+    Vertex esource = source(e); 
+    Vertex etarget = target(e); 
+    Face face = g[e].face;
+    Face twin_face = g[e_twin].face;
+    Edge previous = previous_edge(e);
+    assert( g[previous].face == g[e].face );
+    Edge twin_previous = previous_edge(e_twin);
+    assert( g[twin_previous].face == g[e_twin].face );
+    
+    Edge e1, te2;
+    boost::tie(e1,te2) = add_twin_edges( esource, v ); 
+    Edge e2, te1;
+    boost::tie(e2,te1) = add_twin_edges( v, etarget );    
+    // next-pointers
+    set_next_chain( boost::assign::list_of(previous)(e1)(e2)(g[e].next) );
+    set_next_chain( boost::assign::list_of(twin_previous)(te1)(te2)(g[e_twin].next) );    
+    // this copies params, face, k, type
+    g[e1] = g[e];       g[e2] = g[e];
+    g[te1] = g[e_twin]; g[te2] = g[e_twin];
+    // update the faces 
+    faces[face].edge = e1;
+    faces[twin_face].edge = te1;
+    // finally, remove the old edge
+    remove_twin_edges(esource, etarget);
 }
 
 /// add an edge between vertices v1-v2
@@ -531,6 +579,46 @@ void remove_twin_edges( Vertex v1, Vertex v2) {
     EdgeBool result2 = boost::edge(v2, v1, g );    
     boost::remove_edge( result1.first , g );
     boost::remove_edge( result2.first , g );
+}
+
+void remove_deg2_vertex( Vertex v ) {
+    //                    face1 e[1]
+    //    v1_prev -> v1 -> SPLIT -> v2 -> v2_next
+    //    v1_next <- v1 <- SPLIT <- v2 <- v2_prev
+    //                  e[0]  face2
+    //
+    // is replaced with a single edge:
+    //                    face1
+    //    v1_prev -> v1 ----------> v2 -> v2_next
+    //    v1_next <- v1 <---------- v2 <- v2_prev
+    //                     face2
+    
+    EdgeVector v_edges = out_edges(v);
+    assert( v_edges.size() == 2);
+    assert( source(v_edges[0]) == v && source(v_edges[1]) == v );
+     
+    Vertex v1 = target( v_edges[0] );
+    Vertex v2 = target( v_edges[1] );
+    Edge v1_next = g[ v_edges[0] ].next;
+    Edge v1_prev = previous_edge( g[ v_edges[0] ].twin );
+    Edge v2_next = g[ v_edges[1] ].next;
+    Edge v2_prev = previous_edge( g[ v_edges[1] ].twin );
+    Face face1 = g[ v_edges[1] ].face;
+    Face face2 = g[ v_edges[0] ].face;
+    
+    Edge new1, new2;
+    boost::tie(new1,new2) = add_twin_edges(v1,v2);
+    set_next(new1,v2_next);
+    set_next(new2,v1_next);
+    set_next(v2_prev,new2);
+    set_next(v1_prev,new1);
+    faces[face1].edge = new1;
+    faces[face2].edge = new2;
+    g[new1] = g[ v_edges[1] ]; // params, type, k, face
+    g[new2] = g[ v_edges[0] ];
+    remove_twin_edges(v,v1);
+    remove_twin_edges(v,v2);
+    remove_vertex(v);
 }
 
 // see http://www.boost.org/doc/libs/1_48_0/libs/iterator/doc/iterator_facade.htm

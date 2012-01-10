@@ -139,6 +139,33 @@ void EdgeProps::copy_parameters(EdgeProps& other) {
     y[7] = other.y[7];
 }   
 
+EdgeProps& EdgeProps::operator=(const EdgeProps &other) {
+    if (this == &other)
+        return *this;
+    sign = other.sign;
+    x[0] = other.x[0];
+    x[1] = other.x[1];
+    x[2] = other.x[2];
+    x[3] = other.x[3];
+    x[4] = other.x[4];
+    x[5] = other.x[5];
+    x[6] = other.x[6];        
+    x[7] = other.x[7];
+    y[0] = other.y[0];
+    y[1] = other.y[1];
+    y[2] = other.y[2];
+    y[3] = other.y[3];
+    y[4] = other.y[4];
+    y[5] = other.y[5];
+    y[6] = other.y[6];        
+    y[7] = other.y[7];
+    face = other.face; 
+    k=other.k; 
+    type = other.type;
+    // NOTE we do *not* set: twin, next    
+    return *this;
+}
+
 // called for point(s1)-point(s2) edges
 void EdgeProps::set_pp_parameters(Site* s1, Site* s2) {
     //std::cout << "set_pp_parameters()\n";

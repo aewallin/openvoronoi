@@ -1,5 +1,5 @@
 /* 
- *  Copyright 2010-2011 Anders Wallin (anders.e.e.wallin "at" gmail.com)
+ *  Copyright 2010-2012 Anders Wallin (anders.e.e.wallin "at" gmail.com)
  *  
  *  This file is part of OpenVoronoi.
  *
@@ -18,7 +18,7 @@
 */
 
 #include <cassert>
-#include <limits>
+//#include <limits>
 
 #include <boost/foreach.hpp>
 #include <boost/math/tools/roots.hpp> // for toms748
@@ -231,8 +231,8 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
     HEVertex neg_sep_end = HEVertex();
 
     // returns new seg_start/end vertices, new or existing null-faces, and separator endpoints (if separators should be added)
-    boost::tie(seg_start, start_null_face, pos_sep_start, neg_sep_start) = find_null_face(start, end, left);
-    boost::tie(seg_end, end_null_face, pos_sep_end, neg_sep_end) = find_null_face(end, start, left);
+    boost::tie(seg_start, start_null_face, pos_sep_start, neg_sep_start) = find_null_face(start, end  , left);
+    boost::tie(seg_end  , end_null_face  , pos_sep_end  , neg_sep_end  ) = find_null_face(end  , start, left);
     
     // these globals are used by repair_face() to avoid taking null-face edges
     null_face1=start_null_face;
@@ -295,14 +295,14 @@ if (step==current_step) return false; current_step++;
     
 if (step==current_step) return false; current_step++;
 
-    add_vertices( g[pos_face].site );  // add new vertices on all IN-OUT edges.
+    add_vertices( g[pos_face].site );  // add NEW vertices on all IN-OUT edges.
 
 if (step==current_step) return false; current_step++;
     
     typedef boost::tuple<HEEdge, HEVertex, HEEdge,bool> SepTarget;
     SepTarget pos_start_target, neg_start_target;
     
-    // find the pos targets first
+    // find SEPARATOR targets first
     pos_start_target = find_separator_target(start_face, pos_sep_start);
     neg_start_target = find_separator_target(start_face, neg_sep_start);
     
@@ -479,6 +479,8 @@ HEVertex VoronoiDiagram::process_next_null(Point dir, HEEdge next_edge , bool k3
     assert( g[src].type == ENDPOINT );
     HEVertex sep_point = HEVertex();
     Point neg_sep_dir = dir.xy_perp(); // call this pos?
+    //HEFace null_face = g[next_edge].face;
+    
     double neg_sep_alfa = numeric::diangle(neg_sep_dir.x,neg_sep_dir.y);
     if (debug) {
         std::cout << "process_next_null() e="; print_edge(next_edge);
@@ -505,7 +507,7 @@ HEVertex VoronoiDiagram::process_next_null(Point dir, HEEdge next_edge , bool k3
         }
     } else {
         if ( neg_sep_alfa == g[trg].alfa && g[trg].type == SEPPOINT ) {
-            std::cout << " identical SEPPOINT case!\n";
+            if (debug) std::cout << " identical SEPPOINT case!\n";
             // assign face of separator-edge
             // mark separator target NEW
             HEEdge sep_edge=HEEdge();
@@ -515,9 +517,7 @@ HEVertex VoronoiDiagram::process_next_null(Point dir, HEEdge next_edge , bool k3
                     sep_edge = e;
             }
             assert(sep_edge!=HEEdge()); 
-            if (debug) { 
-                std::cout << " existing SEPARATOR is "; print_edge(sep_edge);
-            }
+            if (debug) { std::cout << " existing SEPARATOR is "; print_edge(sep_edge); }
             HEEdge sep_twin = g[sep_edge].twin;
             HEFace sep_face =  g[sep_edge].face;
             Site* sep_site = g[sep_face].site;
@@ -525,11 +525,10 @@ HEVertex VoronoiDiagram::process_next_null(Point dir, HEEdge next_edge , bool k3
             Site* sep_twin_site = g[sep_twin_face].site;
             HEEdge pointsite_edge;
             if (sep_site->isPoint() ) {
-                std::cout << " PointSite SEPARATOR is "; print_edge(sep_edge);
+                if (debug) { std::cout << " PointSite SEPARATOR is "; print_edge(sep_edge); }
                 pointsite_edge = sep_edge;
-            }
-            if (sep_twin_site->isPoint() ) {
-                std::cout << " PointSite SEPARATOR is "; print_edge(sep_twin);
+            }  else if (sep_twin_site->isPoint() ) {
+                if (debug) { std::cout << " PointSite SEPARATOR is "; print_edge(sep_twin); }
                 pointsite_edge = sep_twin;
             }
             // set face for pointsite_edge ?
@@ -549,10 +548,8 @@ HEVertex VoronoiDiagram::process_next_null(Point dir, HEEdge next_edge , bool k3
         Site* next_edge_site = g[next_face].site;
         
         if ( numeric::diangle_bracket( g[src].alfa, neg_sep_alfa, g[trg].alfa ) && next_edge_site->isPoint() ) {
-            if (debug) {
-                std::cout << " inserting SEPPOINT in edge: "; print_edge(next_edge);
-            }
-            sep_point = add_sep_point(src, next_edge, neg_sep_dir);
+            if (debug) { std::cout << " inserting SEPPOINT in edge: "; print_edge(next_edge); }
+            sep_point = add_separator_point(src, next_edge, neg_sep_dir);
             if (k3)
                 g[sep_point].k3=+1;
             else
@@ -624,15 +621,12 @@ HEVertex VoronoiDiagram::process_prev_null(Point dir, HEEdge prev_edge , bool k3
         else
             g[new_v].k3=+1;
 
-        if (debug) {
-            std::cout << " added NEW NORMAL vertex " << g[new_v].index << " in edge ";
-            print_edge(prev_edge);
-        }
+        if (debug) { std::cout << " added NEW NORMAL vertex " << g[new_v].index << " in edge "; print_edge(prev_edge); }
     } else {
         // we are not dealing with an ENDPOINT
         
         if ( pos_sep_alfa == g[src].alfa && g[src].type == SEPPOINT ) {
-            std::cout << " identical SEPPOINT case!\n";
+            if (debug) std::cout << " identical SEPPOINT case!\n";
             
             // assign face of separator-edge
             // mark separator target NEW
@@ -643,9 +637,7 @@ HEVertex VoronoiDiagram::process_prev_null(Point dir, HEEdge prev_edge , bool k3
                     sep_edge = e;
             }
             assert(sep_edge!=HEEdge()); 
-            if (debug) { 
-                std::cout << " existing SEPARATOR is "; print_edge(sep_edge);
-            }
+            if (debug) { std::cout << " existing SEPARATOR is "; print_edge(sep_edge); }
             HEEdge sep_twin = g[sep_edge].twin;
             HEFace sep_face =  g[sep_edge].face;
             Site* sep_site = g[sep_face].site;
@@ -653,11 +645,11 @@ HEVertex VoronoiDiagram::process_prev_null(Point dir, HEEdge prev_edge , bool k3
             Site* sep_twin_site = g[sep_twin_face].site;
             HEEdge pointsite_edge;
             if (sep_site->isPoint() ) {
-                std::cout << " PointSite SEPARATOR is "; print_edge(sep_edge);
+                if (debug) { std::cout << " PointSite SEPARATOR is "; print_edge(sep_edge); }
                 pointsite_edge = sep_edge;
             }
             if (sep_twin_site->isPoint() ) {
-                std::cout << " PointSite SEPARATOR is "; print_edge(sep_twin);
+                if (debug) { std::cout << " PointSite SEPARATOR is "; print_edge(sep_twin); }
                 pointsite_edge = sep_twin;
             }
             // set face for pointsite_edge to the null_face ?
@@ -676,7 +668,7 @@ HEVertex VoronoiDiagram::process_prev_null(Point dir, HEEdge prev_edge , bool k3
             if (debug) {
                 std::cout << " inserting SEPPOINT in edge: "; print_edge(prev_edge);
             }
-            sep_point = add_sep_point(src, prev_edge, pos_sep_dir);
+            sep_point = add_separator_point(src, prev_edge, pos_sep_dir);
             if (k3)
                 g[sep_point].k3=-1;
             else
@@ -712,7 +704,7 @@ HEVertex VoronoiDiagram::process_prev_null(Point dir, HEEdge prev_edge , bool k3
     return sep_point;
 }
 
-HEVertex VoronoiDiagram::add_sep_point(HEVertex endp, HEEdge edge, Point sep_dir) {
+HEVertex VoronoiDiagram::add_separator_point(HEVertex endp, HEEdge edge, Point sep_dir) {
     HEVertex sep = g.add_vertex( VoronoiVertex(g[endp].position,OUT,SEPPOINT) );
     g[sep].set_alfa(sep_dir);
     if (debug) {
@@ -838,14 +830,13 @@ VoronoiDiagram::find_null_face(HEVertex start, HEVertex other, Point left) {
 /// f is the face of endp 
 /// s1 and s2 are the pos and neg LineSites
 void VoronoiDiagram::add_separator(HEFace f, HEFace null_face, 
-                                   boost::tuple<HEEdge, HEVertex, HEEdge,bool> target,
+                                   boost::tuple<HEEdge, HEVertex, HEEdge, bool> target,
                                    HEVertex sep_endp, Site* s1, Site* s2) {
     if ( sep_endp == HEVertex() ) // no separator
         return; // do nothing!
     
-    if (debug) {
-        std::cout << "add_separator() f="<<f<<" endp=" << g[sep_endp].index << "\n";
-    }
+    if (debug) std::cout << "add_separator() f="<<f<<" endp=" << g[sep_endp].index << "\n";
+    
     assert( (g[sep_endp].k3==1) || (g[sep_endp].k3==-1) );    
     
     HEEdge endp_next = HEEdge();
@@ -884,7 +875,11 @@ void VoronoiDiagram::add_separator(HEFace f, HEFace null_face,
     if ( out_new_in ) {
         g[e2].k    = g[v_target].k3; // e2 is on the segment side
         g[e2_tw].k = +1;             // e2_tw is on the point-site side
-        g[e2_tw].face = f;
+        
+        g[e2_tw].face = f; // point-site face
+        g[e2_tw].null_face = f;
+        g[e2_tw].has_null_face = true;
+        
         g[f].edge = e2_tw;
         g[endp_prev].k = g[e2].k; // endp_prev is on the line-site side
 
@@ -910,7 +905,11 @@ void VoronoiDiagram::add_separator(HEFace f, HEFace null_face,
     } else {
         g[e2].k    = +1;             // e2 is on the point-site side
         g[e2_tw].k = g[v_target].k3; // e2_tw is on the segment side
-        g[e2].face    = f;
+        
+        g[e2].face    = f; // point-site face
+        g[e2].null_face    = f;
+        g[e2].has_null_face = true;
+        
         g[f].edge     = e2;
         g[endp_next].k = g[e2_tw].k; // endp_next is on the linesite-side
         if (g[e2_tw].k == -1) {

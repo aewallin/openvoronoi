@@ -74,8 +74,20 @@ Solution VertexPositioner::position(HEEdge e, Site* s) {
     std::cout << vd->g[twin_face].site->str() << "(k="<< vd->g[twin].k;
     std::cout << ") new= " << s->str() << "\n";
     std::cout << " t-vals t_min= " << t_min << " t_max= " << t_max << "\n";
-  */      
-    Solution sl = position( vd->g[face].site  , vd->g[e].k, vd->g[twin_face].site  , vd->g[twin].k, s );
+  */     
+    Site* s1 =  vd->g[face].site;
+    Site* s2 = vd->g[twin_face].site;
+    
+    if ( vd->g[e].type == SEPARATOR && s1->isLine() && s2->isLine() ) {
+        // the parallell lineseg case
+        if ( vd->g[e].has_null_face ) {
+            s1 = vd->g[ vd->g[e].null_face ].site;    
+        } else if ( vd->g[twin].has_null_face ) {
+            s2 = vd->g[ vd->g[twin].null_face ].site;
+        }
+    }
+    
+    Solution sl = position(  s1 , vd->g[e].k, s2 , vd->g[twin].k, s );
     /*
     std::cout << " new vertex positioned at " << sl.p << " t=" << sl.t << " k3=" << sl.k3;
     std::cout << " err=" << edge_error(edge,sl) << "\n";

@@ -111,7 +111,7 @@ def insert_polygon_segments(vd,id_list):
         if n==(len(id_list)-1):
             n_nxt=0
         print " ",j,"inserting segement ",id_list[n]," - ",id_list[n_nxt]
-        
+        """
         if j == 92:
             vd.debug_on()
             vd.addLineSite( id_list[n], id_list[n_nxt],5)
@@ -122,7 +122,7 @@ def insert_polygon_segments(vd,id_list):
             myscreen.iren.Start()
 
             return
-        
+        """
         vd.addLineSite( id_list[n], id_list[n_nxt])
         j=j+1
 
@@ -236,7 +236,7 @@ if __name__ == "__main__":
     all_segs=segs+segs2 #+segs3 #+segs4
     #all_segs=segs
     #all_segs=segs3 #+segs4
-    all_segs = segs4
+    all_segs = segs3
     insert_many_polygons(vd,all_segs)
     #insert_many_polygons(vd,all_segs)
     

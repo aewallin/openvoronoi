@@ -137,7 +137,7 @@ class VoronoiDiagram {
         HEVertex process_next_null(Point dir, HEEdge next_edge , bool k3);
         HEVertex process_prev_null(Point dir, HEEdge prev_edge , bool k3);
         
-        HEVertex add_sep_point(HEVertex endp, HEEdge edge, Point sep_dir);
+        HEVertex add_separator_point(HEVertex endp, HEEdge edge, Point sep_dir);
 
         void repair_face( HEFace f );
         void remove_vertex_set();

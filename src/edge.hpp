@@ -56,15 +56,18 @@ enum VoronoiEdgeType {LINE, LINELINE, PARA_LINELINE, OUTEDGE, PARABOLA, ELLIPSE,
 class EdgeProps {
 public:
     EdgeProps();
-    EdgeProps(HEEdge n, HEFace f): next(n), face(f) {}
+    EdgeProps(HEEdge n, HEFace f): next(n), face(f), has_null_face(false) {}
     /// create edge with given next, twin, and face
-    EdgeProps(HEEdge n, HEEdge t, HEFace f): next(n), twin(t), face(f) {}
+    EdgeProps(HEEdge n, HEEdge t, HEFace f): next(n), twin(t), face(f), has_null_face(false) {}
     /// the next edge, counterclockwise, from this edge
     HEEdge next; 
     /// the twin edge
     HEEdge twin;
     /// the face to which this edge belongs
     HEFace face; // each face corresponds to an input Site/generator
+    HEFace null_face;
+    bool has_null_face;
+    
     double k; // offset-direction from the adjacent site, either +1 or -1
     VoronoiEdgeType type;
     

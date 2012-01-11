@@ -27,6 +27,7 @@ namespace ovd {
 EdgeProps::EdgeProps() {
     x[0]=0;x[1]=0;x[2]=0;x[3]=0;x[4]=0;x[5]=0;x[6]=0;x[7]=0;
     y[0]=0;y[1]=0;y[2]=0;y[3]=0;y[4]=0;y[5]=0;y[6]=0;y[7]=0;
+    has_null_face = false;
 }
 
 /*
@@ -160,6 +161,8 @@ EdgeProps& EdgeProps::operator=(const EdgeProps &other) {
     y[6] = other.y[6];        
     y[7] = other.y[7];
     face = other.face; 
+    null_face = other.null_face;
+    has_null_face = other.has_null_face;
     k=other.k; 
     type = other.type;
     // NOTE we do *not* set: twin, next    

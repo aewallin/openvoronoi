@@ -205,6 +205,7 @@ if __name__ == "__main__":
     #segs3 = ttt_segments( "m", 6400)
     segs4 = ttt_segments( "nopqrstuvwxyz", 64000) # NOPQRSTUVWXYZ", 64000)
     segs5 = ttt_segments( "0123456789+-*/", 64000)
+    segs6 = ttt_segments( "j", 64000)
     #segs = ttt_segments(  "A", 64000)
     #segs2 = ttt_segments( "B", 64000)
     #segs2=[]
@@ -223,6 +224,9 @@ if __name__ == "__main__":
     segs5 = translate(segs5, -0.6, -0.35)
     segs5 = modify_segments(segs5)
     
+    #segs6 = translate(segs6, -0.6, -0.35)
+    segs6 = modify_segments(segs6)
+    
     vd = ovd.VoronoiDiagram(far,120)
     print vd.version()
     
@@ -237,10 +241,10 @@ if __name__ == "__main__":
     vod.drawNullEdges = 0
     vd.setEdgeOffset(0.00001)
     
-    all_segs=segs+segs2 +segs3 +segs4+segs5
+    all_segs=segs+segs2 #+segs3 +segs4+segs5
     #all_segs=segs
     #all_segs=segs3 #+segs4
-    #all_segs = segs3
+    #all_segs = segs6
     insert_many_polygons(vd,all_segs)
     
     times=[1,1]

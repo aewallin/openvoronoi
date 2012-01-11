@@ -3,38 +3,6 @@ import openvoronoi as ovd
 import ovdvtk
 import time
 import vtk
-"""
-def drawSegment(myscreen, seg):
-    #p1x = seg[0]
-    #p1y = seg[1]
-    #p2x = seg[2]
-    #p2y = seg[3]
-    for pt in seg:
-    actor = ovdvtk.Line( p1=( p1x,p1y, 0), p2=(p2x,p2y, 0), color=ovdvtk.yellow)
-    myscreen.addActor(actor)
-"""
-def drawLoops(myscreen,loops,loopColor):
-    # draw the loops
-    nloop = 0
-    for lop in loops:
-        n = 0
-        N = len(lop)
-        first_point=[]
-        previous=[]
-        for p in lop:
-            if n==0: # don't draw anything on the first iteration
-                previous=p 
-                first_point = p
-            elif n== (N-1): # the last point
-                myscreen.addActor( ovdvtk.Line(p1=(previous[0],previous[1],0),p2=(p[0],p[1],0),color=loopColor) ) # the normal line
-                # and a line from p to the first point
-                myscreen.addActor( ovdvtk.Line(p1=(p[0],p[1],0),p2=(first_point[0],first_point[1],0),color=loopColor) )
-            else:
-                myscreen.addActor( ovdvtk.Line(p1=(previous[0],previous[1],0),p2=(p[0],p[1],0),color=loopColor) )
-                previous=p
-            n=n+1
-        print "rendered loop ",nloop, " with ", len(lop), " points"
-        nloop = nloop+1
 
 def translate(segs,x,y):
     out = []
@@ -48,48 +16,7 @@ def translate(segs,x,y):
             #seg2.append(seg[3] + y)
         out.append(seg2)
     return out
-"""
-def insert_polygon(vd, polygon):
-    pts=[]
-    for p in polygon:
-        pts.append( ovd.Point( p[0], p[1] ) )
-        
-    times=[]
-    id_list = []
-    m=0
-    t_before = time.time()
-    for p in pts:
-        id_list.append( vd.addVertexSite( p ) )
-        print m," added vertex "
-        m=m+1
-    t_after = time.time()
-    times.append( t_after-t_before )
-    
-    print "polygon is: "
-    for idx in id_list:
-        print idx," ",
-    print "."
-    
 
-    
-    print "all point sites inserted. ",
-    vd.check()
-    #vd.debug_on()
-
-    t_before = time.time()
-
-    for n in range(len(id_list)):
-        n_nxt = n+1
-        if n==(len(id_list)-1):
-            n_nxt=0
-        
-        vd.addLineSite( id_list[n], id_list[n_nxt])
-    t_after = time.time()
-    times.append( t_after-t_before )
-    
-    vd.check()
-    return times
-"""
 
 def insert_polygon_points(vd, polygon):
     pts=[]
@@ -240,8 +167,7 @@ if __name__ == "__main__":
     #all_segs=segs3 #+segs4
     #all_segs = segs3
     times = insert_many_polygons(vd,all_segs)
-    
-    #times=[1,1]
+    vd.check()
     vod.setVDText2(times)
     vod.setAll()
     

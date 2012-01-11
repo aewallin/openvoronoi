@@ -83,6 +83,7 @@ class VD:
         self.drawVertices=1
         self.drawGenerators=1
         self.offsetEdges = 0
+        self.drawNullEdges = 1
         
     def getActors(self):
         acts=[]
@@ -242,9 +243,7 @@ class VD:
                 last_idx = idx
                 idx = idx + 1
                 
-            # create line and ce
-            #line = vtk.vtkLine()
-            #for idx in pt_ids:
+            # create line and cells
             for seg in segs:
                 line = vtk.vtkLine()
                 line.GetPointIds().SetId(0, seg[0])

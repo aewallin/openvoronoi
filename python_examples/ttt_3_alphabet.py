@@ -48,7 +48,7 @@ def translate(segs,x,y):
             #seg2.append(seg[3] + y)
         out.append(seg2)
     return out
-
+"""
 def insert_polygon(vd, polygon):
     pts=[]
     for p in polygon:
@@ -89,40 +89,29 @@ def insert_polygon(vd, polygon):
     
     vd.check()
     return times
-    
+"""
+
 def insert_polygon_points(vd, polygon):
     pts=[]
     for p in polygon:
         pts.append( ovd.Point( p[0], p[1] ) )
     id_list = []
-    print "inserting ",len(pts)," point-sites:"
+    #print "inserting ",len(pts)," point-sites:"
     m=0
     for p in pts:
         id_list.append( vd.addVertexSite( p ) )
-        print " ",m," added vertex ", id_list[ len(id_list) -1 ]
+        #print " ",m," added vertex ", id_list[ len(id_list) -1 ]
         m=m+1    
     return id_list
 
 def insert_polygon_segments(vd,id_list):
     j=0
-    print "inserting ",len(id_list)," line-segments:"
+    #print "inserting ",len(id_list)," line-segments:"
     for n in range(len(id_list)):
         n_nxt = n+1
         if n==(len(id_list)-1):
             n_nxt=0
-        print " ",j,"inserting segement ",id_list[n]," - ",id_list[n_nxt]
-        """
-        if j == 92:
-            vd.debug_on()
-            vd.addLineSite( id_list[n], id_list[n_nxt],5)
-            times=[1,1]
-            vod.setVDText2(times)
-            vod.setAll()
-            myscreen.render()        
-            myscreen.iren.Start()
-
-            return
-        """
+        #print " ",j,"inserting segement ",id_list[n]," - ",id_list[n_nxt]
         vd.addLineSite( id_list[n], id_list[n_nxt])
         j=j+1
 
@@ -139,13 +128,22 @@ def modify_segments(segs):
     
 def insert_many_polygons(vd,segs):
     polygon_ids =[]
+    t_before = time.time()
     for poly in segs:
         poly_id = insert_polygon_points(vd,poly)
         polygon_ids.append(poly_id)
+    t_after = time.time()
+    pt_time = t_after-t_before
     
+    t_before = time.time()
     for ids in polygon_ids:
         insert_polygon_segments(vd,ids)
-
+    
+    t_after = time.time()
+    seg_time = t_after-t_before
+    
+    return [pt_time, seg_time]
+    
 def ttt_segments(text,scale):
     wr = ttt.SEG_Writer()
 
@@ -163,10 +161,10 @@ if __name__ == "__main__":
     #w=2500
     #h=1500
     
-    #w=1920
-    #h=1080
-    w=1024
+    w=1600
     h=1024
+    #w=1024
+    #h=1024
     myscreen = ovdvtk.VTKScreen(width=w, height=h) 
     ovdvtk.drawOCLtext(myscreen, rev_text=ovd.revision() )
     
@@ -220,7 +218,7 @@ if __name__ == "__main__":
     segs4 = translate(segs4, -0.6, -0.22)
     segs4 = modify_segments(segs4)
     
-    segs5 = translate(segs5, -0.6, -0.35)
+    segs5 = translate(segs5, -0.6, -0.32)
     segs5 = modify_segments(segs5)
     
     vd = ovd.VoronoiDiagram(far,120)
@@ -241,9 +239,9 @@ if __name__ == "__main__":
     #all_segs=segs
     #all_segs=segs3 #+segs4
     #all_segs = segs3
-    insert_many_polygons(vd,all_segs)
+    times = insert_many_polygons(vd,all_segs)
     
-    times=[1,1]
+    #times=[1,1]
     vod.setVDText2(times)
     vod.setAll()
     

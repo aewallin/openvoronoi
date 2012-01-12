@@ -559,6 +559,7 @@ std::pair<HEVertex,HEFace> VoronoiDiagram::process_null_edge(Point dir, HEEdge n
             // set the separator target to NEW
             HEVertex sep_target = g.target(sep_edge);
             g[sep_target].status = NEW;
+            g[sep_target].k3 = new_k3;
             modified_vertices.insert(sep_target);
             
             return std::make_pair( HEVertex(), g[pointsite_edge].face ); // no new separator-point returned
@@ -1229,7 +1230,7 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
         
     // both trg and src should be on same side of new site 
     if (g[new_target].k3 != g[new_source].k3) {
-        std::cout << " g[" << g[new_target].index << "].k3=" << g[new_target].k3 << " != ";
+        std::cout << "WARNING: g[" << g[new_target].index << "].k3=" << g[new_target].k3 << " != ";
         std::cout << "g[" << g[new_source].index << "].k3=" << g[new_source].k3<< "\n";
     }
     assert( g[new_target].k3 == g[new_source].k3 );

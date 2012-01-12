@@ -106,8 +106,8 @@ if __name__ == "__main__":
     vd.addLineSite( id_list[2], id_list[1])
     vd.check()
     
-    #vd.addLineSite( id_list[2], id_list[3] )
-    #vd.check()
+    vd.addLineSite( id_list[2], id_list[3] )
+    vd.check()
     
     t_after = time.time()
     line_time = t_after-t_before

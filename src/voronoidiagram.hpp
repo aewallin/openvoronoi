@@ -183,12 +183,6 @@ class VoronoiDiagram {
         VertexQueue vertexQueue; 
         std::map<int,HEVertex> vertex_map;
         bool debug;
-        
-        // these are used for guiding repair_face()
-        //HEFace null_face1;
-        //HEFace null_face2;
-        //HEVertex segment_start;
-        //HEVertex segment_end;
 
 };
 

@@ -137,6 +137,7 @@ def modify_segments(segs):
         #drawSegment(myscreen, seg)
     return segs_mod
     
+"""
 def insert_many_polygons(vd,segs):
     polygon_ids =[]
     for poly in segs:
@@ -145,7 +146,26 @@ def insert_many_polygons(vd,segs):
     
     for ids in polygon_ids:
         insert_polygon_segments(vd,ids)
+"""
 
+def insert_many_polygons(vd,segs):
+    polygon_ids =[]
+    t_before = time.time()
+    for poly in segs:
+        poly_id = insert_polygon_points(vd,poly)
+        polygon_ids.append(poly_id)
+    t_after = time.time()
+    pt_time = t_after-t_before
+    
+    t_before = time.time()
+    for ids in polygon_ids:
+        insert_polygon_segments(vd,ids)
+    
+    t_after = time.time()
+    seg_time = t_after-t_before
+    
+    return [pt_time, seg_time]
+    
 def ttt_segments(text,scale):
     wr = ttt.SEG_Writer()
 
@@ -245,10 +265,13 @@ if __name__ == "__main__":
     #all_segs=segs
     #all_segs=segs3 #+segs4
     #all_segs = segs6
-    insert_many_polygons(vd,all_segs)
-    
-    times=[1,1]
+    #insert_many_polygons(vd,all_segs)
+    times = insert_many_polygons(vd,all_segs)
+    vd.check()
     vod.setVDText2(times)
+    
+    #times=[1,1]
+    #vod.setVDText2(times)
     vod.setAll()
     
     print "PYTHON All DONE."

@@ -76,14 +76,11 @@ public:
     bool sign; // choose either +/- in front of sqrt()
     
     Point point(double t) const; 
-    
     double error(Solution& sl) const;
     double minimum_t( Site* s1, Site* s2);
     void copy_parameters(EdgeProps& other);   
     void set_parameters(Site* s1, Site* s2, bool sig);
     void set_sep_parameters(Point& endp, Point& p);
-    //void set_next(HEEdge n);
-    /// assignment
     EdgeProps &operator=(const EdgeProps &p);
 private:
     Point projection_point(Solution& sl) const;

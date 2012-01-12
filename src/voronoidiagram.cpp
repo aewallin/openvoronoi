@@ -553,9 +553,6 @@ std::pair<HEVertex,HEFace> VoronoiDiagram::process_null_edge(Point dir, HEEdge n
                 pointsite_edge = sep_twin;
             }
             
-            // FIXME: handle both next/prev zero_point_face
-            //zero_point_face = g[pointsite_edge].face; // this face will be removed/contracted.
-            
             // set the separator target to NEW
             HEVertex sep_target = g.target(sep_edge);
             g[sep_target].status = NEW;

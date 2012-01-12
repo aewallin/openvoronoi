@@ -1372,9 +1372,9 @@ boost::tuple<HEEdge,HEVertex,HEEdge,bool> VoronoiDiagram::find_separator_target(
     HEEdge current_edge = g[f].edge; // start on some edge of the face
     HEEdge start_edge = current_edge;
     bool found = false;
-    HEVertex v_target;
+    HEVertex v_target = HEVertex();
     HEEdge v_previous, v_next;
-    bool flag;
+    bool flag(true);
     if (debug) { 
         std::cout << " find_separator_target f=" << f << " endp= " << g[endp].index << "\n";
         print_face(f);

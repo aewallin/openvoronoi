@@ -110,7 +110,7 @@ class VoronoiDiagram {
         void initialize();
         HEVertex   find_seed_vertex(HEFace f, Site* site);
         EdgeVector find_in_out_edges(); 
-        EdgeData   find_edge_data(HEFace f, VertexVector startverts=VertexVector());
+        EdgeData   find_edge_data(HEFace f, VertexVector startverts, std::pair<HEVertex,HEVertex> segment);
         EdgeVector find_split_edges(HEFace f, Point pt1, Point pt2);
         bool find_split_vertex(HEFace f, HEVertex& v);
         HEFace find_pointsite_face(HEEdge start_edge);
@@ -124,21 +124,27 @@ class VoronoiDiagram {
         void mark_vertex(HEVertex& v,  Site* site); 
         void   add_vertices( Site* site );
         HEFace add_face(Site* site);
-        void   add_edges(HEFace new_f1, HEFace f, HEFace new_f2 = 0);
+        
+        void   add_edges(HEFace new_f1, HEFace f);        
+        void   add_edges(HEFace new_f1, HEFace f, HEFace new_f2, std::pair<HEVertex,HEVertex> seg);
+        
         void   add_edge(EdgeData ed, HEFace new1, HEFace new2=0);
         void   add_separator(HEFace f, HEFace nf, boost::tuple<HEEdge, HEVertex, HEEdge,bool> target, HEVertex endp, Site* s1, Site* s2);
         void   add_split_vertex(HEFace f, Site* s);
         std::pair<HEFace,HEFace> add_linesite_edges(HEVertex seg_start, HEVertex seg_end, bool linesite_k_sign);
         
-        boost::tuple<HEVertex,HEFace,HEVertex,HEVertex>
+        boost::tuple<HEVertex,HEFace,HEVertex,HEVertex,HEFace>
             find_null_face(HEVertex start, HEVertex other, Point l);
         boost::tuple<HEEdge,HEVertex,HEEdge,bool> find_separator_target(HEFace f, HEVertex endp);
         std::pair<HEEdge,HEEdge> find_next_prev(HEFace null_face, HEVertex endp);
 
-        HEVertex process_null_edge(Point dir, HEEdge next_edge , bool k3, bool next_prev);
+        std::pair<HEVertex,HEFace> process_null_edge(Point dir, HEEdge next_edge , bool k3, bool next_prev);
         HEVertex add_separator_point(HEVertex endp, HEEdge edge, Point sep_dir);
-
+        
         void repair_face( HEFace f );
+        void repair_face( HEFace f , std::pair<HEVertex,HEVertex> segs,
+                                     std::pair<HEFace,HEFace> nulled_faces,
+                                     std::pair<HEFace,HEFace> null_faces );
         void remove_vertex_set();
         void remove_split_vertex(HEFace f);
         void reset_status();
@@ -179,11 +185,11 @@ class VoronoiDiagram {
         bool debug;
         
         // these are used for guiding repair_face()
-        HEFace null_face1;
-        HEFace null_face2;
-        HEVertex segment_start;
-        HEVertex segment_end;
-        HEFace zero_point_face;
+        //HEFace null_face1;
+        //HEFace null_face2;
+        //HEVertex segment_start;
+        //HEVertex segment_end;
+
 };
 
 // class for passing to numerical boost::toms748 root-finding algorithm

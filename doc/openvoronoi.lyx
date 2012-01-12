@@ -750,7 +750,108 @@ Line-Line-Line Solver
 \end_layout
 
 \begin_layout Standard
-solve 3x3 linear system.
+The intersection point between three line sites 
+\begin_inset Formula $l_{1}$
+\end_inset
+
+, 
+\begin_inset Formula $l_{2}$
+\end_inset
+
+, and 
+\begin_inset Formula $l_{3}$
+\end_inset
+
+ is given by the solution 
+\begin_inset Formula $(x,y,t)$
+\end_inset
+
+ to
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $\left\{ \begin{array}{c}
+a_{1}x+b_{1}y+c_{1}+k_{1}t=0\\
+a_{2}x+b_{2}y+c_{2}+k_{2}t=0\\
+a_{3}x+b_{3}y+c_{3}+k_{3}t=0
+\end{array}\right.$
+\end_inset
+
+,
+\end_layout
+
+\begin_layout Standard
+which can be written in matrix-form as 
+\begin_inset Formula $Ax=b$
+\end_inset
+
+ where
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $A=\left[\begin{array}{ccc}
+a_{1} & b_{1} & k_{1}\\
+a_{2} & b_{2} & k_{2}\\
+a_{3} & b_{3} & k_{3}
+\end{array}\right]$
+\end_inset
+
+, 
+\begin_inset Formula $b=\left[\begin{array}{c}
+-c_{1}\\
+-c_{2}\\
+-c_{3}
+\end{array}\right]$
+\end_inset
+
+, 
+\begin_inset Formula $x=\left[\begin{array}{c}
+x\\
+y\\
+t
+\end{array}\right]$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The solutions 
+\begin_inset Formula $x=\left[\begin{array}{ccc}
+x_{1} & x_{2} & x_{3}\end{array}\right]^{T}$
+\end_inset
+
+ are given by Cramer's rule as 
+\begin_inset Formula $x_{i}=\nicefrac{\det(A_{i})}{\det(A)}$
+\end_inset
+
+ where 
+\begin_inset Formula $A_{i}$
+\end_inset
+
+ is found by replacing column 
+\begin_inset Formula $i$
+\end_inset
+
+ of 
+\begin_inset Formula $A$
+\end_inset
+
+ with the column-vector 
+\begin_inset Formula $b$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+See 
+\family typewriter
+solver_lll.hpp
+\end_layout
+
+\begin_layout Standard
+Todo: when det(A) is zero (or small), an alternative strategy is required!
 \end_layout
 
 \begin_layout Section

@@ -194,12 +194,13 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
         //std::cout << std::scientific;
     }
 
-    assert(0);
+    assert(0); // in Debug mode, stop here.
+    
     // try a desperate solution
     double t_mid = 0.5*(t_min+t_max);
     Point p_mid = vd->g[edge].point(t_mid);
     Solution desp( p_mid, t_mid, 1 );
-    std::cout << " Returning desperate solution: \n";
+    std::cout << "WARNING: Returning desperate solution: \n";
     std::cout << desp.p << " t=" << desp.t << " k3=" << desp.k3  << " e_err=" << vd->g[edge].error(desp) <<"\n";
     return desp;
 }

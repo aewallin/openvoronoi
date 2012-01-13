@@ -136,7 +136,7 @@ class VD:
             lns=2 # avoid dividing by log(1)=0
         if pts==0 or pts==1:
             pts=2 # avoid dividing by log(1)
-        self.vdtext2_text = "Used {0:.3f} s CPU time:\n".format(sum(times))
+        self.vdtext2_text = "VD in {0:.3f} s CPU time:\n".format(sum(times))
         self.vdtext2_text += "N={0} point-sites in {1:.3f} s ".format(pts, times[0])
         self.vdtext2_text += "= {0:.2f} us*N*log2(N) \n".format( 1e6*float( times[0] )/(float(pts)*float(math.log10(pts)/math.log10(2.0))) )
         self.vdtext2_text += "M={0} line-sites in {1:.3f} s ".format(lns, times[1])

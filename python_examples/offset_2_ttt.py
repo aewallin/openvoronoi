@@ -3,18 +3,60 @@ import ovdvtk
 import time
 import vtk
 import ttt
+import math
 
 def drawLine(myscreen, pt1, pt2, lineColor):
     myscreen.addActor( ovdvtk.Line(p1=(pt1.x,pt1.y,0),p2=(pt2.x,pt2.y,0),color=lineColor) ) 
 
-def drawArc(myscreen, pt1, pt2, r, arcColor):
-    myscreen.addActor( ovdvtk.Line(p1=(pt1.x,pt1.y,0),p2=(pt2.x,pt2.y,0),color=arcColor) ) 
+def drawArc(myscreen, pt1, pt2, r, cen,cw,arcColor):
+    # draw arc as many line-segments
+    start = pt1-cen
+    end = pt2-cen
+    theta1 = math.atan2(start.x,start.y)
+    theta2 = math.atan2(end.x,end.y)
+    alfa=[] # the list of angles
+    da=0.1
+    CIRCLE_FUZZ = 1e-9
+    # idea from emc2 / cutsim g-code interp G2/G3
+    if (cw == False ): 
+        while ( (theta2 - theta1) > -CIRCLE_FUZZ): 
+            theta2 -= 2*math.pi
+    else:
+        while( (theta2 - theta1) < CIRCLE_FUZZ): 
+            theta2 += 2*math.pi
+    
+    dtheta = theta2-theta1
+    arclength = r*dtheta
+    dlength = min(0.01, arclength/10)
+    steps = int( float(arclength) / float(dlength))
+    rsteps = float(1)/float(steps)
+    dc = math.cos(-dtheta*rsteps) # delta-cos  
+    ds = math.sin(-dtheta*rsteps) # delta-sin
+    
+    previous = pt1
+    tr = [start.x, start.y]
+    for i in range(steps):
+        #f = (i+1) * rsteps #; // varies from 1/rsteps..1 (?)
+        #theta = theta1 + i* dtheta
+        tr = rotate(tr[0], tr[1], dc, ds) #; // rotate center-start vector by a small amount
+        x = cen.x + tr[0] 
+        y = cen.y + tr[1] 
+        current = ovd.Point(x,y)
+        myscreen.addActor( ovdvtk.Line(p1=(previous.x,previous.y,0),p2=(current.x,current.y,0),color=arcColor) )
+        previous = current 
 
+# rotate by cos/sin. from emc2 gcodemodule.cc
+def rotate(x, y,  c,  s):
+    tx = x * c - y * s;
+    y = x * s + y * c;
+    x = tx;
+    return [x,y]
+    
 def drawOffsets(myscreen, ofs):
     # draw loops
     nloop = 0
-    lineColor = ovdvtk.green
-    arcColor = ovdvtk.grass
+    lineColor = ovdvtk.lgreen
+    arcColor = ovdvtk.green #grass
     for lop in ofs:
         n = 0
         N = len(lop)
@@ -27,12 +69,14 @@ def drawOffsets(myscreen, ofs):
                 previous=p[0]
                 #first_point = p[0]
             else:
+                cw=p[3]
+                cen=p[2]
                 r=p[1]
                 p=p[0]
                 if r==-1:
                     drawLine(myscreen, previous, p, lineColor)
                 else:
-                    drawArc(myscreen, previous, p, r, arcColor)
+                    drawArc(myscreen, previous, p, r,cen,cw, arcColor)
                 #myscreen.addActor( ovdvtk.Line(p1=(previous.x,previous.y,0),p2=(p.x,p.y,0),color=loopColor) )
                 previous=p
             n=n+1
@@ -145,7 +189,6 @@ if __name__ == "__main__":
     vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
     vod.drawFarCircle()
 
-    
     vod.textScale = 0.02
     vod.vertexRadius = 0.0031
     vod.drawVertices=0
@@ -156,7 +199,7 @@ if __name__ == "__main__":
     
     
     # segments from ttt
-    segs = ttt_segments(  "AB", 10000)
+    segs = ttt_segments(  "A", 10000)
     segs = translate(segs, -0.06, 0.05)
     segs = modify_segments(segs)
     
@@ -166,9 +209,24 @@ if __name__ == "__main__":
     
     of = ovd.Offset( vd.getGraph() ) # pass the created graph to the Offset class
     of.str()
+    ofs_list=[]
+    t_before = time.time()
     for t in [0.005*x for x in range(1,10)]:
         ofs = of.offset(t)
+        ofs_list.append(ofs)
+    
+        
+    t_after = time.time()
+    oftime = t_after-t_before
+    for ofs in ofs_list:
         drawOffsets(myscreen, ofs)
+    
+    oftext  = ovdvtk.Text()
+    oftext.SetPos( (50, 100) )
+    oftext_text = "Offset in {0:.3f} s CPU time.".format( oftime )
+    oftext.SetText( oftext_text )
+    myscreen.addActor(oftext)
+
 
     vod.setVDText2(times)
     vod.setAll()

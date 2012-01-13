@@ -45,19 +45,9 @@ public:
     }
     boost::python::list offset(double t) {
         offset_list = boost::python::list(); // clear the list
-        
-        std::cout << " generating offset at t = " << t << "\n";
+        std::cout << "Offset::offset(t= " << t << ")\n";
         set_flags(t);
-        // find a face at which to start offset-loop
-        HEFace start= g.HFace();
-        
-        /*for(HEFace f=0; f<g.num_faces() ; f++) {
-            if (face_done[f]==0 ) {
-                start=f;
-                break;
-            }
-        }*/
-        
+        HEFace start;        
         while (find_start_face(start)) {
             offset_walk(start,t);
             print_status();
@@ -75,7 +65,7 @@ public:
     }
     
     void offset_walk(HEFace start,double t) {
-        std::cout << " offset_walk starting on face " << start << "\n";
+        std::cout << " offset_walk() starting on face " << start << "\n";
         HEEdge start_edge =  find_next_offset_edge( g[start].edge , t); // the first edge on the start-face
         boost::python::list loop;
         HEEdge current_edge = start_edge;
@@ -85,24 +75,38 @@ public:
         pt.append( -1 );
         loop.append(pt);
         do {
-            
             HEEdge next_edge = find_next_offset_edge( g[current_edge].next, t); // the following edge
             //std::cout << "offset-output: "; print_edge(current_edge); std::cout << " to "; print_edge(next_edge); std::cout << "\n";
             HEFace current_face = g[current_edge].face;
+            Site* s = g[current_face].site;
             // ask the Site for offset-geometry here.
-            Ofs* o = g[current_face].site->offset( g[current_edge].point(t), g[next_edge].point(t) );
-            std::cout << o->str();
-            //loop.append( g[next_edge].point(t) , o->radius() );
+            
+            Ofs* o = s->offset( g[current_edge].point(t), g[next_edge].point(t) );
+            //std::cout << o->str();
+            // figure out cw or ccw arcs?
+            bool cw(true);
+            if (!s->isLine() ) // point and arc-sites
+                cw = find_cw( o->start(), o->center(), o->end() );
+            
             boost::python::list lpt;
-            lpt.append( g[next_edge].point(t) );
-            lpt.append( o->radius() );
+                lpt.append( g[next_edge].point(t) );
+                lpt.append( o->radius() );
+                lpt.append( o->center() );
+                lpt.append( cw );
             loop.append(lpt);
             face_done[current_face]=1; // this is WRONG, need to check all offsets done first, not only one (for non-convex cells)
             current_edge = g[next_edge].twin;
         } while (current_edge != start_edge);
-        
         offset_list.append(loop);
     }
+    
+    // figure out cw or ccw for an arc
+    bool find_cw(Point s, Point c, Point e) {
+        // arc from current to next edge
+        // center at 
+        return c.is_right(s,e);
+    }
+    
     boost::python::list get_offsets() {
         return offset_list;
     }
@@ -111,7 +115,7 @@ public:
         // find the first edge that has an offset
         HEEdge start=e;
         HEEdge current=start;
-        HEEdge ofs_edge=e; // = HEEdge();
+        HEEdge ofs_edge=e;
         do {
             HEVertex src = g.source(current);
             HEVertex trg = g.target(current);

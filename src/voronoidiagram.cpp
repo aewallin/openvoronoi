@@ -216,8 +216,8 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
     Point left = 0.5*(src_se+trg_se) + (trg_se-src_se).xy_perp(); // this is used below and in find_null_face()
     bool linesite_k_sign = left.is_right(src_se,trg_se); 
 
-    g[start].status=OUT; 
-    g[end].status=OUT;     
+    g[start].status=OUT;
+    g[end].status=OUT;   
     g[start].zero_dist();
     g[end].zero_dist();
 
@@ -263,7 +263,7 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
     boost::tie(pos_face,neg_face) = add_linesite_edges(seg_start,seg_end,linesite_k_sign); 
 
     if (debug)
-        std::cout << " created pos/neg LineSite \n";
+        std::cout << " created pos/neg LineSite pos_face=" << pos_face << " neg_face=" << neg_face<< "\n";
 
     // the start_face/end_face should belong to the point-site at start/end
     // this is the face where possible separators are inserted later.
@@ -412,8 +412,7 @@ HEFace VoronoiDiagram::find_pointsite_face(HEEdge start_edge) {
     return start_face;
 }
 
-std::pair<HEFace,HEFace> VoronoiDiagram::add_linesite_edges(
-                                                 HEVertex seg_start, HEVertex seg_end,bool linesite_k_sign) 
+std::pair<HEFace,HEFace> VoronoiDiagram::add_linesite_edges(HEVertex seg_start, HEVertex seg_end, bool linesite_k_sign) 
 {
     HEFace pos_face, neg_face;  
     LineSite* pos_site;
@@ -422,7 +421,7 @@ std::pair<HEFace,HEFace> VoronoiDiagram::add_linesite_edges(
     if ( linesite_k_sign ) {
         pos_site = new LineSite( g[seg_start].position, g[seg_end  ].position , +1);
         neg_site = new LineSite( g[seg_end  ].position, g[seg_start].position , -1);
-        boost::tie(pos_edge,neg_edge) = g.add_twin_edges( seg_start,   seg_end );
+        boost::tie(pos_edge, neg_edge) = g.add_twin_edges( seg_start,   seg_end );
     } else {
         pos_site = new LineSite( g[seg_end  ].position, g[seg_start].position , +1);
         neg_site = new LineSite( g[seg_start].position, g[seg_end  ].position , -1);
@@ -439,7 +438,8 @@ std::pair<HEFace,HEFace> VoronoiDiagram::add_linesite_edges(
     g[pos_face].edge = pos_edge;
     g[neg_face].edge = neg_edge;
     g[pos_edge].face = pos_face;
-    g[neg_edge].face = neg_face;    
+    g[neg_edge].face = neg_face;
+    if (debug) std::cout << " pos_face=" << pos_face << " neg_face=" << neg_face << "\n";   
     return std::make_pair(pos_face,neg_face);
 }
 
@@ -1487,7 +1487,6 @@ EdgeData VoronoiDiagram::find_edge_data(HEFace f, VertexVector startverts, std::
         //count++;
         //assert(count<10000); // some reasonable max number of edges in face, to avoid infinite loop
     } while (current_edge!=start_edge && !found);
-
     assert(found);
     if (debug) std::cout << " IN-NEW-OUT=" << g[ed.v2].index << "\n";
 
@@ -1509,9 +1508,12 @@ void VoronoiDiagram::repair_face( HEFace f, std::pair<HEVertex,HEVertex> segment
                                             std::pair<HEFace,HEFace> null_face ) {
     if (debug) {
         std::cout << "repair_face ( " << f << " ) null1=" << null_face.first << " null2=" << null_face.second << "\n";
+        std::cout << " seg_start=" << g[segment.first].index << " seg_end=" << g[segment.second].index << "\n";
+        std::cout << " nulled.first=" << nulled_faces.first << " nulled.second=" << nulled_faces.second << "\n";
     }
     HEEdge current_edge = g[f].edge;
     HEEdge start_edge = current_edge;
+    //int count=0;
     do {
         assert( vd_checker->check_edge(current_edge) );
         HEVertex current_target = g.target( current_edge ); // an edge on the new face
@@ -1574,10 +1576,14 @@ void VoronoiDiagram::repair_face( HEFace f, std::pair<HEVertex,HEVertex> segment
                 }
             } 
         }
-        if (!found_next_edge)
+        if (!found_next_edge) {
             std::cout << " repair_face( " << f << " ) error. could not find next-edge!\n";
+            exit(-1);
+        }
         assert(found_next_edge); // must find a next-edge!
-         
+        //count++;
+        //if (count>30)
+        //    exit(-1);
         current_edge = g[current_edge].next; // jump to the next edge
     } while (current_edge != start_edge);
     

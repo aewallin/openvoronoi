@@ -39,7 +39,7 @@ def translate(segs,x,y):
             #seg2.append(seg[3] + y)
         out.append(seg2)
     return out
-
+"""
 def insert_polygon(vd, polygon):
     pts=[]
     for p in polygon:
@@ -80,7 +80,8 @@ def insert_polygon(vd, polygon):
     
     vd.check()
     return times
-    
+"""
+
 def insert_polygon_points(vd, polygon):
     pts=[]
     for p in polygon:
@@ -91,18 +92,23 @@ def insert_polygon_points(vd, polygon):
     for p in pts:
         id_list.append( vd.addVertexSite( p ) )
         print " ",m," added vertex ", id_list[ len(id_list) -1 ]
-        m=m+1    
+        m=m+1   
+    print vd.numFaces()," faces after all points inserted"
     return id_list
 
 def insert_polygon_segments(vd,id_list):
     j=0
+    jmax=9999999
     print "inserting ",len(id_list)," line-segments:"
     for n in range(len(id_list)):
         n_nxt = n+1
         if n==(len(id_list)-1):
             n_nxt=0
-        print " ",j,"inserting segement ",id_list[n]," - ",id_list[n_nxt]
-        vd.addLineSite( id_list[n], id_list[n_nxt])
+        
+        if (j<jmax):
+            #vd.debug_on()
+            print " ",j,"inserting segement ",id_list[n]," - ",id_list[n_nxt]
+            vd.addLineSite( id_list[n], id_list[n_nxt])
         j=j+1
 
 def modify_segments(segs):
@@ -169,7 +175,10 @@ if __name__ == "__main__":
     myscreen.camera.SetClippingRange(-(zmult+1)*camPos,(zmult+1)*camPos)
     myscreen.camera.SetFocalPoint(0.0, 0, 0)
 
-    segs = ttt_segments(  "ABCDEFGHIJKLM", 64000)
+    segs = ttt_segments(  ".", 10000)
+    segs = translate(segs, -0.06, 0.05)
+    
+    #segs = ttt_segments(  "ABCDEFGHIJKLM", 64000)
     segs2 = ttt_segments( "NOPQRSTUVWXYZ", 64000)
     segs3 = ttt_segments( "abcdefghijklm", 64000)
     #segs3 = ttt_segments( "m", 6400)
@@ -179,7 +188,7 @@ if __name__ == "__main__":
     #segs = ttt_segments(  "A", 64000)
     #segs2 = ttt_segments( "B", 64000)
     #segs2=[]
-    segs = translate(segs, -0.6, 0.05)
+    #segs = translate(segs, -0.6, 0.05)
     segs = modify_segments(segs)
     
     segs2 = translate(segs2, -0.6, -0.05)
@@ -202,22 +211,22 @@ if __name__ == "__main__":
     
     vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
     vod.drawFarCircle()
-    vod.textScale = 0.000002
+    vod.textScale = 0.0002
     vod.vertexRadius = 0.0011
     vod.drawVertices=0
-    vod.drawVertexIndex=0
+    vod.drawVertexIndex=1
     vod.drawGenerators=0
-    vod.offsetEdges = 0
-    vod.drawNullEdges = 0
-    vd.setEdgeOffset(0.00001)
+    vod.offsetEdges = 1
+    vod.drawNullEdges = 1
+    vd.setEdgeOffset(0.001)
     
-    all_segs=segs+segs2 #+segs3 +segs4+segs5
+    all_segs=segs #+segs2 #+segs3 +segs4+segs5
     #all_segs=segs
     #all_segs=segs3 #+segs4
     #all_segs = segs6
     #insert_many_polygons(vd,all_segs)
     times = insert_many_polygons(vd,all_segs)
-    vd.check()
+    #vd.check()
     vod.setVDText2(times)
     
     vod.setAll()

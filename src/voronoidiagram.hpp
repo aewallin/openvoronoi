@@ -95,6 +95,7 @@ class VoronoiDiagram {
         int num_line_sites() const {return num_lsites;}
         /// return number of voronoi-vertices
         int num_vertices() const { return g.num_vertices()-num_point_sites(); }
+        int num_faces() const { return g.num_faces(); }
         int num_split_vertices();
         /// string repr
         std::string print() const;

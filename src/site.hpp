@@ -96,33 +96,40 @@ class Ofs {
 public:
     virtual std::string str() = 0;
     virtual double radius() {return -1;}
+    virtual Point center() {return Point(0,0);}
+    virtual Point start() {return Point(0,0);}
+    virtual Point end() {return Point(0,0);}
 };
 
 class LineOfs : public Ofs {
 public:
-    LineOfs(Point p1, Point p2) : start(p1), end(p2) {}
+    LineOfs(Point p1, Point p2) : _start(p1), _end(p2) {}
     virtual std::string str() {
         std::ostringstream o;
-        o << "LineOfs from:"<<start<<" to " << end << "\n";
+        o << "LineOfs from:"<<_start<<" to " << _end << "\n";
         return o.str();        
     }
 protected:
-    Point start;
-    Point end;
+    Point _start;
+    Point _end;
 };
 
 class ArcOfs : public Ofs {
 public:
-    ArcOfs(Point p1, Point p2, double rad) : start(p1), end(p2), r(rad) {}
+    ArcOfs(Point p1, Point p2, Point cen, double rad) : _start(p1), _end(p2), c(cen), r(rad) {}
     virtual std::string str() {
         std::ostringstream o;
-        o << "ArcOfs  from:"<<start<<" to " << end << " r="<<r<<"\n";
+        o << "ArcOfs  from:"<<_start<<" to " << _end << " r="<<r<<"\n";
         return o.str();
     }
     virtual double radius() {return r;}
+    virtual Point center() {return c;}
+    virtual Point start() {return _start;}
+    virtual Point end() {return _end;}
 protected:
-    Point start;
-    Point end;
+    Point _start;
+    Point _end;
+    Point c;
     double r;
 };
 
@@ -229,7 +236,7 @@ public:
     virtual Point apex_point(const Point& ) { return _p; }
     virtual Ofs* offset(Point p1,Point p2) {
         double rad = (p1-_p).norm();
-        return new ArcOfs(p1, p2, rad); 
+        return new ArcOfs(p1, p2, _p, rad); 
     }
     inline virtual const Point position() const { return _p; }
     virtual double x() const {return _p.x;}
@@ -347,7 +354,7 @@ public:
         eq.c = _center.x*_center.x + _center.y*_center.y - _radius*_radius;
     }
     ~ArcSite() {}
-    virtual Ofs* offset(Point p1,Point p2) {return new ArcOfs(p1,p2,-1); } //FIXME: radius
+    virtual Ofs* offset(Point p1,Point p2) {return new ArcOfs(p1,p2,_center,-1); } //FIXME: radius
     Point apex_point(const Point& p) {
         return p+Point(0,0); // FIXME
     }

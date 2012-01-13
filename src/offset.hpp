@@ -45,12 +45,12 @@ public:
     }
     boost::python::list offset(double t) {
         offset_list = boost::python::list(); // clear the list
-        std::cout << "Offset::offset(t= " << t << ")\n";
+        //std::cout << "Offset::offset(t= " << t << ")\n";
         set_flags(t);
         HEFace start;        
         while (find_start_face(start)) {
             offset_walk(start,t);
-            print_status();
+            //print_status();
         }
         return get_offsets();
     }
@@ -150,7 +150,7 @@ public:
                 current = g[current].next;
             } while ( current!=start );
         }
-        print_status();
+        //print_status();
     }
     
     bool t_bracket(double a, double b, double t) {

@@ -1,29 +1,30 @@
 /*  
- *  Copyright 2010-2011 Anders Wallin (anders.e.e.wallin "at" gmail.com)
+ *  Copyright 2010-2012 Anders Wallin (anders.e.e.wallin "at" gmail.com)
  *  
- *  This file is part of OpenCAMlib.
+ *  This file is part of OpenVoronoi.
  *
- *  OpenCAMlib is free software: you can redistribute it and/or modify
+ *  OpenVoronoi is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  OpenCAMlib is distributed in the hope that it will be useful,
+ *  OpenVoronoi is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with OpenCAMlib.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with OpenVoronoi.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <boost/python.hpp>
 
 #include "voronoidiagram_py.hpp"  
 #include "common/point.hpp"
+#include "offset.hpp"
 
 /*
- *  Python wrapping of voronoi diagram
+ *  Boost::Python wrapping of voronoi diagram and related classes.
  */
 
 using namespace ovd;
@@ -35,16 +36,18 @@ std::string ovd_revision() {
 }
 
 BOOST_PYTHON_MODULE(openvoronoi) {
-    bp::def("revision", ovd_revision);
+    bp::def("revision", ovd_revision); // why do we have both module.version() and vd.version() ?
     
     bp::class_<VoronoiDiagram >("VoronoiDiagram_base")
     ;
+    bp::class_<HEGraph>("Graph")
+    ;
     bp::class_< VoronoiDiagram_py, bp::bases<VoronoiDiagram> >("VoronoiDiagram")
         .def(bp::init<double, unsigned int>())
-        .def("addVertexSite",  &VoronoiDiagram_py::insert_point_site1 )
-        .def("addVertexSite",  &VoronoiDiagram_py::insert_point_site2 )
-        .def("addLineSite",  &VoronoiDiagram_py::insert_line_site2 ) // takes one argument
-        .def("addLineSite",  &VoronoiDiagram_py::insert_line_site3 ) // takes two arguments
+        .def("addVertexSite",  &VoronoiDiagram_py::insert_point_site1 ) // (point)
+        .def("addVertexSite",  &VoronoiDiagram_py::insert_point_site2 ) // (point, step)
+        .def("addLineSite",  &VoronoiDiagram_py::insert_line_site2 ) // takes two arguments
+        .def("addLineSite",  &VoronoiDiagram_py::insert_line_site3 ) // takes three arguments (idx1, idx2, step)
         .def("getGenerators",  &VoronoiDiagram_py::getGenerators)
         .def("getEdgesGenerators",  &VoronoiDiagram_py::getEdgesGenerators)
         .def("getVoronoiVertices",  &VoronoiDiagram_py::getVoronoiVertices) 
@@ -66,7 +69,9 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         .staticmethod("reset_vertex_count")
         .def("getStat", &VoronoiDiagram_py::getStat)
         .def("getFaceStats", &VoronoiDiagram_py::getFaceStats)
+        .def("getGraph", &VoronoiDiagram_py::get_graph_reference, bp::return_value_policy<bp::reference_existing_object>())
     ;
+    
     bp::enum_<VoronoiVertexStatus>("VoronoiVertexStatus")
         .value("OUT", OUT)   
         .value("IN", IN)
@@ -92,11 +97,11 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         .def(bp::init<double, double>())
         .def(bp::init<Point>())
         .def(bp::other<double>() * bp::self)
-        .def(bp::self * bp::other<double>())
+        .def(bp::self *  bp::other<double>())
         .def(bp::self -= bp::other<Point>())
-        .def(bp::self - bp::other<Point>())
+        .def(bp::self -  bp::other<Point>())
         .def(bp::self += bp::other<Point>())
-        .def(bp::self + bp::other<Point>())
+        .def(bp::self +  bp::other<Point>())
         .def("norm", &Point::norm)
         .def("normalize", &Point::normalize)
         .def("dot", &Point::dot)
@@ -107,5 +112,10 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         .def_readwrite("y", &Point::y)
         .def_pickle(point_pickle_suite())
     ;
+    bp::class_<Offset, boost::noncopyable >("Offset", bp::no_init)
+        .def(bp::init<HEGraph&>())
+        .def("str", &Offset::print )
+        .def("offset", &Offset::offset )
+    ; 
 }
 

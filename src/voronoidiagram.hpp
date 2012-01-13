@@ -105,6 +105,7 @@ class VoronoiDiagram {
         static void reset_vertex_count() { VoronoiVertex::reset_count(); }
         void debug_on() {debug=true;}
         bool check();
+        HEGraph& get_graph_reference() {return g;}
     protected:
         /// initialize the diagram with three generators
         void initialize();

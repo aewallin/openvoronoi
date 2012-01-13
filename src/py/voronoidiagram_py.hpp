@@ -19,7 +19,7 @@
 #ifndef VODI_PY_H
 #define VODI_PY_H
 
-
+// from where is boost::python included?
 #include "voronoidiagram.hpp"
 #include "vertex.hpp"
 #include "facegrid.hpp"

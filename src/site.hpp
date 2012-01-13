@@ -20,6 +20,7 @@
 #pragma once
 
 #include <qd/qd_real.h> 
+#include <sstream>
 
 #include "common/point.hpp"
 
@@ -91,6 +92,43 @@ struct Eq {
     
 };
 
+class Ofs {
+public:
+    virtual std::string str() = 0;
+    virtual double radius() {return -1;}
+};
+
+class LineOfs : public Ofs {
+public:
+    LineOfs(Point p1, Point p2) : start(p1), end(p2) {}
+    virtual std::string str() {
+        std::ostringstream o;
+        o << "LineOfs from:"<<start<<" to " << end << "\n";
+        return o.str();
+        //return 
+        
+    }
+protected:
+    Point start;
+    Point end;
+};
+
+class ArcOfs : public Ofs {
+public:
+    ArcOfs(Point p1, Point p2, double rad) : start(p1), end(p2), r(rad) {}
+    virtual std::string str() {
+        std::ostringstream o;
+        o << "ArcOfs  from:"<<start<<" to " << end << " r="<<r<<"\n";
+        return o.str();
+        //return "ArcOfs from:"<<start<<" to " << end << "\n";
+    }
+    virtual double radius() {return r;}
+protected:
+    Point start;
+    Point end;
+    double r;
+};
+
 /// Base-class for a voronoi-diagram site, or generator.
 class Site {
 public:
@@ -98,9 +136,14 @@ public:
     virtual ~Site() {}
     /// return closest point on site to given point p
     virtual Point apex_point(const Point& p) = 0;
+    /// return offset of site
+    virtual Ofs* offset(Point, Point) = 0;
+    
     inline virtual const Point position() const {assert(0); return Point(0,0);}
     virtual const Point start() const {assert(0); return Point(0,0);}
     virtual const Point end() const {assert(0); return Point(0,0);}
+    
+    
     Eq<double> eqp() {return eq;} 
     Eq<double> eqp(double kk) {
         Eq<double> eq2(eq);
@@ -187,6 +230,10 @@ public:
     }
     ~PointSite() {}
     virtual Point apex_point(const Point& ) { return _p; }
+    virtual Ofs* offset(Point p1,Point p2) {
+        double rad = (p1-_p).norm();
+        return new ArcOfs(p1, p2, rad); 
+    }
     inline virtual const Point position() const { return _p; }
     virtual double x() const {return _p.x;}
     virtual double y() const {return _p.y;}
@@ -235,6 +282,8 @@ public:
     virtual void set_c(const Point& p) {
         eq.c = -( eq.a * p.x + eq.b * p.y );
     }*/
+    virtual Ofs* offset(Point p1,Point p2) {return new LineOfs(p1, p2); }
+    
     /// closest point on start-end segment to given point.
     /// project onto line and return either the projected point
     /// or one endpoint of the linesegment
@@ -301,6 +350,7 @@ public:
         eq.c = _center.x*_center.x + _center.y*_center.y - _radius*_radius;
     }
     ~ArcSite() {}
+    virtual Ofs* offset(Point p1,Point p2) {return new ArcOfs(p1,p2,-1); } //FIXME: radius
     Point apex_point(const Point& p) {
         return p+Point(0,0); // FIXME
     }

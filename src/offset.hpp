@@ -22,7 +22,10 @@
 #include <string>
 #include <iostream>
 
+#include <boost/python.hpp>
+
 #include "graph.hpp"
+#include "site.hpp"
 
 namespace ovd
 {
@@ -33,35 +36,76 @@ public:
     Offset(HEGraph& gi): g(gi) {
         face_done.clear();
         face_done.assign( g.num_faces(), 1 );
+        //offset_list = boost::python::list();
     }
     void print() {
         std::cout << "Offset: verts: " << g.num_vertices() << "\n";
         std::cout << "Offset: edges: " << g.num_edges() << "\n";
         std::cout << "Offset: faces: " << g.num_faces() << "\n";
     }
-    void offset(double t) {
+    boost::python::list offset(double t) {
+        offset_list = boost::python::list(); // clear the list
+        
         std::cout << " generating offset at t = " << t << "\n";
         set_flags(t);
         // find a face at which to start offset-loop
         HEFace start= g.HFace();
-        for(HEFace f=0; f<g.num_faces() ; f++) {
+        
+        /*for(HEFace f=0; f<g.num_faces() ; f++) {
             if (face_done[f]==0 ) {
                 start=f;
                 break;
             }
-        }
-        std::cout << "start offset at " << start << "\n";
-        HEEdge start_edge =  find_next_offset_edge( g[start].edge , t); // the first edge on the start-face
+        }*/
         
-        HEEdge current_edge = start_edge;
-        do {
-            HEEdge next_edge = find_next_offset_edge( g[current_edge].next, t); // the following edge
-            std::cout << "offset-output: "; print_edge(current_edge); std::cout << " to "; print_edge(next_edge); std::cout << "\n";
-            //face_done[start]=1; // this is WRONG, need to check all offsets done first, not only one (for non-convex cells)
-            current_edge = g[next_edge].twin;
-        } while (current_edge != start_edge);
+        while (find_start_face(start)) {
+            offset_walk(start,t);
+            print_status();
+        }
+        return get_offsets();
+    }
+    bool find_start_face(HEFace& start) {
+        for(HEFace f=0; f<g.num_faces() ; f++) {
+            if (face_done[f]==0 ) {
+                start=f;
+                return true;
+            }
+        }
+        return false;
     }
     
+    void offset_walk(HEFace start,double t) {
+        std::cout << " offset_walk starting on face " << start << "\n";
+        HEEdge start_edge =  find_next_offset_edge( g[start].edge , t); // the first edge on the start-face
+        boost::python::list loop;
+        HEEdge current_edge = start_edge;
+        //loop.append( g[current_edge].point(t) );
+        boost::python::list pt;
+        pt.append( g[current_edge].point(t) );
+        pt.append( -1 );
+        loop.append(pt);
+        do {
+            
+            HEEdge next_edge = find_next_offset_edge( g[current_edge].next, t); // the following edge
+            //std::cout << "offset-output: "; print_edge(current_edge); std::cout << " to "; print_edge(next_edge); std::cout << "\n";
+            HEFace current_face = g[current_edge].face;
+            // ask the Site for offset-geometry here.
+            Ofs* o = g[current_face].site->offset( g[current_edge].point(t), g[next_edge].point(t) );
+            std::cout << o->str();
+            //loop.append( g[next_edge].point(t) , o->radius() );
+            boost::python::list lpt;
+            lpt.append( g[next_edge].point(t) );
+            lpt.append( o->radius() );
+            loop.append(lpt);
+            face_done[current_face]=1; // this is WRONG, need to check all offsets done first, not only one (for non-convex cells)
+            current_edge = g[next_edge].twin;
+        } while (current_edge != start_edge);
+        
+        offset_list.append(loop);
+    }
+    boost::python::list get_offsets() {
+        return offset_list;
+    }
     // starting at e, find the edge that brackets t
     HEEdge find_next_offset_edge(HEEdge e, double t) {
         // find the first edge that has an offset
@@ -102,16 +146,19 @@ public:
                 current = g[current].next;
             } while ( current!=start );
         }
-        for(HEFace f=0; f<g.num_faces() ; f++) {
-            std::cout << (int)face_done[f];
-        }
-        std::cout << "\n";
+        print_status();
     }
     
     bool t_bracket(double a, double b, double t) {
         double min_t = std::min(a,b);
         double max_t = std::max(a,b);
         return ( (min_t<t) && (t<max_t) );
+    }
+    void print_status() {
+        for(HEFace f=0; f<g.num_faces() ; f++) {
+            std::cout << (int)face_done[f];
+        }
+        std::cout << "\n";
     }
     void print_face(HEFace f) { // move to common printing-class?
         std::cout << " Face " << f << ": ";
@@ -136,6 +183,7 @@ private:
     Offset(); // don't use.
     HEGraph& g;
     std::vector<unsigned char> face_done;
+    boost::python::list offset_list;
 };
 
 

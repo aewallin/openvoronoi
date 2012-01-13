@@ -116,6 +116,7 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         .def(bp::init<HEGraph&>())
         .def("str", &Offset::print )
         .def("offset", &Offset::offset )
+
     ; 
 }
 

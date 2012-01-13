@@ -26,6 +26,7 @@ purple=( float(255)/255,float(0)/255,float(176)/255)
 
 green= (0,1,0)
 lgreen = ( float(150)/255,float(255)/255,float(150)/255)
+dgreen= ( float(21)/255,float(119)/255,float(41)/255)
 grass = ( float(182)/255,float(248)/255,float(71)/255)
 
 blue= (0,0,1)

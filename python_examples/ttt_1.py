@@ -3,16 +3,7 @@ import openvoronoi as ovd
 import ovdvtk
 import time
 import vtk
-"""
-def drawSegment(myscreen, seg):
-    #p1x = seg[0]
-    #p1y = seg[1]
-    #p2x = seg[2]
-    #p2y = seg[3]
-    for pt in seg:
-    actor = ovdvtk.Line( p1=( p1x,p1y, 0), p2=(p2x,p2y, 0), color=ovdvtk.yellow)
-    myscreen.addActor(actor)
-"""
+
 def drawLoops(myscreen,loops,loopColor):
     # draw the loops
     nloop = 0
@@ -167,13 +158,6 @@ if __name__ == "__main__":
     myscreen = ovdvtk.VTKScreen(width=w, height=h) 
     ovdvtk.drawOCLtext(myscreen, rev_text=ovd.revision() )
     
-    w2if = vtk.vtkWindowToImageFilter()
-    w2if.SetInput(myscreen.renWin)
-    lwr = vtk.vtkPNGWriter()
-    lwr.SetInput( w2if.GetOutput() )
-    #w2if.Modified()
-    #lwr.SetFileName("tux1.png")
-    
     scale=1
     myscreen.render()
     #random.seed(42)
@@ -184,18 +168,7 @@ if __name__ == "__main__":
     myscreen.camera.SetPosition(0, -camPos/float(1000), zmult*camPos) 
     myscreen.camera.SetClippingRange(-(zmult+1)*camPos,(zmult+1)*camPos)
     myscreen.camera.SetFocalPoint(0.0, 0, 0)
-    
-    """
-    wr = ttt.SEG_Writer()
 
-    # wr.scale = 3
-    wr.arc = False
-    wr.conic = False
-    wr.cubic = False
-    wr.scale = float(1)/float(32000)
-    s3 = ttt.ttt("ABCDEFGHIJKL",wr) 
-    segs = wr.get_segments()
-    """
     segs = ttt_segments(  "ABCDEFGHIJKLM", 64000)
     segs2 = ttt_segments( "NOPQRSTUVWXYZ", 64000)
     segs3 = ttt_segments( "abcdefghijklm", 64000)
@@ -247,15 +220,7 @@ if __name__ == "__main__":
     vd.check()
     vod.setVDText2(times)
     
-    #times=[1,1]
-    #vod.setVDText2(times)
     vod.setAll()
-    
     print "PYTHON All DONE."
-
     myscreen.render()   
-    #w2if.Modified()
-    #lwr.SetFileName("{0}.png".format(Nmax))
-    #lwr.Write()
-     
     myscreen.iren.Start()

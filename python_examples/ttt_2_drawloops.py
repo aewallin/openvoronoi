@@ -3,16 +3,7 @@ import openvoronoi as ovd
 import ovdvtk
 import time
 import vtk
-"""
-def drawSegment(myscreen, seg):
-    #p1x = seg[0]
-    #p1y = seg[1]
-    #p2x = seg[2]
-    #p2y = seg[3]
-    for pt in seg:
-    actor = ovdvtk.Line( p1=( p1x,p1y, 0), p2=(p2x,p2y, 0), color=ovdvtk.yellow)
-    myscreen.addActor(actor)
-"""
+
 def drawLoops(myscreen,loops,loopColor):
     # draw the loops
     nloop = 0
@@ -92,14 +83,7 @@ if __name__ == "__main__":
     h=1024
     myscreen = ovdvtk.VTKScreen(width=w, height=h) 
     ovdvtk.drawOCLtext(myscreen, rev_text=ovd.revision() )
-    
-    w2if = vtk.vtkWindowToImageFilter()
-    w2if.SetInput(myscreen.renWin)
-    lwr = vtk.vtkPNGWriter()
-    lwr.SetInput( w2if.GetOutput() )
-    #w2if.Modified()
-    #lwr.SetFileName("tux1.png")
-    
+        
     scale=1
     myscreen.render()
     #random.seed(42)
@@ -115,15 +99,11 @@ if __name__ == "__main__":
     ca = ovdvtk.Circle(center=(0,0,0) , radius=1, color=(0,1,1), resolution=50 )
     myscreen.addActor(ca)   
     
-    #draw_ttt(myscreen, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", -0.5,0,80000)
-    #draw_ttt(myscreen, "abcdefghijklmnopqrstuvwxyz", -0.5,-0.1,80000)
-    #draw_ttt(myscreen, "1234567890*", -0.5,-0.2,80000)
-    draw_ttt(myscreen, "m", -0.5,-0.2,80000)
+    draw_ttt(myscreen, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", -0.5,0,80000)
+    draw_ttt(myscreen, "abcdefghijklmnopqrstuvwxyz", -0.5,-0.1,80000)
+    draw_ttt(myscreen, "1234567890*", -0.5,-0.2,80000)
+    #draw_ttt(myscreen, "m", -0.5,-0.2,80000)
     print "PYTHON All DONE."
 
-    myscreen.render()   
-    #w2if.Modified()
-    #lwr.SetFileName("{0}.png".format(Nmax))
-    #lwr.Write()
-     
+    myscreen.render()        
     myscreen.iren.Start()

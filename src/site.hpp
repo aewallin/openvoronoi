@@ -104,9 +104,7 @@ public:
     virtual std::string str() {
         std::ostringstream o;
         o << "LineOfs from:"<<start<<" to " << end << "\n";
-        return o.str();
-        //return 
-        
+        return o.str();        
     }
 protected:
     Point start;
@@ -120,7 +118,6 @@ public:
         std::ostringstream o;
         o << "ArcOfs  from:"<<start<<" to " << end << " r="<<r<<"\n";
         return o.str();
-        //return "ArcOfs from:"<<start<<" to " << end << "\n";
     }
     virtual double radius() {return r;}
 protected:

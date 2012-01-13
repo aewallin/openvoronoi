@@ -2,14 +2,6 @@ import openvoronoi as ovd
 import ovdvtk
 import time
 import vtk
-import datetime
-import math
-#import random
-#import os
-#import sys
-#import pickle
-#import gzip
-#import ovdgenerators as gens
 import ttt
 
 def drawLine(myscreen, pt1, pt2, lineColor):
@@ -98,19 +90,16 @@ def translate(segs,x,y):
             p2.append(p[0] + x)
             p2.append(p[1] + y)
             seg2.append(p2)
-            #seg2.append(seg[3] + y)
         out.append(seg2)
     return out
 
 def ttt_segments(text,scale):
     wr = ttt.SEG_Writer()
-
-    # wr.scale = 3
     wr.arc = False
     wr.conic = False
     wr.cubic = False
     wr.scale = float(1)/float(scale)
-    s3 = ttt.ttt(text,wr) 
+    ttt.ttt(text,wr) 
     segs = wr.get_segments()
     return segs
 
@@ -167,7 +156,7 @@ if __name__ == "__main__":
     
     
     # segments from ttt
-    segs = ttt_segments(  "A", 10000)
+    segs = ttt_segments(  "AB", 10000)
     segs = translate(segs, -0.06, 0.05)
     segs = modify_segments(segs)
     

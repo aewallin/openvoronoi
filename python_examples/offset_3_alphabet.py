@@ -27,7 +27,7 @@ def drawArc(myscreen, pt1, pt2, r, cen,cw,arcColor):
     
     dtheta = theta2-theta1
     arclength = r*dtheta
-    dlength = min(0.01, arclength/10)
+    dlength = min(0.001, arclength/10)
     steps = int( float(arclength) / float(dlength))
     rsteps = float(1)/float(steps)
     dc = math.cos(-dtheta*rsteps) # delta-cos  
@@ -161,13 +161,13 @@ def modify_segments(segs):
 
 if __name__ == "__main__":  
     #print ocl.revision()
-    #w=2500
-    #h=1500
+    w=2000
+    h=1200
     
     #w=1920
     #h=1080
-    w=1024
-    h=1024
+    #w=1024
+    #h=1024
     myscreen = ovdvtk.VTKScreen(width=w, height=h) 
     ovdvtk.drawOCLtext(myscreen, rev_text=ovd.revision() )   
     
@@ -221,21 +221,7 @@ if __name__ == "__main__":
     segs5 = translate(segs5, -0.6, -0.32)
     segs5 = modify_segments(segs5)
     
-    vd = ovd.VoronoiDiagram(far,120)
-    print vd.version()
-    
-    vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
-    vod.drawFarCircle()
-    vod.textScale = 0.000002
-    vod.vertexRadius = 0.0011
-    vod.drawVertices=0
-    vod.drawVertexIndex=0
-    vod.drawGenerators=0
-    vod.offsetEdges = 0
-    vod.drawNullEdges = 0
-    vd.setEdgeOffset(0.00001)
-    
-    all_segs=segs #+segs2 +segs3 +segs4+segs5
+    all_segs=segs +segs2 +segs3 +segs4+segs5
     #all_segs=segs
     #all_segs=segs3 #+segs4
     #all_segs = segs3
@@ -257,7 +243,7 @@ if __name__ == "__main__":
     of.str()
     ofs_list=[]
     t_before = time.time()
-    for t in [0.005*x for x in range(1,10)]:
+    for t in [0.0015*x for x in range(1,2)]:
         ofs = of.offset(t)
         ofs_list.append(ofs)
     

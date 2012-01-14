@@ -113,11 +113,9 @@ void EdgeProps::set_parameters(Site* s1, Site* s2, bool sig) {
         set_ll_parameters(s2,s1);
     else
         assert(0);
-        // AP
-        // PA
+        // AP & PA
         // AA
-        // AL
-        // LA
+        // AL & LA
 }
 
 void EdgeProps::copy_parameters(EdgeProps& other) {
@@ -340,6 +338,60 @@ void EdgeProps::set_ll_parameters(Site* s1, Site* s2) {  // Held thesis p96
     y[1]=0;y[3]=0;y[4]=0;y[5]=0;y[6]=0;y[7]=0;
 }
 
+// point(s1)-arc(s2)
+/*
+void EdgeProps::set_pa_parameters(Site* s1, Site* s2) { 
+    d = sqrt( (xc1 - xc2)^2 + (yc1-yc2)^2 )
+    double alfa1 = (xc2-xc1) / d
+    double alfa2 = (yc2-yc1) / d
+    double alfa3 = ( r2^2 - r1^2 - d^2) / 2d
+    double alfa4 = ( lamb2 * r2 - lamb1 * r1 ) / d
+    x[0] = xc1
+    x[1] = alfa1*alfa3
+    x[2] = alfa1*alfa4
+    x[3] = alfa2
+    x[4] = r1
+    x[5] = lamb1
+    x[6] = alfa3
+    x[7] = alfa4
+    
+    y[0] = yc1
+    y[1] = alfa2*alfa3
+    y[2] = alfa2*alfa4
+    y[3] = alfa1
+    y[4] = r1
+    y[5] = lamb1
+    y[6] = alfa3
+    y[7] = alfa4
+}
+
+// arc(s1)-line(s2)
+void EdgeProps::set_la_parameters(Site* s1, Site* s2) { 
+    d = sqrt( (xc1 - xc2)^2 + (yc1-yc2)^2 )
+    double alfa1 = a2
+    double alfa2 = b2
+    double alfa3 = ( a2*xc1 + b2*yc1 + c2 )
+    double alfa4 = r1
+    x[0]= xc1
+    x[1] = alfa1*alfa3
+    x[2] = -alfa1
+    x[3] = alfa2
+    x[4] = alfa4
+    x[5] = lamb1
+    x[6] = alfa3
+    x[7] = -1
+    
+    y[0] = yc1
+    y[1] = alfa2*alfa3
+    y[2] = -alfa2
+    y[3] = alfa1
+    y[4] = alfa4
+    y[5] = lamb1
+    y[6] = alfa3
+    y[7] = -1
+}
+*/
+
 double EdgeProps::minimum_t( Site* s1, Site* s2) {
     if (s1->isPoint() && s2->isPoint())        // PP
         return minimum_pp_t(s1,s2);
@@ -351,7 +403,7 @@ double EdgeProps::minimum_t( Site* s1, Site* s2) {
         return 0;
     else
         assert(0);
-    
+    // todo:  AP, AL, AA
     return -1;
 }
 

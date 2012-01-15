@@ -28,7 +28,7 @@
 
 namespace ovd {
 
-class VoronoiDiagram;
+//class VoronoiDiagram;
 class Solver;
 
 
@@ -64,7 +64,7 @@ private:
 /// Calculates the (x,y) position of vertices in a voronoi diagram
 class VertexPositioner {
 public:
-    VertexPositioner(VoronoiDiagram* vodi);
+    VertexPositioner(HEGraph& gi);
     virtual ~VertexPositioner();
     /// calculate the position of a new voronoi-vertex lying on the given edge.
     /// The new vertex is equidistant to the two sites that defined the edge
@@ -92,7 +92,8 @@ private:
     Solver* lll_solver;
     Solver* qll_solver;
 // DATA
-    VoronoiDiagram* vd;
+    HEGraph& g;
+    //VoronoiDiagram* vd;
     double t_min;
     double t_max;
     HEEdge edge;

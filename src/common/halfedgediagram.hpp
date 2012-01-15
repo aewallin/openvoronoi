@@ -723,6 +723,31 @@ void set_next_chain( std::list<Edge> list ) {
     }
 }
 
+// on a face, search and return the left/right edge from endp
+std::pair<Edge,Edge> find_next_prev(Face f, Vertex endp) {
+    Edge current = faces[f].edge;
+    Edge start_edge = current;
+    Edge next_edge = Edge();
+    Edge prev_edge = Edge(); // uninitialized warning on ubuntu 11.04 ?
+    do {
+        Vertex src = source(current);
+        Vertex trg = target(current);
+        if (src==endp)
+            next_edge = current;
+        if (trg==endp)
+            prev_edge = current;
+        current = g[current].next;
+    } while (current!=start_edge);
+    assert( next_edge != Edge() );
+    assert( prev_edge != Edge() );
+    //if (debug) {
+    //    std::cout << " find_next_prev() next_edge = "; g.print_edge(next_edge); 
+    //    std::cout << " find_next_prev() prev_edge = "; g.print_edge(prev_edge);
+    //}
+    return std::make_pair(next_edge, prev_edge);
+}
+
+
 void print_faces() {
     for( Face f=0;f<g.num_faces();f++) {
         print_face(f);

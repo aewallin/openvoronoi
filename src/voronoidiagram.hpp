@@ -73,7 +73,6 @@ struct EdgeData {
 class VoronoiDiagram {
     public:
         /// ctor
-        VoronoiDiagram() {}
         /// create diagram with given far-radius and number of bins
         /// \param far radius of circle centered at (0,0) within which all sites must lie
         /// \param n_bins number of bins used for nearest vd-vertex bucket-search
@@ -97,7 +96,6 @@ class VoronoiDiagram {
         /// string repr
         std::string print() const;
         std::string version() const { return VERSION_STRING; }
-        //friend class VoronoiDiagramChecker;
         static void reset_vertex_count() { VoronoiVertex::reset_count(); }
         void debug_on() {debug=true;}
         bool check();
@@ -133,7 +131,6 @@ class VoronoiDiagram {
         boost::tuple<HEVertex,HEFace,HEVertex,HEVertex,HEFace>
             find_null_face(HEVertex start, HEVertex other, Point l);
         boost::tuple<HEEdge,HEVertex,HEEdge,bool> find_separator_target(HEFace f, HEVertex endp);
-        std::pair<HEEdge,HEEdge> find_next_prev(HEFace null_face, HEVertex endp);
 
         std::pair<HEVertex,HEFace> process_null_edge(Point dir, HEEdge next_edge , bool k3, bool next_prev);
         HEVertex add_separator_point(HEVertex endp, HEEdge edge, Point sep_dir);
@@ -173,6 +170,8 @@ class VoronoiDiagram {
         VertexQueue vertexQueue; 
         std::map<int,HEVertex> vertex_map;
         bool debug;
+private:
+        VoronoiDiagram(); // don't use.
 
 };
 

@@ -38,11 +38,11 @@ std::string ovd_revision() {
 BOOST_PYTHON_MODULE(openvoronoi) {
     bp::def("revision", ovd_revision); // why do we have both module.version() and vd.version() ?
     
-    bp::class_<VoronoiDiagram >("VoronoiDiagram_base")
+    bp::class_<VoronoiDiagram >("VoronoiDiagram_base", bp::no_init)
     ;
     bp::class_<HEGraph>("Graph")
     ;
-    bp::class_< VoronoiDiagram_py, bp::bases<VoronoiDiagram> >("VoronoiDiagram")
+    bp::class_< VoronoiDiagram_py, bp::bases<VoronoiDiagram> >("VoronoiDiagram", bp::no_init)
         .def(bp::init<double, unsigned int>())
         .def("addVertexSite",  &VoronoiDiagram_py::insert_point_site1 ) // (point)
         .def("addVertexSite",  &VoronoiDiagram_py::insert_point_site2 ) // (point, step)

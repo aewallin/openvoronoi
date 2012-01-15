@@ -40,10 +40,6 @@ struct point_pickle_suite : boost::python::pickle_suite {
 /// \brief python wrapper for VoronoiDiagram
 class VoronoiDiagram_py : public VoronoiDiagram {
 public:
-    VoronoiDiagram_py() : VoronoiDiagram() {
-        _edge_points=40;
-        null_edge_offset=0.01;
-    }
     /// create diagram with given far-radius and number of bins
     VoronoiDiagram_py(double far, unsigned int n_bins) 
         : VoronoiDiagram( far, n_bins) {

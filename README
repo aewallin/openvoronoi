@@ -2,12 +2,13 @@
 The OpenVoronoi project aims to produce an algorithm for calculating
 the 2D voronoi-diagram for point, line-segment, and circular-arc sites.
 Currently point-sites work well and line-segment sites are being worked
-on. The incremental topology-oriented algorithm is used 
-(see References).
+on. The incremental topology-oriented algorithm is used (see References).
+OpenVoronoi is written by Anders Wallin (anders.e.e.wallin "at" gmail.com)
+and released under GPLv3 (see COPYING).
 
 Voronoi diagrams are used for many purposes in computational geometry,
 but the motivation for OpenVoronoi has mainly been 2D offset-generation
-for cnc mill toolpath calcuations.
+(see offset.hpp) for cnc mill toolpath calcuations.
 
 The OpenVoronoi project is at 
 https://github.com/aewallin/openvoronoi
@@ -20,7 +21,7 @@ git (required only for the version-string)
 cmake
 Boost graph library
 Boost python (if python bindings are built)
-libQD ( a quad-precision arithmetic library). Available as package 
+libQD (a quad-precision arithmetic library). Available as package 
 "liqd-dev" on ubuntu. See "http://crd.lbl.gov/~dhbailey/mpdist/
 
 Build instructions
@@ -30,7 +31,15 @@ $ cd bld
 $ cmake ../src
 $ make
 $ sudo make install
+TODO: 
+- have separate targets for pure c++ library and python module.
+- build(and install on github) doxygen html documentation
 
+Organization
+doc/        has documentation in lyx format, with figures in asymptote format. 
+            Build a PDF with the CMakeLists.txt in this directory.
+cpp_examples/ has c++ examples (more needed)
+python_examples/ has Python examples and tests. Many use VTK and VTK's python bindingd for visualization.
 src/        has the source for the main algorithm
 src/solvers has vd-vertex solver code
 src/py      has python wrapping code
@@ -86,13 +95,17 @@ computation of Voronoi diagrams of circular arcs and straight-line
 segments", Computer-Aided Design, Volume 41, Issue 5, May 2009, Pages 327-338
 http://dx.doi.org/10.1016/j.cad.2008.08.004
 
-A smooth spiral tool path for high speed machining of 2D pockets  
-Computer-Aided Design, Volume 41, Issue 7, July 2009, Pages 539-550
-Martin Held, Christian Spielberger
+Martin Held, Christian Spielberger (2009). "A smooth spiral tool path for 
+high speed machining of 2D pockets", Computer-Aided Design, Volume 41, 
+Issue 7, July 2009, Pages 539-550
 http://dx.doi.org/10.1016/j.cad.2009.04.002
 
-Nirav B. Patel, "Voronoi diagrams, robust and efficient implementation", Binghamton
+Nirav B. Patel (2005), "Voronoi diagrams, robust and efficient implementation", Binghamton
 University, State University of New York, 2005, MSc thesis. (this thesis is not
 accompanied by code, or much implementation detail)
+
+Kim D-S, (1998), "Polygon offsetting using a Voronoi diagram and two stacks"
+Computer Aided Design, Vol. 30, No. 14, pp 1069-1076
+http://dx.doi.org/10.1016/S0010-4485(98)00063-3
 
 todo: Burnikel-papers? 

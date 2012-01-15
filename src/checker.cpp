@@ -36,21 +36,21 @@ bool VoronoiDiagramChecker::face_count_equals_generator_count() {
     // v - e + f = 2
     // in a half-edge diagram all edges occur twice, so:
     // f = 2-v+e
-    //int vertex_count = hedi::num_vertices(vd->g);
+    //int vertex_count = hedi::num_vertices(g);
     /*int vertex_count = 0;
-    BOOST_FOREACH( HEVertex v, hedi::vertices( vd->g ) ) {
-        if ( vd->g[v].type == NORMAL )
+    BOOST_FOREACH( HEVertex v, hedi::vertices( g ) ) {
+        if ( g[v].type == NORMAL )
             vertex_count++;
     }
     int face_count = (vertex_count- 4)/2 + 3; // degree three graph
     //int face_count = hed.num_faces();
-    if (face_count != vd->gen_count) {
+    if (face_count != gen_count) {
         std::cout << " face_count_equals_generator_count() ERROR:\n";
         std::cout << " num_vertices = " << vertex_count << "\n";
-        std::cout << " gen_count = " << vd->gen_count << "\n";
+        std::cout << " gen_count = " << gen_count << "\n";
         std::cout << " face_count = " << face_count << "\n";
     }
-    return ( face_count == vd->gen_count );
+    return ( face_count == gen_count );
     * */
     return true;
 }
@@ -58,12 +58,12 @@ bool VoronoiDiagramChecker::face_count_equals_generator_count() {
 /// the diagram should be of degree three.
 /// however SPLIT and APEX vertices are of degree 2.
 bool VoronoiDiagramChecker::vertex_degree_ok() {
-    BOOST_FOREACH(HEVertex v, vd->g.vertices() ) {
-        if ( vd->g.degree(v) != VoronoiVertex::expected_degree[ vd->g[v].type ] ) {
+    BOOST_FOREACH(HEVertex v, g.vertices() ) {
+        if ( g.degree(v) != VoronoiVertex::expected_degree[ g[v].type ] ) {
             std::cout << " vertex_degree_ok() ERROR\n";
-            std::cout << " vertex " << vd->g[v].index << " type = " << vd->g[v].type << "\n";
-            std::cout << " vertex degree = " << vd->g.degree(v) << "\n";
-            std::cout << " expected degree = " << VoronoiVertex::expected_degree[ vd->g[v].type ]  << "\n";
+            std::cout << " vertex " << g[v].index << " type = " << g[v].type << "\n";
+            std::cout << " vertex degree = " << g.degree(v) << "\n";
+            std::cout << " expected degree = " << VoronoiVertex::expected_degree[ g[v].type ]  << "\n";
             return false;
         }
     }
@@ -71,9 +71,10 @@ bool VoronoiDiagramChecker::vertex_degree_ok() {
 }
 
 /// traverse the incident faces and check next-pointers
+/*
 bool VoronoiDiagramChecker::allIncidentFacesOK() { // have this take incident_faces as a parameter?
     // all incident faces should pass the sanity-check
-    BOOST_FOREACH( HEFace f, vd->incident_faces ) {
+    BOOST_FOREACH( HEFace f, incident_faces ) {
         if ( !faceVerticesConnected(  f, IN ) )
             return false; // IN vertices should be connected
         if ( !faceVerticesConnected(  f, OUT ) )  // OUT vertices should be connected
@@ -82,12 +83,12 @@ bool VoronoiDiagramChecker::allIncidentFacesOK() { // have this take incident_fa
             return false;
     }
     return true;
-}
+}*/
 
 /// check that all vertices in the input vector are of type IN
 bool VoronoiDiagramChecker::all_in( const VertexVector& q) {
     BOOST_FOREACH( HEVertex v, q) {
-        if ( vd->g[v].status != IN )
+        if ( g[v].status != IN )
             return false;
     }
     return true;
@@ -95,9 +96,9 @@ bool VoronoiDiagramChecker::all_in( const VertexVector& q) {
 
 /// check that no undecided vertices remain in the face
 bool  VoronoiDiagramChecker::noUndecidedInFace( HEFace f ) { // is this true??
-    VertexVector face_verts = vd->g.face_vertices(f);
+    VertexVector face_verts = g.face_vertices(f);
     BOOST_FOREACH( HEVertex v, face_verts ) {
-        if ( vd->g[v].status == UNDECIDED )
+        if ( g[v].status == UNDECIDED )
             return false;
     }
     return true;
@@ -105,10 +106,10 @@ bool  VoronoiDiagramChecker::noUndecidedInFace( HEFace f ) { // is this true??
 
 // check that for HEFace f the vertices TYPE are connected
 bool VoronoiDiagramChecker::faceVerticesConnected(  HEFace f, VoronoiVertexStatus Vtype ) {
-    VertexVector face_verts = vd->g.face_vertices(f);
+    VertexVector face_verts = g.face_vertices(f);
     VertexVector type_verts;
     BOOST_FOREACH( HEVertex v, face_verts ) {
-        if ( vd->g[v].status == Vtype )
+        if ( g[v].status == Vtype )
             type_verts.push_back(v); // build a vector of all Vtype vertices
     }
     assert( !type_verts.empty() );
@@ -116,19 +117,19 @@ bool VoronoiDiagramChecker::faceVerticesConnected(  HEFace f, VoronoiVertexStatu
         return true;
     
     // check that type_verts are connected
-    HEEdge currentEdge = vd->g[f].edge;
-    HEVertex endVertex = vd->g.source(currentEdge); // stop when target here
+    HEEdge currentEdge = g[f].edge;
+    HEVertex endVertex = g.source(currentEdge); // stop when target here
     EdgeVector startEdges;
     bool done = false;
     while (!done) { 
-        HEVertex src = vd->g.source( currentEdge );
-        HEVertex trg = vd->g.target( currentEdge );
-        if ( vd->g[src].status != Vtype ) { // seach ?? - Vtype
-            if ( vd->g[trg].status == Vtype ) { // we have found ?? - Vtype
+        HEVertex src = g.source( currentEdge );
+        HEVertex trg = g.target( currentEdge );
+        if ( g[src].status != Vtype ) { // seach ?? - Vtype
+            if ( g[trg].status == Vtype ) { // we have found ?? - Vtype
                 startEdges.push_back( currentEdge );
             }
         }
-        currentEdge = vd->g[currentEdge].next;
+        currentEdge = g[currentEdge].next;
         if ( trg == endVertex ) {
             done = true;
         }
@@ -140,38 +141,39 @@ bool VoronoiDiagramChecker::faceVerticesConnected(  HEFace f, VoronoiVertexStatu
         return true;
 }
 
-// sanity check: IN-vertices for each face should be connected
+// sanity check: IN-vertices on each INCIDENT face should be connected
+/*
 bool VoronoiDiagramChecker::incidentFaceVerticesConnected( VoronoiVertexStatus  ) {    
-    BOOST_FOREACH( HEFace f1, vd->incident_faces ) {
+    BOOST_FOREACH( HEFace f1, incident_faces ) {
         if ( !faceVerticesConnected(  f1, IN ) ) {
             std::cout << " VoronoiDiagramChecker::incidentFaceVerticesConnected() ERROR, IN-vertices not connected.\n";
             std::cout << " printing all incident faces for debug: \n";
-            BOOST_FOREACH( HEFace f2, vd->incident_faces ) {
-                vd->g.print_face( f2 );
+            BOOST_FOREACH( HEFace f2, incident_faces ) {
+                g.print_face( f2 );
             } 
             return false;
         }
     }
     return true;
-}
+}*/
 
 bool VoronoiDiagramChecker::in_circle_is_negative(  const Point& p, HEVertex minimalVertex ) {
-    double minimumH = vd->g[minimalVertex].in_circle(p);
+    double minimumH = g[minimalVertex].in_circle(p);
     if (!(minimumH <= 0) ) {
         std::cout << " inCircle_is_negative() WARNING\n";
         std::cout << " WARNING: searching for seed when inserting " << p << " \n";
-    //    std::cout << " WARNING: closest face is " << f << " with generator " << vd->g[f].generator << " \n";
-        std::cout << " WARNING: minimal vd-vertex " << vd->g[minimalVertex].index << " has inCircle= " << minimumH  << "\n";
+    //    std::cout << " WARNING: closest face is " << f << " with generator " << g[f].generator << " \n";
+        std::cout << " WARNING: minimal vd-vertex " << g[minimalVertex].index << " has inCircle= " << minimumH  << "\n";
     }
     return (minimumH <= 0 );
 }
 
 // check that all faces are ok
 bool VoronoiDiagramChecker::all_faces_ok() {
-    for(HEFace f=0;f< vd->g.num_faces() ; f++ ) {
+    for(HEFace f=0;f< g.num_faces() ; f++ ) {
         if (!face_ok(f)) {
             std::cout << " all_faces_ok() ERROR: f= " << f << "\n";
-            vd->g.print_face(f);
+            g.print_face(f);
             return false;
         }
     }
@@ -179,21 +181,21 @@ bool VoronoiDiagramChecker::all_faces_ok() {
 }
 
 bool VoronoiDiagramChecker::face_ok(HEFace f, bool debug) {
-    HEEdge current_edge = vd->g[f].edge;
+    HEEdge current_edge = g[f].edge;
     //std::cout << " face_ok( " << f << " )\n";
     
     HEEdge start_edge= current_edge;
-    double k = vd->g[current_edge].k;
+    double k = g[current_edge].k;
     if ( !((k==1) || (k==-1)) ) {
         std::cout << " face_ok " << f << " ERROR:\n";
         std::cout << " illegal k-value for edge:";
-        std::cout << vd->g[ vd->g.source(current_edge)].index << " - "; 
-        std::cout <<  vd->g[ vd->g.target(current_edge)].index  ;
+        std::cout << g[ g.source(current_edge)].index << " - "; 
+        std::cout <<  g[ g.target(current_edge)].index  ;
         std::cout << " k= " << k << "\n";
         return false;
     }
-    if (vd->g[f].site!=0) { // guard against null-faces that dont have Site
-        if ( vd->g[f].site->isPoint() ) {
+    if (g[f].site!=0) { // guard against null-faces that dont have Site
+        if ( g[f].site->isPoint() ) {
             if ( !(k==1) ) {
                 std::cout << " face_ok() pointsite, but k!=1 ! \n";
                 std::cout << " f = " << f << "\n";
@@ -205,13 +207,13 @@ bool VoronoiDiagramChecker::face_ok(HEFace f, bool debug) {
     if (debug) std::cout << " checking face " << f << "\n";
     do {
         if(debug) {
-            std::cout << " edge: " << vd->g[ vd->g.source(current_edge)].index << " - "; 
-            std::cout <<  vd->g[ vd->g.target(current_edge)].index  ;
-            std::cout << " edge.face= " << vd->g[ current_edge ].face;
-            std::cout << " edge.k= " << vd->g[ current_edge ].k;
+            std::cout << " edge: " << g[ g.source(current_edge)].index << " - "; 
+            std::cout <<  g[ g.target(current_edge)].index  ;
+            std::cout << " edge.face= " << g[ current_edge ].face;
+            std::cout << " edge.k= " << g[ current_edge ].k;
             std::cout << "\n";
         }
-        if (vd->g[current_edge].k != k )  { // all edges should have the same k-value
+        if (g[current_edge].k != k )  { // all edges should have the same k-value
             std::cout << " face_ok() g[current_edge].k != k ! \n";
             return false;
         }
@@ -222,21 +224,21 @@ bool VoronoiDiagramChecker::face_ok(HEFace f, bool debug) {
         
         if ( !check_edge(current_edge) ) {
             std::cout << " VoronoiDiagramChecker::face_ok() f= " << f << " check_edge ERROR\n";
-            std::cout << " edge: " << vd->g[ vd->g.source(current_edge)].index << " t=" << vd->g[ vd->g.source(current_edge)].type; 
+            std::cout << " edge: " << g[ g.source(current_edge)].index << " t=" << g[ g.source(current_edge)].type; 
             std::cout << " - ";
-            std::cout <<  vd->g[ vd->g.target(current_edge)].index << " t=" << vd->g[ vd->g.target(current_edge) ].type << "\n"; 
-            HEEdge twin = vd->g[current_edge].twin;
-            std::cout << " twin: " << vd->g[ vd->g.source(twin)].index  << " t=" << vd->g[ vd->g.source(twin)].type; 
+            std::cout <<  g[ g.target(current_edge)].index << " t=" << g[ g.target(current_edge) ].type << "\n"; 
+            HEEdge twin = g[current_edge].twin;
+            std::cout << " twin: " << g[ g.source(twin)].index  << " t=" << g[ g.source(twin)].type; 
             std::cout << " - ";
-            std::cout <<  vd->g[ vd->g.target(twin)].index << " t=" << vd->g[ vd->g.target(twin) ].type << "\n"; 
-            //std::cout << " twin: " << vd->g[ vd->g.source(twin)].index << " - " <<  vd->g[ vd->g.target(twin)].index << "\n";
+            std::cout <<  g[ g.target(twin)].index << " t=" << g[ g.target(twin) ].type << "\n"; 
+            //std::cout << " twin: " << g[ g.source(twin)].index << " - " <<  g[ g.target(twin)].index << "\n";
             
-            std::cout << " edge-type= " << vd->g[current_edge].type << "\n";
+            std::cout << " edge-type= " << g[current_edge].type << "\n";
 
             return false;
         }
         
-        current_edge = vd->g[current_edge].next; 
+        current_edge = g[current_edge].next; 
         n++;
         assert( n < 10000 ); // reasonable max
     } while( current_edge != start_edge);
@@ -245,50 +247,50 @@ bool VoronoiDiagramChecker::face_ok(HEFace f, bool debug) {
 }
 
 bool VoronoiDiagramChecker::current_face_equals_next_face( HEEdge e) {
-    if ( vd->g[e].face !=  vd->g[ vd->g[e].next ].face) {
+    if ( g[e].face !=  g[ g[e].next ].face) {
         std::cout << " current_face_equals_next_face() ERROR.\n";
-        std::cout << "   current.face = " << vd->g[e].face << " IS NOT next_face = " << vd->g[ vd->g[e].next ].face << std::endl;
-        HEVertex c_trg = vd->g.target( e );
-        HEVertex c_src = vd->g.source( e );
+        std::cout << "   current.face = " << g[e].face << " IS NOT next_face = " << g[ g[e].next ].face << std::endl;
+        HEVertex c_trg = g.target( e );
+        HEVertex c_src = g.source( e );
 
-        HEVertex n_trg = vd->g.target( vd->g[e].next );
-        HEVertex n_src = vd->g.source( vd->g[e].next );
+        HEVertex n_trg = g.target( g[e].next );
+        HEVertex n_src = g.source( g[e].next );
         
-        std::cout << "   current_edge = " << vd->g[c_src].index << " - " << vd->g[c_trg].index << " type=" << vd->g[e].type << " face=" << vd->g[e].face  <<"\n";
-        std::cout << "   next_edge = " << vd->g[n_src].index << " - " << vd->g[n_trg].index << " type=" << vd->g[ vd->g[e].next ].type << " face="<< vd->g[ vd->g[e].next ].face << "\n";
+        std::cout << "   current_edge = " << g[c_src].index << " - " << g[c_trg].index << " type=" << g[e].type << " face=" << g[e].face  <<"\n";
+        std::cout << "   next_edge = " << g[n_src].index << " - " << g[n_trg].index << " type=" << g[ g[e].next ].type << " face="<< g[ g[e].next ].face << "\n";
         
-        vd->g.print_face( vd->g[e].face );
-        vd->g.print_face( vd->g[ vd->g[e].next ].face );
+        g.print_face( g[e].face );
+        g.print_face( g[ g[e].next ].face );
         
-        std::cout << " printing all incident faces for debug: \n";
-        BOOST_FOREACH( HEFace f, vd->incident_faces ) {
-            vd->g.print_face( f );
-        } 
+        //std::cout << " printing all incident faces for debug: \n";
+        //BOOST_FOREACH( HEFace f, incident_faces ) {
+        //    g.print_face( f );
+        //} 
         return false;
     }
     return true;
 }
 
 bool VoronoiDiagramChecker::check_edge(HEEdge e) const {
-    HEVertex src = vd->g.source(e);
-    HEVertex trg = vd->g.target(e);
-    HEEdge twine = vd->g[e].twin;
+    HEVertex src = g.source(e);
+    HEVertex trg = g.target(e);
+    HEEdge twine = g[e].twin;
 
     if (twine == HEEdge() ) {
         return true;
-    } else if ( !( e == vd->g[twine].twin ) ) {
+    } else if ( !( e == g[twine].twin ) ) {
         std::cout << " VoronoiDiagramChecker::check_edge() twinning error!\n";
         return false;
     }
     
-    HEVertex tw_src = vd->g.source(twine);
-    HEVertex tw_trg = vd->g.target(twine);
+    HEVertex tw_src = g.source(twine);
+    HEVertex tw_trg = g.target(twine);
     //std::cout << (src==tw_trg) << " && " << (trg==tw_src) << "\n";
     if ( !((src==tw_trg) && (trg==tw_src)) ) {
         std::cout << "VoronoiDiagramChecker::check_edge() ERROR: \n";
-        std::cout << "      edge: " << vd->g[src].index << "("<< vd->g[src].type << ")";
-        std::cout << " - " << vd->g[trg].index << "("<< vd->g[trg].type << ")" << "\n";
-        //std::cout << "      twin: " << vd->g[tw_src].index << " - " << vd->g[tw_src].index << "\n";
+        std::cout << "      edge: " << g[src].index << "("<< g[src].type << ")";
+        std::cout << " - " << g[trg].index << "("<< g[trg].type << ")" << "\n";
+        //std::cout << "      twin: " << g[tw_src].index << " - " << g[tw_src].index << "\n";
         std::cout << "      edge: " << e << "\n";
         std::cout << "      twin: " << twine << "\n";
         std::cout << "      edge: " << src << " - " << trg << "\n";

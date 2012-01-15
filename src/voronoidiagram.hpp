@@ -34,7 +34,6 @@ namespace ovd
 class VoronoiDiagramChecker;
 class FaceGrid;
 
-
 // in augment_vertex_set() we grow the delete-tree by processing vertices
 // one-by-one from a priority_queue. This is the priority_queue sort predicate.
 // We handle vertices with a large fabs( in_circle() ) first, since we 
@@ -62,8 +61,6 @@ struct EdgeData {
     HEEdge v2_nxt;
     HEFace f;
 };
-
-
 
 /// \brief Voronoi diagram.
 ///
@@ -100,7 +97,7 @@ class VoronoiDiagram {
         /// string repr
         std::string print() const;
         std::string version() const { return VERSION_STRING; }
-        friend class VoronoiDiagramChecker;
+        //friend class VoronoiDiagramChecker;
         static void reset_vertex_count() { VoronoiVertex::reset_count(); }
         void debug_on() {debug=true;}
         bool check();

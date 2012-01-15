@@ -34,7 +34,7 @@ namespace ovd {
 
 VoronoiDiagram::VoronoiDiagram(double far, unsigned int n_bins) {
     fgrid = new FaceGrid(far, n_bins); // helper-class for nearest-neighbor search 
-    vd_checker = new VoronoiDiagramChecker(this); // helper-class that checks topology/geometry
+    vd_checker = new VoronoiDiagramChecker( get_graph_reference() ); // helper-class that checks topology/geometry
     vpos = new VertexPositioner( get_graph_reference() ); // helper-class that positions vertices
     far_radius=far;
     initialize();

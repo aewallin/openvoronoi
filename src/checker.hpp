@@ -28,7 +28,7 @@ class VoronoiDiagram;
 /// this class provides sanity-checks for the VoronoiDiagram class
 class VoronoiDiagramChecker {
 public:
-    VoronoiDiagramChecker(VoronoiDiagram* d) : vd(d) {}
+    VoronoiDiagramChecker(HEGraph& gi) : g(gi) {}
     ~VoronoiDiagramChecker() {}
     /// sanity-check for the diagram, calls other sanity-check functions
     bool is_valid();
@@ -37,13 +37,13 @@ public:
     /// the diagram should be of degree three (at least with point generators)
     bool vertex_degree_ok();
     /// traverse the incident faces and check next-pointers
-    bool allIncidentFacesOK();
+    //bool allIncidentFacesOK();
     /// check that all vertices in the input vector are of type IN
     bool all_in( const VertexVector& q);
     /// check that no undecided vertices remain in the face
     bool noUndecidedInFace( HEFace f );
     bool faceVerticesConnected( HEFace f, VoronoiVertexStatus Vtype );
-    bool incidentFaceVerticesConnected(  VoronoiVertexStatus Vtype );
+    //bool incidentFaceVerticesConnected(  VoronoiVertexStatus Vtype );
     bool in_circle_is_negative( const Point& p, HEVertex minimalVertex );
     bool current_face_equals_next_face( HEEdge e); 
     bool face_ok(HEFace f, bool debug=false);
@@ -51,7 +51,8 @@ public:
     bool check_edge(HEEdge e) const ;
     
 private:
-    VoronoiDiagram* vd;
+    HEGraph& g;
+    //VoronoiDiagram* vd;
 };
 
 } // end namespace

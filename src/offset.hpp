@@ -163,11 +163,6 @@ public:
         }
         std::cout << "\n";
     }
-    void print_edge(HEEdge e) {
-        HEVertex src = g.source(e);
-        HEVertex trg = g.target(e);
-        std::cout << g[src].index << "-f" << g[e].face << "-" << g[trg].index << "\n";
-    }
 private:
     Offset(); // don't use.
     HEGraph& g;

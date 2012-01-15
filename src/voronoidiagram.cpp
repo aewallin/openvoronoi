@@ -18,7 +18,6 @@
 */
 
 #include <cassert>
-//#include <limits>
 
 #include <boost/foreach.hpp>
 #include <boost/math/tools/roots.hpp> // for toms748
@@ -295,7 +294,7 @@ if (step==current_step) return false; current_step++;
     // check that tree (i.e. v0) includes end_face_seed ?
     if (debug) {
         std::cout << " delete-set |v0|="<< v0.size() <<" : "; 
-        print_vertices(v0);
+        g.print_vertices(v0);
     }
     
 if (step==current_step) return false; current_step++;
@@ -472,8 +471,8 @@ std::pair<HEEdge,HEEdge> VoronoiDiagram::find_next_prev(HEFace null_face, HEVert
     assert( next_edge != HEEdge() );
     assert( prev_edge != HEEdge() );
     if (debug) {
-        std::cout << " find_next_prev() next_edge = "; print_edge(next_edge); 
-        std::cout << " find_next_prev() prev_edge = "; print_edge(prev_edge);
+        std::cout << " find_next_prev() next_edge = "; g.print_edge(next_edge); 
+        std::cout << " find_next_prev() prev_edge = "; g.print_edge(prev_edge);
     }
     return std::make_pair(next_edge, prev_edge);
 }
@@ -505,7 +504,7 @@ std::pair<HEVertex,HEFace> VoronoiDiagram::process_null_edge(Point dir, HEEdge n
         new_k3 = k3 ? -1 : +1;
     }
     
-    if (debug) { std::cout << "process_null_edge() next_prev=" << next_prev << " e="; print_edge(next_edge); }
+    if (debug) { std::cout << "process_null_edge() next_prev=" << next_prev << " e="; g.print_edge(next_edge); }
     
     if ( g[adj].type == ENDPOINT ) { // target is endpoint
         // if we have an ENDPOINT then there should not be room for a separator
@@ -520,7 +519,7 @@ std::pair<HEVertex,HEFace> VoronoiDiagram::process_null_edge(Point dir, HEEdge n
         
         if (debug) {
             std::cout << " e.trg=(ENDPOINT) \n";
-            std::cout << " added NEW NORMAL vertex " << g[new_v].index << " in edge "; print_edge(next_edge);
+            std::cout << " added NEW NORMAL vertex " << g[new_v].index << " in edge "; g.print_edge(next_edge);
         }
         return std::make_pair(HEVertex(), g.HFace() );
         
@@ -538,7 +537,7 @@ std::pair<HEVertex,HEFace> VoronoiDiagram::process_null_edge(Point dir, HEEdge n
                     sep_edge = e;
             }
             assert(sep_edge!=HEEdge()); 
-            if (debug) { std::cout << " existing SEPARATOR is "; print_edge(sep_edge); }
+            if (debug) { std::cout << " existing SEPARATOR is "; g.print_edge(sep_edge); }
             HEEdge sep_twin = g[sep_edge].twin;
             HEFace sep_face =  g[sep_edge].face;
             Site* sep_site = g[sep_face].site;
@@ -546,10 +545,10 @@ std::pair<HEVertex,HEFace> VoronoiDiagram::process_null_edge(Point dir, HEEdge n
             Site* sep_twin_site = g[sep_twin_face].site;
             HEEdge pointsite_edge;
             if (sep_site->isPoint() ) {
-                if (debug) { std::cout << " PointSite SEPARATOR is "; print_edge(sep_edge); }
+                if (debug) { std::cout << " PointSite SEPARATOR is "; g.print_edge(sep_edge); }
                 pointsite_edge = sep_edge;
             }  else if (sep_twin_site->isPoint() ) {
-                if (debug) { std::cout << " PointSite SEPARATOR is "; print_edge(sep_twin); }
+                if (debug) { std::cout << " PointSite SEPARATOR is "; g.print_edge(sep_twin); }
                 pointsite_edge = sep_twin;
             }
             
@@ -567,7 +566,7 @@ std::pair<HEVertex,HEFace> VoronoiDiagram::process_null_edge(Point dir, HEEdge n
         Site* next_edge_site = g[next_face].site;
         
         if ( numeric::diangle_bracket( g[src].alfa, neg_sep_alfa, g[trg].alfa ) && next_edge_site->isPoint() ) {
-            if (debug) { std::cout << " inserting SEPPOINT in edge: "; print_edge(next_edge); }
+            if (debug) { std::cout << " inserting SEPPOINT in edge: "; g.print_edge(next_edge); }
             sep_point = add_separator_point(src, next_edge, neg_sep_dir);
             g[sep_point].k3 = new_k3;
             return std::make_pair( sep_point, g.HFace() );
@@ -613,7 +612,7 @@ HEVertex VoronoiDiagram::add_separator_point(HEVertex endp, HEEdge edge, Point s
     g[sep].set_alfa(sep_dir);
     if (debug) {
         std::cout << " adding separator " << g[sep].index << " in null edge "; 
-        print_edge(edge);
+        g.print_edge(edge);
     }
     g.add_vertex_in_edge(sep,edge);
     return sep;
@@ -1000,7 +999,7 @@ EdgeVector VoronoiDiagram::find_split_edges(HEFace f, Point pt1, Point pt2) {
     if (debug) {
         std::cout << " face " << f << " requires SPLIT vertices on edges: \n";
         BOOST_FOREACH( HEEdge e, out ) {
-            std::cout << "  "; print_edge(e);
+            std::cout << "  "; g.print_edge(e);
         }
     }
     return out;
@@ -1458,7 +1457,7 @@ EdgeData VoronoiDiagram::find_edge_data(HEFace f, VertexVector startverts, std::
     if (!found) {
         std::cout << "ERROR: unable to find OUT-NEW-IN vertex on face:\n";
         g.print_face(f);
-        std::cout << " The excluded vertices are: (size=" << startverts.size()<<")"; print_vertices(startverts);
+        std::cout << " The excluded vertices are: (size=" << startverts.size()<<")"; g.print_vertices(startverts);
     }
     assert(found);
     if (debug) std::cout << " OUT-NEW-IN = " << g[ed.v1].index << "\n";
@@ -1713,27 +1712,6 @@ bool VoronoiDiagram::check() {
         if (debug) std::cout << "diagram check ERROR.\n";
         return false;
     }
-}
-
-void VoronoiDiagram::print_edges(EdgeVector& q) {
-    BOOST_FOREACH( HEEdge e, q ) {
-        HEVertex src = g.source(e);
-        HEVertex trg = g.target(e);
-        std::cout << g[src].index << "-" << g[trg].index << "\n";
-    }
-}
-
-void VoronoiDiagram::print_edge(HEEdge e) {
-        HEVertex src = g.source(e);
-        HEVertex trg = g.target(e);
-        std::cout << g[src].index << "-f" << g[e].face << "-" << g[trg].index << "\n";
-}
-
-void VoronoiDiagram::print_vertices(VertexVector& q) {
-    BOOST_FOREACH( HEVertex v, q) {
-        std::cout << g[v].index << "["<< g[v].type << "]" << " ";
-    }
-    std::cout << std::endl;
 }
 
 std::string VoronoiDiagram::print() const {

@@ -689,6 +689,8 @@ void set_next_cycle( std::list<Edge> list, Face f, double k) {
     }
 }
 
+// set next-pointers for the given list (but don't close to form a cycle)
+// also set face and k properties for edge
 void set_next_chain( std::list<Edge> list, Face f, double k) {
     typename std::list<Edge>::iterator it,nxt,end;
     it= list.begin();
@@ -707,6 +709,7 @@ void set_next_chain( std::list<Edge> list, Face f, double k) {
     }
 }
 
+// set next-pointers for the list
 void set_next_chain( std::list<Edge> list ) {
     typename std::list<Edge>::iterator it,nxt,end;
     it= list.begin();
@@ -741,10 +744,28 @@ void print_face(Face f) {
     std::cout << "\n";
 }
 
+void print_edges(EdgeVector& q) {
+    BOOST_FOREACH( Edge e, q ) {
+        Vertex src = source(e);
+        Vertex trg = target(e);
+        std::cout << g[src].index << "-" << g[trg].index << "\n";
+    }
+}
+
+void print_edge(Edge e) {
+    Vertex src = source(e);
+    Vertex trg = target(e);
+    std::cout << g[src].index << "-f" << g[e].face << "-" << g[trg].index << "\n";
+}
+
+void print_vertices(VertexVector& q) {
+    BOOST_FOREACH( Vertex v, q) {
+        std::cout << g[v].index << "["<< g[v].type << "]" << " ";
+    }
+    std::cout << std::endl;
+}
+
 }; // end HEDIGraph class definition
-
-
-
 
 } // end hedi namespace
 

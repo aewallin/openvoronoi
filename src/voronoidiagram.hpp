@@ -151,10 +151,6 @@ class VoronoiDiagram {
         void remove_split_vertex(HEFace f);
         void reset_status();
         int num_new_vertices(HEFace f);
-    // PRINT ETC
-        void print_vertices(VertexVector& q);
-        void print_edges(EdgeVector& q);
-        void print_edge(HEEdge e);
     // HELPER-CLASSES
         /// sanity-checks on the diagram are done by this helper class
         VoronoiDiagramChecker* vd_checker;

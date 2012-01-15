@@ -36,7 +36,6 @@ public:
     Offset(HEGraph& gi): g(gi) {
         face_done.clear();
         face_done.assign( g.num_faces(), 1 );
-        //offset_list = boost::python::list();
     }
     void print() {
         std::cout << "Offset: verts: " << g.num_vertices() << "\n";
@@ -63,7 +62,7 @@ public:
         }
         return false;
     }
-    
+
     void offset_walk(HEFace start,double t) {
         std::cout << " offset_walk() starting on face " << start << "\n";
         HEEdge start_edge =  find_next_offset_edge( g[start].edge , t); // the first edge on the start-face
@@ -134,7 +133,7 @@ public:
     
     void set_flags(double t) {
         for(HEFace f=0; f<g.num_faces() ; f++) {
-            //print_face(f);
+            //g.print_face(f);
             HEEdge start = g[f].edge;
             HEEdge current = start;
             do {
@@ -162,20 +161,6 @@ public:
         for(HEFace f=0; f<g.num_faces() ; f++) {
             std::cout << (int)face_done[f];
         }
-        std::cout << "\n";
-    }
-    void print_face(HEFace f) { // move to common printing-class?
-        std::cout << " Face " << f << ": ";
-        HEEdge current = g[f].edge;
-        HEEdge start=current;
-        int num_e=0;
-        do {
-            HEVertex v = g.source(current);
-            std::cout << g[v].index  << "(" << g[v].status  << ")-f"<< g[current].face << "-";
-            num_e++;
-            assert(num_e<30);
-            current = g[current].next;
-        } while ( current!=start );
         std::cout << "\n";
     }
     void print_edge(HEEdge e) {

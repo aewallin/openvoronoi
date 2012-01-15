@@ -720,6 +720,27 @@ void set_next_chain( std::list<Edge> list ) {
     }
 }
 
+void print_faces() {
+    for( Face f=0;f<g.num_faces();f++) {
+        print_face(f);
+    }
+}
+
+void print_face(Face f) {
+    std::cout << " Face " << f << ": ";
+    Edge current = faces[f].edge;
+    Edge start=current;
+    int num_e=0;
+    do {
+        Vertex v = source(current);
+        std::cout << g[v].index  << "(" << g[v].status  << ")-f"<< g[current].face << "-";
+        num_e++;
+        assert(num_e<300000);
+        current = g[current].next;
+    } while ( current!=start );
+    std::cout << "\n";
+}
+
 }; // end HEDIGraph class definition
 
 

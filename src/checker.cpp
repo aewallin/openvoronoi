@@ -22,18 +22,14 @@
 
 namespace ovd {
 
-    
-/// sanity-check for the diagram, calls other sanity-check functions
+/// overall sanity-check for the diagram, calls other sanity-check functions
 bool VoronoiDiagramChecker::is_valid() {
     return  (   all_faces_ok() && 
                 vertex_degree_ok() &&
                 face_count_equals_generator_count()
             );
-
 }
-    
-    
-    
+
 /// check that number of faces equals the number of generators
 bool VoronoiDiagramChecker::face_count_equals_generator_count() {
     // Euler formula for planar graphs
@@ -59,13 +55,10 @@ bool VoronoiDiagramChecker::face_count_equals_generator_count() {
     return true;
 }
 
-    
-    
-/// the diagram should be of degree three (at least with point generators)
+/// the diagram should be of degree three.
+/// however SPLIT and APEX vertices are of degree 2.
 bool VoronoiDiagramChecker::vertex_degree_ok() {
-    // the outermost init() vertices have special degree, all others == 6
     BOOST_FOREACH(HEVertex v, vd->g.vertices() ) {
-        
         if ( vd->g.degree(v) != VoronoiVertex::expected_degree[ vd->g[v].type ] ) {
             std::cout << " vertex_degree_ok() ERROR\n";
             std::cout << " vertex " << vd->g[v].index << " type = " << vd->g[v].type << "\n";
@@ -76,10 +69,9 @@ bool VoronoiDiagramChecker::vertex_degree_ok() {
     }
     return true;
 }
-    
-    
+
 /// traverse the incident faces and check next-pointers
-bool VoronoiDiagramChecker::allIncidentFacesOK() {
+bool VoronoiDiagramChecker::allIncidentFacesOK() { // have this take incident_faces as a parameter?
     // all incident faces should pass the sanity-check
     BOOST_FOREACH( HEFace f, vd->incident_faces ) {
         if ( !faceVerticesConnected(  f, IN ) )
@@ -91,8 +83,7 @@ bool VoronoiDiagramChecker::allIncidentFacesOK() {
     }
     return true;
 }
-    
-    
+
 /// check that all vertices in the input vector are of type IN
 bool VoronoiDiagramChecker::all_in( const VertexVector& q) {
     BOOST_FOREACH( HEVertex v, q) {
@@ -103,7 +94,7 @@ bool VoronoiDiagramChecker::all_in( const VertexVector& q) {
 }
 
 /// check that no undecided vertices remain in the face
-bool  VoronoiDiagramChecker::noUndecidedInFace(  HEFace f ) {
+bool  VoronoiDiagramChecker::noUndecidedInFace( HEFace f ) { // is this true??
     VertexVector face_verts = vd->g.face_vertices(f);
     BOOST_FOREACH( HEVertex v, face_verts ) {
         if ( vd->g[v].status == UNDECIDED )
@@ -111,7 +102,7 @@ bool  VoronoiDiagramChecker::noUndecidedInFace(  HEFace f ) {
     }
     return true;
 }
-        
+
 // check that for HEFace f the vertices TYPE are connected
 bool VoronoiDiagramChecker::faceVerticesConnected(  HEFace f, VoronoiVertexStatus Vtype ) {
     VertexVector face_verts = vd->g.face_vertices(f);
@@ -133,8 +124,7 @@ bool VoronoiDiagramChecker::faceVerticesConnected(  HEFace f, VoronoiVertexStatu
         HEVertex src = vd->g.source( currentEdge );
         HEVertex trg = vd->g.target( currentEdge );
         if ( vd->g[src].status != Vtype ) { // seach ?? - Vtype
-            if ( vd->g[trg].status == Vtype ) {
-                // we have found ?? - Vtype
+            if ( vd->g[trg].status == Vtype ) { // we have found ?? - Vtype
                 startEdges.push_back( currentEdge );
             }
         }
@@ -157,7 +147,7 @@ bool VoronoiDiagramChecker::incidentFaceVerticesConnected( VoronoiVertexStatus  
             std::cout << " VoronoiDiagramChecker::incidentFaceVerticesConnected() ERROR, IN-vertices not connected.\n";
             std::cout << " printing all incident faces for debug: \n";
             BOOST_FOREACH( HEFace f2, vd->incident_faces ) {
-                vd->print_face( f2 );
+                vd->g.print_face( f2 );
             } 
             return false;
         }
@@ -167,14 +157,12 @@ bool VoronoiDiagramChecker::incidentFaceVerticesConnected( VoronoiVertexStatus  
 
 bool VoronoiDiagramChecker::in_circle_is_negative(  const Point& p, HEVertex minimalVertex ) {
     double minimumH = vd->g[minimalVertex].in_circle(p);
-    
     if (!(minimumH <= 0) ) {
         std::cout << " inCircle_is_negative() WARNING\n";
         std::cout << " WARNING: searching for seed when inserting " << p << " \n";
     //    std::cout << " WARNING: closest face is " << f << " with generator " << vd->g[f].generator << " \n";
         std::cout << " WARNING: minimal vd-vertex " << vd->g[minimalVertex].index << " has inCircle= " << minimumH  << "\n";
     }
-    
     return (minimumH <= 0 );
 }
 
@@ -183,7 +171,7 @@ bool VoronoiDiagramChecker::all_faces_ok() {
     for(HEFace f=0;f< vd->g.num_faces() ; f++ ) {
         if (!face_ok(f)) {
             std::cout << " all_faces_ok() ERROR: f= " << f << "\n";
-            vd->print_face(f);
+            vd->g.print_face(f);
             return false;
         }
     }
@@ -269,12 +257,12 @@ bool VoronoiDiagramChecker::current_face_equals_next_face( HEEdge e) {
         std::cout << "   current_edge = " << vd->g[c_src].index << " - " << vd->g[c_trg].index << " type=" << vd->g[e].type << " face=" << vd->g[e].face  <<"\n";
         std::cout << "   next_edge = " << vd->g[n_src].index << " - " << vd->g[n_trg].index << " type=" << vd->g[ vd->g[e].next ].type << " face="<< vd->g[ vd->g[e].next ].face << "\n";
         
-        vd->print_face( vd->g[e].face );
-        vd->print_face( vd->g[ vd->g[e].next ].face );
+        vd->g.print_face( vd->g[e].face );
+        vd->g.print_face( vd->g[ vd->g[e].next ].face );
         
         std::cout << " printing all incident faces for debug: \n";
         BOOST_FOREACH( HEFace f, vd->incident_faces ) {
-            vd->print_face( f );
+            vd->g.print_face( f );
         } 
         return false;
     }
@@ -309,17 +297,5 @@ bool VoronoiDiagramChecker::check_edge(HEEdge e) const {
     }
     return ( (src==tw_trg) && (trg==tw_src) );
 }
-                 
-/* OLD CODE NOT USED ANYMORE
-int VoronoiDiagram::outVertexCount(HEFace f) {
-    int outCount = 0;
-    VertexVector face_verts = hedi::face_vertices(f, g);
-    BOOST_FOREACH( HEVertex v, face_verts ) {
-        if (g[v].status == OUT )
-            ++outCount;
-    }
-    return outCount;
-}*/
-
 
 } // end namespace

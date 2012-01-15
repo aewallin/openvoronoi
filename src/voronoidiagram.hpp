@@ -152,8 +152,6 @@ class VoronoiDiagram {
         void reset_status();
         int num_new_vertices(HEFace f);
     // PRINT ETC
-        void print_faces();
-        void print_face(HEFace f);
         void print_vertices(VertexVector& q);
         void print_edges(EdgeVector& q);
         void print_edge(HEEdge e);

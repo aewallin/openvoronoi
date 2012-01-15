@@ -53,9 +53,9 @@ class FaceGrid {
         virtual ~FaceGrid();
         /// add face with FaceProps
         void add_face(FaceProps props);
-        /// find and return the closest face to a given Point p. Naive algorithm
+        /// find and return the closest face to a given Point p. Naive algorithm.
         HEFace find_closest_face(const Point& p);
-        /// find and return the closest face to a given Point p. Optimized grid-search algorithm.
+        /// find and return the closest face to a given Point p. Faster grid-search algorithm.
         HEFace grid_find_closest_face(const Point& p);
 
     private:     
@@ -70,7 +70,7 @@ class FaceGrid {
     // DATA
         /// all generators should fit within this radius from the origin
         double far_radius;
-        /// the widht of a bin (grid cell)
+        /// the width of a bin (grid cell)
         double binwidth;
         /// the number of bins in the X and Y direction
         GridIndex nbins;
@@ -80,7 +80,6 @@ class FaceGrid {
         typedef std::vector<FaceProps> FaceSetContainer;
         FaceSetContainer face_set;
 };
-
 
 }
 #endif

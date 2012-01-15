@@ -28,9 +28,7 @@
 
 namespace ovd {
 
-//class VoronoiDiagram;
 class Solver;
-
 
 // predicate for filtering solutions based on t-value being in [tmin,tmax] range
 struct t_filter {
@@ -59,8 +57,6 @@ private:
     Site* site_;
 };
 
-
-
 /// Calculates the (x,y) position of vertices in a voronoi diagram
 class VertexPositioner {
 public:
@@ -87,13 +83,13 @@ private:
     bool check_far_circle(Solution& s);
     bool check_dist(HEEdge e, const Solution& s, Site* s3);
     bool equal(double d1, double d2);
-  
+
+// solvers, to which we dispatch, depending on the input sites
     Solver* ppp_solver;
     Solver* lll_solver;
     Solver* qll_solver;
 // DATA
-    HEGraph& g;
-    //VoronoiDiagram* vd;
+    HEGraph& g; // reference to the VD graph.
     double t_min;
     double t_max;
     HEEdge edge;

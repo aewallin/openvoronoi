@@ -184,7 +184,7 @@ if (step==current_step) return -1; current_step++;
     }
 if (step==current_step) return -1; current_step++;
     repair_face( newface  );
-    if (debug) { std::cout << " new face: "; print_face( newface ); }
+    if (debug) { std::cout << " new face: "; g.print_face( newface ); }
     remove_vertex_set(); // remove all IN vertices and adjacent edges
 if (step==current_step) return -1; current_step++;
     reset_status(); // reset all vertices to UNDECIDED
@@ -244,8 +244,8 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
     //segment_end = seg_end;
     
     if (debug) {
-        std::cout << " start null face : "; print_face(start_null_face);
-        std::cout << " end null face : "; print_face(end_null_face);
+        std::cout << " start null face : "; g.print_face(start_null_face);
+        std::cout << " end null face : "; g.print_face(end_null_face);
     }
     HEEdge start_null_edge = g[start_null_face].edge;
     HEEdge   end_null_edge = g[end_null_face  ].edge;
@@ -343,7 +343,7 @@ if (step==current_step) return false; current_step++;
         if ( g[f].status == INCIDENT )  {// end-point faces already dealt with in add_separator()
             if(debug) { 
                 std::cout << " add_edges f= " << f << "\n";
-                print_face(f);
+                g.print_face(f);
             }
             add_edges( pos_face, f, neg_face, std::make_pair(seg_start,seg_end)); // each INCIDENT face is split into two parts: newface and f
         }
@@ -376,12 +376,12 @@ if (step==current_step) return false; current_step++;
     if (debug) {
         std::cout << "faces " << start_face << " " << end_face << " " << pos_face << " " << neg_face << " repaired \n";
         std::cout << "insert_line_site(" << g[start].index << "-"<< g[end].index << ") done.\n";
-        std::cout << " start_face "; print_face(start_face);
-        std::cout << " start_null_face "; print_face(start_null_face);
-        std::cout << " end_face "; print_face(end_face);
-        std::cout << " end_null_face "; print_face(end_null_face);
-        std::cout << " pos_face "; print_face(pos_face);
-        std::cout << " neg_face "; print_face(neg_face);
+        std::cout << " start_face "; g.print_face(start_face);
+        std::cout << " start_null_face "; g.print_face(start_null_face);
+        std::cout << " end_face "; g.print_face(end_face);
+        std::cout << " end_null_face "; g.print_face(end_null_face);
+        std::cout << " pos_face "; g.print_face(pos_face);
+        std::cout << " neg_face "; g.print_face(neg_face);
     }
     assert( vd_checker->face_ok( start_face ) );
     assert( vd_checker->face_ok( start_null_face ) );
@@ -664,7 +664,7 @@ VoronoiDiagram::find_null_face(HEVertex start, HEVertex other, Point left) {
         
         if (debug) {
             std::cout << "  null_face before sep/new vertices:\n";
-            std::cout << "  "; print_face(start_null_face);
+            std::cout << "  "; g.print_face(start_null_face);
         }
         // delete/contract everything until separator.alfa OR endpoint reached
         
@@ -849,7 +849,7 @@ void VoronoiDiagram::add_separator(HEFace f, HEFace null_face,
 /// find amount of clearance-disk violation on all face vertices 
 /// return vertex with the largest violation
 HEVertex VoronoiDiagram::find_seed_vertex(HEFace f, Site* site)  {
-    if (debug) { std::cout << "find_seed_vertex on f=" << f << "\n"; print_face(f); }
+    if (debug) { std::cout << "find_seed_vertex on f=" << f << "\n"; g.print_face(f); }
     double minPred( 0.0 ); 
     HEVertex minimalVertex = HEVertex();
     bool first( true );
@@ -1115,7 +1115,7 @@ void VoronoiDiagram::remove_split_vertex(HEFace f) {
 
     if (debug) {
         std::cout << "remove_split_vertex( " << f << " )\n";
-        print_face(f);
+        g.print_face(f);
     }
     assert( vd_checker->face_ok( f ) );
     
@@ -1377,7 +1377,7 @@ boost::tuple<HEEdge,HEVertex,HEEdge,bool> VoronoiDiagram::find_separator_target(
     bool flag(true);
     if (debug) { 
         std::cout << " find_separator_target f=" << f << " endp= " << g[endp].index << "\n";
-        print_face(f);
+        g.print_face(f);
     }
     do {
         HEEdge next_edge = g[current_edge].next;
@@ -1416,7 +1416,7 @@ EdgeData VoronoiDiagram::find_edge_data(HEFace f, VertexVector startverts, std::
     ed.f = f;
     if (debug) {
         std::cout << "find_edge_data():\n";
-        std::cout << " "; print_face(f);
+        std::cout << " "; g.print_face(f);
     }
     HEEdge current_edge = g[f].edge; // start on some edge of the face
     HEEdge start_edge = current_edge;
@@ -1457,7 +1457,7 @@ EdgeData VoronoiDiagram::find_edge_data(HEFace f, VertexVector startverts, std::
     } while (current_edge!=start_edge && !found);
     if (!found) {
         std::cout << "ERROR: unable to find OUT-NEW-IN vertex on face:\n";
-        print_face(f);
+        g.print_face(f);
         std::cout << " The excluded vertices are: (size=" << startverts.size()<<")"; print_vertices(startverts);
     }
     assert(found);
@@ -1713,27 +1713,6 @@ bool VoronoiDiagram::check() {
         if (debug) std::cout << "diagram check ERROR.\n";
         return false;
     }
-}
-
-void VoronoiDiagram::print_faces() {
-    for( HEFace f=0;f<g.num_faces();f++) {
-        print_face(f);
-    }
-}
-
-void VoronoiDiagram::print_face(HEFace f) {
-    std::cout << " Face " << f << ": ";
-    HEEdge current = g[f].edge;
-    HEEdge start=current;
-    int num_e=0;
-    do {
-        HEVertex v = g.source(current);
-        std::cout << g[v].index  << "(" << g[v].status  << ")-f"<< g[current].face << "-";
-        num_e++;
-        assert(num_e<30);
-        current = g[current].next;
-    } while ( current!=start );
-    std::cout << "\n";
 }
 
 void VoronoiDiagram::print_edges(EdgeVector& q) {

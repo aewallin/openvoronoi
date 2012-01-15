@@ -101,8 +101,6 @@ class VoronoiDiagram {
         std::string print() const;
         std::string version() const { return VERSION_STRING; }
         friend class VoronoiDiagramChecker;
-        friend class VertexPositioner;
-        friend class SplitPointError;
         static void reset_vertex_count() { VoronoiVertex::reset_count(); }
         void debug_on() {debug=true;}
         bool check();
@@ -161,7 +159,6 @@ class VoronoiDiagram {
     // DATA
         /// the half-edge diagram of the vd
         HEGraph g;
-        //typedef HEGraph::face_edge_iterator FaceEdItr;
         /// the voronoi diagram is constructed for sites within a circle with radius far_radius
         double far_radius;
         /// the number of point sites
@@ -186,14 +183,14 @@ class VoronoiDiagram {
 // to locate split-points
 class SplitPointError {
 public:
-    SplitPointError(VoronoiDiagram* v, HEEdge split_edge,Point pt1, Point pt2) :
-    vd(v), edge(split_edge), p1(pt1), p2(pt2)
+    SplitPointError(HEGraph& gi, HEEdge split_edge, Point pt1, Point pt2) :
+    g(gi),  edge(split_edge), p1(pt1), p2(pt2)
     {}
     
     // find point on edge at t-value
     // compute a signed distance to the pt1-pt2 line
     double operator()(const double t) {
-        Point p = vd->g[edge].point(t);
+        Point p = g[edge].point(t);
         // line: pt1 + u*(pt2-pt1) = p
         //   (p-pt1) dot (pt2-pt1) = u* (pt2-pt1) dot (pt2-pt1)
         
@@ -209,7 +206,7 @@ public:
         return sign*dist;
     }
 private:
-    VoronoiDiagram* vd;
+    HEGraph& g;
     HEEdge edge;
     Point p1;
     Point p2;

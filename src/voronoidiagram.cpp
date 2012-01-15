@@ -802,7 +802,7 @@ void VoronoiDiagram::add_separator(HEFace f, HEFace null_face,
     assert( vd_checker->check_edge(e2_tw) );
 }
 
-/// find amount of clearance-disk violation on all face vertices 
+/// find amount of clearance-disk violation on all vertices of face f 
 /// return vertex with the largest violation
 HEVertex VoronoiDiagram::find_seed_vertex(HEFace f, Site* site)  {
     if (debug) { std::cout << "find_seed_vertex on f=" << f << "\n"; g.print_face(f); }
@@ -1135,11 +1135,12 @@ HEFace VoronoiDiagram::add_face(Site* s) {
 
 // two-argument version used by insert_point_site()
 void VoronoiDiagram::add_edges(HEFace newface, HEFace f) {
-    add_edges( newface,f,g.HFace(),std::make_pair(HEVertex(),HEVertex()) );
+    add_edges( newface, f, g.HFace(), std::make_pair(HEVertex(),HEVertex()) );
 }
 
 // by adding a NEW-NEW edge, split the face f into one part which is newface, and the other part is the old f
 // for linesegment or arc sites we pass in both the k=+1 face newface and the k=-1 face newface2
+// the segment endpoints are passed to find_edge_data()
 void VoronoiDiagram::add_edges(HEFace newface, HEFace f, HEFace newface2, std::pair<HEVertex, HEVertex> segment) {
     int new_count = num_new_vertices(f);
     if (debug) std::cout << " add_edges() on f=" << f << " with " << new_count << " NEW verts.\n";
@@ -1367,6 +1368,12 @@ boost::tuple<HEEdge,HEVertex,HEEdge,bool> VoronoiDiagram::find_separator_target(
 // on a face which has IN and OUT-vertices, find the sequence
 // OUT-OUT-OUT-..-OUT-NEW(v1)-IN-...-IN-NEW(v2)-OUT-OUT
 // and return v1/v2 together with their previous and next edges
+//
+// startverts contains NEW-vertices already found, which are not valid for this call to find_edge_data
+//
+// segment contains ENDPOINT vertices, when we are inserting a line-segment
+// (these vertices are needed to ensure finding correct points around sites/null-edges)
+//
 EdgeData VoronoiDiagram::find_edge_data(HEFace f, VertexVector startverts, std::pair<HEVertex,HEVertex> segment)  {
     EdgeData ed;
     ed.f = f;
@@ -1385,26 +1392,27 @@ EdgeData VoronoiDiagram::find_edge_data(HEFace f, VertexVector startverts, std::
         HEVertex previous_vertex = g.source( current_edge);
         HEVertex  current_vertex = g.target( current_edge );
         HEVertex     next_vertex = g.target( next_edge );
+        bool previous_not_endpoint = (previous_vertex!=segment.first && previous_vertex!=segment.second);
+        bool next_is_endpoint = (next_vertex==segment.first || next_vertex==segment.second);
         
         if ( (g[current_vertex].status==NEW) && (g[current_vertex].type != SEPPOINT) &&
-             (  ((g[previous_vertex].status==OUT || g[previous_vertex].status==UNDECIDED)  && (previous_vertex!=segment.first && previous_vertex!=segment.second))  ||
-                ((g[next_vertex].type==ENDPOINT) && (next_vertex==segment.first || next_vertex==segment.second))
+             (  ((g[previous_vertex].status==OUT || g[previous_vertex].status==UNDECIDED)  &&  previous_not_endpoint ) 
+                   ||
+                ( next_is_endpoint )
              )
            ) {
-            bool not_found=true;
-            BOOST_FOREACH(HEVertex v, startverts) { // exclude vertices already found
-                if (current_vertex==v)
-                    not_found=false;
-            }
+            // slow? linear search through vector. but startverts.size() should not be too large..
+            bool v_in_startverts =
+                ( std::find(startverts.begin(), startverts.end(),  current_vertex) != startverts.end() );
             if (debug) {
                 std::cout << "     " << g[current_vertex].index << "N=" << (g[current_vertex].status == NEW) ;
                 std::cout << " !SEPP=" << (g[current_vertex].type != SEPPOINT) << "\n";
             }
-            if (  not_found ) {
-                    ed.v1 = current_vertex;
-                    ed.v1_prv = current_edge;
-                    ed.v1_nxt = g[current_edge].next;
-                    found = true;                 
+            if ( !v_in_startverts ) {
+                ed.v1 = current_vertex;
+                ed.v1_prv = current_edge;
+                ed.v1_nxt = g[current_edge].next;
+                found = true;
             }
         }
         current_edge = g[current_edge].next;   
@@ -1421,7 +1429,7 @@ EdgeData VoronoiDiagram::find_edge_data(HEFace f, VertexVector startverts, std::
 
     // now search for v2
     //count=0; 
-    start_edge = current_edge;
+    start_edge = current_edge; // note that this search starts where we ended in the loop above!
     found=false;
     if (debug) std::cout << "    finding IN-NEW-OUT vertex: \n";   
     do { // find IN-NEW-OUT vertices in this loop

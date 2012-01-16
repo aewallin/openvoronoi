@@ -3,18 +3,18 @@
  *  
  *  This file is part of OpenVoronoi.
  *
- *  OpenCAMlib is free software: you can redistribute it and/or modify
+ *  OpenVoronoi is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  OpenCAMlib is distributed in the hope that it will be useful,
+ *  OpenVoronoi is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with OpenCAMlib.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with OpenVoronoi.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #ifndef VODI_G_HPP
@@ -111,7 +111,9 @@ typedef boost::adjacency_list_traits<OUT_EDGE_CONTAINER,
                                      VERTEX_CONTAINER, 
                                      boost::bidirectionalS, 
                                      EDGE_LIST_CONTAINER >::edge_descriptor HEEdge;
-// type of face-descriptors in the graph
+                                     
+// type of face-descriptors in the graph 
+// (if there were a traits-class for HEDIGraph we could use it here, instead of "hard coding" the type)
 typedef unsigned int HEFace;    
 
 /// Status of faces in the voronoi diagram

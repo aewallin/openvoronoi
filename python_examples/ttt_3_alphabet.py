@@ -49,6 +49,7 @@ def modify_segments(segs):
         last = seg[ len(seg)-1 ]
         assert( first[0]==last[0] and first[1]==last[1] )
         seg.pop()
+        seg.reverse()
         segs_mod.append(seg)
         #drawSegment(myscreen, seg)
     return segs_mod
@@ -168,6 +169,10 @@ if __name__ == "__main__":
     #all_segs = segs3
     times = insert_many_polygons(vd,all_segs)
     vd.check()
+    
+    ovd.PolygonInterior( vd.getGraph() )
+    ovd.MedialAxis( vd.getGraph() )
+    
     vod.setVDText2(times)
     vod.setAll()
     

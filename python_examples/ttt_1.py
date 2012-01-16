@@ -118,6 +118,7 @@ def modify_segments(segs):
         last = seg[ len(seg)-1 ]
         assert( first[0]==last[0] and first[1]==last[1] )
         seg.pop()
+        seg.reverse()
         segs_mod.append(seg)
         #drawSegment(myscreen, seg)
     return segs_mod
@@ -214,9 +215,9 @@ if __name__ == "__main__":
     vod.textScale = 0.0002
     vod.vertexRadius = 0.0011
     vod.drawVertices=0
-    vod.drawVertexIndex=1
+    vod.drawVertexIndex=0
     vod.drawGenerators=0
-    vod.offsetEdges = 1
+    vod.offsetEdges = 0
     vod.drawNullEdges = 1
     vd.setEdgeOffset(0.001)
     
@@ -228,6 +229,9 @@ if __name__ == "__main__":
     times = insert_many_polygons(vd,all_segs)
     #vd.check()
     vod.setVDText2(times)
+    
+    ovd.PolygonInterior( vd.getGraph() )
+    ovd.MedialAxis( vd.getGraph() )
     
     vod.setAll()
     print "PYTHON All DONE."

@@ -28,6 +28,7 @@ EdgeProps::EdgeProps() {
     x[0]=0;x[1]=0;x[2]=0;x[3]=0;x[4]=0;x[5]=0;x[6]=0;x[7]=0;
     y[0]=0;y[1]=0;y[2]=0;y[3]=0;y[4]=0;y[5]=0;y[6]=0;y[7]=0;
     has_null_face = false;
+    valid=true;
 }
 
 /*
@@ -163,6 +164,7 @@ EdgeProps& EdgeProps::operator=(const EdgeProps &other) {
     has_null_face = other.has_null_face;
     k=other.k; 
     type = other.type;
+    valid = other.valid;
     // NOTE we do *not* set: twin, next    
     return *this;
 }

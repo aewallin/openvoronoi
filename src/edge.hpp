@@ -56,9 +56,9 @@ enum VoronoiEdgeType {LINE, LINELINE, PARA_LINELINE, OUTEDGE, PARABOLA, ELLIPSE,
 class EdgeProps {
 public:
     EdgeProps();
-    EdgeProps(HEEdge n, HEFace f): next(n), face(f), has_null_face(false) {}
+    EdgeProps(HEEdge n, HEFace f): next(n), face(f), has_null_face(false), valid(true) {}
     /// create edge with given next, twin, and face
-    EdgeProps(HEEdge n, HEEdge t, HEFace f): next(n), twin(t), face(f), has_null_face(false) {}
+    EdgeProps(HEEdge n, HEEdge t, HEFace f): next(n), twin(t), face(f), has_null_face(false), valid(true) {}
     /// the next edge, counterclockwise, from this edge
     HEEdge next; 
     /// the twin edge

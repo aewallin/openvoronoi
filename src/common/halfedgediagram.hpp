@@ -596,8 +596,8 @@ void filter_graph(Filter f) {
     BOOST_FOREACH(Edge e, boost::edges(g)) {
         if (!f(e))
             g[e].valid = false;
-        else
-            g[e].valid = true;
+        //else
+        //    g[e].valid = true;
     }
 }
 

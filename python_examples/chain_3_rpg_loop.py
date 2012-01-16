@@ -12,7 +12,7 @@ import gzip
 import ovdgenerators as gens
 import rpg
 
-def draw_vd(vd):
+def draw_vd(vd,times):
     #w=2500
     #h=1500
     
@@ -46,17 +46,15 @@ def draw_vd(vd):
     vod.textScale = 0.02
     vod.vertexRadius = 0.0031
     vod.drawVertices=0
-    vod.drawVertexIndex=1
+    vod.drawVertexIndex=0
     vod.drawGenerators=0
-    vod.offsetEdges = 1
+    vod.offsetEdges = 0
     vd.setEdgeOffset(0.05)
-    times=[]
-    times.append( 1 )
-    times.append( 1 )
+    #times=[]
+    #times.append( 1 )
+    #times.append( 1 )
     
-            
     vod.setVDText2(times)
-    
     
     vod.setAll()
 
@@ -66,7 +64,6 @@ def draw_vd(vd):
     #lwr.Write()
      
     myscreen.iren.Start()
-
 
 def rpg_vd(Npts, seed, debug):
     far = 1
@@ -86,7 +83,7 @@ def rpg_vd(Npts, seed, debug):
     m=0
     t_before = time.time()
     for p in pts:
-        print " adding vertex ",m
+        #print " adding vertex ",m
         id_list.append( vd.addVertexSite( p ) )
         m=m+1
     """
@@ -108,17 +105,17 @@ def rpg_vd(Npts, seed, debug):
         n_nxt = n+1
         if n==(len(id_list)-1):
             n_nxt=0 # point 0 is the endpoint of the last segment
-        print " adding line-site ", id_list[n]," - ", id_list[n_nxt]
+        #print " adding line-site ", id_list[n]," - ", id_list[n_nxt]
         vd.addLineSite( id_list[n], id_list[n_nxt])
     t_after = time.time()
     times.append( t_after-t_before )
 
 
-    #print " segs inserted in ", times[1], " s"
+    print " segs inserted in ", times[1], " s"
     is_valid = vd.check()
-    #print " vd-check: ", is_valid
+    print " vd-check: ", is_valid
     
-    return [is_valid, vd]
+    return [is_valid, vd, times]
 
 def loop_run(Npts, max_seed, debug=False, debug_seed=-1):
     #Npts = 3
@@ -137,14 +134,16 @@ def single_run(Npts, seed, debug=False):
     result = rpg_vd(Npts,seed,debug)
     print "N=",Npts," s=",seed, " ok?=",result
     assert( result[0] == True )
-    return result[1]
+    return result
     
 
     
 if __name__ == "__main__":  
-    #loop_run(7,300)
+    #loop_run(50,300)
     
     
-    vd = single_run(17,int(137))
-    draw_vd(vd)
+    r = single_run(50,int(37))
+    vd = r[1]
+    ovd.PolygonInterior(vd.getGraph())
+    draw_vd(vd,r[2])
         

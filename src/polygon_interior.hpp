@@ -23,7 +23,6 @@
 #include <iostream>
 
 #include <boost/python.hpp>
-//#include <boost/graph/filtered_graph.hpp>
 
 #include "graph.hpp"
 #include "site.hpp"
@@ -37,13 +36,10 @@ struct interior_filter {
         if (g[e].type == LINESITE || g[e].type == NULLEDGE) 
             return true;
         
-        HEVertex src = g.source(e);
-        HEVertex trg = g.target(e);
-        double t1 = g[src].dist();
-        double t2 = g[trg].dist();
-        Point p = (t1>t2) ? g[src].position : g[trg].position; // choose point with larger t-value.
-        
-        // now determine if p is inside or outside polygon
+        //HEVertex src = g.source(e);
+        //HEVertex trg = g.target(e);
+        //double t1 = g[src].dist();
+        //double t2 = g[trg].dist();
         
         // if polygon inserted ccw  as (id1->id2), then the linesite should occur on valid faces as id1->id2
         // for islands and the outside the edge is id2->id1
@@ -56,10 +52,8 @@ struct interior_filter {
             HEEdge linetwin = find_adjacent_linesite(f);
             HEEdge twin = g[linetwin].twin;
             HEFace twin_face = g[twin].face;
-            //Site* s_twin = g[twin_face].site;
             if (linesite_ccw(twin_face))
                 return true;
-            
         } 
         return false;
     }

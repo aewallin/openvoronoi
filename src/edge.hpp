@@ -82,6 +82,8 @@ public:
     void set_parameters(Site* s1, Site* s2, bool sig);
     void set_sep_parameters(Point& endp, Point& p);
     EdgeProps &operator=(const EdgeProps &p);
+    bool valid; // for filtering graph
+    bool inserted_direction; // true if linesite-edge inserted in this direction
 private:
     Point projection_point(Solution& sl) const;
     double minimum_pp_t(Site* s1, Site* s2);

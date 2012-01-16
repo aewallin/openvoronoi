@@ -45,7 +45,7 @@ public:
     boost::python::list offset(double t) {
         offset_list = boost::python::list(); // clear the list
         //std::cout << "Offset::offset(t= " << t << ")\n";
-        set_flags(t);
+        set_flags(t); // mark faces as todo or done, based on the t-value, and validity of edges (after filtering).
         HEFace start;        
         while (find_start_face(start)) {
             offset_walk(start,t);
@@ -133,7 +133,6 @@ public:
     
     void set_flags(double t) {
         for(HEFace f=0; f<g.num_faces() ; f++) {
-            //g.print_face(f);
             HEEdge start = g[f].edge;
             HEEdge current = start;
             do {
@@ -142,13 +141,26 @@ public:
                 double src_r = g[src].dist();
                 double trg_r = g[trg].dist();
                 if (t_bracket(src_r,trg_r,t)) {
-                    //print_edge(current); // store a potential start-edge for the face here!
-                    if ( face_done[f] )
-                        face_done[f] = 0; // this is a face that requires an offset!
+                    if ( face_done[f] ) // if 1
+                        face_done[f] = 0; // , set to 0. this is a face that requires an offset!
                 }
                 current = g[current].next;
             } while ( current!=start );
         }
+        
+        for(HEFace f=0; f<g.num_faces() ; f++) {
+            HEEdge start = g[f].edge;
+            HEEdge current = start;
+            do {
+                if ( !g[current].valid ) {
+                    face_done[f] = 1; // don't offset faces with invalid edges
+                }
+                current = g[current].next;
+            } while ( current!=start );
+        }
+        
+
+        
         //print_status();
     }
     

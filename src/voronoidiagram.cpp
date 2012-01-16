@@ -402,10 +402,14 @@ std::pair<HEFace,HEFace> VoronoiDiagram::add_linesite_edges(HEVertex seg_start, 
         pos_site = new LineSite( g[seg_start].position, g[seg_end  ].position , +1);
         neg_site = new LineSite( g[seg_end  ].position, g[seg_start].position , -1);
         boost::tie(pos_edge, neg_edge) = g.add_twin_edges( seg_start,   seg_end );
+        g[pos_edge].inserted_direction = true;
+        g[neg_edge].inserted_direction = false;
     } else {
         pos_site = new LineSite( g[seg_end  ].position, g[seg_start].position , +1);
         neg_site = new LineSite( g[seg_start].position, g[seg_end  ].position , -1);
         boost::tie( pos_edge, neg_edge) = g.add_twin_edges( seg_end  ,seg_start );
+        g[pos_edge].inserted_direction = false;
+        g[neg_edge].inserted_direction = true;
     }
     g[pos_edge].type = LINESITE;
     g[neg_edge].type = LINESITE;

@@ -52,7 +52,7 @@
 // may or may not store edge pointer
 
 
-/// HEDIGraph is a A half-edge diagram class.
+/// half_edge_diagram is a half-edge diagram class.
 /// Templated on Vertex/Edge/Face property classes which allow
 /// attaching information to vertices/edges/faces that is 
 /// required for a particular algorithm.
@@ -79,7 +79,7 @@ template <class TOutEdgeList,
           class TGraphProperties,
           class TEdgeList 
           >
-class HEDIGraph {
+class half_edge_diagram {
 public:
     typedef unsigned int Face; 
     typedef typename boost::adjacency_list< TOutEdgeList,            
@@ -95,7 +95,7 @@ public:
     typedef typename boost::graph_traits< BGLGraph >::vertex_iterator   VertexItr;
     typedef typename boost::graph_traits< BGLGraph >::out_edge_iterator OutEdgeItr;
     typedef typename boost::graph_traits< BGLGraph >::edge_iterator     EdgeItr; 
-    
+
     // BGL-types (do we need all of these?)
     typedef typename boost::graph_traits< BGLGraph >::vertex_descriptor      vertex_descriptor;
     typedef typename boost::graph_traits< BGLGraph >::edge_descriptor        edge_descriptor;
@@ -110,26 +110,27 @@ public:
     typedef typename boost::graph_traits< BGLGraph >::edges_size_type        edges_size_type;
     typedef typename boost::graph_traits< BGLGraph >::degree_size_type       degree_size_type;
     typedef typename boost::graph_traits< BGLGraph >::adjacency_iterator     adjacency_iterator;
-    
+
     typedef std::vector<Vertex> VertexVector;
     typedef std::vector<Face>   FaceVector;
     typedef std::vector<Edge>   EdgeVector;  
 
-    inline TFaceProperties& operator[](Face f)  { return faces[f];  }
-    inline const TFaceProperties& operator[](Face f) const  { return faces[f]; } 
+    inline TFaceProperties& operator[](Face f) { return faces[f]; }
+    inline const TFaceProperties& operator[](Face f) const { return faces[f]; } 
+
+    inline TEdgeProperties& operator[](Edge e) { return g[e]; }
+    inline const TEdgeProperties& operator[](Edge e) const { return g[e]; }
     
-    inline TEdgeProperties& operator[](Edge e)  { return g[e];  }
-    inline const TEdgeProperties& operator[](Edge e) const  { return g[e];  }
-    
-    inline TVertexProperties& operator[](Vertex v)  { return g[v];  }
-    inline const TVertexProperties& operator[](Vertex v) const  { return g[v];  }
-    
+    inline TVertexProperties& operator[](Vertex v)  { return g[v]; }
+    inline const TVertexProperties& operator[](Vertex v) const  { return g[v]; }
+
 //DATA
-    std::vector< TFaceProperties > faces;
+    std::vector< TFaceProperties > faces; // this could maybe be held as a GraphProperty of the BGL-graph?
     BGLGraph g;
+    
 // NOTE: there is no HEDIGraph constructor, we use the default one..
 
-virtual ~HEDIGraph(){
+virtual ~half_edge_diagram(){
     // sites are associated with faces. go through all faces and delete the site
     BOOST_FOREACH( TFaceProperties fprop, faces ) {
         if (fprop.site)
@@ -588,6 +589,16 @@ std::pair<Edge,Edge> find_next_prev(Face f, Vertex endp) {
     //    std::cout << " find_next_prev() prev_edge = "; g.print_edge(prev_edge);
     //}
     return std::make_pair(next_edge, prev_edge);
+}
+
+template <class Filter>
+void filter_graph(Filter f) {
+    BOOST_FOREACH(Edge e, boost::edges(g)) {
+        if (!f(e))
+            g[e].valid = false;
+        else
+            g[e].valid = true;
+    }
 }
 
 void print_faces() {

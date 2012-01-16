@@ -22,7 +22,7 @@
 #include "voronoidiagram_py.hpp"  
 #include "common/point.hpp"
 #include "offset.hpp"
-//#include "polygon_interior.hpp"
+#include "polygon_interior.hpp"
 
 /*
  *  Boost::Python wrapping of voronoi diagram and related classes.
@@ -120,9 +120,9 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         .def("offset", &Offset::offset )
 
     ; 
-   // bp::class_<PolygonInterior, boost::noncopyable >("PolygonInterior", bp::no_init)
-   //     .def(bp::init<HEGraph&>())
-   //     .def("str", &PolygonInterior::print )
+    bp::class_<PolygonInterior, boost::noncopyable >("PolygonInterior", bp::no_init)
+        .def(bp::init<HEGraph&>())
+        .def("str", &PolygonInterior::print )
         //.def("offset", &Offset::offset )
 
     ; 

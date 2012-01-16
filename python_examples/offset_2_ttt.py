@@ -155,6 +155,7 @@ def modify_segments(segs):
         last = seg[ len(seg)-1 ]
         assert( first[0]==last[0] and first[1]==last[1] )
         seg.pop()
+        #seg.reverse()
         segs_mod.append(seg)
         #drawSegment(myscreen, seg)
     return segs_mod
@@ -199,7 +200,7 @@ if __name__ == "__main__":
     
     
     # segments from ttt
-    segs = ttt_segments(  "A", 10000)
+    segs = ttt_segments(  "lm", 10000)
     segs = translate(segs, -0.06, 0.05)
     segs = modify_segments(segs)
     
@@ -207,11 +208,14 @@ if __name__ == "__main__":
     print "all sites inserted. "
     print "VD check: ", vd.check()
     
+    pi = ovd.PolygonInterior( vd.getGraph() )
+    pi.str()
+    
     of = ovd.Offset( vd.getGraph() ) # pass the created graph to the Offset class
     of.str()
     ofs_list=[]
     t_before = time.time()
-    for t in [0.005*x for x in range(1,10)]:
+    for t in [0.002*x for x in range(1,20)]:
         ofs = of.offset(t)
         ofs_list.append(ofs)
     

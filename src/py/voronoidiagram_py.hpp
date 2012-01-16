@@ -136,6 +136,7 @@ public:
     boost::python::list getVoronoiEdges()  {
         boost::python::list edge_list;
         BOOST_FOREACH( HEEdge edge, g.edges() ) { // loop through each edge
+                if (!g[edge].valid) continue;
                 boost::python::list edge_data;
                 boost::python::list point_list; // the endpoints of each edge
                 HEVertex v1 = g.source( edge );
@@ -170,6 +171,8 @@ public:
         return edge_list;
     }
     
+    
+    // NOTE: no g[edge].valid check here!?
     boost::python::list getVoronoiEdgesOffset()  {
         boost::python::list edge_list;
         BOOST_FOREACH( HEEdge edge, g.edges() ) { // loop through each edge

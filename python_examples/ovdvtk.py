@@ -37,6 +37,85 @@ mag2 =( float(123)/255 , float(35)/255 , float(251)/255  )
 magenta = ( float(153)/255 , float(42)/255 , float(165)/255  )
 
 
+def drawLine(myscreen, pt1, pt2, lineColor):
+    myscreen.addActor( Line(p1=(pt1.x,pt1.y,0),p2=(pt2.x,pt2.y,0),color=lineColor) ) 
+
+def drawArc(myscreen, pt1, pt2, r, cen,cw,arcColor):
+    # draw arc as many line-segments
+    start = pt1-cen
+    end = pt2-cen
+    theta1 = math.atan2(start.x,start.y)
+    theta2 = math.atan2(end.x,end.y)
+    alfa=[] # the list of angles
+    da=0.1
+    CIRCLE_FUZZ = 1e-9
+    # idea from emc2 / cutsim g-code interp G2/G3
+    if (cw == False ): 
+        while ( (theta2 - theta1) > -CIRCLE_FUZZ): 
+            theta2 -= 2*math.pi
+    else:
+        while( (theta2 - theta1) < CIRCLE_FUZZ): 
+            theta2 += 2*math.pi
+    
+    dtheta = theta2-theta1
+    arclength = r*dtheta
+    dlength = min(0.01, arclength/10)
+    steps = int( float(arclength) / float(dlength))
+    rsteps = float(1)/float(steps)
+    dc = math.cos(-dtheta*rsteps) # delta-cos  
+    ds = math.sin(-dtheta*rsteps) # delta-sin
+    
+    previous = pt1
+    tr = [start.x, start.y]
+    for i in range(steps):
+        #f = (i+1) * rsteps #; // varies from 1/rsteps..1 (?)
+        #theta = theta1 + i* dtheta
+        tr = rotate(tr[0], tr[1], dc, ds) #; // rotate center-start vector by a small amount
+        x = cen.x + tr[0] 
+        y = cen.y + tr[1] 
+        current = ovd.Point(x,y)
+        myscreen.addActor( Line(p1=(previous.x,previous.y,0),p2=(current.x,current.y,0),color=arcColor) )
+        previous = current 
+
+# rotate by cos/sin. from emc2 gcodemodule.cc
+def rotate(x, y,  c,  s):
+    tx = x * c - y * s;
+    y = x * s + y * c;
+    x = tx;
+    return [x,y]
+    
+def drawOffsets(myscreen, ofs):
+    # draw loops
+    nloop = 0
+    lineColor = lgreen
+    arcColor = green #grass
+    for lop in ofs:
+        n = 0
+        N = len(lop)
+        first_point=[]
+        previous=[]
+        for p in lop:
+            # p[0] is the Point
+            # p[1] is -1 for lines, and r for arcs
+            if n==0: # don't draw anything on the first iteration
+                previous=p[0]
+                #first_point = p[0]
+            else:
+                cw=p[3]
+                cen=p[2]
+                r=p[1]
+                p=p[0]
+                if r==-1:
+                    drawLine(myscreen, previous, p, lineColor)
+                else:
+                    drawArc(myscreen, previous, p, r,cen,cw, arcColor)
+                #myscreen.addActor( ovdvtk.Line(p1=(previous.x,previous.y,0),p2=(p.x,p.y,0),color=loopColor) )
+                previous=p
+            n=n+1
+        print "rendered loop ",nloop, " with ", len(lop), " points"
+        nloop = nloop+1
+        
+
 class VD:
     def __init__(self, myscreen, vd, scale=1, textscale=0.06, vertexradius=0.04):
         self.myscreen = myscreen

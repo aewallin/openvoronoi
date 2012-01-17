@@ -36,11 +36,6 @@ struct interior_filter {
         if (g[e].type == LINESITE || g[e].type == NULLEDGE) 
             return true;
         
-        //HEVertex src = g.source(e);
-        //HEVertex trg = g.target(e);
-        //double t1 = g[src].dist();
-        //double t2 = g[trg].dist();
-        
         // if polygon inserted ccw  as (id1->id2), then the linesite should occur on valid faces as id1->id2
         // for islands and the outside the edge is id2->id1
         HEFace f = g[e].face;
@@ -92,21 +87,10 @@ class PolygonInterior {
 public:
     PolygonInterior(HEGraph& gi): g(gi) {
         interior_filter f(g);
-        //boost::filtered_graph< HEGraph::BGLGraph , interior_filter > fg(g.g, f);
         interior_filter flt(g);
         g.filter_graph(flt);
-        int edgecount =0;
-        BOOST_FOREACH(HEEdge e , g.edges() ) {
-            if (g[e].valid)
-                edgecount++;
-        }
-        std::cout << "filtered graph has " << edgecount << " edges \n";
     }
-    void print() {
-        std::cout << "pi: verts: " << g.num_vertices() << "\n";
-        std::cout << "pi: edges: " << g.num_edges() << "\n";
-        std::cout << "pi: faces: " << g.num_faces() << "\n";
-    }
+
 
 private:
     PolygonInterior(); // don't use.

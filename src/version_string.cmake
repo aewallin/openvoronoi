@@ -27,10 +27,10 @@ message( STATUS "build type = " ${CMAKE_BUILD_TYPE})
 
 set( vstring "//version_string.hpp - written by cmake. changes will be lost!\n"
              "#ifndef VERSION_STRING\n"
-             "#define VERSION_STRING \"${GIT_COMMIT_ID}"\ ("${CMAKE_BUILD_TYPE}")"\"\n"
+             "#define VERSION_STRING \"${GIT_COMMIT_ID}"\  "${CMAKE_BUILD_TYPE}" "\"\n"
              "#endif\n"
 )
-
+#-"${CMAKE_BUILD_TYPE}"\n"
 file(WRITE version_string.hpp.txt ${vstring} )
 message( STATUS "Git version id: " ${vstring})
 # copy the file to the final header only if the version changes

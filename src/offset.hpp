@@ -63,7 +63,7 @@ public:
     }
 
     void offset_walk(HEFace start,double t) {
-        std::cout << " offset_walk() starting on face " << start << "\n";
+        //std::cout << " offset_walk() starting on face " << start << "\n";
         bool out_in_mode= false; // edge_mode(current_edge, t);
         HEEdge start_edge =  find_next_offset_edge( g[start].edge , t, out_in_mode); // the first edge on the start-face
         

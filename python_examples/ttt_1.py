@@ -176,7 +176,7 @@ if __name__ == "__main__":
     myscreen.camera.SetClippingRange(-(zmult+1)*camPos,(zmult+1)*camPos)
     myscreen.camera.SetFocalPoint(0.0, 0, 0)
 
-    segs = ttt_segments(  "J", 10000)
+    segs = ttt_segments(  "A", 10000)
     segs = translate(segs, -0.06, 0.05)
     
     #segs = ttt_segments(  "ABCDEFGHIJKLM", 64000)

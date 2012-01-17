@@ -2,8 +2,8 @@ import openvoronoi as ovd    # https://github.com/aewallin/openvoronoi
 import ttt                   # https://github.com/aewallin/truetype-tracer
 import time
 
-def line_to(p):
-    print "G1 X% 8.4f Y% 8.4f " % (p.x, p.y)
+def line_to(p,z):
+    print "G1 X% 8.6f Y% 8.6f Z% 8.6f" % (p.x, p.y, z)
 
 def arc_to( p, r, cen, cw ):
     if (cw):
@@ -21,35 +21,52 @@ def pen_up():
 def pen_down():
     print "G0Z0"
 
-# ofs is a list of moves.
-def printOffsets(ofs):
-    nloop = 0
-    for lop in ofs:
+def plunge(p,z):
+    print "G1 X% 8.4f Y% 8.4f Z% 8.4f" % (p.x, p.y, z)
+    
+
+# naive medial-axis printer
+# take all edges from the filtered vd
+# don't print LINESITE or NULLEDGE edges
+# print all other edges in the order they are output with (pen-up, rapid, pen-down) between every move
+# NO depth information (i.e. we don't move in Z-axis)
+def printMedial(vd):
+    #edges = vd.getVoronoiEdges()
+
+    maw = ovd.MedialAxisWalk(  vd.getGraph() )
+    toolpath = maw.walk()
+    #print w
+    #print "( got %d edges )" % (len(edges))
+
+    for chain in toolpath:
+        # edges returned in this format:
+        #            edge_data.append( point_list );   point_list = [ [p, clerance-disk] , ... ]
+        #            edge_data.append( g[edge].type );
+        #            edge_data.append( g[v1].status ); // source status
+        #            edge_data.append( g[v2].status ); // target status
+
         n = 0
-        N = len(lop)
-        first_point=[]
-        previous=[]
-        for p in lop:
-            # p[0] is the Point
-            # p[1] is -1 for lines, and r for arcs
-            if n==0: # don't draw anything on the first iteration
-                previous=p[0]
-                pen_up()
-                rapid_to(previous)
-                pen_down()
-            else:
-                cw=p[3]  # cw or ccw arc
-                cen=p[2] # center of arc
-                r=p[1]   # radius of arc
-                p=p[0]   # target position
-                if r==-1: # -1 means line
-                    line_to( p )
+        for move in chain:
+            #print move
+            for point in move:
+                #print point
+                #exit()
+                if n==0: # don't draw anything on the first iteration
+                    p = point[0]
+                    z = point[1]
+                    pen_up();
+                    rapid_to( p );
+                    pen_down()
+                    plunge( p, -z ) # now we are at the correct height, at the startpoint of the first move
                 else:
-                    arc_to( p, r, cen, cw ) 
-                previous=p
-            n=n+1
-        nloop = nloop+1
-        
+                    p = point[0]
+                    z = point[1]
+                    line_to( p, -z )
+                n=n+1
+
+    return
+
+
 # this function inserts point-sites into vd
 def insert_polygon_points(vd, polygon):
     pts=[]
@@ -133,7 +150,7 @@ def ttt_segments(text,scale):
     return segs
 
 def preamble():
-    print "G20 F60"
+    print "G20 F6"
     print "G64 P0.001"
     print "G0 X0 Y0 Z0"
     
@@ -158,22 +175,11 @@ if __name__ == "__main__":
     print "( all sites inserted in %.3f seconds )" % ( sum(times))
     print "( VD check: ", vd.check(), " )"
     
-    ovd.PolygonInterior( vd.getGraph() ) # polygon interior
-    
-    of = ovd.Offset( vd.getGraph() ) # pass the filtered graph to the Offset class
-
-    ofs_list=[]
-    t_before = time.time()
-    for t in [0.002*x for x in range(1,10)]: # this defines the "step-over" and how many offsets we get
-        ofs = of.offset(t) # generate offset with offset-distance t
-        ofs_list.append(ofs)
-    t_after = time.time()
-    oftime = t_after-t_before
-    print "( offsets generated in %.3f seconds )" % ( oftime )
+    ovd.PolygonInterior( vd.getGraph() ) # filter so that only polygon interior remains
+    ovd.MedialAxis( vd.getGraph() ) # filter so that only medial axis remains
     
     preamble()
     
-    for ofs in ofs_list:
-        printOffsets(ofs)
+    printMedial( vd )
     
     postamble()

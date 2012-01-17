@@ -95,6 +95,7 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         .value("HYPERBOLA", HYPERBOLA)
         .value("SEPARATOR", SEPARATOR)
         .value("LINESITE", LINESITE)
+        .value("NULLEDGE", NULLEDGE)
     ;
     bp::class_<Point>("Point") 
         .def(bp::init<double, double>())
@@ -126,6 +127,10 @@ BOOST_PYTHON_MODULE(openvoronoi) {
     ;
     bp::class_<MedialAxis, boost::noncopyable >("MedialAxis", bp::no_init)
         .def(bp::init<HEGraph&>())
+    ; 
+    bp::class_<MedialAxisWalk, boost::noncopyable >("MedialAxisWalk", bp::no_init)
+        .def(bp::init<HEGraph&>())
+        .def("walk", &MedialAxisWalk::walk)
     ; 
 }
 

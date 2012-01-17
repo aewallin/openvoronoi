@@ -170,7 +170,8 @@ public:
         }
         return edge_list;
     }
-    
+        
+
     
     // NOTE: no g[edge].valid check here!?
     boost::python::list getVoronoiEdgesOffset()  {

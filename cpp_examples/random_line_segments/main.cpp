@@ -16,6 +16,7 @@ namespace po = boost::program_options;
 
 typedef std::pair<ovd::Point,ovd::Point> segment;
 
+// return true if segment s1 intersects with segment s2
 bool intersects( segment& s1, segment& s2 ) {
     ovd::Point p1 = s1.first;
     ovd::Point p2 = s1.second;
@@ -41,8 +42,8 @@ bool intersects( segment& s1, segment& s2 ) {
 }
 
 // test if s intersects with any of the segments in segs
-bool segment_intersects(std::vector<segment>& segs, segment& s) {
-    
+// return true if there is an intersection, otherwise false
+bool segment_intersects(std::vector<segment>& segs, segment& s) {    
     BOOST_FOREACH(segment& seg, segs) {
         if (intersects(seg,s))
             return true;
@@ -50,6 +51,7 @@ bool segment_intersects(std::vector<segment>& segs, segment& s) {
     return false; // no intersections found
 }
 
+// create a random segment
 segment random_segment(double far, double r1,double r2,double r3,double r4) {
     double pradius = (1.0/sqrt(2))*far;
     segment out;
@@ -62,16 +64,18 @@ segment random_segment(double far, double r1,double r2,double r3,double r4) {
     return out;
 }
 
+// create Nmax random segments with a far-radius circle
 std::vector<segment> random_segments(double far,int Nmax) {
     boost::mt19937 rng(42);
     boost::uniform_01<boost::mt19937> rnd(rng);
     
-    std::vector<segment> segs; // = []
-    for (int n=0;n<Nmax;n++) { //n in range(Nmax):
+    std::vector<segment> segs; 
+    for (int n=0;n<Nmax;n++) { 
         segment seg;
         do {
-            seg = random_segment(far, rnd(),rnd(),rnd(),rnd());
-        } while (segment_intersects(segs, seg));
+            seg = random_segment(far, rnd(),rnd(),rnd(),rnd()); // try a new segment until one is found
+        } while (segment_intersects(segs, seg)); // that does not intersect with any previous segment.
+        // NOTE: for high Nmax this can be very slow
         segs.push_back(seg);
     }
     return segs;
@@ -113,26 +117,26 @@ int main(int argc,char *argv[]) {
     boost::uniform_01<boost::mt19937> rnd(rng);
     std::cout << "Waiting for " << nmax << " random line segments..."<< std::flush;
     boost::timer tmr;
-    std::vector<segment> segs = random_segments(1,nmax);
+    std::vector<segment> segs = random_segments(1,nmax); // creante nmax random non-intersecting segments.
     std::cout << "done in " << tmr.elapsed() << " seconds\n" << std::flush;
 
-    typedef std::pair<int,int> IdSeg;
-    typedef std::vector< IdSeg > IdSegments;
+    typedef std::pair<int,int> IdSeg; // the int-handles for a segment
+    typedef std::vector< IdSeg > IdSegments; // all the segments stored in this vector
     IdSegments segment_ids;
-    
     
     tmr.restart();
     BOOST_FOREACH(segment s, segs ) {
         IdSeg id;
-        id.first = vd->insert_point_site(s.first);
-        id.second = vd->insert_point_site(s.second);
-        segment_ids.push_back(id);
+        id.first = vd->insert_point_site(s.first);   // insert the start-point of the segment
+        id.second = vd->insert_point_site(s.second); // insert the endpoint of the segment.
+        segment_ids.push_back(id); // store the int-handles returned by insert_point_site()
     }
     double t_points = tmr.elapsed();
     
+    // now we insert line-segments
     tmr.restart();
     BOOST_FOREACH(IdSeg id, segment_ids ) {
-        vd->insert_line_site(id.first,id.second);
+        vd->insert_line_site(id.first,id.second); // NOTE: arguments are the int-handles we got from VoronoiDiagram::insert_point_site() above!
     }
     double t_lines = tmr.elapsed();
     

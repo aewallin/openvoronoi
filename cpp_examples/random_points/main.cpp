@@ -41,25 +41,25 @@ int main(int argc,char *argv[]) {
         
     std::cout << "Number of points: " << nmax << ".\n";
     int bins = (int)sqrt(nmax);
+    // try to optimize number of bins by changing binmult and seing what is fast.
     ovd::VoronoiDiagram* vd = new ovd::VoronoiDiagram(1,binmult*bins);
     
     std::cout << "version: " << vd->version() << "\n";
     
-    boost::mt19937 rng(42);
+    boost::mt19937 rng(42); // mersenne-twister random number generator
     boost::uniform_01<boost::mt19937> rnd(rng);
     
     std::vector<ovd::Point> pts;
     for (unsigned int m=0;m<nmax;m++) {
-        double x = 0.8*rnd()-0.5;
+        double x = 0.8*rnd()-0.5; // x,y points safely within the unti circle
         double y = 0.8*rnd()-0.5;
         ovd::Point p(x,y);
         pts.push_back(p);
     }
     boost::timer tmr;
     BOOST_FOREACH(ovd::Point p, pts ) {
-        vd->insert_point_site(p);
+        vd->insert_point_site(p); // insert each point. This returns an int-handle which we do not use here.
     }
-    //tmr.stop();
     double t = tmr.elapsed();
     std::cout << t << " seconds \n";
     double norm = nmax*log((double)nmax)/log(2.0);

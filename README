@@ -8,7 +8,8 @@ and released under GPLv3 (see COPYING).
 
 Voronoi diagrams are used for many purposes in computational geometry,
 but the motivation for OpenVoronoi has mainly been 2D offset-generation
-(see offset.hpp) for cnc mill toolpath calcuations.
+(see offset.hpp) for cnc mill toolpath calcuations. An experimental approximate
+medial-axis filter (medial_axis.hpp) has been added.
 
 The OpenVoronoi project is at 
 https://github.com/aewallin/openvoronoi
@@ -31,9 +32,14 @@ $ cd bld
 $ cmake ../src
 $ make
 $ sudo make install
-TODO: 
+Build/packaging TODO: 
 - have separate targets for pure c++ library and python module.
 - build(and install on github) doxygen html documentation
+- look at making a package with cpack
+- a PPA to host the package?
+
+Working Platforms
+- Ubuntu 11.10 (gcc 4.6.1 with Boost 1.46.1)
 
 Organization
 doc/        has documentation in lyx format, with figures in asymptote format. 

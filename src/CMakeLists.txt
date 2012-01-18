@@ -284,7 +284,7 @@ set(CPACK_DEBIAN_DISTRIBUTION_NAME ubuntu)
 set(CPACK_DEBIAN_DISTRIBUTION_RELEASES oneiric) 
 set(CPACK_PACKAGE_DESCRIPTION_FILE ${CMAKE_SOURCE_DIR}/debian_package_description.txt)
 set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/debian_copyright.txt)
-set(CPACK_DEBIAN_CHANGELOG "  * First try at debian source-package.")
+set(CPACK_DEBIAN_CHANGELOG "  * Lated development version of OpenVoronoi.")
 set(DPUT_HOST ppa:anders-e-e-wallin/openvoronoi)
 # this creates a debian source package.
 # it can be uploaded to a PPA with "make dput"

@@ -51,7 +51,7 @@ MESSAGE(STATUS "Debian package section: " ${CPACK_DEBIAN_PACKAGE_SECTION})
 IF(NOT CPACK_DEBIAN_PACKAGE_PRIORITY)
   SET(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
 ENDIF(NOT CPACK_DEBIAN_PACKAGE_PRIORITY)
-MESSAGE(STATUS "Debian package section: " ${CPACK_DEBIAN_PACKAGE_PRIORITY})
+MESSAGE(STATUS "Debian package priority: " ${CPACK_DEBIAN_PACKAGE_PRIORITY})
 
 file(STRINGS ${CPACK_PACKAGE_DESCRIPTION_FILE} DESC_LINES)
 foreach(LINE ${DESC_LINES})
@@ -87,19 +87,20 @@ execute_process(COMMAND ${CMAKE_COMMAND} -E tar czf "${CPACK_DEBIAN_PACKAGE_NAME
                 WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/Debian)
 MESSAGE(STATUS " tar created." )
 
-set(DEB_SOURCE_CHANGES)
+set(DEB_SOURCE_CHANGES) # clear variable
 foreach(RELEASE ${CPACK_DEBIAN_DISTRIBUTION_RELEASES})
     MESSAGE(STATUS " processing release: " ${RELEASE})
-  set(DEBIAN_SOURCE_DIR "${DEBIAN_SOURCE_ORIG_DIR}-${CPACK_DEBIAN_DISTRIBUTION_NAME}1~${RELEASE}1")
-  MESSAGE(STATUS "  release source dir: " ${DEBIAN_SOURCE_DIR})
-  set(RELEASE_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION}-${CPACK_DEBIAN_DISTRIBUTION_NAME}1~${RELEASE}1")
-  MESSAGE(STATUS "  release package version: " ${RELEASE_PACKAGE_VERSION})
-  file(MAKE_DIRECTORY ${DEBIAN_SOURCE_DIR}/debian)
-  ##############################################################################
-  # debian/control
-  MESSAGE(STATUS "  creating debian/control file.")
-  set(DEBIAN_CONTROL ${DEBIAN_SOURCE_DIR}/debian/control)
-  file(WRITE ${DEBIAN_CONTROL}
+    set(DEBIAN_SOURCE_DIR "${DEBIAN_SOURCE_ORIG_DIR}-${CPACK_DEBIAN_DISTRIBUTION_NAME}1~${RELEASE}1")
+    MESSAGE(STATUS "  release source dir: " ${DEBIAN_SOURCE_DIR})
+    set(RELEASE_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION}-${CPACK_DEBIAN_DISTRIBUTION_NAME}1~${RELEASE}1")
+    MESSAGE(STATUS "  release package version: " ${RELEASE_PACKAGE_VERSION})
+    file(MAKE_DIRECTORY ${DEBIAN_SOURCE_DIR}/debian)
+    
+    ##############################################################################
+    # debian/control
+    MESSAGE(STATUS "  creating debian/control file.")
+    set(DEBIAN_CONTROL ${DEBIAN_SOURCE_DIR}/debian/control)
+    file(WRITE ${DEBIAN_CONTROL}
     "Source: ${CPACK_DEBIAN_PACKAGE_NAME}\n"
     "Section: ${CPACK_DEBIAN_PACKAGE_SECTION}\n"
     "Priority: ${CPACK_DEBIAN_PACKAGE_PRIORITY}\n"
@@ -108,66 +109,65 @@ foreach(RELEASE ${CPACK_DEBIAN_DISTRIBUTION_RELEASES})
     "Build-Depends: "
     )
 
-  foreach(DEP ${CPACK_DEBIAN_BUILD_DEPENDS})
-    MESSAGE(STATUS "   build-depency: " ${DEP})
-    file(APPEND ${DEBIAN_CONTROL} "${DEP}, ")
-  endforeach(DEP ${CPACK_DEBIAN_BUILD_DEPENDS})
+    foreach(DEP ${CPACK_DEBIAN_BUILD_DEPENDS})
+        MESSAGE(STATUS "   build-depency: " ${DEP})
+        file(APPEND ${DEBIAN_CONTROL} "${DEP}, ")
+    endforeach(DEP ${CPACK_DEBIAN_BUILD_DEPENDS})
 
-  file(APPEND ${DEBIAN_CONTROL} "\n"
-    "Standards-Version: 3.9.2\n"
-    "Homepage: ${CPACK_PACKAGE_VENDOR}\n"
-    "\n"
-    "Package: ${CPACK_DEBIAN_PACKAGE_NAME}\n"
-    "Architecture: any\n"
-    "Suggests: ${CPACK_DEBIAN_BUILD_SUGGESTS}\n"
-    "Depends: "
+    file(APPEND ${DEBIAN_CONTROL} "\n"
+        "Standards-Version: 3.9.2\n"
+        "Homepage: ${CPACK_PACKAGE_VENDOR}\n"
+        "\n"
+        "Package: ${CPACK_DEBIAN_PACKAGE_NAME}\n"
+        "Architecture: any\n"
+        "Suggests: ${CPACK_DEBIAN_BUILD_SUGGESTS}\n"
+        "Depends: "
     )
     
-  set(DEBHELP_DEPENDS "\${misc:Depends}")
-  file(APPEND ${DEBIAN_CONTROL} "${DEBHELP_DEPENDS}, ")
+    set(DEBHELP_DEPENDS "\${misc:Depends}")
+    file(APPEND ${DEBIAN_CONTROL} "${DEBHELP_DEPENDS}, ")
   
-  foreach(DEP ${CPACK_DEBIAN_PACKAGE_DEPENDS})
-    MESSAGE(STATUS "   package-depency: " ${DEP})
-    file(APPEND ${DEBIAN_CONTROL} "${DEP}, ")
-  endforeach(DEP ${CPACK_DEBIAN_PACKAGE_DEPENDS})  
+    foreach(DEP ${CPACK_DEBIAN_PACKAGE_DEPENDS})
+        MESSAGE(STATUS "   package-depency: " ${DEP})
+        file(APPEND ${DEBIAN_CONTROL} "${DEP}, ")
+    endforeach(DEP ${CPACK_DEBIAN_PACKAGE_DEPENDS})  
 
-  file(APPEND ${DEBIAN_CONTROL} "\n"
-    "Description: ${CPACK_PACKAGE_DISPLAY_NAME} ${CPACK_PACKAGE_DESCRIPTION_SUMMARY}\n"
-    "${DEB_LONG_DESCRIPTION}"
-    )
-
-  foreach(COMPONENT ${CPACK_COMPONENTS_ALL})
-    string(TOUPPER ${COMPONENT} UPPER_COMPONENT)
-    set(DEPENDS "\${shlibs:Depends}")
-    foreach(DEP ${CPACK_COMPONENT_${UPPER_COMPONENT}_DEPENDS})
-      set(DEPENDS "${DEPENDS}, ${DEP}")
-    endforeach(DEP ${CPACK_COMPONENT_${UPPER_COMPONENT}_DEPENDS})
     file(APPEND ${DEBIAN_CONTROL} "\n"
-      "Package: ${COMPONENT}\n"
-      "Architecture: any\n"
-      "Depends: ${DEPENDS}\n"
-      "Description: ${CPACK_PACKAGE_DISPLAY_NAME} ${CPACK_COMPONENT_${UPPER_COMPONENT}_DISPLAY_NAME}\n"
-      "${DEB_LONG_DESCRIPTION}"
-      " .\n"
-      " ${CPACK_COMPONENT_${UPPER_COMPONENT}_DESCRIPTION}\n"
-      )
-  endforeach(COMPONENT ${CPACK_COMPONENTS_ALL})
-
-  MESSAGE(STATUS "  creating debian/control DONE.")
-  
-  ##############################################################################
-  # debian/copyright
-  MESSAGE(STATUS "  creating debian/coyright.")
-  set(DEBIAN_COPYRIGHT ${DEBIAN_SOURCE_DIR}/debian/copyright)
-  execute_process(COMMAND ${CMAKE_COMMAND} -E
-    copy ${CPACK_RESOURCE_FILE_LICENSE} ${DEBIAN_COPYRIGHT}
+        "Description: ${CPACK_PACKAGE_DISPLAY_NAME} ${CPACK_PACKAGE_DESCRIPTION_SUMMARY}\n"
+        "${DEB_LONG_DESCRIPTION}"
     )
 
-  ##############################################################################
-  # debian/rules
-  MESSAGE(STATUS "  creating debian/rules.")
-  set(DEBIAN_RULES ${DEBIAN_SOURCE_DIR}/debian/rules)
-  file(WRITE ${DEBIAN_RULES}
+    foreach(COMPONENT ${CPACK_COMPONENTS_ALL})
+        string(TOUPPER ${COMPONENT} UPPER_COMPONENT)
+        set(DEPENDS "\${shlibs:Depends}")
+        foreach(DEP ${CPACK_COMPONENT_${UPPER_COMPONENT}_DEPENDS})
+            set(DEPENDS "${DEPENDS}, ${DEP}")
+        endforeach(DEP ${CPACK_COMPONENT_${UPPER_COMPONENT}_DEPENDS})
+        file(APPEND ${DEBIAN_CONTROL} "\n"
+            "Package: ${COMPONENT}\n"
+            "Architecture: any\n"
+            "Depends: ${DEPENDS}\n"
+            "Description: ${CPACK_PACKAGE_DISPLAY_NAME} ${CPACK_COMPONENT_${UPPER_COMPONENT}_DISPLAY_NAME}\n"
+            "${DEB_LONG_DESCRIPTION}"
+            " .\n"
+            " ${CPACK_COMPONENT_${UPPER_COMPONENT}_DESCRIPTION}\n"
+        )
+    endforeach(COMPONENT ${CPACK_COMPONENTS_ALL})
+    MESSAGE(STATUS "  creating debian/control DONE.")
+  
+    ##############################################################################
+    # debian/copyright
+    MESSAGE(STATUS "  creating debian/coyright.")
+    set(DEBIAN_COPYRIGHT ${DEBIAN_SOURCE_DIR}/debian/copyright)
+    execute_process(COMMAND ${CMAKE_COMMAND} -E
+            copy ${CPACK_RESOURCE_FILE_LICENSE} ${DEBIAN_COPYRIGHT}
+    )
+
+    ##############################################################################
+    # debian/rules
+    MESSAGE(STATUS "  creating debian/rules.")
+    set(DEBIAN_RULES ${DEBIAN_SOURCE_DIR}/debian/rules)
+    file(WRITE ${DEBIAN_RULES}
     "#!/usr/bin/make -f\n"
     "\n"
     "BUILDDIR = build_dir\n"
@@ -196,76 +196,86 @@ foreach(RELEASE ${CPACK_DEBIAN_DISTRIBUTION_RELEASES})
     "	dpkg-gensymbols -p${CPACK_DEBIAN_PACKAGE_NAME}\n"
     )
 
-  foreach(COMPONENT ${CPACK_COMPONENTS_ALL})
-    set(PATH debian/${COMPONENT})
-    file(APPEND ${DEBIAN_RULES}
-      "	cd $(BUILDDIR); cmake -DCOMPONENT=${COMPONENT} -DCMAKE_INSTALL_PREFIX=../${PATH}/usr -P cmake_install.cmake\n"
-      "	mkdir -p ${PATH}/DEBIAN\n"
-      "	dpkg-gensymbols -p${COMPONENT} -P${PATH}\n"
-      )
-  endforeach(COMPONENT ${CPACK_COMPONENTS_ALL})
+    foreach(COMPONENT ${CPACK_COMPONENTS_ALL})
+        set(PATH debian/${COMPONENT})
+        file(APPEND ${DEBIAN_RULES}
+        "	cd $(BUILDDIR); cmake -DCOMPONENT=${COMPONENT} -DCMAKE_INSTALL_PREFIX=../${PATH}/usr -P cmake_install.cmake\n"
+        "	mkdir -p ${PATH}/DEBIAN\n"
+        "	dpkg-gensymbols -p${COMPONENT} -P${PATH}\n"
+        )
+    endforeach(COMPONENT ${CPACK_COMPONENTS_ALL})
 
-  file(APPEND ${DEBIAN_RULES}
+    file(APPEND ${DEBIAN_RULES}
     "	dh_shlibdeps\n"
     "	dh_strip\n" # for reducing size
     "	dpkg-gencontrol -p${CPACK_DEBIAN_PACKAGE_NAME}\n"
     "	dpkg --build debian/tmp ..\n"
     )
 
-  foreach(COMPONENT ${CPACK_COMPONENTS_ALL})
-    set(PATH debian/${COMPONENT})
+    foreach(COMPONENT ${CPACK_COMPONENTS_ALL})
+        set(PATH debian/${COMPONENT})
+        file(APPEND ${DEBIAN_RULES}
+          "	dpkg-gencontrol -p${COMPONENT} -P${PATH} -Tdebian/${COMPONENT}.substvars\n"
+          "	dpkg --build ${PATH} ..\n"
+        )
+    endforeach(COMPONENT ${CPACK_COMPONENTS_ALL})
+
     file(APPEND ${DEBIAN_RULES}
-      "	dpkg-gencontrol -p${COMPONENT} -P${PATH} -Tdebian/${COMPONENT}.substvars\n"
-      "	dpkg --build ${PATH} ..\n"
-      )
-  endforeach(COMPONENT ${CPACK_COMPONENTS_ALL})
-
-  file(APPEND ${DEBIAN_RULES}
-    "\n"
-    "clean:\n"
-    "	rm -f build\n"
-    "	rm -rf $(BUILDDIR)\n"
-    "\n"
-    ".PHONY: binary binary-arch binary-indep clean\n"
+        "\n"
+        "clean:\n"
+        "	rm -f build\n"
+        "	rm -rf $(BUILDDIR)\n"
+        "\n"
+        ".PHONY: binary binary-arch binary-indep clean\n"
     )
 
-  execute_process(COMMAND chmod +x ${DEBIAN_RULES})
+    execute_process(COMMAND chmod +x ${DEBIAN_RULES})
 
-  ##############################################################################
-  # debian/compat
-  file(WRITE ${DEBIAN_SOURCE_DIR}/debian/compat "7")
+    ##############################################################################
+    # debian/compat
+    file(WRITE ${DEBIAN_SOURCE_DIR}/debian/compat "7")
 
-  ##############################################################################
-  # debian/source/format
-  file(WRITE ${DEBIAN_SOURCE_DIR}/debian/source/format "3.0 (quilt)")
+    ##############################################################################
+    # debian/source/format
+    file(WRITE ${DEBIAN_SOURCE_DIR}/debian/source/format "3.0 (quilt)")
 
-  ##############################################################################
-  # debian/changelog
-  set(DEBIAN_CHANGELOG ${DEBIAN_SOURCE_DIR}/debian/changelog)
-  execute_process(COMMAND date -R  OUTPUT_VARIABLE DATE_TIME)
-  file(WRITE ${DEBIAN_CHANGELOG}
-    "${CPACK_DEBIAN_PACKAGE_NAME} (${RELEASE_PACKAGE_VERSION}) ${RELEASE}; urgency=low\n\n"
-    "  * Package built with CMake\n\n"
-    "${CPACK_DEBIAN_CHANGELOG} \n"
-    " -- ${CPACK_PACKAGE_CONTACT}  ${DATE_TIME}"
+    ##############################################################################
+    # debian/changelog
+    set(DEBIAN_CHANGELOG ${DEBIAN_SOURCE_DIR}/debian/changelog)
+    execute_process(COMMAND date -R  OUTPUT_VARIABLE DATE_TIME)
+    file(WRITE ${DEBIAN_CHANGELOG}
+        "${CPACK_DEBIAN_PACKAGE_NAME} (${RELEASE_PACKAGE_VERSION}) ${RELEASE}; urgency=low\n\n"
+        "  * Package built with CMake\n\n"
+        "${CPACK_DEBIAN_CHANGELOG} \n"
+        " -- ${CPACK_PACKAGE_CONTACT}  ${DATE_TIME}"
     )
 
-  ##############################################################################
-  # debuild -S
-  if( DEB_SOURCE_CHANGES )
-    set(DEBUILD_OPTIONS "-sd")
-  else()
-    set(DEBUILD_OPTIONS "-sa")
-  endif()
-  set(SOURCE_CHANGES_FILE "${CPACK_DEBIAN_PACKAGE_NAME}_${RELEASE_PACKAGE_VERSION}_source.changes")
-  set(DEB_SOURCE_CHANGES ${DEB_SOURCE_CHANGES} "${SOURCE_CHANGES_FILE}")
-  add_custom_command(OUTPUT "${SOURCE_CHANGES_FILE}" COMMAND ${DEBUILD_EXECUTABLE} -S ${DEBUILD_OPTIONS} WORKING_DIRECTORY ${DEBIAN_SOURCE_DIR})
+    ##############################################################################
+    # debuild -S
+    
+    if( DEB_SOURCE_CHANGES )
+        MESSAGE(STATUS "  debuild -sd")
+        set(DEBUILD_OPTIONS "-sd")
+    else()
+        MESSAGE(STATUS "  debuild -sa")
+        set(DEBUILD_OPTIONS "-sa")
+    endif()
+  
+    set(SOURCE_CHANGES_FILE "${CPACK_DEBIAN_PACKAGE_NAME}_${RELEASE_PACKAGE_VERSION}_source.changes")
+    set(DEB_SOURCE_CHANGES ${DEB_SOURCE_CHANGES} "${SOURCE_CHANGES_FILE}")
+    add_custom_command(
+           OUTPUT "${SOURCE_CHANGES_FILE}" 
+           COMMAND ${DEBUILD_EXECUTABLE} -S ${DEBUILD_OPTIONS} 
+           WORKING_DIRECTORY ${DEBIAN_SOURCE_DIR}
+    )
+    
 endforeach(RELEASE ${CPACK_DEBIAN_DISTRIBUTION_RELEASES})
 
 ##############################################################################
 # dput ppa:your-lp-id/ppa <source.changes>
 
 MESSAGE(STATUS "  DPUT_HOST is: " ${DPUT_HOST})
+MESSAGE(STATUS "  will upload: " ${DEB_SOURCE_CHANGES} )
 add_custom_target(dput ${DPUT_EXECUTABLE} ${DPUT_HOST} ${DEB_SOURCE_CHANGES} 
               DEPENDS ${DEB_SOURCE_CHANGES} 
               WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/Debian)

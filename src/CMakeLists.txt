@@ -251,16 +251,41 @@ execute_process(
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
+
+
+
+#set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "2D voronoi diagram algorithm")
+#set(CPACK_DEBIAN_PACKAGE_SECTION "science")
+#set(CPACK_DEBIAN_PACKAGE_VERSION "")
+#set(CPACK_DEBIAN_PACKAGE_DEPENDS "python, libboost-python-dev, libqd" )
+#set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE ${DEB_ARCHITECTURE})
+#SET(CPACK_PACKAGE_VERSION_MAJOR "11") # todo: find the version automatically from the git-tag
+#SET(CPACK_PACKAGE_VERSION_MINOR "10")
+#set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}")
+
 set(CPACK_GENERATOR "DEB")
-set(CPACK_DEBIAN_PACKAGE_MAINTAINER "anders.e.e.wallin@gmail.com")
+#set(CPACK_DEBIAN_PACKAGE_MAINTAINER "anders.e.e.wallin@gmail.com")
+set(CPACK_PACKAGE_CONTACT "Anders Wallin <anders.e.e.wallin@gmail.com>")
 set(CPACK_PACKAGE_NAME "OpenVoronoi")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "2D voronoi diagram algorithm")
+set(CPACK_DEBIAN_BUILD_DEPENDS debhelper cmake)
 set(CPACK_DEBIAN_PACKAGE_SECTION "science")
-set(CPACK_DEBIAN_PACKAGE_VERSION "")
-set(CPACK_DEBIAN_PACKAGE_DEPENDS "python, libboost-python-dev, libqd" )
+set(CPACK_DEBIAN_PACKAGE_VERSION 12.01)
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "python, git, cmake, libboost-python-dev, libqd0, libqd-dev, libboost-graph" )
 set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE ${DEB_ARCHITECTURE})
-SET(CPACK_PACKAGE_VERSION_MAJOR "11") # todo: find the version automatically from the git-tag
-SET(CPACK_PACKAGE_VERSION_MINOR "10")
+set(CPACK_DEBIAN_PACKAGE_PRIORITY optional)
+SET(CPACK_PACKAGE_VERSION "12.01")  # FIXME: figure these out from the git-tag
+SET(CPACK_PACKAGE_VERSION_MAJOR "12")
+SET(CPACK_PACKAGE_VERSION_MINOR "01")
 set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}")
+set(CPACK_DEBIAN_DISTRIBUTION_NAME ubuntu)
+set(CPACK_DEBIAN_DISTRIBUTION_RELEASES oneiric) 
+set(CPACK_PACKAGE_DESCRIPTION_FILE ${CMAKE_SOURCE_DIR}/debian_package_description.txt)
+set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/debian_copyright.txt)
+set(CPACK_DEBIAN_CHANGELOG "  * First try at debian source-package.")
+set(DPUT_HOST ppa:anders-e-e-wallin/openvoronoi)
+# this creates a debian source package.
+# it can be uploaded to a PPA with "make dput"
+INCLUDE(DebSourcePPA.cmake)
 
 include(CPack) # this should be last

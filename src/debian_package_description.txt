@@ -1,0 +1,4 @@
+2D voronoi-diagram for point and line-segment sites.
+A C++ library with python bindings.
+2D offsets and medial axis based on the voronoi diagram.
+Topology-oriented incremental algorithm.

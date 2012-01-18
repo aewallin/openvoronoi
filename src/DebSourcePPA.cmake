@@ -114,7 +114,7 @@ foreach(RELEASE ${CPACK_DEBIAN_DISTRIBUTION_RELEASES})
   endforeach(DEP ${CPACK_DEBIAN_BUILD_DEPENDS})
 
   file(APPEND ${DEBIAN_CONTROL} "\n"
-    "Standards-Version: 3.8.4\n"
+    "Standards-Version: 3.9.2\n"
     "Homepage: ${CPACK_PACKAGE_VENDOR}\n"
     "\n"
     "Package: ${CPACK_DEBIAN_PACKAGE_NAME}\n"
@@ -122,7 +122,10 @@ foreach(RELEASE ${CPACK_DEBIAN_DISTRIBUTION_RELEASES})
     "Suggests: ${CPACK_DEBIAN_BUILD_SUGGESTS}\n"
     "Depends: "
     )
-
+    
+  set(DEBHELP_DEPENDS "\${misc:Depends}")
+  file(APPEND ${DEBIAN_CONTROL} "${DEBHELP_DEPENDS}, ")
+  
   foreach(DEP ${CPACK_DEBIAN_PACKAGE_DEPENDS})
     MESSAGE(STATUS "   package-depency: " ${DEP})
     file(APPEND ${DEBIAN_CONTROL} "${DEP}, ")
@@ -174,6 +177,14 @@ foreach(RELEASE ${CPACK_DEBIAN_DISTRIBUTION_RELEASES})
     "	cd $(BUILDDIR); cmake -DCMAKE_BUILD_TYPE=Release -DOPT_BIN_SUFFIX=ON -DBASH_COMPLETION_DIR=../etc/bash_completion.d -DCMAKE_INSTALL_PREFIX=/usr ..\n"
     "	$(MAKE) -C $(BUILDDIR) preinstall\n"
     "	touch build\n"
+    "\n"
+    "build: build-arch build-indep\n"
+    "\n"
+    "build-arch: build-stamp\n"
+    "\n"
+    "build-indep: build-stamp\n"
+    "\n"
+    "build-stamp: build\n"
     "\n"
     "binary: binary-indep binary-arch\n"
     "\n"
@@ -258,3 +269,9 @@ MESSAGE(STATUS "  DPUT_HOST is: " ${DPUT_HOST})
 add_custom_target(dput ${DPUT_EXECUTABLE} ${DPUT_HOST} ${DEB_SOURCE_CHANGES} 
               DEPENDS ${DEB_SOURCE_CHANGES} 
               WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/Debian)
+              
+# simulated upload
+add_custom_target(dputs ${DPUT_EXECUTABLE} -s ${DPUT_HOST} ${DEB_SOURCE_CHANGES} 
+              DEPENDS ${DEB_SOURCE_CHANGES} 
+              WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/Debian)
+              

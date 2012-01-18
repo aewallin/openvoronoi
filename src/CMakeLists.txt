@@ -264,10 +264,12 @@ execute_process(
 #set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}")
 
 set(CPACK_GENERATOR "DEB")
-#set(CPACK_DEBIAN_PACKAGE_MAINTAINER "anders.e.e.wallin@gmail.com")
+
 set(CPACK_PACKAGE_CONTACT "Anders Wallin <anders.e.e.wallin@gmail.com>")
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Anders Wallin <anders.e.e.wallin@gmail.com>")
 set(CPACK_PACKAGE_NAME "OpenVoronoi")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "2D voronoi diagram algorithm")
+set(CPACK_PACKAGE_VENDOR https://github.com/aewallin/opencamlib)
 set(CPACK_DEBIAN_BUILD_DEPENDS debhelper cmake)
 set(CPACK_DEBIAN_PACKAGE_SECTION "science")
 set(CPACK_DEBIAN_PACKAGE_VERSION 12.01)

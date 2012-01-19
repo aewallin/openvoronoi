@@ -2,21 +2,6 @@ project(OpenVoronoi)
 
 cmake_minimum_required(VERSION 2.4)
 
-# some options to set what is built:
-option(BUILD_CXX_LIB
-  "Build/install the pure c++ library? " ON)
-
-option(BUILD_PY_LIB 
-  "Build/install the python ocl library? " ON)
-
-
-if (NOT BUILD_CXX_LIB)
-    MESSAGE(STATUS " Note: will NOT build pure c++ library")
-endif(NOT BUILD_CXX_LIB)
-
-if (NOT BUILD_PY_LIB)
-    MESSAGE(STATUS " Note: will NOT build python library")
-endif(NOT BUILD_PY_LIB)
 
 #
 # Turn compiler warnings up to 11, at least with gcc.  I dont know how to
@@ -121,7 +106,12 @@ set( OVD_INCLUDE_FILES
     ${OpenVoronoi_SOURCE_DIR}/checker.hpp
     ${OpenVoronoi_SOURCE_DIR}/vertex_positioner.hpp
     ${OpenVoronoi_SOURCE_DIR}/facegrid.hpp
+    
     ${OpenVoronoi_SOURCE_DIR}/offset.hpp
+    ${OpenVoronoi_SOURCE_DIR}/offset2.hpp
+    ${OpenVoronoi_SOURCE_DIR}/medial_axis.hpp
+    ${OpenVoronoi_SOURCE_DIR}/polygon_interior.hpp
+    
     ${CMAKE_CURRENT_BINARY_DIR}/version_string.hpp
 )
 
@@ -148,23 +138,13 @@ add_library(
     SHARED
     ${OVD_SRC}
 )
-add_dependencies( 
-    libopenvoronoi
-    version_string 
-)
 set_target_properties(libopenvoronoi PROPERTIES PREFIX "")
-# todo: figure out the git-tag automatically and use it as the version/suffix
-#
 
 # the pure c++ shared library
 add_library(
     openvoronoi_static
     STATIC
     ${OVD_SRC}
-)
-add_dependencies( 
-    openvoronoi_static
-    version_string 
 )
 
 # this makes the Python module
@@ -242,7 +222,7 @@ execute_process(
 
 
 #message( STATUS " git commit id: " ${GIT_COMMIT_ID})
-# parse the commit id to get major, minor, 
+# parse the commit id to get major, minor, patch
 STRING(REGEX REPLACE "([0-9][0-9]).*" "\\1" GIT_MAJOR_VERSION "${GIT_COMMIT_ID}" )
 #MESSAGE(STATUS "result= ${GIT_MAJOR_VERSION}")
 STRING(REGEX REPLACE "[0-9][0-9].([0-9][0-9])-.*" "\\1" GIT_MINOR_VERSION "${GIT_COMMIT_ID}" )
@@ -250,22 +230,12 @@ STRING(REGEX REPLACE "[0-9][0-9].([0-9][0-9])-.*" "\\1" GIT_MINOR_VERSION "${GIT
 STRING(REGEX REPLACE "[0-9][0-9].[0-9][0-9]-(.*)-.*" "\\1" GIT_PATCH_VERSION "${GIT_COMMIT_ID}" )
 #MESSAGE(STATUS "result= ${GIT_PATCH_VERSION}")
 
-#set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "2D voronoi diagram algorithm")
-#set(CPACK_DEBIAN_PACKAGE_SECTION "science")
-#set(CPACK_DEBIAN_PACKAGE_VERSION "")
-#set(CPACK_DEBIAN_PACKAGE_DEPENDS "python, libboost-python-dev, libqd" )
-#set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE ${DEB_ARCHITECTURE})
-#SET(CPACK_PACKAGE_VERSION_MAJOR "11") # todo: find the version automatically from the git-tag
-#SET(CPACK_PACKAGE_VERSION_MINOR "10")
-#set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}")
-
 set(CPACK_GENERATOR "DEB")
 set(CPACK_PACKAGE_CONTACT "Anders Wallin <anders.e.e.wallin@gmail.com>" CACHE STRING "email")
 set(CPACK_PACKAGE_NAME "openvoronoi" CACHE STRING "name")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "openvoronoi" CACHE STRING "name")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "2D voronoi diagram algorithm" CACHE STRING "name")
 set(CPACK_PACKAGE_VENDOR https://github.com/aewallin/opencamlib)
 set(CPACK_DEBIAN_PACKAGE_SECTION "science" CACHE STRING "name")
-#set(CPACK_DEBIAN_PACKAGE_VERSION 11.09 CACHE STRING "name")
 set(CPACK_DEBIAN_BUILD_DEPENDS debhelper python git cmake libboost-dev libqd0 libqd-dev libboost-python-dev libgomp1 CACHE STRINGS "name")
 set(CPACK_DEBIAN_PACKAGE_DEPENDS python git cmake libboost-python libqd0 libgomp1 CACHE STRING "name")
 set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE ${DEB_ARCHITECTURE} CACHE STRING "name")
@@ -275,9 +245,6 @@ SET(CPACK_PACKAGE_VERSION "${GIT_MAJOR_VERSION}.${GIT_MINOR_VERSION}.${GIT_PATCH
 set_target_properties(libopenvoronoi PROPERTIES VERSION ${CPACK_PACKAGE_VERSION}) 
 set_target_properties(openvoronoi PROPERTIES VERSION ${CPACK_PACKAGE_VERSION}) 
 
-#SET(CPACK_PACKAGE_VERSION_MAJOR ${GIT_MAJOR_VERSION} CACHE STRING "name")
-#SET(CPACK_PACKAGE_VERSION_MINOR "${GIT_MINOR_VERSION}.${GIT_PATCH_VERSION}" CACHE STRING "name")
-#SET(CPACK_PACKAGE_VERSION_PATCH ${GIT_PATCH_VERSION} CACHE STRING "name")
 set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}" CACHE STRING "name")
 set(CPACK_DEBIAN_DISTRIBUTION_NAME ubuntu CACHE STRING "name")
 set(CPACK_DEBIAN_DISTRIBUTION_RELEASES oneiric CACHE STRING "name") 
@@ -286,21 +253,11 @@ set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/debian_copyright.txt CACHE S
 set(CPACK_DEBIAN_CHANGELOG "  * Latest development version." CACHE STRING "name")
 set(DEB_SRC_DIR ${CMAKE_SOURCE_DIR} CACHE STRING "name" )
 
-
-# set(DPUT_HOST ppa:anders-e-e-wallin/openvoronoi)
-
-
-# this creates a debian source package.
-# it can be uploaded to a PPA with "make dput"
-#INCLUDE(DebSourcePPA.cmake)
-
 # run the source package generation as a target, so we don't have to do it every time
 add_custom_target(spackage 
               ${CMAKE_COMMAND} -C ${CMAKE_BINARY_DIR}/CMakeCache.txt
               -P ${CMAKE_CURRENT_SOURCE_DIR}/DebSourcePPA.cmake 
               # WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
             ) # get the changes file as an output from here?
-
-
 
 include(CPack) # this should be last

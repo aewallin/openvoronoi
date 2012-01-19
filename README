@@ -18,6 +18,7 @@ The mailing-list for OpenVoronoi is at
 https://groups.google.com/forum/?hl=en#!forum/opencamlib
 
 Dependencies
+python
 git (required only for the version-string)
 cmake
 Boost graph library
@@ -25,18 +26,26 @@ Boost python (if python bindings are built)
 libQD (a quad-precision arithmetic library). Available as package 
 "liqd-dev" on ubuntu. See "http://crd.lbl.gov/~dhbailey/mpdist/
 
-Build instructions
-This project uses cmake, and can be built out-of-source:
+Build/Install instructions
+
+From PPA (works on Ubuntu 11.10 oneiric)
+sudo add-apt-repository ppa:anders-e-e-wallin/openvoronoi 
+sudo apt-get update
+sudo apt-get install openvoronoi
+
+From source
+$ git clone git://github.com/aewallin/openvoronoi.git
+$ cd openvoronoi
 $ mkdir bld
 $ cd bld
 $ cmake ../src
 $ make
 $ sudo make install
+
 Build/packaging TODO: 
 - have separate targets for pure c++ library and python module.
 - build(and install on github) doxygen html documentation
 - look at making a package with cpack
-- a PPA to host the package?
 
 Working Platforms
 - Ubuntu 11.10 (gcc 4.6.1 with Boost 1.46.1)

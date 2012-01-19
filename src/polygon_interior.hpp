@@ -30,8 +30,16 @@
 namespace ovd
 {
 
+// this filter sets the valid-property of edges
+// all interior edges are marked valid=true
+// all exterior edges are marked valid=false
+//
+// a polygon/pocket boundary shoud be specified in CW order
+// islands within the polygon should be specified in CCW order
 struct interior_filter {
     interior_filter(HEGraph& gi) : g(gi) { }
+    
+    // determine if an edge is valid or not
     bool operator()(const HEEdge& e) const {
         if (g[e].type == LINESITE || g[e].type == NULLEDGE) 
             return true;
@@ -90,13 +98,9 @@ public:
         interior_filter flt(g);
         g.filter_graph(flt);
     }
-
-
 private:
     PolygonInterior(); // don't use.
     HEGraph& g; // original graph
-    
-
 };
 
 

@@ -48,7 +48,7 @@ Build/packaging TODO:
 - look at making a package with cpack
 
 Working Platforms
-- Ubuntu 11.10 (gcc 4.6.1 with Boost 1.46.1)
+- Ubuntu 11.10 oneiric (gcc 4.6.1 with Boost 1.46.1)
 
 Organization
 doc/        has documentation in lyx format, with figures in asymptote format. 

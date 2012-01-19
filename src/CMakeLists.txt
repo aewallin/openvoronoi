@@ -175,16 +175,14 @@ MESSAGE(STATUS "CMAKE_INSTALL_PREFIX is : " ${CMAKE_INSTALL_PREFIX})
 MESSAGE(STATUS "Python libraries will be installed to: " ${Python_site_packages})
 
 
-if (BUILD_PY_LIB)
+
     # this installs the python library
     install(
         TARGETS openvoronoi
         LIBRARY DESTINATION ${Python_site_packages}
     )
-endif (BUILD_PY_LIB)
 
 # this installs the c++ library
-if (BUILD_CXX_LIB)
     install(
         TARGETS libopenvoronoi
         LIBRARY 
@@ -209,7 +207,6 @@ if (BUILD_CXX_LIB)
         DESTINATION include/openvoronoi/solvers
         PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
     )
-endif (BUILD_CXX_LIB)
 
 
 # "make package" stuff

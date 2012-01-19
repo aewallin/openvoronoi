@@ -2,27 +2,41 @@ import openvoronoi as ovd    # https://github.com/aewallin/openvoronoi
 import ttt                   # https://github.com/aewallin/truetype-tracer
 import time
 
-def line_to(p,z):
-    print "G1 X% 8.6f Y% 8.6f Z% 8.6f" % (p.x, p.y, z)
+scale = 140
+feed = 200
+clearance_height=10
+plunge_height = 2
+plunge_feed = 100
 
+def line_to(p,z):
+    print "G1 X% 8.6f Y% 8.6f Z% 8.6f F%.0f" % (scale*p.x, scale*p.y, scale*z, feed)
+
+# no arc-output in medial axis!
+"""
 def arc_to( p, r, cen, cw ):
     if (cw):
-        print "G2 X% 8.5f Y% 8.5f R% 8.5f" % (p.x, p.y, r)
+        print "G2 X% 8.5f Y% 8.5f R% 8.5f" % (scale*p.x, scale*p.y, scale*r)
     else:
-        print "G3 X% 8.5f Y% 8.5f R% 8.5f" % (p.x, p.y, r)
-        
+        print "G3 X% 8.5f Y% 8.5f R% 8.5f" % (scale*p.x, scale*p.y, scale*r)
+"""
+
 def rapid_to(p):
-    print "G0 X% 8.4f Y% 8.4f " % (p.x, p.y)
+    print "G0 X% 8.4f Y% 8.4f " % (scale*p.x, scale*p.y)
     
-clearance_height=0.1
+
 
 def pen_up():
     print "G0Z% 8.4f " % (clearance_height)
-def pen_down():
-    print "G0Z0"
 
+
+
+def pen_down():
+    print "G0Z% 8.4f" % (plunge_height)
+    print "G1Z0F% 8.0f" % (plunge_feed)
+    
+    
 def plunge(p,z):
-    print "G1 X% 8.4f Y% 8.4f Z% 8.4f" % (p.x, p.y, z)
+    print "G1 X% 8.4f Y% 8.4f Z% 8.4f" % (scale*p.x, scale*p.y, scale*z)
     
 
 # naive medial-axis printer
@@ -150,9 +164,10 @@ def ttt_segments(text,scale):
     return segs
 
 def preamble():
-    print "G20 F6"
+    print "G21 F% 8.0f" % (feed) # G20 F6 for inch
     print "G64 P0.001"
-    print "G0 X0 Y0 Z0"
+    pen_up()
+    print "G0 X0 Y0"
     
 def postamble():
     pen_up()
@@ -167,7 +182,7 @@ if __name__ == "__main__":
     print "( OpenVoronoi",vd.version()," )"
     
     # get segments from ttt. NOTE: must set scale so all geometry fits within unit-circle!
-    segs = ttt_segments(  "EMC2", 20000) # (text, scale) all coordinates are divided by scale
+    segs = ttt_segments(  "EMC2", 15000) # (text, scale) all coordinates are divided by scale
     segs = translate(segs, -0.06, 0.05)
     segs = modify_segments(segs)
     

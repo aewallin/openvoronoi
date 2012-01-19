@@ -141,25 +141,19 @@ private:
 
 class MedialAxisWalk {
 public:
-    MedialAxisWalk(HEGraph& gi): g(gi) {
-        //medial_filter f(g);
-        //medial_filter flt(g);
-        //g.filter_graph(flt);
-        
-    }
+    MedialAxisWalk(HEGraph& gi): g(gi) {}
+    
     boost::python::list walk() {
         out = boost::python::list();
         
         HEEdge start;
         while( find_start_edge(start) ) { // find a suitable start-edge
-            ma_walk(start); // from the start-edge, walk as far as possible
+            medial_axis_walk(start); // from the start-edge, walk as far as possible
         }
-        
-        //std::cout << " start edge is "; g.print_edge(start);
         return out;
     }
     
-    void ma_walk(HEEdge start) {
+    void medial_axis_walk(HEEdge start) {
         // start at source of start, and walk as far as possible
         // begin chain with start.
         HEEdge next;
@@ -186,8 +180,6 @@ public:
     }
     
     void append_edge(boost::python::list& list, HEEdge edge)  {
-        //boost::python::list edge_data;
-        
         boost::python::list point_list; // the endpoints of each edge
         HEVertex v1 = g.source( edge );
         HEVertex v2 = g.target( edge );
@@ -199,21 +191,22 @@ public:
             boost::python::list pt2;
             pt2.append( g[v2].position ); pt2.append( g[v2].dist() );
             point_list.append(pt2);
-            //point_list.append( g[v2].position );
         } else if ( g[edge].type == PARABOLA ) { // these edge-types are drawn as polylines with edge_points number of points
             double t_src = g[v1].dist();
             double t_trg = g[v2].dist();
             double t_min = std::min(t_src,t_trg);
             double t_max = std::max(t_src,t_trg);
-            int _edge_points= 20; // number of points to subdivide parabolas
+            int _edge_points= 20; // number of points to subdivide parabolas. FIXME: make this adjustable
             
             for (int n=0;n< _edge_points;n++) {
                 //double t = t_min + n*(t_max-t_min)/(_edge_points-1); // linear
                 double t;
                 if (t_src<=t_trg) // increasing t-value
                     t = t_min + ((t_max-t_min)/sq(_edge_points-1))*sq(n);
-                else if (t_trg<t_src) // decreasing t-value
-                    t = t_max - ((t_max-t_min)/sq(_edge_points))*sq(n);
+                else if (t_trg<t_src) { // decreasing t-value
+                    int m = _edge_points-1-n; // m goes from (N-1)...0   as n goes from 0...(N-1)
+                    t = t_max + ((t_max-t_min)/sq(_edge_points-1))*sq(m);
+                }
                 else
                     exit(-1);
                 Point p = g[edge].point(t);
@@ -222,22 +215,18 @@ public:
                 point_list.append(pt);
             }
         }
-        //edge_data.append( point_list );
-        //edge_data.append( g[edge].type );
-        //edge_data.append( g[v1].status ); // source status
-        //edge_data.append( g[v2].status ); // target status
+
         list.append( point_list );
     }
-    
+    // we are at target(e). find the next suitable edge.
+    // return true if a next-edge was found, false otherwise.
     bool next_edge(HEEdge e, HEEdge& next) {
         HEVertex trg = g.target(e);
         EdgeVector out_edges = g.out_edges(trg);
-        //int count(0);
         std::vector<HEEdge> valid_edges;
         BOOST_FOREACH( HEEdge oe, out_edges) {
             if ( valid_next_edge(oe) ) {
                 valid_edges.push_back(oe);
-                //count++;
             }
         }
         if (!valid_edges.empty() ) {
@@ -251,21 +240,20 @@ public:
         g[e].valid = false;
         g[ g[e].twin ].valid = false;
     }
+    // loop through all edges and find an edge where we can start
+    // valid edges have a source-vertex with exactly one valid out-edge.
     bool find_start_edge(HEEdge& start) {
-        BOOST_FOREACH(HEEdge e, g.edges() ) { // loop through all edges and find an edge where we can start
+        BOOST_FOREACH(HEEdge e, g.edges() ) { 
             if ( valid_next_edge(e) ) {
                 if (degree_one_source(e)) {
                     start = e;
                     return true;
-                } 
-                /*else if ( degree_one_endpoint( g[e].twin ) ) {
-                    start = g[e].twin;
-                    return true;
-                }*/
+                }
             }
         }
         return false;
     }
+    // we can follow an edge if it is valid, and not a LINESITE or NULLEDGE
     bool valid_next_edge(HEEdge e) {
         return ( (g[e].type != LINESITE) && (g[e].type !=NULLEDGE) && (g[e].valid) );
     }
@@ -290,4 +278,4 @@ private:
 
 } // end namespace
 
-// end file polygon_interior.hpp
+// end file medial_axis.hpp

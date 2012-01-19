@@ -156,7 +156,7 @@ public:
     void medial_axis_walk(HEEdge start) {
         // start at source of start, and walk as far as possible
         // begin chain with start.
-        HEEdge next;
+        HEEdge next = start; // why does = HEEdge() cause Wuninitialized ?
         boost::python::list chain;
         append_edge(chain, start);
         set_invalid(start);

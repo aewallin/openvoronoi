@@ -6,6 +6,7 @@
 # where test is the name of the last tagged git revision, 1 is the number of commits since that tag,
 # 'g' is ???, and 5e1fb47 is the first 7 chars of the git sha1 commit id.
 
+
 find_package(Git)
 if(GIT_FOUND)
     execute_process(
@@ -14,27 +15,38 @@ if(GIT_FOUND)
         OUTPUT_VARIABLE GIT_COM_ID 
     )
     if( NOT ${res_var} EQUAL 0 )
-        set( GIT_COMMIT_ID "git commit id unknown")
-        message( WARNING "Git failed (not a repo, or no tags). Build will not contain git revision info." )
+        message( WARNING "Git failed (not a repo, or no tags)." )
+        file(READ "git-tag.txt" GIT_COMMIT_ID)
+        message( STATUS "version_string.cmake read from file GIT_COMMIT_ID: " ${GIT_COMMIT_ID})
+    else()
+        string( REPLACE "\n" "" GIT_COMMIT_ID ${GIT_COM_ID} )
+        message( STATUS "version_string.cmake git set GIT_COMMIT_ID: " ${GIT_COMMIT_ID})
     endif()
-    string( REPLACE "\n" "" GIT_COMMIT_ID ${GIT_COM_ID} )
+    
 else()
-    set( GIT_COMMIT_ID "unknown (git not found!)")
-    message( WARNING "Git not found. Build will not contain git revision info." )
+    # if we don't have git, try to read git-tag from file instead
+    file(READ "git-tag.txt" GIT_COMMIT_ID)
+    
+    #set( GIT_COMMIT_ID "unknown (git not found!)")
+    message( STATUS "version_string.cmake read from file GIT_COMMIT_ID: " ${GIT_COMMIT_ID})
+    #message( WARNING "Git not found. Reading tag from git-tag.txt instead: " ${GIT_COMMIT_ID})
 endif()
-
-message( STATUS "build type = " ${CMAKE_BUILD_TYPE})
 
 set( vstring "//version_string.hpp - written by cmake. changes will be lost!\n"
              "#ifndef VERSION_STRING\n"
-             "#define VERSION_STRING \"${GIT_COMMIT_ID}"\  "${CMAKE_BUILD_TYPE}" "\"\n"
+             "#define VERSION_STRING \"${GIT_COMMIT_ID}\"\n"
              "#endif\n"
 )
-#-"${CMAKE_BUILD_TYPE}"\n"
-file(WRITE version_string.hpp.txt ${vstring} )
-message( STATUS "Git version id: " ${vstring})
+
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/version_string.hpp ${vstring} )
+set_source_files_properties(
+    ${CMAKE_CURRENT_BINARY_DIR}/version_string.hpp
+    PROPERTIES GENERATED TRUE
+    HEADER_FILE_ONLY TRUE
+)
+
 # copy the file to the final header only if the version changes
 # reduces needless rebuilds
-execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                        version_string.hpp.txt ${CMAKE_CURRENT_BINARY_DIR}/version_string.hpp)
+#execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different
+#                        version_string.hpp.txt /version_string.hpp)
 

@@ -200,7 +200,7 @@ if __name__ == "__main__":
     
     
     # segments from ttt
-    segs = ttt_segments(  "lm", 10000)
+    segs = ttt_segments(  "O", 20000)
     segs = translate(segs, -0.06, 0.05)
     segs = modify_segments(segs)
     
@@ -215,7 +215,7 @@ if __name__ == "__main__":
     #of.str()
     ofs_list=[]
     t_before = time.time()
-    for t in [0.008*x for x in range(1,5)]:
+    for t in [0.002*x for x in range(1,10)]:
         ofs = of.offset(t)
         ofs_list.append(ofs)
     

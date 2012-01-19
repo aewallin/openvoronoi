@@ -205,7 +205,7 @@ public:
                     t = t_min + ((t_max-t_min)/sq(_edge_points-1))*sq(n);
                 else if (t_trg<t_src) { // decreasing t-value
                     int m = _edge_points-1-n; // m goes from (N-1)...0   as n goes from 0...(N-1)
-                    t = t_max + ((t_max-t_min)/sq(_edge_points-1))*sq(m);
+                    t = t_min + ((t_max-t_min)/sq(_edge_points-1))*sq(m);
                 }
                 else
                     exit(-1);

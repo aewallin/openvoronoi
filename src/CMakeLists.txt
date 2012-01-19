@@ -273,7 +273,7 @@ set(CPACK_PACKAGE_VENDOR https://github.com/aewallin/opencamlib)
 set(CPACK_DEBIAN_BUILD_DEPENDS debhelper cmake)
 set(CPACK_DEBIAN_PACKAGE_SECTION "science")
 set(CPACK_DEBIAN_PACKAGE_VERSION 12.01)
-set(CPACK_DEBIAN_PACKAGE_DEPENDS "python, git, cmake, libboost-python-dev, libqd0, libqd-dev, libboost-graph" )
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "python, git, cmake, libboost-python, libboost-python-dev, libboost-graph-dev, libqd0, libqd-dev, libboost-graph" )
 set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE ${DEB_ARCHITECTURE})
 set(CPACK_DEBIAN_PACKAGE_PRIORITY optional)
 SET(CPACK_PACKAGE_VERSION "12.01")  # FIXME: figure these out from the git-tag

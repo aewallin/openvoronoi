@@ -245,15 +245,15 @@ set_target_properties(openvoronoi PROPERTIES VERSION ${CPACK_PACKAGE_VERSION})
 set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}" CACHE STRING "name")
 set(CPACK_DEBIAN_DISTRIBUTION_NAME ubuntu CACHE STRING "name")
 set(CPACK_DEBIAN_DISTRIBUTION_RELEASES oneiric CACHE STRING "name") 
-set(CPACK_PACKAGE_DESCRIPTION_FILE ${CMAKE_SOURCE_DIR}/debian_package_description.txt CACHE STRING "${CPACK_PACKAGE_DESCRIPTION_FILE}")
-set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/debian_copyright.txt CACHE STRING "name")
+set(CPACK_PACKAGE_DESCRIPTION_FILE ${CMAKE_SOURCE_DIR}/debian/debian_package_description.txt CACHE STRING "${CPACK_PACKAGE_DESCRIPTION_FILE}")
+set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/debian/debian_copyright.txt CACHE STRING "name")
 set(CPACK_DEBIAN_CHANGELOG "  * Latest development version." CACHE STRING "name")
 set(DEB_SRC_DIR ${CMAKE_SOURCE_DIR} CACHE STRING "name" )
 
 # run the source package generation as a target, so we don't have to do it every time
 add_custom_target(spackage 
               ${CMAKE_COMMAND} -C ${CMAKE_BINARY_DIR}/CMakeCache.txt
-              -P ${CMAKE_CURRENT_SOURCE_DIR}/DebSourcePPA.cmake 
+              -P ${CMAKE_CURRENT_SOURCE_DIR}/debian/DebSourcePPA.cmake 
               # WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
             ) # get the changes file as an output from here?
 

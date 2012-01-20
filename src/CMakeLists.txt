@@ -82,7 +82,10 @@ message( STATUS "build type = " ${CMAKE_BUILD_TYPE})
 # include the output directory, where the version_string.hpp file is generated
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 INCLUDE(version_string.cmake)
-
+STRING(REGEX REPLACE "([0-9][0-9]).*" "\\1" GIT_MAJOR_VERSION "${GIT_COMMIT_ID}" )
+STRING(REGEX REPLACE "[0-9][0-9].([0-9][0-9])-.*" "\\1" GIT_MINOR_VERSION "${GIT_COMMIT_ID}" )
+STRING(REGEX REPLACE "[0-9][0-9].[0-9][0-9]-(.*)-.*" "\\1" GIT_PATCH_VERSION "${GIT_COMMIT_ID}" )
+set(MY_VERSION "${GIT_MAJOR_VERSION}.${GIT_MINOR_VERSION}.${GIT_PATCH_VERSION}" CACHE STRING "version")
 
 
 # this defines the source-files
@@ -139,8 +142,9 @@ add_library(
     ${OVD_SRC}
 )
 set_target_properties(libopenvoronoi PROPERTIES PREFIX "")
+set_target_properties(libopenvoronoi PROPERTIES VERSION ${MY_VERSION}) 
 
-# the pure c++ shared library
+# static library, linked with the python module below
 add_library(
     openvoronoi_static
     STATIC
@@ -155,7 +159,7 @@ add_library(
 )
 target_link_libraries(openvoronoi openvoronoi_static ${Boost_LIBRARIES} ${QD_LIBRARY}) 
 set_target_properties(openvoronoi PROPERTIES PREFIX "") 
-
+set_target_properties(openvoronoi PROPERTIES VERSION ${MY_VERSION}) 
 
 #
 # this figures out where to install the Python modules
@@ -217,14 +221,8 @@ execute_process(
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
-
 #message( STATUS " git commit id: " ${GIT_COMMIT_ID})
-# parse the commit id to get major, minor, patch
-STRING(REGEX REPLACE "([0-9][0-9]).*" "\\1" GIT_MAJOR_VERSION "${GIT_COMMIT_ID}" )
-#MESSAGE(STATUS "result= ${GIT_MAJOR_VERSION}")
-STRING(REGEX REPLACE "[0-9][0-9].([0-9][0-9])-.*" "\\1" GIT_MINOR_VERSION "${GIT_COMMIT_ID}" )
-#MESSAGE(STATUS "result= ${GIT_MINOR_VERSION}")
-STRING(REGEX REPLACE "[0-9][0-9].[0-9][0-9]-(.*)-.*" "\\1" GIT_PATCH_VERSION "${GIT_COMMIT_ID}" )
+
 #MESSAGE(STATUS "result= ${GIT_PATCH_VERSION}")
 
 set(CPACK_GENERATOR "DEB")
@@ -237,23 +235,19 @@ set(CPACK_DEBIAN_BUILD_DEPENDS debhelper python git cmake libboost-dev libqd0 li
 set(CPACK_DEBIAN_PACKAGE_DEPENDS python git cmake libboost-python libqd0 libgomp1 CACHE STRING "name")
 set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE ${DEB_ARCHITECTURE} CACHE STRING "name")
 set(CPACK_DEBIAN_PACKAGE_PRIORITY optional CACHE STRING "name")
-SET(CPACK_PACKAGE_VERSION "${GIT_MAJOR_VERSION}.${GIT_MINOR_VERSION}.${GIT_PATCH_VERSION}" CACHE STRING "name")
-
-set_target_properties(libopenvoronoi PROPERTIES VERSION ${CPACK_PACKAGE_VERSION}) 
-set_target_properties(openvoronoi PROPERTIES VERSION ${CPACK_PACKAGE_VERSION}) 
-
-set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}" CACHE STRING "name")
+SET(CPACK_PACKAGE_VERSION  ${MY_VERSION} CACHE STRING "name")
+#set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}" CACHE STRING "name")
 set(CPACK_DEBIAN_DISTRIBUTION_NAME ubuntu CACHE STRING "name")
 set(CPACK_DEBIAN_DISTRIBUTION_RELEASES oneiric CACHE STRING "name") 
-set(CPACK_PACKAGE_DESCRIPTION_FILE ${CMAKE_SOURCE_DIR}/debian/debian_package_description.txt CACHE STRING "${CPACK_PACKAGE_DESCRIPTION_FILE}")
-set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/debian/debian_copyright.txt CACHE STRING "name")
+set(CPACK_PACKAGE_DESCRIPTION_FILE ${CMAKE_SOURCE_DIR}/deb/debian_package_description.txt CACHE STRING "${CPACK_PACKAGE_DESCRIPTION_FILE}")
+set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/deb/debian_copyright.txt CACHE STRING "name")
 set(CPACK_DEBIAN_CHANGELOG "  * Latest development version." CACHE STRING "name")
 set(DEB_SRC_DIR ${CMAKE_SOURCE_DIR} CACHE STRING "name" )
 
 # run the source package generation as a target, so we don't have to do it every time
 add_custom_target(spackage 
               ${CMAKE_COMMAND} -C ${CMAKE_BINARY_DIR}/CMakeCache.txt
-              -P ${CMAKE_CURRENT_SOURCE_DIR}/debian/DebSourcePPA.cmake 
+              -P ${CMAKE_CURRENT_SOURCE_DIR}/deb/DebSourcePPA.cmake 
               # WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
             ) # get the changes file as an output from here?
 

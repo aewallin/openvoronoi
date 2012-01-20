@@ -29,7 +29,7 @@ libQD (a quad-precision arithmetic library). Available as package
 Build/Install instructions
 
 From PPA (works on Ubuntu 11.10 oneiric)
-sudo add-apt-repository ppa:anders-e-e-wallin/openvoronoi 
+sudo add-apt-repository ppa:anders-e-e-wallin/cam
 sudo apt-get update
 sudo apt-get install openvoronoi
 

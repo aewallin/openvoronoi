@@ -221,11 +221,6 @@ execute_process(
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
-#message( STATUS " git commit id: " ${GIT_COMMIT_ID})
-
-#MESSAGE(STATUS "result= ${GIT_PATCH_VERSION}")
-
-
 include(package_details.cmake)
 
 # run the source package generation as a target, so we don't have to do it every time

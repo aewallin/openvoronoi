@@ -115,7 +115,7 @@ if __name__ == "__main__":
         Nmax=1
     print " VD done in ", calctime," s, ", calctime/Nmax," s per generator"
     
-    vod.setAll(vd)
+    vod.setAll()
     myscreen.render()
             
 

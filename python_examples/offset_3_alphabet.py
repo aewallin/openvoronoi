@@ -1,49 +1,10 @@
 import openvoronoi as ovd
 import ovdvtk
+import ttt # https://github.com/aewallin/truetype-tracer
+
 import time
 import vtk
-import ttt
 import math
-
-def drawLine(myscreen, pt1, pt2, lineColor):
-    myscreen.addActor( ovdvtk.Line(p1=(pt1.x,pt1.y,0),p2=(pt2.x,pt2.y,0),color=lineColor) ) 
-
-def drawArc(myscreen, pt1, pt2, r, cen,cw,arcColor):
-    # draw arc as many line-segments
-    start = pt1-cen
-    end = pt2-cen
-    theta1 = math.atan2(start.x,start.y)
-    theta2 = math.atan2(end.x,end.y)
-    alfa=[] # the list of angles
-    da=0.1
-    CIRCLE_FUZZ = 1e-9
-    # idea from emc2 / cutsim g-code interp G2/G3
-    if (cw == False ): 
-        while ( (theta2 - theta1) > -CIRCLE_FUZZ): 
-            theta2 -= 2*math.pi
-    else:
-        while( (theta2 - theta1) < CIRCLE_FUZZ): 
-            theta2 += 2*math.pi
-    
-    dtheta = theta2-theta1
-    arclength = r*dtheta
-    dlength = min(0.001, arclength/10)
-    steps = int( float(arclength) / float(dlength))
-    rsteps = float(1)/float(steps)
-    dc = math.cos(-dtheta*rsteps) # delta-cos  
-    ds = math.sin(-dtheta*rsteps) # delta-sin
-    
-    previous = pt1
-    tr = [start.x, start.y]
-    for i in range(steps):
-        #f = (i+1) * rsteps #; // varies from 1/rsteps..1 (?)
-        #theta = theta1 + i* dtheta
-        tr = rotate(tr[0], tr[1], dc, ds) #; // rotate center-start vector by a small amount
-        x = cen.x + tr[0] 
-        y = cen.y + tr[1] 
-        current = ovd.Point(x,y)
-        myscreen.addActor( ovdvtk.Line(p1=(previous.x,previous.y,0),p2=(current.x,current.y,0),color=arcColor) )
-        previous = current 
 
 # rotate by cos/sin. from emc2 gcodemodule.cc
 def rotate(x, y,  c,  s):
@@ -52,7 +13,8 @@ def rotate(x, y,  c,  s):
     x = tx;
     return [x,y]
 
-def arc_pts(  pt1, pt2, r, cen,cw): #previous, p, r,cen,cw):
+# return a list of points corresponding to an arc
+def arc_pts(  pt1, pt2, r, cen,cw): # (start, end, radius, center, cw )
     # draw arc as many line-segments
     start = pt1-cen
     end = pt2-cen
@@ -92,39 +54,6 @@ def arc_pts(  pt1, pt2, r, cen,cw): #previous, p, r,cen,cw):
         pts.extend([previous, current])
         previous = current 
     return pts
-
-def drawOffsets(myscreen, ofs):
-    # draw loops
-    nloop = 0
-    lineColor = ovdvtk.lgreen
-    arcColor = ovdvtk.green #grass
-    for lop in ofs:
-        n = 0
-        N = len(lop)
-        first_point=[]
-        previous=[]
-        for p in lop:
-            # p[0] is the Point
-            # p[1] is -1 for lines, and r for arcs
-            if n==0: # don't draw anything on the first iteration
-                previous=p[0]
-                #first_point = p[0]
-            else:
-                cw=p[3]
-                cen=p[2]
-                r=p[1]
-                p=p[0]
-                if r==-1:
-                    drawLine(myscreen, previous, p, lineColor)
-                else:
-                    drawArc(myscreen, previous, p, r,cen,cw, arcColor)
-
-                previous=p
-            n=n+1
-        print "rendered loop ",nloop, " with ", len(lop), " points"
-        nloop = nloop+1
-        
-
 
 def drawOffsets2(myscreen, ofs):
     # draw loops
@@ -169,11 +98,8 @@ def drawOffsets2(myscreen, ofs):
     last_idx = 0
         
     for of in ofs_points:
-        epts  = of #e[0]  # points
-        #etype = e[1]  # type
-        #first = 1
+        epts  = of 
         segs=[]
-
         first = 1
         print " loop with ", len(epts)," points"
         for p in epts:
@@ -182,9 +108,6 @@ def drawOffsets2(myscreen, ofs):
                 seg = [last_idx,idx]
                 segs.append(seg)
             first = 0
-            #seg = [last_idx,idx]
-            #segs.append(seg)
-            #first = 0
             last_idx = idx
             idx = idx + 1
             
@@ -199,7 +122,6 @@ def drawOffsets2(myscreen, ofs):
     linePolyData = vtk.vtkPolyData()
     linePolyData.SetPoints(oPoints)
     linePolyData.SetLines(lineCells)
-    #linePolyData.GetPointData().SetScalars(self.colorLUT)
     linePolyData.Modified() 
     linePolyData.Update()
     mapper = vtk.vtkPolyDataMapper()
@@ -208,9 +130,7 @@ def drawOffsets2(myscreen, ofs):
     edge_actor.SetMapper(mapper)
     edge_actor.GetProperty().SetColor( ovdvtk.lgreen)
     myscreen.addActor( edge_actor )
-    #self.edges.append(self.edge_actor)
-    
-    
+
 def insert_polygon_points(vd, polygon):
     pts=[]
     for p in polygon:
@@ -285,11 +205,9 @@ def modify_segments(segs):
         seg.pop()
         seg.reverse() # switch interior/exterior
         segs_mod.append(seg)
-        #drawSegment(myscreen, seg)
     return segs_mod
 
 if __name__ == "__main__":  
-    #print ocl.revision()
     w=2000
     h=1200
     
@@ -301,12 +219,11 @@ if __name__ == "__main__":
     ovdvtk.drawOCLtext(myscreen, rev_text=ovd.revision() )   
     
     scale=1
-    myscreen.render()
-    #random.seed(42)
+
+
     far = 1
     camPos = far
     zmult = 3
-    # camPos/float(1000)
     myscreen.camera.SetPosition(0, -camPos/float(1000), zmult*camPos) 
     myscreen.camera.SetClippingRange(-(zmult+1)*camPos,(zmult+1)*camPos)
     myscreen.camera.SetFocalPoint(0.0, 0, 0)
@@ -369,10 +286,9 @@ if __name__ == "__main__":
     #print "VD check: ", vd.check()
     
     pi = ovd.PolygonInterior( vd.getGraph() )
-    pi.str()
+
     
     of = ovd.Offset( vd.getGraph() ) # pass the created graph to the Offset class
-    of.str()
     ofs_list=[]
     t_before = time.time()
     for t in [0.0003*x for x in range(1,20)]:

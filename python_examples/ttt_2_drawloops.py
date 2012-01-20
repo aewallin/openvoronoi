@@ -1,5 +1,5 @@
-import ttt
-import openvoronoi as ovd
+import ttt                 # https://github.com/aewallin/truetype-tracer
+import openvoronoi as ovd  # https://github.com/aewallin/openvoronoi
 import ovdvtk
 import time
 import vtk
@@ -72,7 +72,8 @@ def draw_ttt(myscreen, text, x,y,scale):
     segs = modify_segments(segs)
     drawLoops(myscreen, segs, ovdvtk.yellow )
     
-    
+# this script only draws geometry from ttt
+# no voronoi-diagram is created!
 if __name__ == "__main__":  
     #w=2500
     #h=1500
@@ -85,12 +86,9 @@ if __name__ == "__main__":
     ovdvtk.drawOCLtext(myscreen, rev_text=ovd.revision() )
         
     scale=1
-    myscreen.render()
-    #random.seed(42)
     far = 1
     camPos = far
     zmult = 3
-    # camPos/float(1000)
     myscreen.camera.SetPosition(0, -camPos/float(1000), zmult*camPos) 
     myscreen.camera.SetClippingRange(-(zmult+1)*camPos,(zmult+1)*camPos)
     myscreen.camera.SetFocalPoint(0.0, 0, 0)

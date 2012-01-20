@@ -104,27 +104,14 @@ if __name__ == "__main__":
     #lwr.SetFileName("tux1.png")
     
     scale=1
-    myscreen.render()
-    #random.seed(42)
     far = 1
     camPos = far
     zmult = 3
-    # camPos/float(1000)
     myscreen.camera.SetPosition(0, -camPos/float(1000), zmult*camPos) 
     myscreen.camera.SetClippingRange(-(zmult+1)*camPos,(zmult+1)*camPos)
     myscreen.camera.SetFocalPoint(0.0, 0, 0)
     
-    """
-    wr = ttt.SEG_Writer()
 
-    # wr.scale = 3
-    wr.arc = False
-    wr.conic = False
-    wr.cubic = False
-    wr.scale = float(1)/float(32000)
-    s3 = ttt.ttt("ABCDEFGHIJKL",wr) 
-    segs = wr.get_segments()
-    """
     segs = ttt_segments(  "ABCDEFGHIJKLM", 64000)
     segs2 = ttt_segments( "NOPQRSTUVWXYZ", 64000)
     segs3 = ttt_segments( "abcdefghijklm", 64000)

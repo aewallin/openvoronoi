@@ -1,5 +1,8 @@
 import openvoronoi as ovd
 import ovdvtk
+import ovdgenerators as gens
+import rpg  # random polygon generator see https://github.com/aewallin/CGAL_RPG
+
 import time
 import vtk
 import datetime
@@ -9,11 +12,8 @@ import os
 import sys
 import pickle
 import gzip
-import ovdgenerators as gens
-import rpg
 
 if __name__ == "__main__":  
-    #print ocl.revision()
     #w=2500
     #h=1500
     

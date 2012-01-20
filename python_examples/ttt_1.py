@@ -1,6 +1,7 @@
-import ttt
-import openvoronoi as ovd
-import ovdvtk
+import ttt                # https://github.com/aewallin/truetype-tracer
+import openvoronoi as ovd # https://github.com/aewallin/openvoronoi
+import ovdvtk 
+
 import time
 import vtk
 
@@ -98,7 +99,7 @@ def insert_polygon_points(vd, polygon):
 
 def insert_polygon_segments(vd,id_list):
     j=0
-    jmax=9999999
+    jmax=9999999 # for debugging, set jmax to the problematic case to stop algorithm in the middle
     print "inserting ",len(id_list)," line-segments:"
     for n in range(len(id_list)):
         n_nxt = n+1
@@ -166,12 +167,10 @@ if __name__ == "__main__":
     ovdvtk.drawOCLtext(myscreen, rev_text=ovd.revision() )
     
     scale=1
-    myscreen.render()
-    #random.seed(42)
+
     far = 1
     camPos = far
     zmult = 3
-    # camPos/float(1000)
     myscreen.camera.SetPosition(0, -camPos/float(1000), zmult*camPos) 
     myscreen.camera.SetClippingRange(-(zmult+1)*camPos,(zmult+1)*camPos)
     myscreen.camera.SetFocalPoint(0.0, 0, 0)

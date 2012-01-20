@@ -1,5 +1,6 @@
 import openvoronoi as ovd
 import ovdvtk
+
 import time
 import vtk
 import datetime
@@ -116,7 +117,7 @@ def drawFrame(N=2,nframe=1):
     print "PYTHON All DONE."
 
 if __name__ == "__main__":  
-    Nmax = 300
+    Nmax = 10 # number of frames to draw
     for n in range(Nmax):
         drawFrame(N=(2+n),nframe=n)        
     

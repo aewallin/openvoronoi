@@ -2,18 +2,19 @@ import openvoronoi as ovd
 import ovdvtk
 import time
 import vtk
-import datetime
-import math
-import random
-import os
-import sys
-import pickle
-import gzip
-import ovdgenerators as gens
+#import datetime
+#import math
+#import random
+#import os
+#import sys
+#import pickle
+#import gzip
+
 
 def drawLine(myscreen, pt1, pt2, lineColor):
     myscreen.addActor( ovdvtk.Line(p1=(pt1.x,pt1.y,0),p2=(pt2.x,pt2.y,0),color=lineColor) ) 
 
+#NOTE: we draw arcs as lines (with a darker green color) !!!
 def drawArc(myscreen, pt1, pt2, r, arcColor):
     myscreen.addActor( ovdvtk.Line(p1=(pt1.x,pt1.y,0),p2=(pt2.x,pt2.y,0),color=arcColor) ) 
 
@@ -60,7 +61,7 @@ if __name__ == "__main__":
     
     scale=1
     myscreen.render()
-    random.seed(42)
+
     far = 1
     camPos = far
     zmult = 3

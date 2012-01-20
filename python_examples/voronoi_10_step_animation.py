@@ -80,7 +80,6 @@ def circleGenerators(far, Nmax, shuffle=0):
     
     
 if __name__ == "__main__":  
-    #print ocl.revision()
     myscreen = ovdvtk.VTKScreen()
     ovdvtk.drawOCLtext(myscreen)
     
@@ -135,7 +134,7 @@ if __name__ == "__main__":
         print "PYTHON: adding generator: ",n," at ",p
         
         if n in ren:
-            vod.setAll(vd)
+            vod.setAll()
             myscreen.render()
             time.sleep(delay)
             writeFrame( w2if, lwr, nf )
@@ -219,7 +218,7 @@ if __name__ == "__main__":
         #lwr.Write()
         
         if n in ren:
-            vod.setAll(vd)
+            vod.setAll()
             myscreen.render()
             time.sleep(delay)
             writeFrame( w2if, lwr, nf )
@@ -241,8 +240,6 @@ if __name__ == "__main__":
     print " VD done in ", calctime," s, ", calctime/Nmax," s per generator"
         
     print "PYTHON All DONE."
-
-
     
     myscreen.render()    
     myscreen.iren.Start()

@@ -1,5 +1,5 @@
 import openvoronoi as ovd
-import ovdvtk
+import ovdvtk  # comes with openvoronoi
 import time
 import vtk
 import datetime
@@ -9,8 +9,8 @@ import os
 import sys
 import pickle
 import gzip
-import ovdgenerators as gens
-import rpg
+import ovdgenerators as gens # comes with openvoronoi
+import rpg # random polygon generator see https://github.com/aewallin/CGAL_RPG
 
 def draw_vd(vd,times):
     #w=2500

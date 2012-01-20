@@ -1,8 +1,9 @@
 import openvoronoi as ovd
 import ovdvtk
+import ttt   # https://github.com/aewallin/truetype-tracer
+
 import time
 import vtk
-import ttt
 import math
 
 def drawLine(myscreen, pt1, pt2, lineColor):
@@ -174,7 +175,7 @@ if __name__ == "__main__":
     
     scale=1
     myscreen.render()
-    #random.seed(42)
+
     far = 1
     camPos = far
     zmult = 3
@@ -219,7 +220,6 @@ if __name__ == "__main__":
         ofs = of.offset(t)
         ofs_list.append(ofs)
     
-        
     t_after = time.time()
     oftime = t_after-t_before
     for ofs in ofs_list:

@@ -1,5 +1,6 @@
 import openvoronoi as ovd
 import ovdvtk
+
 import time
 import vtk
 import datetime
@@ -127,7 +128,7 @@ if __name__ == "__main__":
     Nsegs = 0
     
     
-    print "returned: ",vd.addLineSite(69,105,10)
+    # print "returned: ",vd.addLineSite(69,105,10)
     """
     vd.addLineSite(83,35)
     vd.addLineSite(63,153)

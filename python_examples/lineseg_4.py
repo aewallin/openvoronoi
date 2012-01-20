@@ -1,5 +1,8 @@
 import openvoronoi as ovd
 import ovdvtk
+import ovdgenerators as gens
+
+
 import time
 import vtk
 import datetime
@@ -9,7 +12,7 @@ import os
 import sys
 import pickle
 import gzip
-import ovdgenerators as gens
+
 
 def writeFrame( w2if, lwr, n ):
     w2if.Modified() 
@@ -78,8 +81,10 @@ if __name__ == "__main__":
     print "waiting for ",Nmax," segments..",
     sys.stdout.flush()
     t_before = time.time()
-    #segs = gens.randomSegments(far,Nmax)
-    filename = "data/randomsegments_{0}.pickle.gz".format(Nmax)
+    #segs = gens.randomSegments(far,Nmax) # uncomment this to generate segments on the fly 
+    
+    filename = "data/randomsegments_{0}.pickle.gz".format(Nmax) # or use this to load pre-computed segments 
+    # (produced with lineseg_dataset_generator.py)
     f = gzip.open(filename, 'rb')
     pstring = f.read()
     segs = pickle.loads( pstring )

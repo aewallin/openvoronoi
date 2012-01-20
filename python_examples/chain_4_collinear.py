@@ -1,5 +1,6 @@
 import openvoronoi as ovd
 import ovdvtk
+
 import time
 import vtk
 import datetime
@@ -9,7 +10,6 @@ import os
 import sys
 import pickle
 import gzip
-import ovdgenerators as gens
 
 if __name__ == "__main__":  
     #print ocl.revision()

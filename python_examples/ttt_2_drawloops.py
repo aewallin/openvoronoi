@@ -57,6 +57,12 @@ def draw_ttt(myscreen, text, x,y,scale):
     wr.conic = False
     wr.cubic = False
     wr.scale = float(1)/float(scale)
+    # "L" has 36 points by default
+    wr.conic_biarc_subdivision = 10 # this has no effect?
+    wr.conic_line_subdivision = 10 # this increasesn nr of points to 366
+    wr.cubic_biarc_subdivision = 10 # no effect?
+    wr.cubic_line_subdivision = 10 # no effect?
+    
     s3 = ttt.ttt(text,wr) 
     ext = wr.extents
     print ext
@@ -74,7 +80,8 @@ def draw_ttt(myscreen, text, x,y,scale):
     
 # this script only draws geometry from ttt
 # no voronoi-diagram is created!
-if __name__ == "__main__":  
+if __name__ == "__main__": 
+    print ttt.version()
     #w=2500
     #h=1500
     
@@ -96,10 +103,10 @@ if __name__ == "__main__":
     # draw a unit-circle
     ca = ovdvtk.Circle(center=(0,0,0) , radius=1, color=(0,1,1), resolution=50 )
     myscreen.addActor(ca)   
-    
-    draw_ttt(myscreen, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", -0.5,0,80000)
-    draw_ttt(myscreen, "abcdefghijklmnopqrstuvwxyz", -0.5,-0.1,80000)
-    draw_ttt(myscreen, "1234567890*", -0.5,-0.2,80000)
+    draw_ttt(myscreen, "L", -0.5,0,80000)
+    #draw_ttt(myscreen, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", -0.5,0,80000)
+    #draw_ttt(myscreen, "abcdefghijklmnopqrstuvwxyz", -0.5,-0.1,80000)
+    #draw_ttt(myscreen, "1234567890*", -0.5,-0.2,80000)
     #draw_ttt(myscreen, "m", -0.5,-0.2,80000)
     print "PYTHON All DONE."
 

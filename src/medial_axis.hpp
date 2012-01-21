@@ -34,7 +34,7 @@ namespace ovd
 // marks the valid-property true for edges belonging to the medial axis
 // and false for other edges.
 struct medial_filter {
-    medial_filter(HEGraph& gi) : g(gi) { }
+    medial_filter(HEGraph& gi) : g(gi) , _dot_product_threshold(0.3) { }
     bool operator()(const HEEdge& e) const {
         if (g[e].type == LINESITE || g[e].type == NULLEDGE) 
             return true; // we keep linesites and nulledges
@@ -67,7 +67,7 @@ struct medial_filter {
         HEEdge e2 = find_segment(endp2);
         e2 = g[e2].twin; // this makes the edges oriented in the same direction 
         double dotprod = edge_dotprod(e1,e2);
-        return fabs(dotprod)>0.8; // FIXME: make this adjustable
+        return fabs(dotprod)>_dot_product_threshold; // FIXME: make this adjustable
     }
     
     // calculate the dot-product between unit vectors aligned along edges e1->e2
@@ -122,6 +122,7 @@ struct medial_filter {
     
 private:
     HEGraph& g;
+    double _dot_product_threshold;
 };
 
 /// \brief From a voronoi-diagram, generate offset curve(s).

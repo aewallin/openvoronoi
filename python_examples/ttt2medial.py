@@ -157,7 +157,10 @@ def ttt_segments(text,scale):
     wr.arc = False   # approximate arcs with lines
     wr.conic = False # approximate conic with arc/line
     wr.cubic = False # approximate cubic with arc/line
-    
+    wr.conic_biarc_subdivision = 10 # this has no effect?
+    wr.conic_line_subdivision = 50 # =10 increasesn nr of points to 366, = 5 gives 729 pts
+    wr.cubic_biarc_subdivision = 10 # no effect?
+    wr.cubic_line_subdivision = 10 # no effect?
     wr.scale = float(1)/float(scale)
     ttt.ttt(text,wr) 
     segs = wr.get_segments()
@@ -182,7 +185,7 @@ if __name__ == "__main__":
     print "( OpenVoronoi",vd.version()," )"
     
     # get segments from ttt. NOTE: must set scale so all geometry fits within unit-circle!
-    segs = ttt_segments(  "EMC2", 15000) # (text, scale) all coordinates are divided by scale
+    segs = ttt_segments(  "LinuxCNC", 15000) # (text, scale) all coordinates are divided by scale
     segs = translate(segs, -0.06, 0.05)
     segs = modify_segments(segs)
     
@@ -190,7 +193,7 @@ if __name__ == "__main__":
     print "( all sites inserted in %.3f seconds )" % ( sum(times))
     print "( VD check: ", vd.check(), " )"
     
-    ovd.PolygonInterior( vd.getGraph() ) # filter so that only polygon interior remains
+    ovd.PolygonInterior( vd.getGraph() , True ) # filter so that only polygon interior remains
     ovd.MedialAxis( vd.getGraph() ) # filter so that only medial axis remains
     
     preamble()

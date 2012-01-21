@@ -37,7 +37,7 @@ namespace ovd
 // a polygon/pocket boundary shoud be specified in CW order
 // islands within the polygon should be specified in CCW order
 struct interior_filter {
-    interior_filter(HEGraph& gi) : g(gi) { }
+    interior_filter(HEGraph& gi, bool side=true) : g(gi), _side(side) { }
     
     // determine if an edge is valid or not
     bool operator()(const HEEdge& e) const {
@@ -80,27 +80,30 @@ struct interior_filter {
         HEEdge current = g[f].edge;
         HEEdge start = current;
         do {
-            if ( g[current].type == LINESITE && g[current].inserted_direction )
+            if ( (_side && g[current].type == LINESITE && g[current].inserted_direction) ||
+                  (!_side && g[current].type == LINESITE && !g[current].inserted_direction)  )
                 return true;
+                
             current = g[current].next;
         } while(current!=start);
         return false;
     }
     
     HEGraph& g;
+    bool _side;
 };
 
 /// \brief From a voronoi-diagram, generate offset curve(s).
 class PolygonInterior {
 public:
-    PolygonInterior(HEGraph& gi): g(gi) {
-        interior_filter f(g);
-        interior_filter flt(g);
+    PolygonInterior(HEGraph& gi, bool side): g(gi) {
+        interior_filter flt(g,side);
         g.filter_graph(flt);
     }
 private:
     PolygonInterior(); // don't use.
     HEGraph& g; // original graph
+    
 };
 
 

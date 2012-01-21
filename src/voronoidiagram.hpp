@@ -100,6 +100,7 @@ class VoronoiDiagram {
         void debug_on() {debug=true;}
         bool check();
         HEGraph& get_graph_reference() {return g;}
+        void filter_reset() {g.filter_reset();}
     protected:
         /// initialize the diagram with three generators
         void initialize();

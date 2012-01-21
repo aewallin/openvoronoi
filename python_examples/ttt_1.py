@@ -152,7 +152,7 @@ def ttt_segments(text,scale):
     wr.scale = float(1)/float(scale)
     # "L" has 36 points by default
     wr.conic_biarc_subdivision = 10 # this has no effect?
-    wr.conic_line_subdivision = 5 # =10 increasesn nr of points to 366, = 5 gives 729 pts
+    wr.conic_line_subdivision = 50 # =10 increasesn nr of points to 366, = 5 gives 729 pts
     wr.cubic_biarc_subdivision = 10 # no effect?
     wr.cubic_line_subdivision = 10 # no effect?
     s3 = ttt.ttt(text,wr) 
@@ -180,9 +180,9 @@ if __name__ == "__main__":
     myscreen.camera.SetClippingRange(-(zmult+1)*camPos,(zmult+1)*camPos)
     myscreen.camera.SetFocalPoint(0.0, 0, 0)
 
-    segs = ttt_segments(  "EMC23", 30000)
-    segs = ttt_segments(  "P", 2500)
-    segs = translate(segs, -0.36, -0.45)
+    segs = ttt_segments(  "OpenVoronoi", 70000)
+    #segs = ttt_segments(  "P", 2500)
+    segs = translate(segs, -0.36, -0.05)
     
     #segs = ttt_segments(  "ABCDEFGHIJKLM", 64000)
     segs2 = ttt_segments( "NOPQRSTUVWXYZ", 64000)

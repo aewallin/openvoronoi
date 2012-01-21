@@ -704,6 +704,7 @@ void VoronoiDiagram::add_separator(HEFace f, HEFace null_face,
     if (debug) std::cout << "add_separator() f="<<f<<" endp=" << g[sep_endp].index << "\n";
     
     assert( (g[sep_endp].k3==1) || (g[sep_endp].k3==-1) );    
+    g[sep_endp].zero_dist();
     
     HEEdge endp_next = HEEdge();
     HEEdge endp_prev = HEEdge();

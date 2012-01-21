@@ -185,7 +185,7 @@ if __name__ == "__main__":
     print "( OpenVoronoi",vd.version()," )"
     
     # get segments from ttt. NOTE: must set scale so all geometry fits within unit-circle!
-    segs = ttt_segments(  "LinuxCNC", 15000) # (text, scale) all coordinates are divided by scale
+    segs = ttt_segments(  "EMC2", 15000) # (text, scale) all coordinates are divided by scale
     segs = translate(segs, -0.06, 0.05)
     segs = modify_segments(segs)
     

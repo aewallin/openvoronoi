@@ -180,7 +180,7 @@ if __name__ == "__main__":
     myscreen.camera.SetClippingRange(-(zmult+1)*camPos,(zmult+1)*camPos)
     myscreen.camera.SetFocalPoint(0.0, 0, 0)
 
-    segs = ttt_segments(  "OpenVoronoi", 70000)
+    segs = ttt_segments(  "EMC2", 70000)
     #segs = ttt_segments(  "P", 2500)
     segs = translate(segs, -0.36, -0.05)
     
@@ -235,7 +235,7 @@ if __name__ == "__main__":
     #vd.check()
     vod.setVDText2(times)
     
-    ovd.PolygonInterior( vd.getGraph() )
+    ovd.PolygonInterior( vd.getGraph() , True )
     ovd.MedialAxis( vd.getGraph() )
     
     vod.setAll()

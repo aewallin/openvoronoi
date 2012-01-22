@@ -11,18 +11,16 @@ set(CPACK_DEBIAN_PACKAGE_SECTION "science" CACHE STRING "name3")
 
 # the debian source-package builder wants dependencies as an array
 set(DEBSRC_BUILD_DEPENDS debhelper python git cmake libboost-dev "libqd0 | libqd2c2a" libqd-dev libboost-python-dev libgomp1 CACHE STRINGS "name")
-set(DEBSRC_PACKAGE_DEPENDS python git cmake libboost-python libqd0 libgomp1 CACHE STRING "name")
+set(DEBSRC_PACKAGE_DEPENDS python git cmake libboost-python "libqd0 | libqd2c2a" CACHE STRING "name")
 
 # however CPack wants dependencies as a single comma separated string!
 set(CPACK_DEBIAN_PACKAGE_DEPENDS)
 foreach(DEP ${DEBSRC_PACKAGE_DEPENDS})
-    #MESSAGE(STATUS "   package-depency: " ${DEP})
     set(CPACK_DEBIAN_PACKAGE_DEPEND "${CPACK_DEBIAN_PACKAGE_DEPENDS}, ${DEP}")
 endforeach(DEP ${DEBSRC_PACKAGE_DEPENDS})  
 
 set(CPACK_DEBIAN_BUILD_DEPENDS)
 foreach(DEP ${DEBSRC_BUILD_DEPENDS})
-    #MESSAGE(STATUS "   package-depency: " ${DEP})
     set(CPACK_DEBIAN_BUILD_DEPENDS "${CPACK_DEBIAN_BUILD_DEPENDS}, ${DEP}")
 endforeach(DEP ${DEBSRC_BUILD_DEPENDS})  
 

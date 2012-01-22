@@ -2,6 +2,10 @@ project(OpenVoronoi)
 
 cmake_minimum_required(VERSION 2.4)
 
+# figure out the gcc version
+
+INCLUDE(gcc_version.cmake)
+
 
 #
 # Turn compiler warnings up to 11, at least with gcc.  I dont know how to
@@ -11,19 +15,34 @@ cmake_minimum_required(VERSION 2.4)
 # thus we use now use -Wno-deprecated here.
 #
 if (CMAKE_BUILD_TOOL MATCHES "make")
-    MESSAGE(STATUS "setting gcc options: -W -Wall -Wundef  
-    -Wshadow -Winline -Wno-long-long -Wno-deprecated -Werror -pedantic-errors")
-    
-    # -pedantic -W -Wall -Wundef -Wfloat-equal -Wshadow -Winline -Wno-long-long
-    add_definitions( -Werror -Wall -Wundef -Wno-error=uninitialized -Wshadow  -Wno-long-long -Wno-deprecated -pedantic -pedantic-errors)
+    if(GCC_4_6)
+        MESSAGE(STATUS "setting strict gcc options: -Wall -Werror etc...")
+        add_definitions(-Werror -Wall -Wundef -Wno-error=uninitialized -Wshadow  -Wno-long-long -Wno-deprecated -pedantic -pedantic-errors)
+    else(GCC_4_6)
+        MESSAGE(STATUS "setting less strict gcc options.. (you have an old gcc version!)")
+        add_definitions(-Wall  -Wno-deprecated -pedantic-errors)
+    endif(GCC_4_6)
     
     # some reasons why we don't enable certain errors:
-    # this gives warning when comparing float/double with != or ==:  -Wfloat-equal
-    # this gives warnings for BGL: -Winline
-    
+    # -Wfloat-equal        gives warning when comparing float/double with != or ==:  
+    # -Winline             gives warnings for BGL
     
     add_definitions(-fPIC)
 endif (CMAKE_BUILD_TOOL MATCHES "make")
+
+
+#
+# Turn compiler warnings up to 11, at least with gcc.  I dont know how to
+# do this with other compilers we might support and I'm leaving it up to
+# the relevant platform maintainers...
+# #include'ing the boost graph-library creates deprecated warnings
+# thus we use now use -Wno-deprecated here.
+#
+#if (CMAKE_BUILD_TOOL MATCHES "make")
+#    MESSAGE(STATUS "setting gcc options: -W -Wall -Wundef  -Wshadow -Winline -Wno-long-long -Wno-deprecated -Werror -pedantic-errors")
+    # -pedantic -W -Wall -Wundef -Wfloat-equal -Wshadow -Winline -Wno-long-long
+#    add_definitions( -Werror -Wall -Wundef -Wno-error=uninitialized -Wshadow  -Wno-long-long -Wno-deprecated -pedantic -pedantic-errors)
+#endif (CMAKE_BUILD_TOOL MATCHES "make")
 
 # uncomment one of these to change build-type
  set(CMAKE_BUILD_TYPE Release)
@@ -122,7 +141,14 @@ set( OVD_INCLUDE_COMMON_FILES
     ${OpenVoronoi_SOURCE_DIR}/common/numeric.hpp  
     ${OpenVoronoi_SOURCE_DIR}/common/point.hpp
     ${OpenVoronoi_SOURCE_DIR}/common/halfedgediagram.hpp
+    
 )
+
+set( OVD_INCLUDE_UTIL_FILES
+    ${OpenVoronoi_SOURCE_DIR}/utility/vd2svg.hpp    
+    ${OpenVoronoi_SOURCE_DIR}/utility/simple_svg_1.0.0.hpp
+)
+
 
 set( OVD_INCLUDE_SOLVERS_FILES
     ${OpenVoronoi_SOURCE_DIR}/solvers/solution.hpp  
@@ -206,6 +232,12 @@ MESSAGE(STATUS "Python libraries will be installed to: " ${Python_site_packages}
         DESTINATION include/openvoronoi/common
         PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
     )
+    install(
+        FILES ${OVD_INCLUDE_UTIL_FILES}
+        DESTINATION include/openvoronoi/utility
+        PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
+    )
+
     install(
         FILES ${OVD_INCLUDE_SOLVERS_FILES}
         DESTINATION include/openvoronoi/solvers

@@ -31,7 +31,7 @@ namespace ovd
 {
 
 typedef std::vector<HEFace> FaceLoop; // store the t-value too?
-typedef std::vector<FaceLoop> OffsetLoops;
+typedef std::vector<FaceLoop> FaceOffsetLoops;
 
 // experimental alternative offset approach.
 class FaceOffset {
@@ -41,7 +41,7 @@ public:
         face_done.assign( g.num_faces(), 1 );
     }
     void offset(double t) {
-        offset_list = OffsetLoops(); // clear the list
+        offset_list = FaceOffsetLoops(); // clear the list
         set_flags(t); // mark faces as todo or done, based on the t-value, and validity of edges (after filtering).
         HEFace start;        
         while (find_start_face(start)) { // while there are faces that still require offsets
@@ -208,7 +208,7 @@ private:
     HEGraph& g;
     // hold a 0/1 flag for each face, indicating if an offset for this face has been produced or not.
     std::vector<unsigned char> face_done;
-    OffsetLoops offset_list;
+    FaceOffsetLoops offset_list;
 };
 
 

@@ -228,9 +228,9 @@ if __name__ == "__main__":
     print of.str()
     #ofs_list.append(ofs)
     
-    """
     t_after = time.time()
     oftime = t_after-t_before
+    """
     for ofs in ofs_list:
         drawOffsets(myscreen, ofs)
     """

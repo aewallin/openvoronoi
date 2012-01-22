@@ -6,7 +6,18 @@
 *.exe
 *.o
 *.so
+*.so.*
+*.a
 *.pyc
+*.eps
+
+# Other build litter #
+######################
+bld
+cmake_install.cmake
+CMakeCache.txt
+CMakeFiles
+Makefile
 
 # Packages #
 ############
@@ -20,6 +31,17 @@
 *.rar
 *.tar
 *.zip
+
+# Vim swapfiles #
+#################
+*.sw?
+
+# Tag files for "Global" command #
+##################################
+GPATH
+GRTAGS
+GSYMS
+GTAGS
 
 # Logs and databases #
 ######################
@@ -40,6 +62,9 @@ Thumbs.db
 # build directories
 build/
 bld/
+
+# commonly-named test executables
+ovd_tst
 
 # lyx backup
 *.lyx~

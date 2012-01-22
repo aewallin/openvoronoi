@@ -141,7 +141,14 @@ set( OVD_INCLUDE_COMMON_FILES
     ${OpenVoronoi_SOURCE_DIR}/common/numeric.hpp  
     ${OpenVoronoi_SOURCE_DIR}/common/point.hpp
     ${OpenVoronoi_SOURCE_DIR}/common/halfedgediagram.hpp
+    
 )
+
+set( OVD_INCLUDE_UTIL_FILES
+    ${OpenVoronoi_SOURCE_DIR}/utility/vd2svg.hpp    
+    ${OpenVoronoi_SOURCE_DIR}/utility/simple_svg_1.0.0.hpp
+)
+
 
 set( OVD_INCLUDE_SOLVERS_FILES
     ${OpenVoronoi_SOURCE_DIR}/solvers/solution.hpp  
@@ -225,6 +232,12 @@ MESSAGE(STATUS "Python libraries will be installed to: " ${Python_site_packages}
         DESTINATION include/openvoronoi/common
         PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
     )
+    install(
+        FILES ${OVD_INCLUDE_UTIL_FILES}
+        DESTINATION include/openvoronoi/utility
+        PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
+    )
+
     install(
         FILES ${OVD_INCLUDE_SOLVERS_FILES}
         DESTINATION include/openvoronoi/solvers

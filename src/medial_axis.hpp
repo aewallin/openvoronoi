@@ -198,7 +198,7 @@ public:
             int _edge_points= 20; // number of points to subdivide parabolas. FIXME: make this adjustable
             
             for (int n=0;n< _edge_points;n++) {
-                double t;
+                double t(0);
                 if (t_src<=t_trg) // increasing t-value
                     t = t_min + ((t_max-t_min)/sq(_edge_points-1))*sq(n); // NOTE: quadratic t-dependece. More points at smaller t.
                 else if (t_trg<t_src) { // decreasing t-value

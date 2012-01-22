@@ -40,7 +40,7 @@ struct OffsetVertex {
     bool cw; // clockwise (or not)
 
     OffsetVertex(Point pi, double ri, Point ci, bool cwi): p(pi), r(ri), c(ci), cw(cwi) {}
-    OffsetVertex(Point pi): p(pi), r(-1.) {}
+    OffsetVertex(Point pi): p(pi), r(-1.), cw(false) {}
 };
 typedef std::list<OffsetVertex> OffsetLoop;
 typedef std::list<OffsetLoop> OffsetLoops;
@@ -70,6 +70,7 @@ public:
     }
     OffsetLoops offset(double t) {
         offset_list = OffsetLoops();
+        set_flags(t);
         HEFace start;        
         while (find_start_face(start)) { // while there are faces that still require offsets
             offset_walk(start,t); // start on the face, and do an offset loop

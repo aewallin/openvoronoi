@@ -21,7 +21,7 @@
 
 #include "voronoidiagram_py.hpp"  
 #include "common/point.hpp"
-#include "offset.hpp"
+#include "offset_py.hpp"
 #include "offset2.hpp"
 #include "polygon_interior.hpp"
 #include "medial_axis.hpp"
@@ -119,10 +119,10 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         .def_readwrite("y", &Point::y)
         .def_pickle(point_pickle_suite())
     ;
-    bp::class_<Offset, boost::noncopyable >("Offset", bp::no_init)
+    bp::class_<Offset_py, boost::noncopyable >("Offset", bp::no_init)
         .def(bp::init<HEGraph&>())
-        .def("str", &Offset::print )
-        .def("offset", &Offset::offset )
+        .def("str", &Offset_py::print )
+        .def("offset", &Offset_py::offset_py )
     ; 
     bp::class_<FaceOffset, boost::noncopyable >("FaceOffset", bp::no_init)
         .def(bp::init<HEGraph&>())

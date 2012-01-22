@@ -16,19 +16,34 @@
  *  You should have received a copy of the GNU General Public License
  *  along with OpenVoronoi.  If not, see <http://www.gnu.org/licenses/>.
 */
+#ifndef OFFSET_HPP
+#define OFFSET_HPP
 
 #pragma once
 
 #include <string>
 #include <iostream>
 
-#include <boost/python.hpp>
-
 #include "graph.hpp"
 #include "site.hpp"
 
 namespace ovd
 {
+
+/// \brief Line- or arc-vertex of an offset curve.
+struct OffsetVertex {
+    Point p;
+    // line-vertex is indicated by radius of -1, and c and cw are then ignored.
+    // otherwise this is an arc-vertex.
+    double r; // arc radius
+    Point c; // arc center
+    bool cw; // clockwise (or not)
+
+    OffsetVertex(Point pi, double ri, Point ci, bool cwi): p(pi), r(ri), c(ci), cw(cwi) {}
+    OffsetVertex(Point pi): p(pi), r(-1.) {}
+};
+typedef std::list<OffsetVertex> OffsetLoop;
+typedef std::list<OffsetLoop> OffsetLoops;
 
 /// \brief From a voronoi-diagram, generate offsets.
 /// an offset is allways a closed loop.
@@ -53,10 +68,8 @@ public:
         std::cout << "Offset: edges: " << g.num_edges() << "\n";
         std::cout << "Offset: faces: " << g.num_faces() << "\n";
     }
-    boost::python::list offset(double t) {
-        offset_list = boost::python::list(); // clear the list
-        //std::cout << "Offset::offset(t= " << t << ")\n";
-        set_flags(t); // mark faces as todo or done, based on the t-value, and validity of edges (after filtering).
+    OffsetLoops offset(double t) {
+        offset_list = OffsetLoops();
         HEFace start;        
         while (find_start_face(start)) { // while there are faces that still require offsets
             offset_walk(start,t); // start on the face, and do an offset loop
@@ -79,13 +92,11 @@ public:
         HEEdge start_edge =  find_next_offset_edge( g[start].edge , t, out_in_mode); // the first edge on the start-face
         HEEdge current_edge = start_edge;
         
-        boost::python::list loop; // store the output in this loop
+        OffsetLoop loop; // store the output in this loop
         
         // add the first point to the loop.
-        boost::python::list pt;
-        pt.append( g[current_edge].point(t) );
-        pt.append( -1 ); // radius, center, cw
-        loop.append(pt);
+        OffsetVertex pt( g[current_edge].point(t) );
+        loop.push_back( pt );
         
         do {
             out_in_mode = edge_mode(current_edge, t);
@@ -100,17 +111,13 @@ public:
                 if (!s->isLine() ) // point and arc-sites produce arc-offsets, for which cw must be set.
                     cw = find_cw( o->start(), o->center(), o->end() ); // figure out cw or ccw arcs?
                 // add offset to output
-                boost::python::list lpt;
-                    lpt.append( g[next_edge].point(t) );
-                    lpt.append( o->radius() );
-                    lpt.append( o->center() );
-                    lpt.append( cw );
-                loop.append(lpt);
+                OffsetVertex lpt( g[next_edge].point(t), o->radius(), o->center(), cw );
+                loop.push_back( lpt );
             }
             face_done[current_face]=1; // although we may revisit current_face (if it is non-convex), it seems safe to mark it "done" here.
             current_edge = g[next_edge].twin;
         } while (current_edge != start_edge);
-        offset_list.append(loop); // append the created loop to the output
+        offset_list.push_back( loop ); // append the created loop to the output
     }
     bool edge_mode(HEEdge e, double t) {
         HEVertex src = g.source(e);
@@ -209,15 +216,16 @@ public:
         }
         std::cout << "\n";
     }
+protected:
+    OffsetLoops offset_list;
 private:
     Offset(); // don't use.
     HEGraph& g;
     // hold a 0/1 flag for each face, indicating if an offset for this face has been produced or not.
     std::vector<unsigned char> face_done;
-    boost::python::list offset_list;
 };
 
 
 } // end namespace
-
+#endif
 // end file offset.hpp

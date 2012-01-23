@@ -25,6 +25,12 @@ new SEPSolver
 
 Offset
 - figure out how to nest offset-loops to generate a machining-graph
+-- the FaceOffset (in offset2.hpp) class is an attempt in this direction
+   An offset-loop consists of a sequence of offsets coming from a face.
+   If we store the sequence of faces it may be possible to nest offset-loops based on this.
+   OR it may be necessary to compute and store the VD vertices that a loop encloses, and nest loops based on this.
+   Another approach to nesting is a point-in-polygon test - but this test is based on geometry, the above approach would
+   be based on topology, and thus be more robust.
 - linking of offset loops for an offsetting-toolpath
 - provide an alternative zigzag-pocketing toolpath (see optimization papers by Held/Arkin)
 - Look at HSM-literature and try to implement one or many HSM-strategies.
@@ -44,6 +50,11 @@ Tests
 - Code-coverage for tests
 - Benchmark against libarea/kbool and libarea/Clipper (are there other FOSS offsetting codes?)
 - Compare against other VD codes (CGAL, boost-sweepline, others?)
+- Write software that generates test-cases (ttt is a good example)
+-- notes on random polygons:
+-- http://www.geometrylab.de/applet-29-en
+-- http://www.cgal.org/Manual/latest/doc_html/cgal_manual/Generator_ref/Function_random_polygon_2.html
+-- http://www.cs.uiuc.edu/~jeffe/open/randompoly.html
 
 Documentation
 - improve doxygen documentation (can we put Asymptote/SVG drawings in the doxygen-generated html?)
@@ -54,4 +65,4 @@ Packaging/Building etc
 - have separate targets for pure c++ library and python module.
 - build(and install on github) doxygen html documentation
 - Windows package/installer with cmake/NSIS?
-- automate source-package building from github and periodic uplad to launchpad (?)
+- automate source-package building from github and periodic upload to launchpad (?)

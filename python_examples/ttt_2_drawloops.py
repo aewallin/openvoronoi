@@ -81,7 +81,7 @@ def draw_ttt(myscreen, text, x,y,scale):
 # this script only draws geometry from ttt
 # no voronoi-diagram is created!
 if __name__ == "__main__": 
-    print ttt.version()
+    print "ttt version = ",ttt.version()
     #w=2500
     #h=1500
     
@@ -90,7 +90,7 @@ if __name__ == "__main__":
     w=1024
     h=1024
     myscreen = ovdvtk.VTKScreen(width=w, height=h) 
-    ovdvtk.drawOCLtext(myscreen, rev_text=ovd.revision() )
+    ovdvtk.drawOCLtext(myscreen, rev_text=ovd.version() )
         
     scale=1
     far = 1

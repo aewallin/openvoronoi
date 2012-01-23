@@ -79,6 +79,10 @@ def ttt_segments(text,scale):
     wr.arc = False
     wr.conic = False
     wr.cubic = False
+    wr.conic_biarc_subdivision = 10 # this has no effect?
+    wr.conic_line_subdivision = 500 # this increases nr of points 
+    wr.cubic_biarc_subdivision = 10 # no effect?
+    wr.cubic_line_subdivision = 10 # no effect?
     wr.scale = float(1)/float(scale)
     s3 = ttt.ttt(text,wr) 
     segs = wr.get_segments()
@@ -94,7 +98,7 @@ if __name__ == "__main__":
     #w=1024
     #h=1024
     myscreen = ovdvtk.VTKScreen(width=w, height=h) 
-    ovdvtk.drawOCLtext(myscreen, rev_text=ovd.revision() )
+    ovdvtk.drawOCLtext(myscreen, rev_text=ovd.version() )
     
     w2if = vtk.vtkWindowToImageFilter()
     w2if.SetInput(myscreen.renWin)
@@ -111,13 +115,13 @@ if __name__ == "__main__":
     myscreen.camera.SetClippingRange(-(zmult+1)*camPos,(zmult+1)*camPos)
     myscreen.camera.SetFocalPoint(0.0, 0, 0)
     
-
-    segs = ttt_segments(  "ABCDEFGHIJKLM", 64000)
-    segs2 = ttt_segments( "NOPQRSTUVWXYZ", 64000)
-    segs3 = ttt_segments( "abcdefghijklm", 64000)
+    scale = 30000
+    segs = ttt_segments(  "ABCDEFGHIJKLM", scale)
+    segs2 = ttt_segments( "NOPQRSTUVWXYZ", scale)
+    segs3 = ttt_segments( "abcdefghijklm", scale)
     #segs3 = ttt_segments( "m", 6400)
-    segs4 = ttt_segments( "nopqrstuvwxyz", 64000) # NOPQRSTUVWXYZ", 64000)
-    segs5 = ttt_segments( "0123456789+-*/", 64000)
+    segs4 = ttt_segments( "nopqrstuvwxyz", scale) # NOPQRSTUVWXYZ", 64000)
+    segs5 = ttt_segments( "0123456789+-*/", scale)
     #segs = ttt_segments(  "A", 64000)
     #segs2 = ttt_segments( "B", 64000)
     #segs2=[]
@@ -157,7 +161,7 @@ if __name__ == "__main__":
     times = insert_many_polygons(vd,all_segs)
     vd.check()
     
-    ovd.PolygonInterior( vd.getGraph() )
+    ovd.PolygonInterior( vd.getGraph() , True )
     ovd.MedialAxis( vd.getGraph() )
     
     vod.setVDText2(times)

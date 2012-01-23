@@ -208,7 +208,7 @@ if __name__ == "__main__":
     print "all sites inserted. "
     print "VD check: ", vd.check()
     
-    pi = ovd.PolygonInterior( vd.getGraph() )
+    pi = ovd.PolygonInterior( vd.getGraph(), True )
     #pi.str()
     
     of = ovd.FaceOffset( vd.getGraph() ) # pass the created graph to the Offset class
@@ -218,19 +218,19 @@ if __name__ == "__main__":
     t_before = time.time()
     #for t in [0.002*x for x in range(1,10)]:
     t=0.005
-    of.offset(t)
+    drawOffsets(myscreen, of.offset(t))
     print of.str()
     t=0.006
-    of.offset(t)
+    drawOffsets(myscreen, of.offset(t))
     print of.str()
     t=0.008
-    of.offset(t)
+    drawOffsets(myscreen, of.offset(t))
     print of.str()
     #ofs_list.append(ofs)
     
-    """
     t_after = time.time()
     oftime = t_after-t_before
+    """
     for ofs in ofs_list:
         drawOffsets(myscreen, ofs)
     """

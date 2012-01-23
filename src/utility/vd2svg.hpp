@@ -16,7 +16,7 @@ ovd::Point scale(ovd::Point p) {
     return s*p+s*ovd::Point(1,1);
 }
 
-svg::Color edge_color(ovd::HEGraph& g, ovd::HEEdge e) {
+svg::Color get_edge_color(ovd::HEGraph& g, ovd::HEEdge e) {
     if ( g[e].type == ovd::LINESITE )
         return svg::Color::Yellow;
     if ( g[e].type == ovd::PARABOLA )
@@ -30,7 +30,7 @@ void write_edge_to_svd(ovd::HEGraph& g, svg::Document& doc, ovd::HEEdge e) {
     ovd::Point src_p = scale( g[src].position );
     ovd::Point trg_p = scale( g[trg].position );
     
-    svg::Color col = edge_color(g,e);
+    svg::Color col = get_edge_color(g,e);
     svg::Polyline polyline( svg::Stroke(1, col) );
     if ( (g[e].type == ovd::SEPARATOR) || (g[e].type == ovd::LINE) || 
                      (g[e].type == ovd::LINESITE) || (g[e].type == ovd::OUTEDGE) || 

@@ -135,11 +135,11 @@ if __name__ == "__main__":
     #print ofs
     #drawOffsets(myscreen, ofs)
     
-    pi = ovd.PolygonInterior( vd.getGraph() )
-    pi.str()
+    pi = ovd.PolygonInterior( vd.getGraph(), True )
+    
     
     of = ovd.Offset( vd.getGraph() ) # pass the created graph to the Offset class
-    of.str()
+    
     ofs = of.offset(0.123)
     #print ofs
     ovdvtk.drawOffsets(myscreen, ofs)

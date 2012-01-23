@@ -144,6 +144,6 @@ if __name__ == "__main__":
     
     r = single_run(50,int(37))
     vd = r[1]
-    ovd.PolygonInterior(vd.getGraph())
+    ovd.PolygonInterior(vd.getGraph(), True)
     draw_vd(vd,r[2])
         

@@ -208,12 +208,12 @@ if __name__ == "__main__":
     print "all sites inserted. "
     print "VD check: ", vd.check()
     
-    pi = ovd.PolygonInterior( vd.getGraph() )
-    #pi.str()
+    pi = ovd.PolygonInterior( vd.getGraph(), True )
+ 
     
     of = ovd.FaceOffset( vd.getGraph() ) # pass the created graph to the Offset class
     
-    #of.str()
+ 
     ofs_list=[]
     t_before = time.time()
     #for t in [0.002*x for x in range(1,10)]:

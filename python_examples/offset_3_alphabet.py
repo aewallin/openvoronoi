@@ -285,7 +285,7 @@ if __name__ == "__main__":
     #print "all sites inserted. "
     #print "VD check: ", vd.check()
     
-    pi = ovd.PolygonInterior( vd.getGraph() )
+    pi = ovd.PolygonInterior( vd.getGraph(), True )
 
     
     of = ovd.Offset( vd.getGraph() ) # pass the created graph to the Offset class

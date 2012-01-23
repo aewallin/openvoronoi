@@ -5,6 +5,7 @@
 #include <cmath>
 
 #include <openvoronoi/voronoidiagram.hpp>
+#include <openvoronoi/utility/vd2svg.hpp>
 
 #include <boost/random.hpp>
 #include <boost/timer.hpp>
@@ -65,6 +66,7 @@ int main(int argc,char *argv[]) {
     double norm = nmax*log((double)nmax)/log(2.0);
     std::cout << 1e6*t/norm << " us * n*log2(n)\n";
     std::cout << vd->print();
+    vd2svg("random_points.svg", vd);
     return 0;
 }
 

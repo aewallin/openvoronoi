@@ -6,6 +6,7 @@
 
 #include <openvoronoi/voronoidiagram.hpp>
 #include <openvoronoi/common/point.hpp>
+#include <openvoronoi/utility/vd2svg.hpp>
 
 #include <boost/random.hpp>
 #include <boost/timer.hpp>
@@ -146,6 +147,7 @@ int main(int argc,char *argv[]) {
     std::cout << "Points: " << 1e6*t_points/norm << " us * n*log2(n)\n";
     std::cout << "Lines: " << 1e6*t_lines/norm << " us * n*log2(n)\n";
     std::cout << vd->print();
+    vd2svg("random_segments.svg", vd);
     return 0;
 }
 

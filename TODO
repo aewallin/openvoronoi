@@ -14,6 +14,9 @@ Core algorithm
   case which makes the code crash, the Reducer takes the (potentially large)
   test case and removes sites one-by-one until we have a minimal test-case
   that still causes failure. This would greatly help pinpoint problems in Solvers.
+- A segfault will result if the user tries to insert a line-segment that intersects with an already inserted
+  line-segment. Try to fail more graciously, or warn the user. Probably same issue with identical point-sites.
+  
 
 Solvers
 - geometric-filtering. try solver<double>, evaulate quality of solution, 

@@ -26,3 +26,8 @@ endforeach()
 foreach( CASE RANGE 25) # characters A..Z
     ADD_TEST(ttt_single_glyph_${CASE} python ../src/test/ttt_single_glyph.py ${CASE})
 endforeach()
+
+set( TTT_ALPHA_CASES 200 100 50 25 12) 
+foreach( CASE ${TTT_ALPHA_CASES}) # characters A..Z
+    ADD_TEST(ttt_alphabet_${CASE} python ../src/test/ttt_alphabet.py ${CASE})
+endforeach()

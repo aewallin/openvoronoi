@@ -1,8 +1,7 @@
 import ttt
 import openvoronoi as ovd
-import ovdvtk
 import time
-import vtk
+import sys
 
 def translate(segs,x,y):
     out = []
@@ -39,17 +38,6 @@ def insert_polygon_segments(vd,id_list):
         if n==(len(id_list)-1):
             n_nxt=0
         print " ",j,"inserting segement ",id_list[n]," - ",id_list[n_nxt]
-        """
-        if id_list[n] ==12856:
-            vd.debug_on()
-            vd.addLineSite( id_list[n], id_list[n_nxt], 5)
-            vod.setVDText2([1,1])
-            vod.setAll()
-            print "PYTHON All DONE."
-            myscreen.render()   
-            myscreen.iren.Start()
-        else:
-        """
         vd.addLineSite( id_list[n], id_list[n_nxt])
         j=j+1
 
@@ -83,7 +71,7 @@ def insert_many_polygons(vd,segs):
     
     return [pt_time, seg_time]
     
-def ttt_segments(text,scale):
+def ttt_segments(text,scale,conic_subdiv):
     wr = ttt.SEG_Writer()
 
     # wr.scale = 3
@@ -91,7 +79,7 @@ def ttt_segments(text,scale):
     wr.conic = False
     wr.cubic = False
     wr.conic_biarc_subdivision = 10 # this has no effect?
-    wr.conic_line_subdivision = 100 # this increases nr of points 
+    wr.conic_line_subdivision = conic_subdiv # this increases nr of points 
     wr.cubic_biarc_subdivision = 10 # no effect?
     wr.cubic_line_subdivision = 10 # no effect?
     wr.scale = float(1)/float(scale)
@@ -101,90 +89,37 @@ def ttt_segments(text,scale):
     
     
 if __name__ == "__main__":  
-    #w=2500
-    #h=1500
-    
-    w=1600
-    h=1024
-    #w=1024
-    #h=1024
-    myscreen = ovdvtk.VTKScreen(width=w, height=h) 
-    ovdvtk.drawOCLtext(myscreen, rev_text=ovd.version() )
-    
-    w2if = vtk.vtkWindowToImageFilter()
-    w2if.SetInput(myscreen.renWin)
-    lwr = vtk.vtkPNGWriter()
-    lwr.SetInput( w2if.GetOutput() )
-    #w2if.Modified()
-    #lwr.SetFileName("tux1.png")
-    
-    scale=1
-    far = 1
-    camPos = far
-    zmult = 3
-    myscreen.camera.SetPosition(0, -camPos/float(1000), zmult*camPos) 
-    myscreen.camera.SetClippingRange(-(zmult+1)*camPos,(zmult+1)*camPos)
-    myscreen.camera.SetFocalPoint(0.0, 0, 0)
+
+    conic_subdiv = int(sys.argv[1])
     
     scale = 25000
-    segs = ttt_segments(  "ABCDEFGHIJKLM", scale)
-    segs2 = ttt_segments( "NOPQRSTUVWXYZ", scale)
-    segs3 = ttt_segments( "abcdefghijklm", scale)
+    segs = ttt_segments(  "ABCDEFGHIJKLM", scale, conic_subdiv)
+    segs2 = ttt_segments( "NOPQRSTUVWXYZ", scale, conic_subdiv)
+    segs3 = ttt_segments( "abcdefghijklm", scale, conic_subdiv)
     #segs3 = ttt_segments( "m", 6400)
-    segs4 = ttt_segments( "nopqrstuvwxyz", scale) # NOPQRSTUVWXYZ", 64000)
-    segs5 = ttt_segments( "0123456789+-*/", scale)
-    #segs = ttt_segments(  "A", 64000)
-    #segs2 = ttt_segments( "B", 64000)
-    #segs2=[]
+    segs4 = ttt_segments( "nopqrstuvwxyz", scale, conic_subdiv) # NOPQRSTUVWXYZ", 64000)
+    segs5 = ttt_segments( "0123456789+-*/", scale, conic_subdiv)
     dx =  float(50000)/float(scale)
     xt=-0.3
     segs = translate(segs, xt*dx, 0.05*dx)
     segs = modify_segments(segs)
-    
     segs2 = translate(segs2, xt*dx, -0.05*dx)
     segs2 = modify_segments(segs2)
-    
     segs3 = translate(segs3, xt*dx, -0.15*dx)
     segs3 = modify_segments(segs3)
-    
     segs4 = translate(segs4, xt*dx, -0.22*dx)
     segs4 = modify_segments(segs4)
-    
     segs5 = translate(segs5, xt*dx, -0.32*dx)
     segs5 = modify_segments(segs5)
     
-    vd = ovd.VoronoiDiagram(far,120)
-    print vd.version()
-    
-    vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
-    vod.drawFarCircle()
-    vod.textScale = 0.000002
-    vod.vertexRadius = 0.0011
-    vod.drawVertices=0
-    vod.drawVertexIndex=0
-    vod.drawGenerators=0
-    vod.offsetEdges = 0
-    vod.drawNullEdges = 0
-    vd.setEdgeOffset(0.00001)
-    
+    vd = ovd.VoronoiDiagram(1,120)
+        
     all_segs=segs+segs2 +segs3 +segs4+segs5
-    #all_segs=segs
-    #all_segs=segs3 #+segs4
-    #all_segs = segs3
-    times = insert_many_polygons(vd,all_segs)
-    assert( vd.check() )
-    
-    #ovd.PolygonInterior( vd.getGraph() , True )
-    #ovd.MedialAxis( vd.getGraph() )
-    
-    vod.setVDText2(times)
-    vod.setAll()
-    
-    print "PYTHON All DONE."
+    insert_many_polygons(vd,all_segs)
 
-    myscreen.render()   
-    #w2if.Modified()
-    #lwr.SetFileName("{0}.png".format(Nmax))
-    #lwr.Write()
-     
-    myscreen.iren.Start()
+    c = vd.check()
+    print " VD check: ", c
+    if c:
+        exit(0)
+    else:
+        exit(-1)

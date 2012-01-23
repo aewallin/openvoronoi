@@ -246,7 +246,7 @@ MESSAGE(STATUS "Python libraries will be installed to: " ${Python_site_packages}
 
 
 # tests
-include(${CMAKE_SOURCE_DIR}/../test/ovd_tests.cmake)
+include(${CMAKE_SOURCE_DIR}/test/ovd_tests.cmake)
 
 # "make package" stuff
 execute_process(

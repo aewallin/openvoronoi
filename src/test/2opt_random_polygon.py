@@ -1,15 +1,7 @@
 import openvoronoi as ovd
-#import ovdvtk  # comes with openvoronoi
-import time
-import vtk
-import datetime
 import math
-import random
-#import os
 import sys
-#import pickle
-#import gzip
-#import ovdgenerators as gens # comes with openvoronoi
+
 import rpg # random polygon generator see https://github.com/aewallin/CGAL_RPG
 
 

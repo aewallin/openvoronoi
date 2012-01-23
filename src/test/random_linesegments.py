@@ -2,8 +2,6 @@ import openvoronoi as ovd
 
 import time
 import math
-#import random
-#import os
 import sys
 import pickle
 import gzip
@@ -13,7 +11,7 @@ if __name__ == "__main__":
     vd = ovd.VoronoiDiagram(1,120)
     print "random_linesegments.py:  ",Nmax," random segments."
     sys.stdout.flush()
-    filename = "../test/data/randomsegments_{0}.pickle.gz".format(Nmax) #  load pre-computed segments 
+    filename = "../src/test/data/randomsegments_{0}.pickle.gz".format(Nmax) #  load pre-computed segments 
     # (produced with lineseg_dataset_generator.py)
     f = gzip.open(filename, 'rb')
     pstring = f.read()

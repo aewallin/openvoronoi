@@ -1,33 +1,7 @@
 import ttt                # https://github.com/aewallin/truetype-tracer
 import openvoronoi as ovd # https://github.com/aewallin/openvoronoi
-#import ovdvtk 
 import sys
 import time
-#import vtk
-"""
-def drawLoops(myscreen,loops,loopColor):
-    # draw the loops
-    nloop = 0
-    for lop in loops:
-        n = 0
-        N = len(lop)
-        first_point=[]
-        previous=[]
-        for p in lop:
-            if n==0: # don't draw anything on the first iteration
-                previous=p 
-                first_point = p
-            elif n== (N-1): # the last point
-                myscreen.addActor( ovdvtk.Line(p1=(previous[0],previous[1],0),p2=(p[0],p[1],0),color=loopColor) ) # the normal line
-                # and a line from p to the first point
-                myscreen.addActor( ovdvtk.Line(p1=(p[0],p[1],0),p2=(first_point[0],first_point[1],0),color=loopColor) )
-            else:
-                myscreen.addActor( ovdvtk.Line(p1=(previous[0],previous[1],0),p2=(p[0],p[1],0),color=loopColor) )
-                previous=p
-            n=n+1
-        print "rendered loop ",nloop, " with ", len(lop), " points"
-        nloop = nloop+1
-"""
 
 def translate(segs,x,y):
     out = []

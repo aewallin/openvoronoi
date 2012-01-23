@@ -1,11 +1,7 @@
 import openvoronoi as ovd
-#import ovdvtk
 import time
-#import vtk
-#import datetime
 import math
 import random
-#import os
 import sys
 
 def randomGenerators(far, Nmax):

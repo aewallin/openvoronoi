@@ -47,7 +47,7 @@ Input/Output
 - SVG, DXF input
 
 Tests
-- Write some tests! (boost-test?, ctest?)
+- Write more tests! ( also in c++? )
 - Test for memory-leaks with valgrind
 - Code-coverage for tests
 - Benchmark against libarea/kbool and libarea/Clipper (are there other FOSS offsetting codes?)

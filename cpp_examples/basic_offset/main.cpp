@@ -4,6 +4,7 @@
 
 #include <openvoronoi/offset.hpp>
 #include <openvoronoi/voronoidiagram.hpp>
+#include <openvoronoi/utility/vd2svg.hpp>
 
 // very simple OpenVoronoi example program
 int main() {
@@ -49,7 +50,11 @@ int main() {
       }
     }
 
+    // save drawing to svg file.
+    vd2svg("basic_offset.svg", vd);
+
     std::cout << vd->print();
+    delete vd;
 
     return 0;
 }

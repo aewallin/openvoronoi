@@ -44,6 +44,7 @@ endif (CMAKE_BUILD_TOOL MATCHES "make")
 #    add_definitions( -Werror -Wall -Wundef -Wno-error=uninitialized -Wshadow  -Wno-long-long -Wno-deprecated -pedantic -pedantic-errors)
 #endif (CMAKE_BUILD_TOOL MATCHES "make")
 
+
 # uncomment one of these to change build-type
  set(CMAKE_BUILD_TYPE Release)
 # set(CMAKE_BUILD_TYPE Debug)

@@ -36,12 +36,16 @@ using namespace ovd;
 
 namespace bp = boost::python;
 
-std::string ovd_revision() {
-    return VERSION_STRING;
+std::string version() {
+    return VERSION_STRING; // the git-commit-id, e.g. "12.01-102-gf516b17"
+}
+std::string build_type() {
+    return BUILDTYPE_STRING; // "Release"  "Debug" or "Profile"
 }
 
 BOOST_PYTHON_MODULE(openvoronoi) {
-    bp::def("revision", ovd_revision); // why do we have both module.version() and vd.version() ?
+    bp::def("version", version); // why do we have both module.version() and vd.version() ?
+    bp::def("build_type", build_type);
     
     bp::class_<VoronoiDiagram >("VoronoiDiagram_base", bp::no_init)
     ;

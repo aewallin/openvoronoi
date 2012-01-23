@@ -11,7 +11,15 @@ set(CPACK_DEBIAN_PACKAGE_SECTION "science" CACHE STRING "name3")
 
 # the debian source-package builder wants dependencies as an array
 set(DEBSRC_BUILD_DEPENDS debhelper python git cmake libboost-dev "libqd0 | libqd2c2a" libqd-dev libboost-python-dev libgomp1 CACHE STRINGS "name")
-set(DEBSRC_PACKAGE_DEPENDS python git cmake libboost-python "libqd0 | libqd2c2a" CACHE STRING "name")
+
+# we need to explicitly list the libboost-python versions here. why??
+# precise has 1.48.0
+# oneiric has 1.46.1
+# natty/maverick has 1.42.0
+# lucid has 1.40.0
+set(DEBSRC_PACKAGE_DEPENDS python git cmake 
+                "libboost-python1.48.0 | libboost-python1.46.1 | libboost-python1.42.0 | libboost-python1.40.0"
+                "libqd0 | libqd2c2a" CACHE STRING "name")
 
 # however CPack wants dependencies as a single comma separated string!
 set(CPACK_DEBIAN_PACKAGE_DEPENDS)

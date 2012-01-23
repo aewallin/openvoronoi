@@ -42,11 +42,6 @@ $ cmake ../src
 $ make
 $ sudo make install
 
-Build/packaging TODO: 
-- have separate targets for pure c++ library and python module.
-- build(and install on github) doxygen html documentation
-- look at making a package with cpack
-
 Working Platforms
 - Ubuntu 11.10 oneiric (gcc 4.6.1 with Boost 1.46.1)
 
@@ -54,11 +49,18 @@ Organization
 doc/        has documentation in lyx format, with figures in asymptote format. 
             Build a PDF with the CMakeLists.txt in this directory.
 cpp_examples/ has c++ examples (more needed)
-python_examples/ has Python examples and tests. Many use VTK and VTK's python bindingd for visualization.
+python_examples/ has Python examples. Many use VTK and VTK's python bindingd for visualization.
 src/        has the source for the main algorithm
 src/solvers has vd-vertex solver code
 src/py      has python wrapping code
 src/common  has common classes not specific to voronoi diagrams
+src/utility input and output from OpenVoronoi to/from various formats
+
+Contributing
+See the TODO file. Fork the github repo, create a feature branch, commit yor 
+changes, test. Make a short description of your changes and create a pull request.
+Follow the coding-style of the existing code. One fix/feature per pull request.
+Contributed code must comply with the GPL.
 
 Other voronoi-diagram codes
 

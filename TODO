@@ -1,0 +1,57 @@
+
+Core algorithm
+- add suport for arcs
+- better logging (logging levels, where we log, etc)
+- better error handling (exceptions?)
+- refactor (?) to reduce voronoidiagram.cpp (almost 2000 lines)
+- Edge-parametrizations are now stored twice, for Edge e and for g[e].twin. 
+  We could save memory by only storing them once.
+- Edge and Vertex types are now "C-style" polymorphic. Could this be 
+  improved with inheritance-based polymorphism.  This may be problematic 
+  if BGL wants Edge/Vertex properties to be default-constructible and assignable etc.
+- separate VoronoiDiagramChecker code into topology tests and geometry tests.
+- write a "Reducer" class for investigating problematic cases. When we find a
+  case which makes the code crash, the Reducer takes the (potentially large)
+  test case and removes sites one-by-one until we have a minimal test-case
+  that still causes failure. This would greatly help pinpoint problems in Solvers.
+
+Solvers
+- geometric-filtering. try solver<double>, evaulate quality of solution, 
+  if it's good take it, if it's bad, call solver<qd_real> (which is a lot slower!)
+LLLSolver
+- alternative geometry for parallel line-segment case
+new SEPSolver
+- when we have a line-segment site and its endpoint
+
+Offset
+- figure out how to nest offset-loops to generate a machining-graph
+- linking of offset loops for an offsetting-toolpath
+- provide an alternative zigzag-pocketing toolpath (see optimization papers by Held/Arkin)
+- Look at HSM-literature and try to implement one or many HSM-strategies.
+
+Medial-Axis
+- is the current medial-axis-walk a sound machining strategy? can it be improved.
+- fix medial-axis-walk case where we don't find a start-edge if the medial axis is e.g. O-shaped
+
+Input/Output
+- Write a class that makes it simpler to insert a polygon (with islands), and/or many polygons
+- SVG, DXF output for vd and offsets
+- SVG, DXF input
+
+Tests
+- Write some tests! (boost-test?, ctest?)
+- Test for memory-leaks with valgrind
+- Code-coverage for tests
+- Benchmark against libarea/kbool and libarea/Clipper (are there other FOSS offsetting codes?)
+- Compare against other VD codes (CGAL, boost-sweepline, others?)
+
+Documentation
+- improve doxygen documentation (can we put Asymptote/SVG drawings in the doxygen-generated html?)
+- set up github homepage with gallery of output, doxygen documentation, download counters, etc.
+
+Packaging/Building etc 
+- solve problem with libboost-python when installing from PPA
+- have separate targets for pure c++ library and python module.
+- build(and install on github) doxygen html documentation
+- Windows package/installer with cmake/NSIS?
+- automate source-package building from github and periodic uplad to launchpad (?)

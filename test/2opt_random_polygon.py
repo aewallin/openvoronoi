@@ -50,6 +50,8 @@ def loop_run(Npts, max_seed, debug=False, debug_seed=-1):
         result = rpg_vd(Npts,seed,debug2)
         print "N=",Npts," s=",seed, " ok?=",result
         assert( result == True )
+        if ( not result ):
+            exit(-1)
 
 def single_run(Npts, seed, debug=False):
     result = rpg_vd(Npts,seed,debug)
@@ -61,7 +63,8 @@ if __name__ == "__main__":
     n_pts  = int(sys.argv[1])
     seed   = int(sys.argv[2])
     loop_run(n_pts,seed)
-
+    exit(0)
+    
     #r = single_run(50,int(37))
     #vd = r[1]
     #ovd.PolygonInterior(vd.getGraph(), True)

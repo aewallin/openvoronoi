@@ -22,16 +22,34 @@
 #include <string>
 #include <iostream>
 
-#include <boost/python.hpp>
-
 #include "graph.hpp"
 #include "site.hpp"
 
 namespace ovd
 {
 
-typedef std::vector<HEFace> FaceLoop; // store the t-value too?
-typedef std::vector<FaceLoop> FaceOffsetLoops;
+
+/// \brief Face and corresponding edges encountered in offset_walk.
+/// From the face and corresponding edges we can later construct the
+/// corresponding OffsetVertex.
+struct FaceEdge {
+    HEFace f;
+    HEEdge next_edge;
+
+    FaceEdge(HEFace fi, const HEEdge &ei): f(fi), next_edge(ei) {}
+};
+typedef std::vector<FaceEdge> FaceEdges;
+
+/// \brief FaceEdge list encountered in walk of offset by t.
+struct FaceOffsetLoop {
+    FaceEdges face_edges;
+    HEEdge start_edge;
+    double t;
+
+    FaceOffsetLoop(const HEEdge &si, double ti): start_edge(si), t(ti) {}
+};
+typedef std::vector<FaceOffsetLoop> FaceOffsetLoops;
+
 
 // experimental alternative offset approach.
 class FaceOffset {
@@ -49,6 +67,9 @@ public:
         }
         //return offset_list;
     }
+    FaceOffsetLoops get_offset_list() {
+        return offset_list;
+    }
     bool find_start_face(HEFace& start) {
         for(HEFace f=0; f<g.num_faces() ; f++) {
             if (face_done[f]==0 ) {
@@ -65,7 +86,7 @@ public:
         HEEdge start_edge =  find_next_offset_edge( g[start].edge , t, out_in_mode); // the first edge on the start-face
         HEEdge current_edge = start_edge;
         
-        FaceLoop loop; // store the output in this loop
+        FaceOffsetLoop loop(start_edge, t); // store the output in this loop
         
         // add the first point to the loop.
         //boost::python::list pt;
@@ -80,7 +101,7 @@ public:
             //std::cout << "offset-output: "; print_edge(current_edge); std::cout << " to "; print_edge(next_edge); std::cout << "\n";
             HEFace current_face = g[current_edge].face;
             { // append the offset-element of current_face to the output
-                loop.push_back(current_face);
+                loop.face_edges.push_back(FaceEdge(current_face, next_edge));
                 /*
                 Site* s = g[current_face].site;
                 Ofs* o = s->offset( g[current_edge].point(t), g[next_edge].point(t) ); // ask the Site for offset-geometry here.
@@ -196,19 +217,22 @@ public:
     void print() {
         std::cout << "Offset has " << offset_list.size() << " loops.\n";
         int n(0);
-        BOOST_FOREACH(FaceLoop l, offset_list ) {
-            std::cout << " Loop " << n++ << " has " << l.size() << " faces:\n";
-            BOOST_FOREACH(HEFace f, l) {
-                std::cout << "   " << f << "\n";
+        BOOST_FOREACH(FaceOffsetLoop l, offset_list ) {
+            std::cout << " Loop " << n++ << " has " << l.face_edges.size() << " faces:\n";
+            BOOST_FOREACH(FaceEdge fe, l.face_edges) {
+                std::cout << "   " << fe.f << "\n";
             }
         }
     }
+protected:
+    HEGraph& g;
+    FaceOffsetLoops offset_list;
 private:
     FaceOffset(); // don't use.
-    HEGraph& g;
     // hold a 0/1 flag for each face, indicating if an offset for this face has been produced or not.
     std::vector<unsigned char> face_done;
     FaceOffsetLoops offset_list;
+
 };
 
 

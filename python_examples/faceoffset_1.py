@@ -209,7 +209,11 @@ if __name__ == "__main__":
     print "VD check: ", vd.check()
     
     pi = ovd.PolygonInterior( vd.getGraph(), True )
+<<<<<<< HEAD
  
+=======
+    #pi.str()
+>>>>>>> 4eb84acbefce432ec2136dbfe50ba31b01ba6b5a
     
     of = ovd.FaceOffset( vd.getGraph() ) # pass the created graph to the Offset class
     
@@ -218,13 +222,13 @@ if __name__ == "__main__":
     t_before = time.time()
     #for t in [0.002*x for x in range(1,10)]:
     t=0.005
-    of.offset(t)
+    drawOffsets(myscreen, of.offset(t))
     print of.str()
     t=0.006
-    of.offset(t)
+    drawOffsets(myscreen, of.offset(t))
     print of.str()
     t=0.008
-    of.offset(t)
+    drawOffsets(myscreen, of.offset(t))
     print of.str()
     #ofs_list.append(ofs)
     

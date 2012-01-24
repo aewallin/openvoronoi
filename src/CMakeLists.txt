@@ -136,6 +136,7 @@ set( OVD_INCLUDE_FILES
     ${OpenVoronoi_SOURCE_DIR}/polygon_interior.hpp
     
     ${CMAKE_CURRENT_BINARY_DIR}/version_string.hpp
+    ${CMAKE_SOURCE_DIR}/version.hpp
 )
 
 set( OVD_INCLUDE_COMMON_FILES

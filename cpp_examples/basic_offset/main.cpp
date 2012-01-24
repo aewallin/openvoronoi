@@ -5,6 +5,7 @@
 #include <openvoronoi/offset.hpp>
 #include <openvoronoi/voronoidiagram.hpp>
 #include <openvoronoi/utility/vd2svg.hpp>
+#include <openvoronoi/version.hpp>
 
 // very simple OpenVoronoi example program
 int main() {
@@ -12,7 +13,7 @@ int main() {
     // double r: radius of circle within which all input geometry must fall. use 1 (unit-circle). Scale geometry if necessary.
     // int bins:  bins for face-grid search. roughly sqrt(n), where n is the number of sites is good according to Held.
      
-    std::cout << vd->version() << "\n"; // the git revision-string
+    std::cout << ovd::version() << "\n"; // the git revision-string
     ovd::Point p0(-0.1,-0.2);
     ovd::Point p1(0.2,0.1);
     ovd::Point p2(0.4,0.2);

@@ -5,6 +5,7 @@
 #include <cmath>
 
 #include <openvoronoi/voronoidiagram.hpp>
+#include <openvoronoi/version.hpp>
 #include <openvoronoi/utility/vd2svg.hpp>
 
 #include <boost/random.hpp>
@@ -34,18 +35,20 @@ int main(int argc,char *argv[]) {
     }
     
     unsigned int nmax = 100;
-    unsigned int binmult = 10;
+    unsigned int binmult = 1;
     if (vm.count("n")) 
         nmax = vm["n"].as<int>();
     if (vm.count("b")) 
         binmult = vm["b"].as<int>();
         
     std::cout << "Number of points: " << nmax << ".\n";
-    int bins = (int)sqrt(nmax);
+    int bins = std::min( 200, (int)sqrt(nmax) ); // more than 200x200 bins causes a lot of memory use, so limit.
+    std::cout << "Using " << binmult*bins << " bins \n";
+    
     // try to optimize number of bins by changing binmult and seing what is fast.
     ovd::VoronoiDiagram* vd = new ovd::VoronoiDiagram(1,binmult*bins);
     
-    std::cout << "version: " << vd->version() << "\n";
+    std::cout << "version: " << ovd::version() << "\n";
     
     boost::mt19937 rng(42); // mersenne-twister random number generator
     boost::uniform_01<boost::mt19937> rnd(rng);

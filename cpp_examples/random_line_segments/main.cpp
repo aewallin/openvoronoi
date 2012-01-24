@@ -5,6 +5,7 @@
 #include <cmath>
 
 #include <openvoronoi/voronoidiagram.hpp>
+#include <openvoronoi/version.hpp>
 #include <openvoronoi/common/point.hpp>
 #include <openvoronoi/utility/vd2svg.hpp>
 
@@ -112,7 +113,7 @@ int main(int argc,char *argv[]) {
     int bins = (int)sqrt(nmax);
     ovd::VoronoiDiagram* vd = new ovd::VoronoiDiagram(1,10*bins);
     
-    std::cout << "OpenVoronoi version: " << vd->version() << "\n";
+    std::cout << "OpenVoronoi version: " << ovd::version() << "\n";
     
     boost::mt19937 rng(42);
     boost::uniform_01<boost::mt19937> rnd(rng);

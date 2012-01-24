@@ -28,6 +28,7 @@
 #include "medial_axis.hpp"
 #include "island_filter.hpp"
 #include "utility/vd2svg.hpp"
+#include "version.hpp"
 
 /*
  *  Boost::Python wrapping of voronoi diagram and related classes.
@@ -37,12 +38,7 @@ using namespace ovd;
 
 namespace bp = boost::python;
 
-std::string version() {
-    return VERSION_STRING; // the git-commit-id, e.g. "12.01-102-gf516b17"
-}
-std::string build_type() {
-    return BUILDTYPE_STRING; // "Release"  "Debug" or "Profile"
-}
+
 
 BOOST_PYTHON_MODULE(openvoronoi) {
     bp::def("version", version);

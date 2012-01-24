@@ -7,6 +7,7 @@
 #include <cmath>
 
 #include <openvoronoi/voronoidiagram.hpp>
+#include <openvoronoi/version.hpp>
 #include <openvoronoi/common/point.hpp>
 #include <openvoronoi/utility/vd2svg.hpp>
 
@@ -19,7 +20,7 @@
 int main(int argc,char *argv[]) {
     ovd::VoronoiDiagram* vd = new ovd::VoronoiDiagram(1,10);
     
-    std::cout << "OpenVoronoi version: " << vd->version() << "\n";
+    std::cout << "OpenVoronoi version: " << ovd::version() << "\n";
     
     // create a voronoi diagram for a simple polygon
     //

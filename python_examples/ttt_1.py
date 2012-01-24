@@ -169,7 +169,7 @@ if __name__ == "__main__":
     w=1024
     h=1024
     myscreen = ovdvtk.VTKScreen(width=w, height=h) 
-    ovdvtk.drawOCLtext(myscreen, rev_text=ovd.revision() )
+    ovdvtk.drawOCLtext(myscreen, rev_text=ovd.version() )
     
     scale=1
 

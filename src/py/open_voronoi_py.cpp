@@ -27,6 +27,7 @@
 #include "polygon_interior.hpp"
 #include "medial_axis.hpp"
 #include "island_filter.hpp"
+#include "utility/vd2svg.hpp"
 
 /*
  *  Boost::Python wrapping of voronoi diagram and related classes.
@@ -46,6 +47,7 @@ std::string build_type() {
 BOOST_PYTHON_MODULE(openvoronoi) {
     bp::def("version", version); // why do we have both module.version() and vd.version() ?
     bp::def("build_type", build_type);
+    bp::def("vd2svg", vd2svg);
     
     bp::class_<VoronoiDiagram >("VoronoiDiagram_base", bp::no_init)
     ;

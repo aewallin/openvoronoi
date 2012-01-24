@@ -71,8 +71,8 @@ namespace svg
     class optional
     {
     public:
-        optional<T>(T const & type)
-            : valid(true), type(type) { }
+        optional<T>(T const & itype)
+            : valid(true), type(itype) { }
         optional<T>() : valid(false), type(T()) { }
         T * operator->()
         {
@@ -91,15 +91,15 @@ namespace svg
 
     struct Dimensions
     {
-        Dimensions(double width, double height) : width(width), height(height) { }
-        Dimensions(double combined = 0) : width(combined), height(combined) { }
+        Dimensions(double iwidth, double iheight) : width(iwidth), height(iheight) { }
+        Dimensions(double icombined = 0) : width(icombined), height(icombined) { }
         double width;
         double height;
     };
 
     struct Point
     {
-        Point(double x = 0, double y = 0) : x(x), y(y) { }
+        Point(double ix = 0, double iy = 0) : x(ix), y(iy) { }
         double x;
         double y;
     };
@@ -137,9 +137,9 @@ namespace svg
     {
         enum Origin { TopLeft, BottomLeft, TopRight, BottomRight };
 
-        Layout(Dimensions const & dimensions = Dimensions(400, 300), Origin origin = BottomLeft,
-            double scale = 1, Point const & origin_offset = Point(0, 0))
-            : dimensions(dimensions), scale(scale), origin(origin), origin_offset(origin_offset) { }
+        Layout(Dimensions const & idimensions = Dimensions(400, 300), Origin iorigin = BottomLeft,
+            double iscale = 1, Point const & iorigin_offset = Point(0, 0))
+            : dimensions(idimensions), scale(iscale), origin(iorigin), origin_offset(iorigin_offset) { }
         Dimensions dimensions;
         double scale;
         Origin origin;
@@ -232,9 +232,9 @@ namespace svg
     class Fill : public Serializeable
     {
     public:
-        Fill(Color::Defaults color) : color(color) { }
-        Fill(Color color = Color::Transparent)
-            : color(color) { }
+        Fill(Color::Defaults icolor) : color(icolor) { }
+        Fill(Color icolor = Color::Transparent)
+            : color(icolor) { }
         std::string toString(Layout const & layout) const
         {
             std::stringstream ss;
@@ -248,8 +248,8 @@ namespace svg
     class Stroke : public Serializeable
     {
     public:
-        Stroke(double width = -1, Color color = Color::Transparent)
-            : width(width), color(color) { }
+        Stroke(double iwidth = -1, Color icolor = Color::Transparent)
+            : width(iwidth), color(icolor) { }
         std::string toString(Layout const & layout) const
         {
             // If stroke width is invalid.
@@ -268,7 +268,7 @@ namespace svg
     class Font : public Serializeable
     {
     public:
-        Font(double size = 12, std::string const & family = "Verdana") : size(size), family(family) { }
+        Font(double isize = 12, std::string const & ifamily = "Verdana") : size(isize), family(ifamily) { }
         std::string toString(Layout const & layout) const
         {
             std::stringstream ss;
@@ -283,8 +283,8 @@ namespace svg
     class Shape : public Serializeable
     {
     public:
-        Shape(Fill const & fill = Fill(), Stroke const & stroke = Stroke())
-            : fill(fill), stroke(stroke) { }
+        Shape(Fill const & ifill = Fill(), Stroke const & istroke = Stroke())
+            : fill(ifill), stroke(istroke) { }
         virtual ~Shape() { }
         virtual std::string toString(Layout const & layout) const = 0;
         virtual void offset(Point const & offset) = 0;
@@ -305,9 +305,9 @@ namespace svg
     class Circle : public Shape
     {
     public:
-        Circle(Point const & center, double diameter, Fill const & fill,
-            Stroke const & stroke = Stroke())
-            : Shape(fill, stroke), center(center), radius(diameter / 2) { }
+        Circle(Point const & icenter, double idiameter, Fill const & ifill,
+            Stroke const & istroke = Stroke())
+            : Shape(ifill, istroke), center(icenter), radius(idiameter / 2) { }
         std::string toString(Layout const & layout) const
         {
             std::stringstream ss;
@@ -317,10 +317,10 @@ namespace svg
                 << stroke.toString(layout) << emptyElemEnd();
             return ss.str();
         }
-        void offset(Point const & offset)
+        void offset(Point const & ioffset)
         {
-            center.x += offset.x;
-            center.y += offset.y;
+            center.x += ioffset.x;
+            center.y += ioffset.y;
         }
     private:
         Point center;
@@ -330,10 +330,10 @@ namespace svg
     class Elipse : public Shape
     {
     public:
-        Elipse(Point const & center, double width, double height,
-            Fill const & fill = Fill(), Stroke const & stroke = Stroke())
-            : Shape(fill, stroke), center(center), radius_width(width / 2),
-            radius_height(height / 2) { }
+        Elipse(Point const & icenter, double iwidth, double iheight,
+            Fill const & ifill = Fill(), Stroke const & istroke = Stroke())
+            : Shape(ifill, istroke), center(icenter), radius_width(iwidth / 2),
+            radius_height(iheight / 2) { }
         std::string toString(Layout const & layout) const
         {
             std::stringstream ss;
@@ -344,10 +344,10 @@ namespace svg
                 << fill.toString(layout) << stroke.toString(layout) << emptyElemEnd();
             return ss.str();
         }
-        void offset(Point const & offset)
+        void offset(Point const & ioffset)
         {
-            center.x += offset.x;
-            center.y += offset.y;
+            center.x += ioffset.x;
+            center.y += ioffset.y;
         }
     private:
         Point center;
@@ -358,10 +358,10 @@ namespace svg
     class Rectangle : public Shape
     {
     public:
-        Rectangle(Point const & edge, double width, double height,
-            Fill const & fill = Fill(), Stroke const & stroke = Stroke())
-            : Shape(fill, stroke), edge(edge), width(width),
-            height(height) { }
+        Rectangle(Point const & iedge, double iwidth, double iheight,
+            Fill const & ifill = Fill(), Stroke const & istroke = Stroke())
+            : Shape(ifill, istroke), edge(iedge), width(iwidth),
+            height(iheight) { }
         std::string toString(Layout const & layout) const
         {
             std::stringstream ss;
@@ -372,10 +372,10 @@ namespace svg
                 << fill.toString(layout) << stroke.toString(layout) << emptyElemEnd();
             return ss.str();
         }
-        void offset(Point const & offset)
+        void offset(Point const & ioffset)
         {
-            edge.x += offset.x;
-            edge.y += offset.y;
+            edge.x += ioffset.x;
+            edge.y += ioffset.y;
         }
     private:
         Point edge;
@@ -386,10 +386,10 @@ namespace svg
     class Line : public Shape
     {
     public:
-        Line(Point const & start_point, Point const & end_point,
-            Stroke const & stroke = Stroke())
-            : Shape(Fill(), stroke), start_point(start_point),
-            end_point(end_point) { }
+        Line(Point const & istart_point, Point const & iend_point,
+            Stroke const & istroke = Stroke())
+            : Shape(Fill(), istroke), start_point(istart_point),
+            end_point(iend_point) { }
         std::string toString(Layout const & layout) const
         {
             std::stringstream ss;
@@ -400,13 +400,13 @@ namespace svg
                 << stroke.toString(layout) << emptyElemEnd();
             return ss.str();
         }
-        void offset(Point const & offset)
+        void offset(Point const & ioffset)
         {
-            start_point.x += offset.x;
-            start_point.y += offset.y;
+            start_point.x += ioffset.x;
+            start_point.y += ioffset.y;
 
-            end_point.x += offset.x;
-            end_point.y += offset.y;
+            end_point.x += ioffset.x;
+            end_point.y += ioffset.y;
         }
     private:
         Point start_point;
@@ -416,9 +416,9 @@ namespace svg
     class Polygon : public Shape
     {
     public:
-        Polygon(Fill const & fill = Fill(), Stroke const & stroke = Stroke())
-            : Shape(fill, stroke) { }
-        Polygon(Stroke const & stroke = Stroke()) : Shape(Color::Transparent, stroke) { }
+        Polygon(Fill const & ifill = Fill(), Stroke const & istroke = Stroke())
+            : Shape(ifill, istroke) { }
+        Polygon(Stroke const & istroke = Stroke()) : Shape(Color::Transparent, istroke) { }
         Polygon & operator<<(Point const & point)
         {
             points.push_back(point);
@@ -437,11 +437,11 @@ namespace svg
             ss << fill.toString(layout) << stroke.toString(layout) << emptyElemEnd();
             return ss.str();
         }
-        void offset(Point const & offset)
+        void offset(Point const & ioffset)
         {
             for (unsigned i = 0; i < points.size(); ++i) {
-                points[i].x += offset.x;
-                points[i].y += offset.y;
+                points[i].x += ioffset.x;
+                points[i].y += ioffset.y;
             }
         }
     private:
@@ -451,12 +451,12 @@ namespace svg
     class Polyline : public Shape
     {
     public:
-        Polyline(Fill const & fill = Fill(), Stroke const & stroke = Stroke())
-            : Shape(fill, stroke) { }
-        Polyline(Stroke const & stroke = Stroke()) : Shape(Color::Transparent, stroke) { }
-        Polyline(std::vector<Point> const & points,
-            Fill const & fill = Fill(), Stroke const & stroke = Stroke())
-            : Shape(fill, stroke), points(points) { }
+        Polyline(Fill const & ifill = Fill(), Stroke const & istroke = Stroke())
+            : Shape(ifill, istroke) { }
+        Polyline(Stroke const & istroke = Stroke()) : Shape(Color::Transparent, istroke) { }
+        Polyline(std::vector<Point> const & ipoints,
+            Fill const & ifill = Fill(), Stroke const & istroke = Stroke())
+            : Shape(ifill, istroke), points(ipoints) { }
         Polyline & operator<<(Point const & point)
         {
             points.push_back(point);
@@ -475,11 +475,11 @@ namespace svg
             ss << fill.toString(layout) << stroke.toString(layout) << emptyElemEnd();
             return ss.str();
         }
-        void offset(Point const & offset)
+        void offset(Point const & ioffset)
         {
             for (unsigned i = 0; i < points.size(); ++i) {
-                points[i].x += offset.x;
-                points[i].y += offset.y;
+                points[i].x += ioffset.x;
+                points[i].y += ioffset.y;
             }
         }
         std::vector<Point> points;
@@ -488,9 +488,9 @@ namespace svg
     class Text : public Shape
     {
     public:
-        Text(Point const & origin, std::string const & content, Fill const & fill = Fill(),
-             Font const & font = Font(), Stroke const & stroke = Stroke())
-            : Shape(fill, stroke), origin(origin), content(content), font(font) { }
+        Text(Point const & iorigin, std::string const & icontent, Fill const & ifill = Fill(),
+             Font const & ifont = Font(), Stroke const & istroke = Stroke())
+            : Shape(ifill, istroke), origin(iorigin), content(icontent), font(ifont) { }
         std::string toString(Layout const & layout) const
         {
             std::stringstream ss;
@@ -500,10 +500,10 @@ namespace svg
                 << ">" << content << elemEnd("text");
             return ss.str();
         }
-        void offset(Point const & offset)
+        void offset(Point const & ioffset)
         {
-            origin.x += offset.x;
-            origin.y += offset.y;
+            origin.x += ioffset.x;
+            origin.y += ioffset.y;
         }
     private:
         Point origin;
@@ -515,9 +515,9 @@ namespace svg
     class LineChart : public Shape
     {
     public:
-        LineChart(Dimensions margin = Dimensions(), double scale = 1,
-                  Stroke const & axis_stroke = Stroke(.5, Color::Purple))
-            : axis_stroke(axis_stroke), margin(margin), scale(scale) { }
+        LineChart(Dimensions imargin = Dimensions(), double iscale = 1,
+                  Stroke const & iaxis_stroke = Stroke(.5, Color::Purple))
+            : axis_stroke(iaxis_stroke), margin(imargin), scale(iscale) { }
         LineChart & operator<<(Polyline const & polyline)
         {
             if (polyline.points.empty())
@@ -537,10 +537,10 @@ namespace svg
 
             return ret + axisString(layout);
         }
-        void offset(Point const & offset)
+        void offset(Point const & ioffset)
         {
             for (unsigned i = 0; i < polylines.size(); ++i)
-                polylines[i].offset(offset);
+                polylines[i].offset(ioffset);
         }
     private:
         Stroke axis_stroke;
@@ -601,8 +601,8 @@ namespace svg
     class Document
     {
     public:
-        Document(std::string const & file_name, Layout layout = Layout())
-            : file_name(file_name), layout(layout) { }
+        Document(std::string const & ifile_name, Layout ilayout = Layout())
+            : file_name(ifile_name), layout(ilayout) { }
 
         Document & operator<<(Shape const & shape)
         {

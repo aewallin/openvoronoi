@@ -19,7 +19,6 @@ def writeFrame( w2if, lwr, n ):
     #lwr.Write()
 
 if __name__ == "__main__":  
-    #print ocl.revision()
     #w=2500
     #h=1500
     
@@ -28,7 +27,7 @@ if __name__ == "__main__":
     w=1024
     h=1024
     myscreen = ovdvtk.VTKScreen(width=w, height=h) 
-    ovdvtk.drawOCLtext(myscreen, rev_text=ovd.revision() )
+    ovdvtk.drawOCLtext(myscreen, rev_text=ovd.version() )
     
     w2if = vtk.vtkWindowToImageFilter()
     w2if.SetInput(myscreen.renWin)
@@ -49,7 +48,7 @@ if __name__ == "__main__":
     myscreen.camera.SetFocalPoint(0.0, 0, 0)
     
     vd = ovd.VoronoiDiagram(far,120)
-    print vd.version()
+    print ovd.version()
     
     # for vtk visualization
     vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)

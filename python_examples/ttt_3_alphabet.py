@@ -154,7 +154,7 @@ if __name__ == "__main__":
     segs5 = modify_segments(segs5)
     
     vd = ovd.VoronoiDiagram(far,120)
-    print vd.version()
+    print ovd.version()
     
     vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
     vod.drawFarCircle()

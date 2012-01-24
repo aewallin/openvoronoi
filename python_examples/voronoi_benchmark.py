@@ -67,7 +67,6 @@ def circleGenerators(far, Nmax):
     
     
 if __name__ == "__main__":  
-    #print ocl.revision()
     myscreen = ovdvtk.VTKScreen()
     ovdvtk.drawOCLtext(myscreen)
     
@@ -89,7 +88,7 @@ if __name__ == "__main__":
     myscreen.camera.SetClippingRange(-(zmult+1)*camPos,(zmult+1)*camPos)
     myscreen.camera.SetFocalPoint(0.0, 0, 0)
     vd = ovd.VoronoiDiagram(far,120)
-    print vd.version()
+    print ovd.version()
     vod = ovdvtk.VD(myscreen,vd,float(scale))
     drawFarCircle(myscreen, vd.getFarRadius(), ovdvtk.orange)
     

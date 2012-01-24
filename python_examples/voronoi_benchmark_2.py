@@ -9,7 +9,7 @@ import ovdgenerators as gens
 def timeVoronoi(Nmax):
     far = 1
     vd = ovd.VoronoiDiagram(far, int( math.floor( math.sqrt(2)*math.sqrt(Nmax) ) ) )
-    print vd.version()
+    
     plist = gens.randomGenerators(far, Nmax)
     #plist = regularGridGenerators(far, Nmax)
     #plist = circleGenerators(far, Nmax)
@@ -43,13 +43,14 @@ if __name__ == "__main__":
     Nmax_list=[]
     for e in exp_list:
         Nmax_list.append( int( math.floor( (math.pow(2,e) ) ) ) )
-
+    print ovd.version()
+    print "Benchmarking for Nmax in: "
     print Nmax_list
     #exit()
     csvWriter = csv.writer(open('results_rand_189.csv', 'wb'), delimiter=',' )
     for Nmax in Nmax_list:
         t = timeVoronoi(Nmax)
-        print Nmax," gens took ", t ," seconds, ", 1e6*float(t)/(float(Nmax)*float(math.log10(Nmax)/math.log10(2)))," us/n*log(n)"
+        print Nmax," points took %.3f seconds = %.3f us/n*log2(n)" %  ( t,  1e6*float(t)/(float(Nmax)*float(math.log10(Nmax)/math.log10(2))) ) 
         csvWriter.writerow( [ Nmax, t ] )
         
 

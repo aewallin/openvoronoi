@@ -67,7 +67,7 @@ def circleGenerators(far, Nmax):
 if __name__ == "__main__":  
     #print ocl.revision()
     myscreen = ovdvtk.VTKScreen(width=1024, height=720) #(width=1920, height=1080)
-    ovdvtk.drawOCLtext(myscreen, rev_text=ovd.revision() )
+    ovdvtk.drawOCLtext(myscreen, rev_text=ovd.version() )
     
     w2if = vtk.vtkWindowToImageFilter()
     w2if.SetInput(myscreen.renWin)
@@ -88,7 +88,7 @@ if __name__ == "__main__":
     myscreen.camera.SetFocalPoint(0.0, 0, 0)
     
     vd = ovd.VoronoiDiagram(far,120)
-    print vd.version()
+    print ovd.version()
     vd.check()
     print "created."
     

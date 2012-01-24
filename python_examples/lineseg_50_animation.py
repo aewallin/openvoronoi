@@ -143,14 +143,15 @@ def drawLinesegFrame(Nmax, myscreen, vd, vod, framenr, anim, step):
     myscreen.render()    
 
 if __name__ == "__main__":
-    Nmax = 50
+    Nmax = 50 # number of points to insert
+    
     nframe=0 
     w=1920
     h=1080
     #w=1024
     #h=720
     myscreen = ovdvtk.VTKScreen(width=w, height=h) 
-    ovdvtk.drawOCLtext(myscreen, rev_text=ovd.revision() )
+    ovdvtk.drawOCLtext(myscreen, rev_text=ovd.version() )
     w2if = vtk.vtkWindowToImageFilter()
     w2if.SetInput(myscreen.renWin)
     lwr = vtk.vtkPNGWriter()

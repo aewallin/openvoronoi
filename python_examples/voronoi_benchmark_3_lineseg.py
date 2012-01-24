@@ -62,15 +62,15 @@ def log2(x):
     return math.log10(x)/math.log10(2)
     
 if __name__ == "__main__":  
-    print ovd.revision()
+    print ovd.version()
     far = 1
     Nmax_exp_start = 13
     Nmax_exp_end = 20
     # 10 -> 32 linesites
     # 14 -> 128
     # 18 -> 512
-    # 20 -> 1024        
-    # 24 -> 4096
+    # 20 -> 1024        (this takes 19s to generate the dataset!)
+    # 24 -> 4096        ( this and below takes much longer!!)
     # 28 -> 16384
     # 32 -> 65536
     # 33 -> 92681
@@ -85,8 +85,8 @@ if __name__ == "__main__":
     for e in exp_list:
         Nmax_list.append( [ n, int( math.floor( (math.pow(2,e) ) ) ) ] )
         n=n+1
-        
-    #print Nmax_list
+    print "Benchmarking for : "    
+    print Nmax_list
     #exit()
     csvWriter = csv.writer(open('results_rand_opt.csv', 'wb'), delimiter=',' )
     for case in Nmax_list:

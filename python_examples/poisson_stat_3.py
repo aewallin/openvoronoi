@@ -41,7 +41,7 @@ def getVoronoiStats(Nmax,seed=1):
     random.seed(seed)
     far = 1
     vd = ovd.VoronoiDiagram(1,int( math.floor( math.sqrt(2)*math.sqrt(Nmax) ) ))
-    print vd.version()
+    
     plist = randomGenerators(1, Nmax)    
     t_before = time.time() 
 
@@ -50,7 +50,7 @@ def getVoronoiStats(Nmax,seed=1):
 
     t_after = time.time()
     calctime = t_after-t_before
-    print " VD done in ", calctime," s, ", calctime/(Nmax*(math.log(Nmax)/math.log(2)))," s per n*log2(n())"
+    print " VD done in ", calctime," s, ", 1e6*calctime/(Nmax*(math.log(Nmax)/math.log(2)))," us per n*log2(n())"
     stat = vd.getFaceStats()
     data=[]
     for s in stat:
@@ -68,8 +68,8 @@ def writeResults(seed,Nmax,data):
     f.close()
 
 if __name__ == "__main__":  
-
-    Nmax=100000
+    print ovd.version()
+    Nmax=10000
     max_seed = 10
     for s in range(0,max_seed):
         d = getVoronoiStats(Nmax,s)

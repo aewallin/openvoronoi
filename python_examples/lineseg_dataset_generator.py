@@ -7,10 +7,10 @@ import gzip
 import ovdgenerators as gens
 
 if __name__ == "__main__":  
-    print ovd.revision()
+    print ovd.version()
     
     far = 1
-    Nmax = int(math.pow(2,16))
+    Nmax = int(math.pow(2,10)) # number of line-segments to generate
     
     print "waiting for ",Nmax," segments..",
     sys.stdout.flush()

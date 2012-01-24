@@ -95,7 +95,6 @@ class VoronoiDiagram {
         int num_split_vertices();
         /// string repr
         std::string print() const;
-        std::string version() const { return VERSION_STRING; }
         static void reset_vertex_count() { VoronoiVertex::reset_count(); }
         void debug_on() {debug=true;}
         bool check();

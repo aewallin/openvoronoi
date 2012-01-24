@@ -45,7 +45,7 @@ std::string build_type() {
 }
 
 BOOST_PYTHON_MODULE(openvoronoi) {
-    bp::def("version", version); // why do we have both module.version() and vd.version() ?
+    bp::def("version", version);
     bp::def("build_type", build_type);
     bp::def("vd2svg", vd2svg);
     
@@ -72,7 +72,6 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         .def("numFaces", &VoronoiDiagram_py::num_faces)
         .def("numSplitVertices", &VoronoiDiagram_py::num_split_vertices)
         .def("__str__", &VoronoiDiagram_py::print)
-        .def("version", &VoronoiDiagram_py::version)
         .def("reset_vertex_count", &VoronoiDiagram_py::reset_vertex_count)
         .def("setEdgePoints", &VoronoiDiagram_py::set_edge_points)
         .def("setEdgeOffset", &VoronoiDiagram_py::set_null_edge_offset)

@@ -55,13 +55,12 @@ def segmentIntersects(segs, s):
     return 0 # no intersections found
     
 if __name__ == "__main__":  
-    #print ocl.revision()
     #w=1920
     #h=1080
     w=1024
     h=720
     myscreen = ovdvtk.VTKScreen(width=w, height=h) 
-    ovdvtk.drawOCLtext(myscreen, rev_text=ovd.revision() )
+    ovdvtk.drawOCLtext(myscreen, rev_text=ovd.version() )
     
     w2if = vtk.vtkWindowToImageFilter()
     w2if.SetInput(myscreen.renWin)
@@ -83,7 +82,7 @@ if __name__ == "__main__":
     
     vd = ovd.VoronoiDiagram(far,120)
     vd.setEdgePoints(1000)
-    print vd.version()
+    print ovd.version()
     
     # for vtk visualization
     vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)

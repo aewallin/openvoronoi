@@ -40,48 +40,6 @@ def translate(segs,x,y):
             #seg2.append(seg[3] + y)
         out.append(seg2)
     return out
-"""
-def insert_polygon(vd, polygon):
-    pts=[]
-    for p in polygon:
-        pts.append( ovd.Point( p[0], p[1] ) )
-        
-    times=[]
-    id_list = []
-    m=0
-    t_before = time.time()
-    for p in pts:
-        id_list.append( vd.addVertexSite( p ) )
-        print m," added vertex "
-        m=m+1
-    t_after = time.time()
-    times.append( t_after-t_before )
-    
-    print "polygon is: "
-    for idx in id_list:
-        print idx," ",
-    print "."
-    
-
-    
-    print "all point sites inserted. ",
-    vd.check()
-    #vd.debug_on()
-
-    t_before = time.time()
-
-    for n in range(len(id_list)):
-        n_nxt = n+1
-        if n==(len(id_list)-1):
-            n_nxt=0
-        
-        vd.addLineSite( id_list[n], id_list[n_nxt])
-    t_after = time.time()
-    times.append( t_after-t_before )
-    
-    vd.check()
-    return times
-"""
 
 def insert_polygon_points(vd, polygon):
     pts=[]
@@ -213,7 +171,7 @@ if __name__ == "__main__":
     segs6 = modify_segments(segs6)
     
     vd = ovd.VoronoiDiagram(far,120)
-    print vd.version()
+    print ovd.version()
     
     vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
     vod.drawFarCircle()

@@ -38,8 +38,6 @@ using namespace ovd;
 
 namespace bp = boost::python;
 
-
-
 BOOST_PYTHON_MODULE(openvoronoi) {
     bp::def("version", version);
     bp::def("build_type", build_type);

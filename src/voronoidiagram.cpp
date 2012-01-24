@@ -1359,7 +1359,7 @@ boost::tuple<HEEdge,HEVertex,HEEdge,bool> VoronoiDiagram::find_separator_target(
         bool in_new_out = ( g[previous_vertex].status == IN  && g[current_vertex].status == NEW && g[next_vertex].status == OUT); 
         if ( out_new_in || in_new_out   ) {
             if (debug) {
-                std::cout << "OUT/IN-NEW-IN/OUT: " << g[previous_vertex].index << "-" << g[current_vertex].index;
+                std::cout << "potential OUT/IN-NEW-IN/OUT: " << g[previous_vertex].index << "-" << g[current_vertex].index;
                 std::cout << "-" << g[next_vertex].index << "\n";
             }
             if ( (g[endp].k3 == g[current_vertex].k3)  && endp!=current_vertex ) {
@@ -1369,7 +1369,14 @@ boost::tuple<HEEdge,HEVertex,HEEdge,bool> VoronoiDiagram::find_separator_target(
                     flag = out_new_in ? true : false;
                     found = true;                 
                     if (debug) std::cout << "FOUND!\n";
-            }  
+            }  else {
+                if (debug) {
+                    std::cout << " g[endp].k3  = " <<  g[endp].k3  <<"\n";
+                    std::cout << " g[current_vertex].k3  = " << g[current_vertex].k3  <<"\n";
+                    std::cout << " k3 match? = " <<  (g[endp].k3 == g[current_vertex].k3) <<"\n";
+                    std::cout << " endp!=current_vertex ? = " <<  (endp!=current_vertex) <<"\n";
+                }
+            }
         }
         current_edge = g[current_edge].next;   
         //count++;
@@ -1379,6 +1386,8 @@ boost::tuple<HEEdge,HEVertex,HEEdge,bool> VoronoiDiagram::find_separator_target(
     if (!found) {
         std::cout << "find_separator_target() FATAL ERROR\n";
         std::cout << " find_separator_target Unable to find target vertex on face f=" << f << " endp= " << g[endp].index << "\n";
+        std::cout << " looking for OUT-NEW-IN: " << OUT << " - " << NEW << " - " << IN << "\n";
+        std::cout << " looking for IN-NEW-OUT: " << IN << " - " << NEW << " - " << OUT << "\n";
         g.print_face(f);
         exit(-1);
     }

@@ -199,7 +199,22 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     // try a desperate solution
     double t_mid = 0.5*(t_min+t_max);
     Point p_mid = g[edge].point(t_mid);
-    Solution desp( p_mid, t_mid, 1 );
+    double desp_k3(0);
+    if (s3->isPoint())
+        desp_k3 = 1;
+    else if ( s3->isLine() ) {
+        // find out on which side the desperate solution lies
+        Point src_se = s3->start();
+        Point trg_se = s3->end();
+        Point left = 0.5*(src_se+trg_se) + (trg_se-src_se).xy_perp(); // this is used below and in find_null_face()
+        if (p_mid.is_right(src_se,trg_se)) {
+            desp_k3 = -1;
+        } else {
+            desp_k3 = 1;
+        }
+    }
+    Solution desp( p_mid, t_mid, desp_k3 ); // FIXME k3=1 is not correct here!
+    
     std::cout << "WARNING: Returning desperate solution: \n";
     std::cout << desp.p << " t=" << desp.t << " k3=" << desp.k3  << " e_err=" << g[edge].error(desp) <<"\n";
     return desp;

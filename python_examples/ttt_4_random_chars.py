@@ -46,15 +46,23 @@ def insert_polygon_segments(vd,id_list):
         if (j<jmax):
             #vd.debug_on()
             print " ",j,"inserting segement ",id_list[n]," - ",id_list[n_nxt]
-            if id_list[n] == 133630:
+            
+            if 0: #id_list[n] == 51456:
                 vd.debug_on()
-                vd.addLineSite( id_list[n], id_list[n_nxt],5)
+                vd.addLineSite( id_list[n], id_list[n_nxt],6)
                 vod.setVDText2([1,1])
                 vod.setAll()
+                verts=[92555, 51680,92624,52559,51474,92620,52805]
+                for v in verts:
+                    #print "drawing ",v
+                    #print vod
+                    #print dir(vod)
+                    vod.drawVertexIdx(v)
                 print "PYTHON All DONE."
                 myscreen.render()   
                 myscreen.iren.Start()
             else:
+                #pass
                 vd.addLineSite( id_list[n], id_list[n_nxt])
         j=j+1
 
@@ -148,7 +156,9 @@ def get_scaled_translated_segs( chars, length, dx, n_row):
     segs = modify_segments(segs)
     return segs
     
-if __name__ == "__main__":  
+if __name__ == "__main__": 
+    print ttt.version()
+    #exit() 
     #w=2500
     #h=1500
     
@@ -169,10 +179,10 @@ if __name__ == "__main__":
     myscreen.camera.SetFocalPoint(0.0, 0, 0)
     
     random.seed(42)
-    row_length = 12
-    n_rows = 3
-    # works (seed=42) 10/3 11/3
-    # segfaults: 12/3
+    row_length = 13
+    n_rows = 4
+    # works (seed=42) 10/3 11/3 12/3
+    # segfaults: 
     # length = 10 fits ca 4 rows
     
     length = 1
@@ -186,7 +196,7 @@ if __name__ == "__main__":
         rowsegs = get_scaled_translated_segs( chars, length, dx, n)
         segs+=rowsegs
         print chars
-    exit()
+    #exit()
     #print chars
     
     vd = ovd.VoronoiDiagram(far,120)
@@ -199,7 +209,7 @@ if __name__ == "__main__":
     vod.drawVertices=0
     vod.drawVertexIndex=0
     vod.drawGenerators=0
-    vod.offsetEdges = 0
+    vod.offsetEdges = 1
     vod.drawNullEdges = 1
     vd.setEdgeOffset(0.001)
     

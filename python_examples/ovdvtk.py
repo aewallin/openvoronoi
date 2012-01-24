@@ -291,8 +291,19 @@ class VD:
                 self.myscreen.addActor(cir_actor)
         self.myscreen.render() 
     
-    
-        
+    def drawVertexIdx(self, index):
+        #print "hello"
+        for pt in self.vd.getVoronoiVertices():
+            p = self.scale*pt[0]
+            vcolor = cyan
+            status = pt[2]
+            idx = pt[3]
+            if idx == index:
+                id_text = str(idx)
+                factor = FollowerText( text=id_text,center=(p.x,p.y,0), scale = self.textScale, color=vcolor)
+                self.verts.append(factor)
+                self.myscreen.addActor( factor )
+            
     def setEdgesPolydata(self):
         for e in self.edges:
             self.myscreen.removeActor(e)

@@ -84,6 +84,15 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         .value("UNDECIDED", UNDECIDED)
         .value("NEW", NEW)
     ;
+    bp::enum_<VoronoiVertexType>("VoronoiVertexType") // OUTER, NORMAL, POINTSITE, ENDPOINT, SEPPOINT, APEX, SPLIT};
+        .value("OUTER", OUTER)   
+        .value("NORMAL", NORMAL)
+        .value("POINTSITE", POINTSITE)
+        .value("ENDPOINT", ENDPOINT)
+        .value("SEPPOINT", SEPPOINT)
+        .value("APEX", APEX)
+        .value("SPLIT", SPLIT)
+    ;
     bp::enum_<VoronoiFaceStatus>("VoronoiFaceStatus")
         .value("INCIDENT", INCIDENT)
         .value("NONINCIDENT", NONINCIDENT)

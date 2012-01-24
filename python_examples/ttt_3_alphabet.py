@@ -40,24 +40,26 @@ def insert_polygon_segments(vd,id_list):
             n_nxt=0
         print " ",j,"inserting segement ",id_list[n]," - ",id_list[n_nxt]
         
-        if id_list[n] == 47124:
+        if id_list[n] == 47288:
             vd.debug_on()
-            vd.addLineSite( id_list[n], id_list[n_nxt], 5)
+            vd.addLineSite( id_list[n], id_list[n_nxt], 4)
             vod.setVDText2([1,1])
             vod.setAll()
-            verts=[116646,116662,116648]
-            for v in verts:
-                print "drawing ",v
+            #verts=[id_list[n], id_list[n_nxt], 117443,117445,117460,117454]
+            #for v in verts:
+            #    print "drawing ",v
                 #print vod
                 #print dir(vod)
-                vod.drawVertexIdx(v)
-                
+            #    vod.drawVertexIdx(v)
+            vod.drawIncidentVertexIds()
             print "PYTHON All DONE."
             myscreen.render()   
             myscreen.iren.Start()
-        else:
-            #pass
+        elif id_list[n] in [47277]:
             vd.addLineSite( id_list[n], id_list[n_nxt])
+        else:
+            pass
+            #vd.addLineSite( id_list[n], id_list[n_nxt])
         j=j+1
 
 def modify_segments(segs):
@@ -163,17 +165,17 @@ if __name__ == "__main__":
     vd = ovd.VoronoiDiagram(far,120)
     print ovd.version()
     
-    vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
+    vod = ovdvtk.VD(myscreen,vd,float(1), textscale=0.01, vertexradius=0.003)
     vod.drawFarCircle()
     #vod.textScale = 0.000002
-    vod.textScale = 0.002
+    vod.textScale = 0.00002
     vod.vertexRadius = 0.0011
     vod.drawVertices=0
     vod.drawVertexIndex=0
     vod.drawGenerators=0
-    vod.offsetEdges = 0
-    vod.drawNullEdges = 0
-    vd.setEdgeOffset(0.00001)
+    vod.offsetEdges = 1
+    vod.drawNullEdges = 1
+    vd.setEdgeOffset(0.0001)
     
     all_segs=segs+segs2 +segs3 +segs4+segs5
     #all_segs=segs

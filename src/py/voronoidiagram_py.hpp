@@ -98,9 +98,10 @@ public:
     boost::python::list getVoronoiVertices()  {
         boost::python::list plist;
         BOOST_FOREACH( HEVertex v, g.vertices() ) {
-            if ( g[v].type == NORMAL || g[v].type == ENDPOINT || 
-               g[v].type == SEPPOINT || g[v].type == APEX || 
-               g[v].type == OUTER || g[v].type == SPLIT) {
+            //if ( g[v].type == NORMAL || g[v].type == ENDPOINT || 
+            //   g[v].type == SEPPOINT || g[v].type == APEX || 
+            //   g[v].type == OUTER || g[v].type == SPLIT) 
+            {
                 boost::python::list pd;
                 Point offset(0,0);
                 //double ofs= 0.01;
@@ -114,6 +115,7 @@ public:
                 pd.append( g[v].dist() );
                 pd.append( g[v].status );
                 pd.append( g[v].index );
+                pd.append( g[v].type );
                 plist.append(pd);
             }
         }

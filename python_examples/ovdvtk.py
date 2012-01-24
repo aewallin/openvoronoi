@@ -292,7 +292,7 @@ class VD:
         self.myscreen.render() 
     
     def drawVertexIdx(self, index):
-        #print "hello"
+        #print "drawVertexIdx ", index
         for pt in self.vd.getVoronoiVertices():
             p = self.scale*pt[0]
             vcolor = cyan
@@ -300,10 +300,33 @@ class VD:
             idx = pt[3]
             if idx == index:
                 id_text = str(idx)
+                #print "drawVertexIdx text= ", id_text, " pos= ", p
                 factor = FollowerText( text=id_text,center=(p.x,p.y,0), scale = self.textScale, color=vcolor)
-                self.verts.append(factor)
+                #self.verts.append(factor)
                 self.myscreen.addActor( factor )
-            
+                
+    def drawIncidentVertexIds(self):
+        for pt in self.vd.getVoronoiVertices():
+            p = self.scale*pt[0]
+            vcolor = cyan
+            status = pt[2]
+            idx = pt[3]
+            vtype = pt[4]
+            if status == ovd.VoronoiVertexStatus.IN:
+                vcolor = red
+            elif status == ovd.VoronoiVertexStatus.OUT:
+                vcolor = blue
+            elif status == ovd.VoronoiVertexStatus.NEW:
+                vcolor = green
+                    
+            if status == ovd.VoronoiVertexStatus.IN or status == ovd.VoronoiVertexStatus.OUT or status == ovd.VoronoiVertexStatus.NEW:
+                if ( vtype != ovd.VoronoiVertexType.SEPPOINT and vtype != ovd.VoronoiVertexType.ENDPOINT and vtype != ovd.VoronoiVertexType.POINTSITE):
+                    id_text = str(idx)
+                    #print "drawVertexIdx text= ", id_text, " pos= ", p
+                    factor = FollowerText( text=id_text,center=(p.x,p.y,0), scale = self.textScale, color=vcolor)
+                    #self.verts.append(factor)
+                    self.myscreen.addActor( factor )
+        
     def setEdgesPolydata(self):
         for e in self.edges:
             self.myscreen.removeActor(e)

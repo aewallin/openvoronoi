@@ -39,18 +39,25 @@ def insert_polygon_segments(vd,id_list):
         if n==(len(id_list)-1):
             n_nxt=0
         print " ",j,"inserting segement ",id_list[n]," - ",id_list[n_nxt]
-        """
-        if id_list[n] ==12856:
+        
+        if id_list[n] == 47124:
             vd.debug_on()
             vd.addLineSite( id_list[n], id_list[n_nxt], 5)
             vod.setVDText2([1,1])
             vod.setAll()
+            verts=[116646,116662,116648]
+            for v in verts:
+                print "drawing ",v
+                #print vod
+                #print dir(vod)
+                vod.drawVertexIdx(v)
+                
             print "PYTHON All DONE."
             myscreen.render()   
             myscreen.iren.Start()
         else:
-        """
-        vd.addLineSite( id_list[n], id_list[n_nxt])
+            #pass
+            vd.addLineSite( id_list[n], id_list[n_nxt])
         j=j+1
 
 def modify_segments(segs):
@@ -158,7 +165,8 @@ if __name__ == "__main__":
     
     vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
     vod.drawFarCircle()
-    vod.textScale = 0.000002
+    #vod.textScale = 0.000002
+    vod.textScale = 0.002
     vod.vertexRadius = 0.0011
     vod.drawVertices=0
     vod.drawVertexIndex=0

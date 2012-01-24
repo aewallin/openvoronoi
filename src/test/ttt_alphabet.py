@@ -90,7 +90,8 @@ def ttt_segments(text,scale,conic_subdiv):
     
 if __name__ == "__main__":  
 
-    conic_subdiv = int(sys.argv[1])
+    #conic_subdiv = int(sys.argv[1])
+    conic_subdiv = 200
     
     scale = 25000
     segs = ttt_segments(  "ABCDEFGHIJKLM", scale, conic_subdiv)

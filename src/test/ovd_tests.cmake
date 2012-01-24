@@ -17,7 +17,7 @@ foreach( CASE ${2OPT_RPG_CASES} )
     ADD_TEST(2opt_random_polygon_${CASE} python ../src/test/2opt_random_polygon.py ${CASE} ${2OPT_RPG_MAX_SEED})
 endforeach()
 
-set( 2OPT_RPG_CASES 40 50 100 200 400 800) # the number of vertices in the polygon
+set( 2OPT_RPG_CASES 40 50 100 200) # 400 800 the number of vertices in the polygon
 set( 2OPT_RPG_MAX_SEED 10) # run test for seeds 0,1,2,3,...,max-1
 foreach( CASE ${2OPT_RPG_CASES} )
     ADD_TEST(2opt_random_polygon_${CASE} python ../src/test/2opt_random_polygon.py ${CASE} ${2OPT_RPG_MAX_SEED})

@@ -46,7 +46,16 @@ def insert_polygon_segments(vd,id_list):
         if (j<jmax):
             #vd.debug_on()
             print " ",j,"inserting segement ",id_list[n]," - ",id_list[n_nxt]
-            vd.addLineSite( id_list[n], id_list[n_nxt])
+            if id_list[n] == 133630:
+                vd.debug_on()
+                vd.addLineSite( id_list[n], id_list[n_nxt],5)
+                vod.setVDText2([1,1])
+                vod.setAll()
+                print "PYTHON All DONE."
+                myscreen.render()   
+                myscreen.iren.Start()
+            else:
+                vd.addLineSite( id_list[n], id_list[n_nxt])
         j=j+1
 
 def modify_segments(segs):
@@ -133,6 +142,7 @@ def get_scaled_translated_segs( chars, length, dx, n_row):
     # translate to final position
     start_y=-0.5
     dy = 1.5*float(length)/float(current_length)*current_height
+    print " row to y= ",start_y+n_row*dy
     segs = translate(segs, dx, start_y+n_row*dy )
     # remove duplicate points
     segs = modify_segments(segs)
@@ -159,8 +169,10 @@ if __name__ == "__main__":
     myscreen.camera.SetFocalPoint(0.0, 0, 0)
     
     random.seed(42)
-    row_length = 13
+    row_length = 12
     n_rows = 3
+    # works (seed=42) 10/3 11/3
+    # segfaults: 12/3
     # length = 10 fits ca 4 rows
     
     length = 1
@@ -173,8 +185,9 @@ if __name__ == "__main__":
         chars = get_random_row(row_length)
         rowsegs = get_scaled_translated_segs( chars, length, dx, n)
         segs+=rowsegs
-        
-    print chars
+        print chars
+    exit()
+    #print chars
     
     vd = ovd.VoronoiDiagram(far,120)
     print ovd.version()
@@ -190,18 +203,9 @@ if __name__ == "__main__":
     vod.drawNullEdges = 1
     vd.setEdgeOffset(0.001)
     
-    all_segs=segs #+segs2 #+segs3 +segs4+segs5
-    #all_segs=segs
-    #all_segs=segs3 #+segs4
-    #all_segs = segs6
-    #insert_many_polygons(vd,all_segs)
-    times = insert_many_polygons(vd,all_segs)
-    #vd.check()
+    times = insert_many_polygons(vd,segs)
+    vd.check()
     vod.setVDText2(times)
-    
-    ovd.PolygonInterior( vd.getGraph() , True )
-    ovd.MedialAxis( vd.getGraph() )
-    
     vod.setAll()
     print "PYTHON All DONE."
     myscreen.render()   

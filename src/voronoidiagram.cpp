@@ -712,6 +712,12 @@ void VoronoiDiagram::add_separator(HEFace f, HEFace null_face,
     HEEdge endp_prev_tw = HEEdge();
 
     boost::tie( endp_next_tw, endp_prev_tw ) = g.find_next_prev(null_face, sep_endp);
+    if (debug) {
+        std::cout << "add_separator() endp_next_tw="; g.print_edge(endp_next_tw); 
+        std::cout << "add_separator() endp_prev_tw="; g.print_edge(endp_prev_tw); 
+        std::cout << "add_separator() g[endp_next_tw].twin="; g.print_edge(g[endp_next_tw].twin); 
+        std::cout << "add_separator() g[endp_prev_tw].twin="; g.print_edge(g[endp_prev_tw].twin); 
+    }
     endp_prev = g[endp_next_tw].twin; // NOTE twin!
     endp_next = g[endp_prev_tw].twin; // NOTE twin!
     assert( endp_next != HEEdge() );
@@ -723,7 +729,10 @@ void VoronoiDiagram::add_separator(HEFace f, HEFace null_face,
     HEVertex v_target = boost::get<1>(target);
     HEEdge    v_next  = boost::get<2>(target);
     bool out_new_in   = boost::get<3>(target);
-
+    if (debug) {
+        std::cout << "add_separator() v_previous="; g.print_edge(v_previous) ;
+        std::cout << "add_separator() v_target="<< g[v_target].index <<"\n";
+    }
     assert( (g[v_target].k3==1) || (g[v_target].k3==-1) );    
     assert( g[sep_endp].k3 == g[v_target].k3 );
     assert( s1->in_region( g[v_target].position ) ); // v1 and v2 should be in the region of the line-site
@@ -1367,6 +1376,12 @@ boost::tuple<HEEdge,HEVertex,HEEdge,bool> VoronoiDiagram::find_separator_target(
         //assert(count<10000); // some reasonable max number of edges in face, to avoid infinite loop
     } while (current_edge!=start_edge && !found);
     assert(found);
+    if (!found) {
+        std::cout << "find_separator_target() FATAL ERROR\n";
+        std::cout << " find_separator_target Unable to find target vertex on face f=" << f << " endp= " << g[endp].index << "\n";
+        g.print_face(f);
+        exit(-1);
+    }
     return boost::make_tuple(v_previous, v_target, v_next, flag);
 }
 

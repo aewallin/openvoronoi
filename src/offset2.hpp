@@ -231,7 +231,7 @@ private:
     FaceOffset(); // don't use.
     // hold a 0/1 flag for each face, indicating if an offset for this face has been produced or not.
     std::vector<unsigned char> face_done;
-    FaceOffsetLoops offset_list;
+    
 
 };
 

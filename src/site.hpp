@@ -83,6 +83,7 @@
 #include <sstream>
 
 #include "common/point.hpp"
+//#include "graph.hpp"
 
 namespace ovd {
 
@@ -152,6 +153,7 @@ struct Eq {
     
 };
 
+// preliminary offset-prerensentations. experiental...
 class Ofs {
 public:
     virtual std::string str() = 0;
@@ -206,8 +208,7 @@ public:
     inline virtual const Point position() const {assert(0); return Point(0,0);}
     virtual const Point start() const {assert(0); return Point(0,0);}
     virtual const Point end() const {assert(0); return Point(0,0);}
-    
-    
+
     Eq<double> eqp() {return eq;} 
     Eq<double> eqp(double kk) {
         Eq<double> eq2(eq);
@@ -220,10 +221,10 @@ public:
         eq2.k *= kk;
         return eq2;
     }
-    
+
     bool is_linear() {return isLine(); }
     bool is_quadratic() {return isPoint();}
-    
+
     virtual double x() const {
         std::cout << " WARNING: never call Site !\n";
         assert(0); 

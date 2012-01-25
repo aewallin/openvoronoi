@@ -1111,7 +1111,8 @@ void VoronoiDiagram::add_vertices( Site* new_site ) {
     EdgeVector q_edges = find_in_out_edges();       // new vertices generated on these IN-OUT edges
     for( unsigned int m=0; m<q_edges.size(); ++m )  {   
 
-        Solution sl = vpos->position( q_edges[m], new_site );
+        Solution sl = vpos->position( q_edges[m], new_site ); // vertex_positioner.cpp
+
         if ( vpos->dist_error( q_edges[m], sl, new_site) > 1e-9 ) {
             HEVertex src = g.source(q_edges[m]);
             HEVertex trg = g.target(q_edges[m]);

@@ -410,7 +410,10 @@ def drawLineLineTest():
     myscreen.render()
     myscreen.iren.Start()
 
-def drawSeparatorSolver(alfa = 6.4):
+# s1= l1: line-site
+# s2= p2: point-site (and end-point of l1)
+# s3: l3: line-site
+def drawSeparatorSolver1(alfa = 6.4):
     myscreen = ovdvtk.VTKScreen()
     myscreen.camera.SetPosition(0.01, 0,  100 ) 
     myscreen.camera.SetFocalPoint(0, 0, 0)
@@ -431,46 +434,94 @@ def drawSeparatorSolver(alfa = 6.4):
     myscreen.camera.SetPosition(p2.x+0.001, p2.y,  300 ) 
     myscreen.camera.SetFocalPoint(p2.x, p2.y, 0)
     
-    # create a line perpendicular to l1
-    #sep = Line( -l1.b, l1.a, 1, +1)
-    #if l1.k == +1:
-    #    sep = Line( -l1.b, l1.a, 1, +1)
-    #else:
-    #    sep = Line( l1.b, -l1.a, 1, +1)
-
-      
-    #for t in range(10):
-    #    drawVertex(myscreen, p2+t*10*ovd.Point( -sep.b,sep.a), ovdvtk.green , rad=2)
-    #    drawVertex(myscreen, p2-t*10*ovd.Point( -sep.b,sep.a), ovdvtk.red , rad=2)
-    
     # a second line-site
     #alfa = 4.1
     l3 = Line( math.cos(alfa),   math.sin(alfa)   , +50 , -1) # second line-site
     drawLine(myscreen, l3, ovdvtk.orange )
+    
     sv = ovd.Point()
-    #sv.x = -l1.b
-    #sv.y = l1.a
     if l1.k == -1:
         sv.x = l1.a
         sv.y = l1.b
     else:
         sv.x = -l1.a
         sv.y = -l1.b
-    # draw rays representing positive/begative separator:
+    # draw rays representing positive/negative separator:
     pos_sep =[p2, p2+100*sv ]
     neg_sep =[p2, p2-100*sv ]
     drawEdge(myscreen, pos_sep, edgeColor=ovdvtk.green)
     drawEdge(myscreen, neg_sep, edgeColor=ovdvtk.red)
     
     # 1st degree equation gives t directly:
-    tsln = -(l3.a*p2.x+l3.b*p2.y+l3.c) / ( (sv.x)*l3.a + sv.y*l3.b + l3.k  )
+    tsln = -(l3.a*p2.x+l3.b*p2.y+l3.c) / ( sv.x*l3.a + sv.y*l3.b + l3.k  )
     print tsln
     psln = p2 + tsln*sv
     drawVertex(myscreen, psln, ovdvtk.pink , rad=1)
     drawCircle(myscreen, psln, tsln, ovdvtk.pink )
+    drawCircle(myscreen, p2, tsln, ovdvtk.red )
+    
     myscreen.render()
     myscreen.iren.Start()
 
+# s1= l1: line-site
+# s2= p2: point-site (and end-point of l1)
+# s3: p3: point-site
+def drawSeparatorSolver2(px=10,py=20):
+    myscreen = ovdvtk.VTKScreen()
+    myscreen.camera.SetPosition(0.01, 0,  100 ) 
+    myscreen.camera.SetFocalPoint(0, 0, 0)
+    myscreen.camera.SetClippingRange(-100,3000)
+    
+    w2if = vtk.vtkWindowToImageFilter()
+    w2if.SetInput(myscreen.renWin)
+    lwr = vtk.vtkPNGWriter()
+    lwr.SetInput( w2if.GetOutput() )
+    #             a              b            c    k       
+    l1 = Line( math.cos(1),   math.sin(1)   , 1 , -1) # first line-site
+    drawLine(myscreen, l1, ovdvtk.yellow )
+    
+    # pick a point on the line which represents the end-point
+    y = 20
+    p2 = ovd.Point( (-l1.b*y-l1.c)/l1.a , y )
+    drawVertex(myscreen, p2, ovdvtk.orange , rad=1)
+    myscreen.camera.SetPosition(p2.x+0.001, p2.y,  300 ) 
+    myscreen.camera.SetFocalPoint(p2.x, p2.y, 0)
+    
+    
+    # a second point-site
+    #alfa = 4.1
+    #l3 = Line( math.cos(alfa),   math.sin(alfa)   , +50 , -1) # second line-site
+    p3 = ovd.Point(px,py)
+    drawVertex(myscreen, p3, ovdvtk.yellow , rad=1)
+    #drawLine(myscreen, l3, ovdvtk.orange )
+    sv = ovd.Point()
+    if l1.k == -1:
+        sv.x = l1.a
+        sv.y = l1.b
+    else:
+        sv.x = -l1.a
+        sv.y = -l1.b
+    # draw rays representing positive/negative separator:
+    pos_sep =[p2, p2+100*sv ]
+    neg_sep =[p2, p2-100*sv ]
+    drawEdge(myscreen, pos_sep, edgeColor=ovdvtk.green)
+    drawEdge(myscreen, neg_sep, edgeColor=ovdvtk.red)
+    
+    # 2nd degree equation gives t :
+    #  A t^2 +  B t + C = 0
+    dx = p2.x - p3.x
+    dy = p2.y - p3.y
+    tsln = -(dx*dx+dy*dy) / (2*( dx*sv.x+dy*sv.y  ))
+
+    print tsln
+    psln = p2 + tsln*sv
+    drawVertex(myscreen, psln, ovdvtk.pink , rad=1)
+    drawCircle(myscreen, psln, tsln, ovdvtk.pink )
+    drawCircle(myscreen, p3, tsln, ovdvtk.orange )
+    drawCircle(myscreen, p2, tsln, ovdvtk.red )
+    myscreen.render()
+    myscreen.iren.Start()
+    
 if __name__ == "__main__":  
     #drawPointPointTest()# point-point bisector is a LINE
     
@@ -478,4 +529,5 @@ if __name__ == "__main__":
     
     #drawLineLineTest() # line-line bisector is LINE(LINE)
     
-    drawSeparatorSolver(4.3)
+    drawSeparatorSolver1(4.3)
+    #drawSeparatorSolver2(4.3)

@@ -28,6 +28,7 @@
 #include "solvers/solver_ppp.hpp"
 #include "solvers/solver_lll.hpp"
 #include "solvers/solver_qll.hpp"
+#include "solvers/solver_sep.hpp"
 
 using namespace ovd::numeric; // sq() chop()
 
@@ -38,6 +39,7 @@ VertexPositioner::VertexPositioner(HEGraph& gi): g(gi) {
     //ppp_solver = new PPPSolver<double>(); // faster, but inaccurate
     lll_solver = new LLLSolver();
     qll_solver = new QLLSolver();
+    sep_solver = new SEPSolver();
     errstat.clear();
 }
 
@@ -45,6 +47,7 @@ VertexPositioner::~VertexPositioner() {
     delete ppp_solver;
     delete lll_solver;
     delete qll_solver;
+    delete sep_solver;
     errstat.clear();
 }
 
@@ -55,49 +58,34 @@ VertexPositioner::~VertexPositioner() {
 // - site to the left of HEEdge e
 // - site to the right of HEEdge e
 // - given new Site s
-Solution VertexPositioner::position(HEEdge e, Site* s) {
+Solution VertexPositioner::position(HEEdge e, Site* s3) {
     edge = e;
     HEFace face = g[e].face;     
     HEEdge twin = g[e].twin;
-    HEFace twin_face = g[twin].face;      
-    //assert(  g[face].status == INCIDENT);
-    //assert( g[twin_face].status == INCIDENT);
-    
+    HEFace twin_face = g[twin].face;
+
     HEVertex src = g.source(e);
     HEVertex trg = g.target(e);
     double t_src = g[src].dist();
     double t_trg = g[trg].dist();
-    t_min = std::min( t_src, t_trg );
+    t_min = std::min( t_src, t_trg ); // the solution we seek must have t_min<t<t_max
     t_max = std::max( t_src, t_trg );
-/*
-    std::cout << "  sites: " << g[face].site->str() << "(k="<< g[e].k<< ") ";
-    std::cout << g[twin_face].site->str() << "(k="<< g[twin].k;
-    std::cout << ") new= " << s->str() << "\n";
-    std::cout << " t-vals t_min= " << t_min << " t_max= " << t_max << "\n";
-  */     
+
     Site* s1 =  g[face].site;
     Site* s2 = g[twin_face].site;
-    
-    if ( g[e].type == SEPARATOR && s1->isLine() && s2->isLine() ) {
-        // the parallell lineseg case
-        if ( g[e].has_null_face ) {
-            s1 = g[ g[e].null_face ].site;    
-        } else if ( g[twin].has_null_face ) {
-            s2 = g[ g[twin].null_face ].site;
-        }
-    }
-    
-    Solution sl = position(  s1 , g[e].k, s2 , g[twin].k, s );
-    /*
-    std::cout << " new vertex positioned at " << sl.p << " t=" << sl.t << " k3=" << sl.k3;
-    std::cout << " err=" << edge_error(edge,sl) << "\n";
-    */
+
+    Solution sl = position(  s1 , g[e].k, s2, g[twin].k, s3 );
+
     assert( solution_on_edge(sl) );
     assert( check_far_circle(sl) );
-    assert( check_dist(edge, sl, s) );
-    errstat.push_back( dist_error(edge, sl, s) );
-    if ( dist_error(edge, sl, s) > 1e-9 ) {
-        std::cout << " VertexPositioner::position() ERROR dist_error = " << dist_error(edge,  sl, s) << "\n";
+    assert( check_dist(edge, sl, s3) );
+    
+    // error logging (FIXME: make optional, for max performance?)
+    {
+        errstat.push_back( dist_error(edge, sl, s3) );
+        if ( dist_error(edge, sl, s3) > 1e-9 ) {
+            std::cout << " VertexPositioner::position() WARBUBG; large dist_error = " << dist_error(edge,  sl, s3) << "\n";
+        }
     }
     
     return sl;
@@ -110,8 +98,33 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     assert( (k1==1) || (k1 == -1) );
     assert( (k2==1) || (k2 == -1) );
     std::vector<Solution> solutions;
-    solver_dispatch(s1,k1,s2,k2,s3,+1, solutions);
-    if (!s3->isPoint()) // for points k3=+1 allways
+    
+    if ( g[edge].type == SEPARATOR && s1->isLine() && s2->isLine() ) {
+        // the parallell lineseg case
+        if ( g[edge].has_null_face ) {
+            s2 = g[ g[edge].null_face ].site;
+            assert( s2->isPoint() ); // the sites of null-faces are allwais PointSite
+            k2 = +1;
+        } else if ( g[ g[edge].twin ].has_null_face ) {
+            s2 = g[ g[ g[edge].twin ].null_face ].site;
+            assert( s2->isPoint() );
+            k2 = +1;
+        }
+    } else if ( g[edge].type == SEPARATOR && s1->isPoint() && s2->isLine() ) {
+        // swap sites, so sep_solver can assume s1=line s2=point
+        Site* tmp = s1;
+        double k_tmp = k1;
+        s1 = s2;
+        s2 = tmp;
+        k1 = k2;
+        k2 = k_tmp;
+        assert( s1->isLine() );
+        assert( s2->isPoint() );
+    }
+    
+    solver_dispatch(s1,k1,s2,k2,s3,+1, solutions); // a single k3=+1 call for s3->isPoint()
+    
+    if (!s3->isPoint()) 
         solver_dispatch(s1,k1,s2,k2,s3,-1, solutions); // for lineSite or ArcSite we try k3=-1 also    
     
     if (solutions.empty() ) 
@@ -220,8 +233,10 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     return desp;
 }
 
-int VertexPositioner::solver_dispatch(Site* s1, double k1, Site* s2, double k2, Site* s3, double k3, std::vector<Solution>& solns) {    
-    if ( s1->isLine() && s2->isLine() && s3->isLine() ) 
+int VertexPositioner::solver_dispatch(Site* s1, double k1, Site* s2, double k2, Site* s3, double k3, std::vector<Solution>& solns) {
+    if ( g[edge].type == SEPARATOR )
+        return sep_solver->solve(s1,k1,s2,k2,s3,k3,solns); // we have previously set s1(line) s2(point)
+    else if ( s1->isLine() && s2->isLine() && s3->isLine() ) 
         return lll_solver->solve( s1,k1,s2,k2,s3,k3, solns ); // all lines.
     else if ( s1->isPoint() && s2->isPoint() && s3->isPoint() )
         return ppp_solver->solve( s1,s2,s3, solns ); // all points, no need to specify k1,k2,k3, they are all +1

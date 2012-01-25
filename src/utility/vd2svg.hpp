@@ -27,9 +27,19 @@
 
 #include "simple_svg_1.0.0.hpp"
 
+#include <cmath>
+
+#define PI 3.1415926535897932384626433832795
+#define CIRCLE_FUZZ 1.e-9
+
 ovd::Point scale(ovd::Point p) {
     double s = 500;
     return s*p+s*ovd::Point(1,1);
+}
+
+double scale(double d) {
+    double s = 500;
+    return s*d;
 }
 
 svg::Color get_edge_color(ovd::HEGraph& g, ovd::HEEdge e) {
@@ -38,6 +48,48 @@ svg::Color get_edge_color(ovd::HEGraph& g, ovd::HEEdge e) {
     if ( g[e].type == ovd::PARABOLA )
         return svg::Color::Green;
     return svg::Color::Blue;
+}
+
+void write_line_to_svd(ovd::HEGraph& g, svg::Document& doc, ovd::Point src, ovd::Point trg, svg::Color col) {
+    ovd::Point src_p = scale( src );
+    ovd::Point trg_p = scale( trg );
+    
+    svg::Polyline polyline( svg::Stroke(1, col) );
+    polyline << svg::Point( src_p.x, src_p.y ) << svg::Point( trg_p.x, trg_p.y );
+    doc << polyline;
+}
+
+void write_arc_to_svd(ovd::HEGraph& g, svg::Document& doc, ovd::Point src, ovd::Point trg, double r, ovd::Point ctr, bool cw, svg::Color col) {
+    ovd::Point src_p = scale( src );
+    ovd::Point trg_p = scale( trg );
+    double radius = scale( r );
+    ovd::Point ctr_p = scale( ctr );
+
+    // determine angle theta
+    ovd::Point start( src - ctr );
+    ovd::Point end( trg - ctr );
+    double theta1 = atan2( start.x, start.y );
+    double theta2 = atan2( end.x, end.y );
+    if ( !cw ) {
+        while( (theta2 - theta1) > -CIRCLE_FUZZ )
+            theta2 -= 2*PI;
+    } else {
+        while( (theta2 - theta1) < CIRCLE_FUZZ )
+            theta2 += 2*PI;
+    }
+    double theta = theta2-theta1;
+
+    double x_radius(radius), y_radius(radius), x_axis_rotation(0.);
+    bool large_arc_flag( PI <= theta );
+    bool sweep_flag( cw );
+    svg::EllipticalArc arc(
+        svg::Point( src_p.x, src_p.y ),
+        x_radius, y_radius, x_axis_rotation,
+        large_arc_flag, sweep_flag,
+        svg::Point( trg_p.x, trg_p.y ),
+        svg::Stroke(1, col)
+    );
+    doc << arc;
 }
 
 void write_edge_to_svd(ovd::HEGraph& g, svg::Document& doc, ovd::HEEdge e) {

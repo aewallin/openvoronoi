@@ -776,6 +776,12 @@ Point-Point-Point Solver
  
 \end_layout
 
+\begin_layout Standard
+See 
+\family typewriter
+solver_ppp.hpp
+\end_layout
+
 \begin_layout Subsection
 Line-Line-Line Solver
 \end_layout
@@ -915,10 +921,6 @@ This solver is used when the input sites consist of a line-site
 \end_inset
 
 :
-\end_layout
-
-\begin_layout Standard
-
 \end_layout
 
 \begin_layout Section

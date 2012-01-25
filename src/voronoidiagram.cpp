@@ -470,6 +470,7 @@ std::pair<HEVertex,HEFace> VoronoiDiagram::process_null_edge(Point dir, HEEdge n
     if ( g[adj].type == ENDPOINT ) { // target is endpoint
         // if we have an ENDPOINT then there should not be room for a separator
         if ( numeric::diangle_bracket( g[src].alfa, neg_sep_alfa, g[trg].alfa ) ) { 
+            // FIXME: do this test with in_circle() ?
             assert(0);
             exit(-1); 
         }
@@ -480,7 +481,7 @@ std::pair<HEVertex,HEFace> VoronoiDiagram::process_null_edge(Point dir, HEEdge n
         modified_vertices.insert(new_v);
         g.add_vertex_in_edge( new_v, next_edge);
         g[new_v].k3=new_k3;
-        
+
         if (debug) {
             std::cout << " e.trg=(ENDPOINT) \n";
             std::cout << " added NEW NORMAL vertex " << g[new_v].index << " in edge "; g.print_edge(next_edge);
@@ -488,8 +489,10 @@ std::pair<HEVertex,HEFace> VoronoiDiagram::process_null_edge(Point dir, HEEdge n
         return std::make_pair(HEVertex(), g.HFace() );
         
     } else {
-        assert( g[adj].type != ENDPOINT ); // src
+        // Not an ENDPOINT vertex.
+        assert( g[adj].type != ENDPOINT ); 
         
+        // FIXME: don't use alfa!
         if ( neg_sep_alfa == g[adj].alfa && g[adj].type == SEPPOINT ) {
             if (debug) std::cout << " identical SEPPOINT case!\n";
             // assign face of separator-edge
@@ -529,15 +532,16 @@ std::pair<HEVertex,HEFace> VoronoiDiagram::process_null_edge(Point dir, HEEdge n
         HEFace next_face = g[ g[next_edge].twin ].face;
         Site* next_edge_site = g[next_face].site;
         
+        // FIXME: use in_circle() !!
         if ( numeric::diangle_bracket( g[src].alfa, neg_sep_alfa, g[trg].alfa ) && next_edge_site->isPoint() ) {
-            if (debug) { 
+            if (debug) {
                 std::cout << " inserting SEPPOINT in edge: "; g.print_edge(next_edge);
                 std::cout << "   src alfa = " << g[src].alfa << "\n";
                 std::cout << "   SEP==src alfa? = " << (g[src].alfa == neg_sep_alfa) << "\n";
                 std::cout << "   SEP alfa = " << neg_sep_alfa << "\n";
                 std::cout << "   trg alfa = " << g[trg].alfa << "\n"; 
             }
-            
+
             sep_point = add_separator_point(src, next_edge, neg_sep_dir);
             g[sep_point].k3 = new_k3;
             return std::make_pair( sep_point, g.HFace() );
@@ -549,6 +553,7 @@ std::pair<HEVertex,HEFace> VoronoiDiagram::process_null_edge(Point dir, HEEdge n
                 HEEdge next_next = g[next_edge].next; // previous_edge
                 HEVertex next_trg = g.target(next_next); // source
                 mid = numeric::diangle_mid( g[src].alfa, g[next_trg].alfa  ); // prev_src, trg
+                // use in-circle!
                 seppoint_pred = numeric::diangle_bracket(neg_sep_alfa, mid  , g[next_trg].alfa );
             } else {
                 HEEdge prev_prev = g.previous_edge(next_edge);
@@ -878,12 +883,12 @@ void VoronoiDiagram::augment_vertex_set(  Site* site ) {
                 mark_vertex( v,  site); // h<0 and no violations, so mark IN. push adjacent UNDECIDED vertices onto Q.
                 if (debug) { 
                     std::cout << g[v].index << " marked IN (in_circle) ( " << h << " )";
-                    std::cout << "  in_region?= " << site->in_region(g[v].position);
-                    std::cout << "  in_region_t= "<< site->in_region_t(g[v].position) << "\n";
-                    std::cout << "  in_region_t_raw= "<< (site->in_region_t_raw(g[v].position)-1.0) << "\n";
+                    //std::cout << "  in_region?= " << site->in_region(g[v].position);
+                    //std::cout << "  in_region_t= "<< site->in_region_t(g[v].position) << "\n";
+                    //std::cout << "  in_region_t_raw= "<< (site->in_region_t_raw(g[v].position)-1.0) << "\n";
                 }
             }
-        } else { 
+        } else {
             g[v].status = OUT; // detH was positive (or zero), so mark OUT
             if (debug) std::cout << g[v].index << " marked OUT (in_circle) ( " << h << " )\n";
         }

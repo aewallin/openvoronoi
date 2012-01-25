@@ -60,7 +60,7 @@ int main() {
                   if (lpt.r == -1.) {
                       write_line_to_svd(g,doc,previous,lpt.p,line_color);
                   } else {
-                      write_arc_to_svd(g,doc,previous,lpt.p,lpt.r,lpt.c,lpt.cw,line_color);
+                      write_arc_to_svd(g,doc,previous,lpt.p,lpt.r,lpt.c,lpt.cw,arc_color);
                   }
                   previous = lpt.p;
                   std::cout << "offset:p:" << lpt.p << ",r:" << lpt.r << ",c:" << lpt.c << ",cw:" << lpt.cw << std::endl;

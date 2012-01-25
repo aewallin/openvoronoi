@@ -119,7 +119,14 @@ Point site
 \end_layout
 
 \begin_layout Standard
-Point sites are defined by their xy-coordinates 
+Point sites (
+\begin_inset CommandInset ref
+LatexCommand formatted
+reference "fig:Point-site"
+
+\end_inset
+
+) are defined by their xy-coordinates 
 \begin_inset Formula $(x_{C},y_{C})$
 \end_inset
 
@@ -169,6 +176,12 @@ status open
 \begin_inset Caption
 
 \begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Point-site"
+
+\end_inset
+
 Point site.
 \end_layout
 
@@ -191,7 +204,14 @@ Line site
 \end_layout
 
 \begin_layout Standard
-Line sites are defined by
+Line sites (
+\begin_inset CommandInset ref
+LatexCommand formatted
+reference "fig:Line-site"
+
+\end_inset
+
+) are defined by
 \end_layout
 
 \begin_layout Standard
@@ -260,6 +280,12 @@ status open
 \begin_inset Caption
 
 \begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Line-site"
+
+\end_inset
+
 Line site
 \end_layout
 
@@ -282,7 +308,7 @@ Arc site
 \end_layout
 
 \begin_layout Standard
-Arc(circle) sites are defined by
+Arc(circle) sites (FIXME: add figure) are defined by
 \end_layout
 
 \begin_layout Standard
@@ -737,12 +763,17 @@ An alternative approach to finding the position of a vertex in the diagram
  the input sites directly.
 \end_layout
 
+\begin_layout Standard
+The solvers are named based on the three input sites.
+\end_layout
+
 \begin_layout Subsection
 Point-Point-Point Solver
 \end_layout
 
 \begin_layout Standard
-Sugihara&iri paper.
+( see Sugihara&iri 1994 paper.).
+ 
 \end_layout
 
 \begin_layout Subsection
@@ -750,7 +781,7 @@ Line-Line-Line Solver
 \end_layout
 
 \begin_layout Standard
-The intersection point between three line sites 
+The intersection point between the offsets of three line sites 
 \begin_inset Formula $l_{1}$
 \end_inset
 
@@ -822,7 +853,11 @@ x_{1} & x_{2} & x_{3}\end{array}\right]^{T}$
 \end_inset
 
  are given by Cramer's rule as 
-\begin_inset Formula $x_{i}=\nicefrac{\det(A_{i})}{\det(A)}$
+\begin_inset Formula 
+\[
+x_{i}=\frac{\det(A_{i})}{\det(A)}
+\]
+
 \end_inset
 
  where 
@@ -852,6 +887,38 @@ solver_lll.hpp
 
 \begin_layout Standard
 Todo: when det(A) is zero (or small), an alternative strategy is required!
+\end_layout
+
+\begin_layout Subsection
+Separator Solver
+\end_layout
+
+\begin_layout Standard
+This solver is used when the input sites consist of a line-site 
+\begin_inset Formula $l_{1}$
+\end_inset
+
+ and a point-site 
+\begin_inset Formula $p_{2}$
+\end_inset
+
+ which is either end-point of the line-site.
+ This configuration forces the solution to lie on the separator between
+ the line-site and the point-site, and we may look for a point on the separator
+ which is equidistant to the third input site.
+ The separator is a line perpendicular to 
+\begin_inset Formula $l_{1}$
+\end_inset
+
+ passing through 
+\begin_inset Formula $p_{2}$
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Standard
+
 \end_layout
 
 \begin_layout Section

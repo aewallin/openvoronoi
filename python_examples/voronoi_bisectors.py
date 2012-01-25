@@ -3,45 +3,50 @@ import openvoronoi as ovd
 import ovdvtk
 #import time
 import vtk
-import datetime
+#import datetime
 import math
-import random
+#import random
 
 """
 This script does not use OpenVoronoi, it is used merely for drawing
 bisectors and verifying the parametric equations for bisectors
+
 """
 
 def drawVertex(myscreen, p, vertexColor, rad=1):
-    myscreen.addActor( ovdvtk.Sphere( center=(p.x,p.y,p.z), radius=rad, color=vertexColor ) )
+    myscreen.addActor( ovdvtk.Sphere( center=(p.x,p.y,0), radius=rad, color=vertexColor ) )
 
 def drawEdge(myscreen, e, edgeColor=ovdvtk.yellow):
     p1 = e[0]
     p2 = e[1]
-    myscreen.addActor( ovdvtk.Line( p1=( p1.x,p1.y,p1.z), p2=(p2.x,p2.y,p2.z), color=edgeColor ) )
+    myscreen.addActor( ovdvtk.Line( p1=( p1.x,p1.y,0), p2=(p2.x,p2.y,0), color=edgeColor ) )
 
 def drawCircle(myscreen, c, circleColor):
     myscreen.addActor( ovdvtk.Circle( center=(c.c.x,c.c.y,c.c.z), radius=c.r, color=circleColor ) )
 
+def drawCircle(myscreen, c, r, circleColor):
+    myscreen.addActor( ovdvtk.Circle( center=(c.x,c.y, 0), radius=r, color=circleColor ) )
+
+# draw line  a x + b y + c = 0
+# draws lines roughly in a 100x100 box (?)
 def drawLine(myscreen, l, lineColor):
-    # a x + b y + c = 0
     #  x = -by-c / a
     #if l.a != 0:
     if (abs(l.a) > abs(l.b)):
         y=100
-        p1 = ovd.Point( (-l.b*y-l.c)/l.a , y )
+        p1 = ovd.Point( float(-l.b*y-l.c)/l.a , y )
         y=-100
-        p2 = ovd.Point( (-l.b*y-l.c)/l.a , y )
+        p2 = ovd.Point( float(-l.b*y-l.c)/l.a , y )
         myscreen.addActor( ovdvtk.Line( p1=( p1.x,p1.y,0), p2=(p2.x,p2.y,0), color=lineColor ) )
     else:
         x=100
-        p1 = ovd.Point( x, (-l.a*x-l.c)/l.b )
+        p1 = ovd.Point( x, float(-l.a*x-l.c)/l.b )
         x=-100
-        p2 = ovd.Point( x, (-l.a*x-l.c)/l.b )
+        p2 = ovd.Point( x, float(-l.a*x-l.c)/l.b )
         myscreen.addActor( ovdvtk.Line( p1=( p1.x,p1.y,0), p2=(p2.x,p2.y,0), color=lineColor ) )
-    
-# CIRCLE def
-# (x(t) - xc)^2 + (y(t)-yc)^2 = (r+k*t)^2
+
+# CIRCLE definition
+# circle offset is  (x(t) - xc)^2 + (y(t)-yc)^2 = (r+k*t)^2
 # POINT is circle with r=1 and k=1 
 class Circle:
     def __init__(self,c=ovd.Point(0,0),r=1,cw=1,k=1):
@@ -51,7 +56,7 @@ class Circle:
         self.k = k # offset direction
 
 # LINE def
-# a1 x + b1 y + c1 + k1 t = 0 and a*a + b*b = 1 
+# line offset is  a1 x + b1 y + c1 + k1 t = 0 and a*a + b*b = 1 
 class Line:
     def __init__(self,a,b,c,k):
         self.a = float(a)
@@ -161,7 +166,7 @@ class CircleCircle:
     # d= sqrt( square(xc1-xc2) + square(yc1-yc2) ) 
     # cw=-1 for CCW arc and +1 otherwise 
     def __init__(self, c1, c2):
-        self.d     = (c1.c-c2.c).xyNorm() 
+        self.d     = (c1.c-c2.c).norm() 
         self.alfa1 = 0.0
         self.alfa2 = 0.0
         self.alfa3 = 0.0
@@ -258,7 +263,8 @@ class CircleLine:
         y.append( self.k ) 
         return y
 
-
+# this is the general bisector representation that can be used to get points
+# and draw all bisectors ( POINTPOINT, POINTLINE, LINELINE, etc)
 class Bisector:
     def __init__(self, Bis):
         self.bis = Bis
@@ -271,9 +277,9 @@ class Bisector:
         y=self.y
         detx = ( math.pow((x[4]+x[5]*t),2) - math.pow((x[6]+x[7]*t),2) )
         dety = ( math.pow((y[4]+y[5]*t),2) - math.pow((y[6]+y[7]*t),2) )
-        xp = x[0]-x[1]-x[2]*t + x[3]*math.sqrt( detx ) 
+        xp = x[0]-x[1]-x[2]*t + x[3]*math.sqrt( detx ) # plus sign
         yp = y[0]-y[1]-y[2]*t - y[3]*math.sqrt( dety )
-        xm = x[0]-x[1]-x[2]*t - x[3]*math.sqrt( detx ) 
+        xm = x[0]-x[1]-x[2]*t - x[3]*math.sqrt( detx ) # minus sign
         ym = y[0]-y[1]-y[2]*t + y[3]*math.sqrt( dety ) 
         return [ovd.Point(xp,yp), ovd.Point(xm,ym)]
         """
@@ -348,38 +354,13 @@ def drawLinePointTest():
     myscreen.camera.SetPosition(0.01, 0,  1000 ) 
     myscreen.camera.SetFocalPoint(0, 0, 0)
     myscreen.camera.SetClippingRange(-100,3000)
-    ovdvtk.drawovdtext(myscreen)
-    c1 = Circle(c=ovd.Point(10,-30), r=0, cw=+1)
+    c1 = Circle(c=ovd.Point(10,-30), r=0, cw=+1) # first site is zero-radius circle, i.e. point-site
     drawVertex(myscreen, c1.c, ovdvtk.yellow)
-    l1 = Line( math.cos(1),   math.sin(1)   , 1 , +1)
+    l1 = Line( math.cos(1),   math.sin(1)   , 1 , +1) # second site is a line
     drawLine(myscreen, l1, ovdvtk.yellow )
-    c1l1 = CircleLine( c1, l1)
+    c1l1 = CircleLine( c1, l1) # the bisector between the sites
     bill = Bisector( c1l1 )
     drawBisector( myscreen, bill )
-    myscreen.render()    
-    myscreen.iren.Start()
-
-def drawLinePointFrame( x=10, y=30, angle=1, filename="test.png"):
-    myscreen = ovdvtk.VTKScreen()
-    myscreen.camera.SetPosition(0.01, 0,  1000 ) 
-    myscreen.camera.SetFocalPoint(0, 0, 0)
-    myscreen.camera.SetClippingRange(-100,3000)
-    ovdvtk.drawovdtext(myscreen)
-    w2if = vtk.vtkWindowToImageFilter()
-    w2if.SetInput(myscreen.renWin)
-    lwr = vtk.vtkPNGWriter()
-    lwr.SetInput( w2if.GetOutput() )
-    c1 = Circle(c=ovd.Point(x,y), r=0, cw=+1)
-    drawVertex(myscreen, c1.c, ovdvtk.yellow)
-    l1 = Line( math.cos(1),   math.sin(1)   , 1 , +1)
-    drawLine(myscreen, l1, ovdvtk.yellow )
-    c1l1 = CircleLine( c1, l1)
-    bill = Bisector( c1l1 )
-    drawBisector( myscreen, bill )
-    myscreen.render()
-    w2if.Modified() 
-    lwr.SetFileName(filename)
-    lwr.Write()
     myscreen.render()    
     myscreen.iren.Start()
 
@@ -388,24 +369,18 @@ def drawPointPointTest():
     myscreen.camera.SetPosition(0.01, 0,  1000 ) 
     myscreen.camera.SetFocalPoint(0, 0, 0)
     myscreen.camera.SetClippingRange(-100,3000)
-    ovdvtk.drawovdtext(myscreen)
     w2if = vtk.vtkWindowToImageFilter()
     w2if.SetInput(myscreen.renWin)
     lwr = vtk.vtkPNGWriter()
     lwr.SetInput( w2if.GetOutput() )
-    c1 = Circle(c=ovd.Point(-10,20), r=0, cw=+1)
+    c1 = Circle(c=ovd.Point(-10,20), r=0, cw=+1) # first site
     drawVertex(myscreen, c1.c, ovdvtk.yellow)
-    c2 = Circle(c=ovd.Point(20,4),  r=0,cw=+1)
+    c2 = Circle(c=ovd.Point(20,4),  r=0,cw=+1) # second site
     drawVertex(myscreen, c2.c, ovdvtk.yellow)
-    #drawLine(myscreen, l1, ovdvtk.yellow )
-    c1l1 = CircleCircle( c1, c2)
+    c1l1 = CircleCircle( c1, c2) # bisector
     bill = Bisector( c1l1 )
     drawBisector( myscreen, bill )
     myscreen.render()
-    #w2if.Modified() 
-    #lwr.SetFileName(filename)
-    #lwr.Write()
-    #myscreen.render()    
     myscreen.iren.Start()
 
 def drawLineLineTest():
@@ -413,25 +388,19 @@ def drawLineLineTest():
     myscreen.camera.SetPosition(0.01, 0,  1000 ) 
     myscreen.camera.SetFocalPoint(0, 0, 0)
     myscreen.camera.SetClippingRange(-100,3000)
-    #ovdvtk.drawovdtext(myscreen)
     w2if = vtk.vtkWindowToImageFilter()
     w2if.SetInput(myscreen.renWin)
     lwr = vtk.vtkPNGWriter()
     lwr.SetInput( w2if.GetOutput() )
     
-    l1 = Line( math.cos(1),   math.sin(1)   , 1 , +1)
+    l1 = Line( math.cos(1),   math.sin(1)   , 1 , +1) # first line-site
     drawLine(myscreen, l1, ovdvtk.yellow )
     
-    l2 = Line( math.cos(3),   math.sin(3)   , 1 , -1)
+    l2 = Line( math.cos(3),   math.sin(3)   , 1 , -1) # second line-site
     drawLine(myscreen, l2, ovdvtk.orange )
     
-    #l1 = Circle(c=ovd.Point(-10,20), r=0, cw=+1)
-    #drawVertex(myscreen, c1.c, ovdvtk.yellow)
-    #l2 = Circle(c=ovd.Point(20,4),  r=0,cw=+1)
-    #drawVertex(myscreen, c2.c, ovdvtk.yellow)
-    #drawLine(myscreen, l1, ovdvtk.yellow )
-    l1l2 = LineLine( l1, l2 )
-    l2l1 = LineLine( l2, l1 )
+    l1l2 = LineLine( l1, l2 ) # bisectors
+    l2l1 = LineLine( l2, l1 ) # it should not matter if we call with (l1,l2) or (l2,l1) (?)
     print l1l2
     print l2l1
     b1= Bisector( l1l2 )
@@ -439,17 +408,74 @@ def drawLineLineTest():
     drawBisector( myscreen, b1 )
     drawBisector( myscreen, b2 )
     myscreen.render()
-    #w2if.Modified() 
-    #lwr.SetFileName(filename)
-    #lwr.Write()
-    #myscreen.render()    
+    myscreen.iren.Start()
+
+def drawSeparatorSolver(alfa = 6.4):
+    myscreen = ovdvtk.VTKScreen()
+    myscreen.camera.SetPosition(0.01, 0,  100 ) 
+    myscreen.camera.SetFocalPoint(0, 0, 0)
+    myscreen.camera.SetClippingRange(-100,3000)
+    
+    w2if = vtk.vtkWindowToImageFilter()
+    w2if.SetInput(myscreen.renWin)
+    lwr = vtk.vtkPNGWriter()
+    lwr.SetInput( w2if.GetOutput() )
+    #             a              b            c    k       
+    l1 = Line( math.cos(1),   math.sin(1)   , 1 , -1) # first line-site
+    drawLine(myscreen, l1, ovdvtk.yellow )
+    
+    # pick a point on the line which represents the end-point
+    y = 20
+    p2 = ovd.Point( (-l1.b*y-l1.c)/l1.a , y )
+    drawVertex(myscreen, p2, ovdvtk.orange , rad=1)
+    myscreen.camera.SetPosition(p2.x+0.001, p2.y,  300 ) 
+    myscreen.camera.SetFocalPoint(p2.x, p2.y, 0)
+    
+    # create a line perpendicular to l1
+    #sep = Line( -l1.b, l1.a, 1, +1)
+    #if l1.k == +1:
+    #    sep = Line( -l1.b, l1.a, 1, +1)
+    #else:
+    #    sep = Line( l1.b, -l1.a, 1, +1)
+
+      
+    #for t in range(10):
+    #    drawVertex(myscreen, p2+t*10*ovd.Point( -sep.b,sep.a), ovdvtk.green , rad=2)
+    #    drawVertex(myscreen, p2-t*10*ovd.Point( -sep.b,sep.a), ovdvtk.red , rad=2)
+    
+    # a second line-site
+    #alfa = 4.1
+    l3 = Line( math.cos(alfa),   math.sin(alfa)   , +50 , -1) # second line-site
+    drawLine(myscreen, l3, ovdvtk.orange )
+    sv = ovd.Point()
+    #sv.x = -l1.b
+    #sv.y = l1.a
+    if l1.k == -1:
+        sv.x = l1.a
+        sv.y = l1.b
+    else:
+        sv.x = -l1.a
+        sv.y = -l1.b
+    # draw rays representing positive/begative separator:
+    pos_sep =[p2, p2+100*sv ]
+    neg_sep =[p2, p2-100*sv ]
+    drawEdge(myscreen, pos_sep, edgeColor=ovdvtk.green)
+    drawEdge(myscreen, neg_sep, edgeColor=ovdvtk.red)
+    
+    # 1st degree equation gives t directly:
+    tsln = -(l3.a*p2.x+l3.b*p2.y+l3.c) / ( (sv.x)*l3.a + sv.y*l3.b + l3.k  )
+    print tsln
+    psln = p2 + tsln*sv
+    drawVertex(myscreen, psln, ovdvtk.pink , rad=1)
+    drawCircle(myscreen, psln, tsln, ovdvtk.pink )
+    myscreen.render()
     myscreen.iren.Start()
 
 if __name__ == "__main__":  
-    #drawLinePointTest()
+    #drawPointPointTest()# point-point bisector is a LINE
     
-    #drawLinePointFrame(angle=1,filename="test.png")
+    #drawLinePointTest() # point-line bisector is a PARABOLA
     
-    #drawPointPointTest()
-    drawLineLineTest()
+    #drawLineLineTest() # line-line bisector is LINE(LINE)
     
+    drawSeparatorSolver(4.3)

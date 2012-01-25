@@ -42,7 +42,7 @@ def insert_polygon_segments(vd,id_list):
         
         if id_list[n] == 47288:
             vd.debug_on()
-            vd.addLineSite( id_list[n], id_list[n_nxt], 6)
+            vd.addLineSite( id_list[n], id_list[n_nxt], 4)
             vod.setVDText2([1,1])
             vod.setAll()
             #verts=[id_list[n], id_list[n_nxt], 117443,117445,117460,117454]

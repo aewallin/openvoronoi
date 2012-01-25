@@ -33,9 +33,7 @@ public:
 int solve( Site* s1, double k1, 
            Site* s2, double k2, 
            Site* s3, double k3, std::vector<Solution>& slns ) {
-    
-               
-    
+
     assert( s1->isLine() && s2->isPoint() );
     // separator direction
     Point sv(0,0);
@@ -46,7 +44,7 @@ int solve( Site* s1, double k1,
         sv.x = -s1->a();
         sv.y = -s1->b();
     }
-    
+
     double tsln(0);
     if ( s3->isPoint() ) {
         double dx = s2->x() - s3->x();

@@ -66,8 +66,9 @@ bld/
 # commonly-named test executables
 ovd_tst
 
-# lyx backup
+# lyx backup / autosave
 *.lyx~
+*.lyx#
 
 # python script output files etc
 python_examples/frames

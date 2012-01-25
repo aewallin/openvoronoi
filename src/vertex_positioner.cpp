@@ -84,7 +84,7 @@ Solution VertexPositioner::position(HEEdge e, Site* s3) {
     {
         errstat.push_back( dist_error(edge, sl, s3) );
         if ( dist_error(edge, sl, s3) > 1e-9 ) {
-            std::cout << " VertexPositioner::position() WARBUBG; large dist_error = " << dist_error(edge,  sl, s3) << "\n";
+            std::cout << " VertexPositioner::position() WARNING; large dist_error = " << dist_error(edge,  sl, s3) << "\n";
         }
     }
     
@@ -137,7 +137,8 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     solutions.erase( std::remove_if(solutions.begin(),solutions.end(), in_region_filter(s3) ), solutions.end() );
     if (solutions.empty() ) 
         std::cout << "WARNING in_region_filter() results in empty solution set!!\n";
-
+    
+    
     // choose only t_min < t < t_max solutions 
     solutions.erase( std::remove_if(solutions.begin(),solutions.end(), t_filter(t_min,t_max) ), solutions.end() );
     if (solutions.empty() ) 

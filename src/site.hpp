@@ -275,6 +275,9 @@ public:
         std::cout << " WARNING: never call Site !\n";
         return 0;
     } 
+    virtual double in_region_t_raw(const Point&) const {
+        return -99;
+    }
     
     typedef unsigned int HEFace;    
     HEFace face;
@@ -380,11 +383,17 @@ public:
         Point s_p = p-_start;
         Point s_e = _end - _start;
         double t = s_p.dot(s_e) / s_e.dot(s_e);
-        double eps = 1e-5;
+        double eps = 1e-7;
         if (fabs(t) < eps)  // rounding... UGLY
             t = 0.0;
         else if ( fabs(t-1.0) < eps )
             t = 1.0;
+        return t;
+    }
+    virtual double in_region_t_raw(const Point& p) const {
+        Point s_p = p-_start;
+        Point s_e = _end - _start;
+        double t = s_p.dot(s_e) / s_e.dot(s_e);
         return t;
     }
     inline virtual bool isLine() const {return true;}

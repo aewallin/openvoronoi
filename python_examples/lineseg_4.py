@@ -64,11 +64,11 @@ if __name__ == "__main__":
     vod.offsetEdges = 1
     vd.setEdgeOffset(0.001)
     
-    Nmax = 128
+    # Nmax = 128
     # Nmax = 256
     # Nmax = 512
     # Nmax = 1024
-    # Nmax = 2048
+    Nmax = 2048
     # Nmax = 4096
     # Nmax = 8192
     # Nmax = 16384

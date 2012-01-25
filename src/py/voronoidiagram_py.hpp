@@ -168,11 +168,25 @@ public:
                 edge_data.append( g[edge].type );
                 edge_data.append( g[v1].status ); // source status
                 edge_data.append( g[v2].status ); // target status
+                edge_data.append( g[v2].face ); // target status
                 edge_list.append( edge_data );
         }
         return edge_list;
     }
-        
+    
+    boost::python::list get_face_vertices(HEFace f)  {
+        boost::python::list vertex_list;
+        BOOST_FOREACH( HEEdge edge, g.edges() ) { // loop through each edge
+            if (!g[edge].valid) continue;
+            //boost::python::list edge_data;
+            //boost::python::list point_list; // the endpoints of each edge
+            if ( g[edge].face == f) {
+                HEVertex v1 = g.source( edge );
+                vertex_list.append( g[v1].index );
+            }
+        }
+        return vertex_list;
+    }
 
     
     // NOTE: no g[edge].valid check here!?

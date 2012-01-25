@@ -469,7 +469,10 @@ std::pair<HEVertex,HEFace> VoronoiDiagram::process_null_edge(Point dir, HEEdge n
     
     if ( g[adj].type == ENDPOINT ) { // target is endpoint
         // if we have an ENDPOINT then there should not be room for a separator
-        if ( numeric::diangle_bracket( g[src].alfa, neg_sep_alfa, g[trg].alfa ) ) { assert(0); }
+        if ( numeric::diangle_bracket( g[src].alfa, neg_sep_alfa, g[trg].alfa ) ) { 
+            assert(0);
+            exit(-1); 
+        }
         // insert a normal vertex, positioned at mid-alfa between src/trg.
         HEVertex new_v = g.add_vertex( VoronoiVertex(g[src].position,NEW,NORMAL,g[src].position) );
         double mid = numeric::diangle_mid( g[src].alfa, g[trg].alfa  );
@@ -527,7 +530,14 @@ std::pair<HEVertex,HEFace> VoronoiDiagram::process_null_edge(Point dir, HEEdge n
         Site* next_edge_site = g[next_face].site;
         
         if ( numeric::diangle_bracket( g[src].alfa, neg_sep_alfa, g[trg].alfa ) && next_edge_site->isPoint() ) {
-            if (debug) { std::cout << " inserting SEPPOINT in edge: "; g.print_edge(next_edge); }
+            if (debug) { 
+                std::cout << " inserting SEPPOINT in edge: "; g.print_edge(next_edge);
+                std::cout << "   src alfa = " << g[src].alfa << "\n";
+                std::cout << "   SEP==src alfa? = " << (g[src].alfa == neg_sep_alfa) << "\n";
+                std::cout << "   SEP alfa = " << neg_sep_alfa << "\n";
+                std::cout << "   trg alfa = " << g[trg].alfa << "\n"; 
+            }
+            
             sep_point = add_separator_point(src, next_edge, neg_sep_dir);
             g[sep_point].k3 = new_k3;
             return std::make_pair( sep_point, g.HFace() );
@@ -549,7 +559,10 @@ std::pair<HEVertex,HEFace> VoronoiDiagram::process_null_edge(Point dir, HEEdge n
             
             if ( seppoint_pred  ) { // mid, pos_sep_alfa, trg
                 // if mid is beyond the separator-position, the pushed vertex becomes a SEPPOINT
-                if (debug) std::cout << " pushed vertex " << g[adj].index << " becomes SEPPOINT\n";
+                if (debug) {
+                    std::cout << " pushed vertex " << g[adj].index << " becomes SEPPOINT\n";
+                    std::cout << "   sep_alfa = " << neg_sep_alfa << "\n";
+                }
                 g[adj].alfa = neg_sep_alfa;
                 g[adj].type = SEPPOINT;
                 g[adj].status = NEW;
@@ -863,7 +876,12 @@ void VoronoiDiagram::augment_vertex_set(  Site* site ) {
                 if (debug) std::cout << g[v].index << " marked OUT (topo): c4="<< predicate_c4(v) << " c5=" << !predicate_c5(v) << " r=" << !site->in_region(g[v].position) << " h=" << h << "\n";
             } else {
                 mark_vertex( v,  site); // h<0 and no violations, so mark IN. push adjacent UNDECIDED vertices onto Q.
-                if (debug) std::cout << g[v].index << " marked IN (in_circle) ( " << h << " )\n";
+                if (debug) { 
+                    std::cout << g[v].index << " marked IN (in_circle) ( " << h << " )";
+                    std::cout << "  in_region?= " << site->in_region(g[v].position);
+                    std::cout << "  in_region_t= "<< site->in_region_t(g[v].position) << "\n";
+                    std::cout << "  in_region_t_raw= "<< (site->in_region_t_raw(g[v].position)-1.0) << "\n";
+                }
             }
         } else { 
             g[v].status = OUT; // detH was positive (or zero), so mark OUT

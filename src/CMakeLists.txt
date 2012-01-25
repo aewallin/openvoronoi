@@ -158,6 +158,7 @@ set( OVD_INCLUDE_SOLVERS_FILES
     ${OpenVoronoi_SOURCE_DIR}/solvers/solver_lll.hpp
     ${OpenVoronoi_SOURCE_DIR}/solvers/solver_ppp.hpp
     ${OpenVoronoi_SOURCE_DIR}/solvers/solver_qll.hpp
+    ${OpenVoronoi_SOURCE_DIR}/solvers/solver_sep.hpp
 )
 
 # include directories

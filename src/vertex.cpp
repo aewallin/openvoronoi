@@ -62,7 +62,11 @@ VoronoiVertex::VoronoiVertex( Point p, VoronoiVertexStatus st, VoronoiVertexType
 {   
     init(p,st,t,initDist,lk3);
 }
-
+VoronoiVertex::VoronoiVertex( Point p, VoronoiVertexStatus st, VoronoiVertexType t, double init_radius)
+{
+    init(p,st,t);
+    r = init_radius;
+}
 /// set index, increase count, initialize in_queue to false.
 void VoronoiVertex::init() {
     index = count;

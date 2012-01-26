@@ -244,7 +244,7 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
     HEFace pos_face, neg_face;   
     boost::tie(pos_face,neg_face) = add_linesite_edges(seg_start,seg_end,linesite_k_sign); 
 
-    if (debug) std::cout << " created pos/neg LineSite pos_face=" << pos_face << " neg_face=" << neg_face<< "\n";
+if (debug) std::cout << " created pos/neg LineSite pos_face=" << pos_face << " neg_face=" << neg_face<< "\n";
 
     // the start_face/end_face should belong to the point-site at start/end
     // this is the face where possible separators are inserted later.
@@ -252,6 +252,7 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
     HEFace end_face = find_pointsite_face(end_null_edge);
 
 if (step==current_step) return false; current_step++;
+    
     if (debug)
         std::cout << " start/end face = " << start_face << " " << end_face << "\n";
 
@@ -266,7 +267,8 @@ if (step==current_step) return false; current_step++;
         g[start_to_null].edge = start_null_edge; 
     if (end_to_null!=g.HFace())
         g[end_to_null].edge = end_null_edge; 
-
+    
+    
 if (step==current_step) return false; current_step++;
 
     augment_vertex_set( g[pos_face].site  ); // it should not matter if we use pos_site or neg_site here
@@ -278,16 +280,17 @@ if (step==current_step) return false; current_step++;
         g.print_vertices(v0);
     }
     
+    // process the null-faces here!! before add_vertices(), since some null-vertices should be marked NEW
+    
 if (step==current_step) return false; current_step++;
 
     add_vertices( g[pos_face].site );  // add NEW vertices on all IN-OUT edges.
 
 if (step==current_step) return false; current_step++;
-    
+
+    // find SEPARATOR targets first
     typedef boost::tuple<HEEdge, HEVertex, HEEdge,bool> SepTarget;
     SepTarget pos_start_target, neg_start_target;
-    
-    // find SEPARATOR targets first
     pos_start_target = find_separator_target(start_face, pos_sep_start);
     neg_start_target = find_separator_target(start_face, neg_sep_start);
     
@@ -318,6 +321,7 @@ if (step==current_step) return false; current_step++;
 
 if (step==current_step) return false; current_step++;
 
+// add non-separator edges by calling add_edges on all INCIDENT faces
     if(debug) std::cout << " adding edges.\n";
     BOOST_FOREACH( HEFace f, incident_faces ) {
         if ( g[f].status == INCIDENT )  {// end-point faces already dealt with in add_separator()
@@ -330,6 +334,8 @@ if (step==current_step) return false; current_step++;
     }
 
 if (step==current_step) return false; current_step++;
+
+// new vertices and edges inserted. remove the delete-set, repair faces.
 
     remove_vertex_set();
 
@@ -597,33 +603,43 @@ HEVertex VoronoiDiagram::add_separator_point(HEVertex endp, HEEdge edge, Point s
     return sep;
 }
 
+//
 // either find an existing null-face, or create a new one.
 //
 // return segment-endpoint and separator-points,
+// HEVertex: new segment ENDPOINT-vertex
+// HEFace:   null-face (new or existing)
+// HEVertex: positive separator ENDPOINT vertex (if a positive separator should be added)
+// HEVertex: negative separator ENDPOINT vertex (of neg separator should be added)
+// HEFace:    
 boost::tuple<HEVertex,HEFace,HEVertex,HEVertex,HEFace>
 VoronoiDiagram::find_null_face(HEVertex start, HEVertex other, Point left) {
     HEVertex seg_start = HEVertex(); // new end-point vertices
     HEFace start_null_face; // either existing or new null-faces at endpoints
+    
     HEVertex pos_sep_start = HEVertex(); // optional separator endpoints at start
-    HEVertex neg_sep_start = HEVertex();
-    HEFace face_to_null = g.HFace();
+    HEVertex neg_sep_start = HEVertex(); // invalid vertices are default
+    
+    HEFace face_to_null = g.HFace(); // invalid face is default
     
     Point dir = g[other].position - g[start].position;
-    double alfa = numeric::diangle( dir.x, dir.y );
+    double alfa = numeric::diangle( dir.x, dir.y ); // alfa for the new endpoint vertex
     bool k3_sign = left.is_right( g[start].position , g[other].position); // this is used below and in find_null_face()
+    // k3_sign is already calculated in insert_line_segment() ??
+    
+    if (g[start].null_face != g.HFace() ) { // there is an existing null face
         
-    if (g[start].null_face != g.HFace() ) {
-        // there is an existing null face
         if (debug) std::cout << " find_null_face() endp= " << g[start].index << " has existing null_face : " << g[start].null_face << "\n";
         start_null_face = g[start].null_face;
         
-        // create segment endpoint
-        seg_start = g.add_vertex( VoronoiVertex(g[start].position,OUT,ENDPOINT) );
-        g[seg_start].zero_dist();
+        // create a new segment ENDPOINT vertex with zero clearance-disk
+        seg_start = g.add_vertex( VoronoiVertex(g[start].position,OUT,ENDPOINT,0) );
+        
         // find the edge on the null-face where we insert seg_start
+        // FIXME: avoid using alfa here?
+        // if we call augment_vertex_set() AND process_null_edge() before the call here, maybe insert_edge is allways a NEW-NEW edge??
         HEEdge current = g[start_null_face].edge;
         HEEdge start_edge = current;
-        
         g[seg_start].set_alfa(dir);
         HEEdge insert_edge= HEEdge();
         bool found = false;
@@ -644,16 +660,17 @@ VoronoiDiagram::find_null_face(HEVertex start, HEVertex other, Point left) {
             std::cout << "  null_face before sep/new vertices:\n";
             std::cout << "  "; g.print_face(start_null_face);
         }
-        // delete/contract everything until separator.alfa OR endpoint reached
         
+        // "process" the adjacent null-edges 
         HEEdge next_edge, prev_edge;
         boost::tie(next_edge,prev_edge) = g.find_next_prev(start_null_face, seg_start);
         assert( g[prev_edge].next == next_edge );
         boost::tie( neg_sep_start, face_to_null) = process_null_edge(dir,next_edge, k3_sign, true);
         boost::tie( pos_sep_start, face_to_null) = process_null_edge(dir,prev_edge, k3_sign, false);
-
-    } else {
-        // create a new null face at start
+        
+        return boost::make_tuple( seg_start, start_null_face, pos_sep_start, neg_sep_start, face_to_null);
+    } else { // no existing null-face
+        // create a new null face at start. the face has three vertices/edges:
         //
         //  neg_sep -> seg_endp -> pos_sep
         //
@@ -706,8 +723,10 @@ VoronoiDiagram::find_null_face(HEVertex start, HEVertex other, Point left) {
         g[e1_tw].type = NULLEDGE; g[e3_tw].type = NULLEDGE; g[e2_tw].type = NULLEDGE;
 
         g[start].null_face = start_null_face;
+        
+        return boost::make_tuple( seg_start, start_null_face, pos_sep_start, neg_sep_start, face_to_null);
     }
-    return boost::make_tuple(seg_start,start_null_face,pos_sep_start,neg_sep_start,face_to_null);
+    
 }
 
 /// add separator on the face f, which contains the endpoint

@@ -61,6 +61,7 @@ public:
     VoronoiVertex( Point p, VoronoiVertexStatus st);
     /// vertex with given position, status, and type
     VoronoiVertex( Point p, VoronoiVertexStatus st, VoronoiVertexType t);
+    VoronoiVertex( Point p, VoronoiVertexStatus st, VoronoiVertexType t, double init_radius);
     VoronoiVertex( Point pos, VoronoiVertexStatus st, VoronoiVertexType t, Point initDist);
     VoronoiVertex( Point pos, VoronoiVertexStatus st, VoronoiVertexType t, Point initDist, double k3);
     

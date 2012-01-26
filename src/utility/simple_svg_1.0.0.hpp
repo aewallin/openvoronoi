@@ -413,6 +413,44 @@ namespace svg
         Point end_point;
     };
 
+    class EllipticalArc : public Shape
+    {
+    public:
+        EllipticalArc(Point const & istart_point, double ix_radius, double iy_radius,
+            double ix_axis_rotation, bool ilarge_arc_flag, bool isweep_flag,
+            Point const & iend_point, Stroke const & istroke = Stroke())
+            : Shape(Fill(), istroke), start_point(istart_point),
+            x_radius(ix_radius), y_radius(iy_radius), x_axis_rotation(ix_axis_rotation),
+            large_arc_flag((ilarge_arc_flag)?(1):(0)), sweep_flag((isweep_flag)?(1):(0)),
+            end_point(iend_point) { }
+        std::string toString(Layout const & layout) const
+        {
+            std::stringstream ss;
+            ss << elemStart("path");
+            ss << "d=\"M";
+            ss << translateX(start_point.x, layout) << "," << translateY(start_point.y, layout) << " ";
+            ss << "A" << x_radius << "," << y_radius << " ";
+            ss << x_axis_rotation << " ";
+            ss << large_arc_flag << "," << sweep_flag << " ";
+            ss << translateX(end_point.x, layout) << "," << translateY(end_point.y, layout) << "\" ";
+            ss << fill.toString(layout) << stroke.toString(layout) << emptyElemEnd();
+            return ss.str();
+        }
+        void offset(Point const & ioffset)
+        {
+            start_point.x += ioffset.x;
+            start_point.y += ioffset.y;
+
+            end_point.x += ioffset.x;
+            end_point.y += ioffset.y;
+        }
+    private:
+        Point start_point;
+        double x_radius, y_radius, x_axis_rotation;
+        int large_arc_flag, sweep_flag;
+        Point end_point;
+    };
+
     class Polygon : public Shape
     {
     public:

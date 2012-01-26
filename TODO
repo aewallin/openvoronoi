@@ -23,8 +23,6 @@ Solvers
   if it's good take it, if it's bad, call solver<qd_real> (which is a lot slower!)
 LLLSolver
 - alternative geometry for parallel line-segment case. See Patel's thesis, page 32.
-new SEPSolver
-- when we have a line-segment site and its endpoint
 
 Offset
 - figure out how to nest offset-loops to generate a machining-graph
@@ -71,3 +69,7 @@ Packaging/Building etc
 - build(and install on github?) doxygen html documentation
 - Windows package/installer with cmake/NSIS?
 - automate source-package building from github and periodic upload to launchpad (?)
+
+
+DONE:
+- 2012-01-25 new SEPSolver when we have a line-segment site and its endpoint

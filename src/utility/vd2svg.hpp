@@ -20,8 +20,8 @@
 #include <string>
 #include <iostream>
 
-#include <openvoronoi/voronoidiagram.hpp>
-#include <openvoronoi/common/point.hpp>
+#include "voronoidiagram.hpp"
+#include "common/point.hpp"
 
 #include <boost/foreach.hpp>
 

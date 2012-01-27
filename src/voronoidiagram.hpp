@@ -167,7 +167,9 @@ class VoronoiDiagram {
         VertexVector v0;
         /// queue of vertices to be processed
         VertexQueue vertexQueue; 
-        std::map<int,HEVertex> vertex_map;
+        typedef std::map<int,HEVertex> VertexMap;
+        typedef std::pair<int,HEVertex> VertexMapPair;
+        VertexMap vertex_map;
         bool debug;
 private:
         VoronoiDiagram(); // don't use.

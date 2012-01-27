@@ -93,7 +93,7 @@ public:
     double k3; // the offset-direction {-1,+1} to the newly inserted site.
     double alfa; // angle for a null-vertex
     HEFace null_face;
-    HEFace face;
+    HEFace face; // the face of this vertex, if the vertex is a point-site
 protected:
     void init();
     void init(Point p, VoronoiVertexStatus st);

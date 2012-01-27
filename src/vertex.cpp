@@ -75,6 +75,7 @@ void VoronoiVertex::init() {
     alfa=-1; // invalid/non-initialized alfa value
     null_face = std::numeric_limits<HEFace>::quiet_NaN();    
     type = NORMAL;
+    face = std::numeric_limits<HEFace>::quiet_NaN();  
     //status = UNDECIDED;
 }
 

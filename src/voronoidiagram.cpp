@@ -213,17 +213,7 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
     //Point start_dir = (g[end].position - g[start].position)*(-1);
     
     
-    //HEVertex seg_start, seg_end; // new segment end-point vertices
-    //HEFace start_null_face, end_null_face; // either existing or new null-faces at endpoints
-    //HEVertex pos_sep_start = HEVertex(); // optional separator endpoints at start
-    //HEVertex neg_sep_start = HEVertex();
-    //HEVertex pos_sep_end = HEVertex(); // optional separator endpoints at end
-    //HEVertex neg_sep_end = HEVertex();
-    //HEFace start_to_null = g.HFace(); // when a point-site completely disappears, we "null" the face belonging to this pointsite
-    //HEFace   end_to_null = g.HFace();
-    // returns new seg_start/end vertices, new or existing null-faces, and separator endpoints (if separators should be added)
-    //boost::tie(seg_start, start_null_face, pos_sep_start, neg_sep_start, start_to_null) = find_null_face(start, end  , left);
-    //boost::tie(seg_end  , end_null_face  , pos_sep_end  , neg_sep_end, end_to_null  ) = find_null_face(end  , start, left);
+
         
     //if (debug) {
     //    std::cout << " start null face : "; g.print_face(start_null_face);
@@ -239,17 +229,17 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
     current_step++;
 
     LineSite* pos_site;
-    //LineSite* neg_site;
+    LineSite* neg_site;
     //HEEdge pos_edge, neg_edge;
     if ( linesite_k_sign ) {
         pos_site = new LineSite( g[start].position, g[end  ].position , +1);
-        //neg_site = new LineSite( g[end  ].position, g[start].position , -1);
+        neg_site = new LineSite( g[end  ].position, g[start].position , -1);
         //boost::tie(pos_edge, neg_edge) = g.add_twin_edges( seg_start,   seg_end );
         //g[pos_edge].inserted_direction = true;
         //g[neg_edge].inserted_direction = false;
     } else {
         pos_site = new LineSite( g[end  ].position, g[start].position , +1);
-        //neg_site = new LineSite( g[start].position, g[end  ].position , -1);
+        neg_site = new LineSite( g[start].position, g[end  ].position , -1);
         //boost::tie( pos_edge, neg_edge) = g.add_twin_edges( seg_end  ,seg_start );
         //g[pos_edge].inserted_direction = false;
         //g[neg_edge].inserted_direction = true;
@@ -298,11 +288,59 @@ if (step==current_step) return false; current_step++;
         std::cout << " delete-set |v0|="<< v0.size() <<" : "; 
         g.print_vertices(v0);
     }
-    
+
+if (step==current_step) return false; current_step++;
+
     // process the null-faces here!! before add_vertices(), since some null-vertices should be marked NEW
     
-    
-    
+    HEVertex seg_start, seg_end; // new segment end-point vertices
+    HEFace start_null_face, end_null_face; // either existing or new null-faces at endpoints
+    HEVertex pos_sep_start = HEVertex(); // optional separator endpoints at start
+    HEVertex neg_sep_start = HEVertex();
+    HEVertex pos_sep_end = HEVertex(); // optional separator endpoints at end
+    HEVertex neg_sep_end = HEVertex();
+    HEFace start_to_null = g.HFace(); // when a point-site completely disappears, we "null" the face belonging to this pointsite
+    HEFace   end_to_null = g.HFace();
+    // returns new seg_start/end vertices, new or existing null-faces, and separator endpoints (if separators should be added)
+    boost::tie(seg_start, start_null_face, pos_sep_start, neg_sep_start, start_to_null) = find_null_face(start, end  , left);
+    boost::tie(seg_end  , end_null_face  , pos_sep_end  , neg_sep_end, end_to_null  ) = find_null_face(end  , start, left);
+
+if (step==current_step) return false; current_step++;
+    // create edges and faces
+    HEFace pos_face, neg_face; 
+    HEEdge pos_edge, neg_edge;
+    {
+        //LineSite* pos_site;
+        //LineSite* neg_site;
+        //HEEdge pos_edge, neg_edge;
+        if ( linesite_k_sign ) {
+            //pos_site = new LineSite( g[seg_start].position, g[seg_end  ].position , +1);
+            //neg_site = new LineSite( g[seg_end  ].position, g[seg_start].position , -1);
+            boost::tie(pos_edge, neg_edge) = g.add_twin_edges( seg_start,   seg_end );
+            g[pos_edge].inserted_direction = true;
+            g[neg_edge].inserted_direction = false;
+        } else {
+            //pos_site = new LineSite( g[seg_end  ].position, g[seg_start].position , +1);
+            //neg_site = new LineSite( g[seg_start].position, g[seg_end  ].position , -1);
+            boost::tie( pos_edge, neg_edge) = g.add_twin_edges( seg_end  ,seg_start );
+            g[pos_edge].inserted_direction = false;
+            g[neg_edge].inserted_direction = true;
+        }
+        g[pos_edge].type = LINESITE;
+        g[neg_edge].type = LINESITE;
+        g[pos_edge].k = +1;
+        g[neg_edge].k = -1;
+        //g.twin_edges(pos_edge, neg_edge);
+        //assert( vd_checker->check_edge(pos_edge) && vd_checker->check_edge(neg_edge) );
+        pos_face = add_face( pos_site ); //  this face to the left of start->end edge    
+        neg_face = add_face( neg_site ); //  this face is to the left of end->start edge
+        g[pos_face].edge = pos_edge;
+        g[neg_face].edge = neg_edge;
+        g[pos_edge].face = pos_face;
+        g[neg_edge].face = neg_face;
+        if (debug) std::cout << "created faces: pos_face=" << pos_face << " neg_face=" << neg_face << "\n";   
+        //return std::make_pair(pos_face,neg_face);
+    }
     
 if (step==current_step) return false; current_step++;
 
@@ -310,47 +348,50 @@ if (step==current_step) return false; current_step++;
 
 if (step==current_step) return false; current_step++;
 
+#define SEPARATORS
 #ifdef SEPARATORS
     { // add SEPARATORS
         // find SEPARATOR targets first
         typedef boost::tuple<HEEdge, HEVertex, HEEdge,bool> SepTarget;
         SepTarget pos_start_target, neg_start_target;
-        pos_start_target = find_separator_target(start_face, pos_sep_start);
-        neg_start_target = find_separator_target(start_face, neg_sep_start);
+        pos_start_target = find_separator_target( g[start].face , pos_sep_start);
+        neg_start_target = find_separator_target( g[start].face , neg_sep_start);
         
         // then add the separators
-        add_separator(start_face, start_null_face, pos_start_target, pos_sep_start, g[pos_face].site , g[neg_face].site );
+        add_separator( g[start].face , start_null_face, pos_start_target, pos_sep_start, g[pos_face].site , g[neg_face].site );
         
         if (step==current_step) return false; current_step++;
-            
-        add_separator(start_face, start_null_face, neg_start_target, neg_sep_start, g[pos_face].site , g[neg_face].site );
-        g[start_face].status = NONINCIDENT; // face is now done.
-        assert( vd_checker->face_ok( start_face ) );
+        
+        add_separator( g[start].face , start_null_face, neg_start_target, neg_sep_start, g[pos_face].site , g[neg_face].site );
+        g[ g[start].face ].status = NONINCIDENT; // face is now done.
+        assert( vd_checker->face_ok( g[start].face ) );
         
         if (step==current_step) return false; current_step++;
 
         SepTarget pos_end_target, neg_end_target;
-        pos_end_target = find_separator_target(end_face, pos_sep_end);
-        neg_end_target = find_separator_target(end_face, neg_sep_end);
-        add_separator(end_face, end_null_face, pos_end_target, pos_sep_end, g[pos_face].site , g[neg_face].site );
+        pos_end_target = find_separator_target( g[end].face ,  pos_sep_end);
+        neg_end_target = find_separator_target( g[end].face , neg_sep_end);
+        add_separator( g[end].face , end_null_face, pos_end_target, pos_sep_end, g[pos_face].site , g[neg_face].site );
         
         if (step==current_step) return false; current_step++;
         
-        add_separator(end_face, end_null_face, neg_end_target, neg_sep_end, g[pos_face].site , g[neg_face].site );
+        add_separator( g[end].face , end_null_face, neg_end_target, neg_sep_end, g[pos_face].site , g[neg_face].site );
 
-        g[end_face].status = NONINCIDENT;
-        assert( vd_checker->face_ok( end_face ) );
+        g[ g[end].face ].status = NONINCIDENT;
+        assert( vd_checker->face_ok( g[end].face ) );
 
-        if(debug) std::cout << " all separators  done.\n";
+        if(debug) std::cout << "all separators  done.\n";
+        
     }
 #endif
 
 if (step==current_step) return false; current_step++;
 
+#define EDGES
 #ifdef EDGES
 // add non-separator edges by calling add_edges on all INCIDENT faces
     {
-        if(debug) std::cout << " adding edges.\n";
+        if(debug) std::cout << "adding edges.\n";
         BOOST_FOREACH( HEFace f, incident_faces ) {
             if ( g[f].status == INCIDENT )  {// end-point faces already dealt with in add_separator()
                 if(debug) { 
@@ -360,6 +401,7 @@ if (step==current_step) return false; current_step++;
                 add_edges( pos_face, f, neg_face, std::make_pair(seg_start,seg_end)); // each INCIDENT face is split into two parts: newface and f
             }
         }
+        if(debug) std::cout << "adding edges. DONE.\n";
     }
 #endif 
 
@@ -369,7 +411,8 @@ if (step==current_step) return false; current_step++;
 
     remove_vertex_set();
 
-    //if (debug) { std::cout << "will now repair pos/neg faces: " << pos_face << " " << neg_face << "\n"; }
+    if (debug) { std::cout << "will now repair pos/neg faces: " << pos_face << " " << neg_face << "\n"; }
+#define REPAIR
 #ifdef REPAIR
     repair_face( pos_face,std::make_pair(seg_start,seg_end), 
                           std::make_pair(start_to_null,end_to_null),
@@ -380,17 +423,19 @@ if (step==current_step) return false; current_step++;
                           std::make_pair(start_to_null,end_to_null),
                           std::make_pair(start_null_face,end_null_face) );
     assert( vd_checker->face_ok( neg_face ) );
+    if (debug) { std::cout << "faces repaired.\n"; }
 #endif
 
 if (step==current_step) return false; current_step++;
 
-#ifdef FALSE
+//#define FALSE
+//#ifdef FALSE
     // we are done and can remove split-vertices
     BOOST_FOREACH(HEFace f, incident_faces) {
         remove_split_vertex(f);
     }
     reset_status();
-    
+    /*
     if (debug) {
         std::cout << "faces " << start_face << " " << end_face << " " << pos_face << " " << neg_face << " repaired \n";
         std::cout << "insert_line_site(" << g[start].index << "-"<< g[end].index << ") done.\n";
@@ -400,15 +445,15 @@ if (step==current_step) return false; current_step++;
         std::cout << " end_null_face "; g.print_face(end_null_face);
         std::cout << " pos_face "; g.print_face(pos_face);
         std::cout << " neg_face "; g.print_face(neg_face);
-    }
-    assert( vd_checker->face_ok( start_face ) );
+    }*/
+    //assert( vd_checker->face_ok( start_face ) );
     assert( vd_checker->face_ok( start_null_face ) );
-    assert( vd_checker->face_ok( end_face ) );
+    //assert( vd_checker->face_ok( end_face ) );
     assert( vd_checker->face_ok( end_null_face ) );
     assert( vd_checker->face_ok( pos_face ) );
     assert( vd_checker->face_ok( neg_face ) );    
     assert( vd_checker->is_valid() );
-#endif
+//#endif
 
     return true; 
 }
@@ -663,7 +708,7 @@ VoronoiDiagram::find_null_face(HEVertex start, HEVertex other, Point left) {
     
     if (g[start].null_face != g.HFace() ) { // there is an existing null face
         
-        if (debug) std::cout << " find_null_face() endp= " << g[start].index << " has existing null_face : " << g[start].null_face << "\n";
+        if (debug) std::cout << "find_null_face() endp= " << g[start].index << " has existing null_face : " << g[start].null_face << "\n";
         start_null_face = g[start].null_face;
         
         // create a new segment ENDPOINT vertex with zero clearance-disk
@@ -784,10 +829,10 @@ void VoronoiDiagram::add_separator(HEFace f, HEFace null_face,
 
     boost::tie( endp_next_tw, endp_prev_tw ) = g.find_next_prev(null_face, sep_endp);
     if (debug) {
-        std::cout << "add_separator() endp_next_tw="; g.print_edge(endp_next_tw); 
-        std::cout << "add_separator() endp_prev_tw="; g.print_edge(endp_prev_tw); 
-        std::cout << "add_separator() g[endp_next_tw].twin="; g.print_edge(g[endp_next_tw].twin); 
-        std::cout << "add_separator() g[endp_prev_tw].twin="; g.print_edge(g[endp_prev_tw].twin); 
+        std::cout << "  add_separator() endp_next_tw="; g.print_edge(endp_next_tw); 
+        std::cout << "  add_separator() endp_prev_tw="; g.print_edge(endp_prev_tw); 
+        std::cout << "  add_separator() g[endp_next_tw].twin="; g.print_edge(g[endp_next_tw].twin); 
+        std::cout << "  add_separator() g[endp_prev_tw].twin="; g.print_edge(g[endp_prev_tw].twin); 
     }
     endp_prev = g[endp_next_tw].twin; // NOTE twin!
     endp_next = g[endp_prev_tw].twin; // NOTE twin!
@@ -801,8 +846,8 @@ void VoronoiDiagram::add_separator(HEFace f, HEFace null_face,
     HEEdge    v_next  = boost::get<2>(target);
     bool out_new_in   = boost::get<3>(target);
     if (debug) {
-        std::cout << "add_separator() v_previous="; g.print_edge(v_previous) ;
-        std::cout << "add_separator() v_target="<< g[v_target].index <<"\n";
+        std::cout << "  add_separator() v_previous="; g.print_edge(v_previous) ;
+        std::cout << "  add_separator() v_target="<< g[v_target].index <<"\n";
     }
     assert( (g[v_target].k3==1) || (g[v_target].k3==-1) );    
     assert( g[sep_endp].k3 == g[v_target].k3 );
@@ -880,8 +925,8 @@ void VoronoiDiagram::add_separator(HEFace f, HEFace null_face,
     g[e2_tw].set_sep_parameters( g[sep_endp].position, g[v_target].position );
         
     if (debug) {
-        std::cout << "added separator: ";
-        std::cout << g[sep_endp].index << " - " << g[v_target].index << "\n";
+        std::cout << "add_separator(): ";
+        std::cout << g[sep_endp].index << " - " << g[v_target].index << ". Done.\n";
     }
     assert( vd_checker->check_edge(e2) );
     assert( vd_checker->check_edge(e2_tw) );
@@ -935,7 +980,7 @@ void VoronoiDiagram::augment_vertex_set(  Site* site ) {
             } else {
                 mark_vertex( v,  site); // h<0 and no violations, so mark IN. push adjacent UNDECIDED vertices onto Q.
                 if (debug) { 
-                    std::cout << g[v].index << " marked IN (in_circle) ( " << h << " )";
+                    std::cout << g[v].index << " marked IN (in_circle) ( " << h << " )\n";
                     //std::cout << "  in_region?= " << site->in_region(g[v].position);
                     //std::cout << "  in_region_t= "<< site->in_region_t(g[v].position) << "\n";
                     //std::cout << "  in_region_t_raw= "<< (site->in_region_t_raw(g[v].position)-1.0) << "\n";
@@ -1695,6 +1740,7 @@ EdgeVector VoronoiDiagram::find_in_out_edges() {
                 output.push_back(e); // this is an IN-OUT edge
         }
     }
+    if (debug) std::cout << "find_in_out_edges() " << output.size() << " IN-OUT edges \n";
     assert( !output.empty() );
     return output;
 }

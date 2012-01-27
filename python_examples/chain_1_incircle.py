@@ -95,9 +95,13 @@ if __name__ == "__main__":
     #n=1
     t_before = time.time()
     
-    #vd.debug_on()
-    vd.addLineSite( id_list[0], id_list[1],5)
+    vd.debug_on()
+    vd.addLineSite( id_list[0], id_list[1])
     
+    # 11, all separators added
+    # 12, add edges
+    # 13, remove delete-set
+    # 13, reset status, delete split-verts
     
     #vd.check()
     
@@ -144,6 +148,7 @@ if __name__ == "__main__":
     
     err = vd.getStat()
     #print err 
+    """
     print "got errorstats for ",len(err)," points"
     if len(err)>1:
         minerr = min(err)
@@ -153,7 +158,7 @@ if __name__ == "__main__":
     
     print "num vertices: ",vd.numVertices() 
     print "num SPLIT vertices: ",vd.numSplitVertices() 
-        
+    """
     calctime = t_after-t_before
     
     vod.setAll()

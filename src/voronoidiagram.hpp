@@ -81,7 +81,7 @@ class VoronoiDiagram {
 
         int insert_point_site(const Point& p, int step=0);
 
-        bool insert_line_site(int idx1, int idx2, int step=13);
+        bool insert_line_site(int idx1, int idx2, int step=99); // default step should make algorithm run until the end!
         /// return the far radius
         double get_far_radius() const {return far_radius;}
         /// return number of point sites in diagram

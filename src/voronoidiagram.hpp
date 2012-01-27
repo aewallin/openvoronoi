@@ -110,6 +110,10 @@ class VoronoiDiagram {
         HEFace find_pointsite_face(HEEdge start_edge);
         std::pair<HEVertex,HEVertex> find_endpoints(int idx1, int idx2);
         
+        
+        bool face_has_new_new_edge(HEFace f);
+        HEEdge find_separator_edge( HEFace f );
+        
         void augment_vertex_set( Site* site);        
         bool predicate_c4(HEVertex v);
         bool predicate_c5(HEVertex v);

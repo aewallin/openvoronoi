@@ -77,7 +77,12 @@ public:
     void zero_dist() {r=0;}
     double dist() const { return r; }
     /// in-circle predicate 
-    double in_circle(const Point& p) const { return dist(p) - r; }
+    double in_circle(const Point& p) const {
+        //if ( r==0 && dist(p) == 0 ) 
+        //    return -1;
+        //else
+            return dist(p) - r; 
+    }
     static void reset_count() { count = 0; }
 // DATA
     int index;

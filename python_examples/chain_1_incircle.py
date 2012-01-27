@@ -95,18 +95,23 @@ if __name__ == "__main__":
     #n=1
     t_before = time.time()
     
-    vd.debug_on()
+    #vd.debug_on()
     vd.addLineSite( id_list[0], id_list[1])
     
+    # 4 augment vertex set
+    # 5 process null-faces
+    # 6 create faces and pseudo-edges
+    # 7 add new vertices
+    # 8,9,10,11 separators
     # 11, all separators added
     # 12, add edges
     # 13, remove delete-set
     # 13, reset status, delete split-verts
     
-    #vd.check()
+    vd.check()
     
-    #vd.debug_on()
-    #vd.addLineSite( id_list[1], id_list[2])
+    vd.debug_on()
+    vd.addLineSite( id_list[1], id_list[2],13)
     #vd.check()
     
     #vd.addLineSite( id_list[2], id_list[3])

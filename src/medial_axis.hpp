@@ -23,6 +23,7 @@
 #include <iostream>
 
 #include "graph.hpp"
+#include "common/numeric.hpp"
 #include "site.hpp"
 
 namespace ovd
@@ -218,10 +219,10 @@ public:
             for (int n=0;n< _edge_points;n++) {
                 double t(0);
                 if (t_src<=t_trg) // increasing t-value
-                    t = t_min + ((t_max-t_min)/sq(_edge_points-1))*sq(n); // NOTE: quadratic t-dependece. More points at smaller t.
+                    t = t_min + ((t_max-t_min)/numeric::sq(_edge_points-1))*numeric::sq(n); // NOTE: quadratic t-dependece. More points at smaller t.
                 else if (t_trg<t_src) { // decreasing t-value
                     int m = _edge_points-1-n; // m goes from (N-1)...0   as n goes from 0...(N-1)
-                    t = t_min + ((t_max-t_min)/sq(_edge_points-1))*sq(m);
+                    t = t_min + ((t_max-t_min)/numeric::sq(_edge_points-1))*numeric::sq(m);
                 }
                 Point p = g[edge].point(t);
                 MedialPoint pt( p, t );
@@ -250,7 +251,9 @@ public:
     
     void set_invalid(HEEdge e) {
         g[e].valid = false;
-        g[ g[e].twin ].valid = false;
+        if (g[e].twin != HEEdge()) {
+            g[ g[e].twin ].valid = false;
+        }
     }
     // loop through all edges and find an edge where we can start
     // valid edges have a source-vertex with exactly one valid out-edge.

@@ -20,13 +20,13 @@
 #include <boost/python.hpp>
 
 #include "voronoidiagram_py.hpp"  
-#include "common/point.hpp"
 
-#include "offset_py.hpp"
+#include "common/point.hpp"
 #include "face_offset_py.hpp"
-#include "polygon_interior.hpp"
-#include "medial_axis.hpp"
 #include "island_filter.hpp"
+#include "medial_axis_walk_py.hpp"
+#include "offset_py.hpp"
+#include "polygon_interior.hpp"
 #include "utility/vd2svg.hpp"
 #include "version.hpp"
 
@@ -144,10 +144,12 @@ BOOST_PYTHON_MODULE(openvoronoi) {
     ;
     bp::class_<MedialAxis, boost::noncopyable >("MedialAxis", bp::no_init)
         .def(bp::init<HEGraph&>())
+        .def(bp::init<HEGraph&, double>())
     ; 
-    bp::class_<MedialAxisWalk, boost::noncopyable >("MedialAxisWalk", bp::no_init)
+    bp::class_<MedialAxisWalk_py, boost::noncopyable >("MedialAxisWalk", bp::no_init)
         .def(bp::init<HEGraph&>())
-        .def("walk", &MedialAxisWalk::walk)
+        .def(bp::init<HEGraph&, int>())
+        .def("walk", &MedialAxisWalk_py::walk_py)
     ;
     bp::class_<IslandFilter, boost::noncopyable >("IslandFilter", bp::no_init)
         .def(bp::init<HEGraph&>())

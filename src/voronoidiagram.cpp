@@ -769,17 +769,19 @@ VoronoiDiagram::find_null_face(HEVertex start, HEVertex other, Point left) {
             bool found = false;
             if (debug) std::cout << "Looking for endpoint edge:\n";
             do {
+                /*
                 HEVertex src = g.source(current2);
                 HEVertex trg = g.target(current2);
                 Point src_p = g[ null_vertex_target(src) ].position;
                 Point trg_p = g[ null_vertex_target(trg) ].position;
                 bool src_right  = src_p.is_right( g[start].position, g[other].position );
                 bool trg_right = trg_p.is_right( g[start].position, g[other].position );
+                */
                 bool face_incident = ( g[ g[ g[current2].twin ].face ].status == INCIDENT);
                 if (debug) {
                     g.print_edge(current2); std::cout << " incident= " << face_incident << "\n";
                 }
-                if ( (src_right != trg_right) && face_incident ) { 
+                if ( face_incident ) { // (src_right != trg_right) && 
                         insert_edge = current2;
                         found = true;
                 }

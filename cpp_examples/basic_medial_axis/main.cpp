@@ -8,7 +8,9 @@
 #include <openvoronoi/utility/vd2svg.hpp>
 #include <openvoronoi/version.hpp>
 
-// very simple OpenVoronoi example program
+// OpenVoronoi example program. Uses MedialAxis filter to filter the complete Voronoi diagram
+// down to the medial axis.
+// then uses MedialAxisWalk to walk along the medial axis and draw clearance-disks
 int main() {
     ovd::VoronoiDiagram* vd = new ovd::VoronoiDiagram(1,100); // (r, bins)
     // double r: radius of circle within which all input geometry must fall. use 1 (unit-circle). Scale geometry if necessary.
@@ -42,7 +44,7 @@ int main() {
 
     // save drawing to svg file.
     svg::Dimensions dimensions(1024, 1024);
-    svg::Document doc("basic_offset.svg", svg::Layout(dimensions, svg::Layout::BottomLeft));
+    svg::Document doc("medial_axis.svg", svg::Layout(dimensions, svg::Layout::BottomLeft));
     BOOST_FOREACH( ovd::HEEdge e, g.edges() ) {
         if( g[e].valid ) write_edge_to_svd(g,doc,e);
     }
@@ -62,6 +64,7 @@ int main() {
                 }
                 ovd::Point ctr( scale( pt.p ) );
                 double radius( scale( pt.clearance_radius ) );
+                // draw a circle, centered on the medial-axis, with radius = clearance-disc
                 svg::Circle clearance_disc( svg::Point( ctr.x, ctr.y ), 2*radius, svg::Fill(), svg::Stroke( 1, svg::Color::Red ) );
                 doc << clearance_disc;
             }

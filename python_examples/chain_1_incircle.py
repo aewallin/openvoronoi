@@ -111,9 +111,10 @@ if __name__ == "__main__":
     vd.check()
     
     vd.debug_on()
-    vd.addLineSite( id_list[1], id_list[2],13)
+    vd.addLineSite( id_list[1], id_list[2], 5)
     #vd.check()
-    
+
+        
     #vd.addLineSite( id_list[2], id_list[3])
     #vd.check()
     
@@ -151,7 +152,7 @@ if __name__ == "__main__":
             
     vod.setVDText2(times)
     
-    err = vd.getStat()
+    #err = vd.getStat()
     #print err 
     """
     print "got errorstats for ",len(err)," points"
@@ -164,7 +165,7 @@ if __name__ == "__main__":
     print "num vertices: ",vd.numVertices() 
     print "num SPLIT vertices: ",vd.numSplitVertices() 
     """
-    calctime = t_after-t_before
+    #calctime = t_after-t_before
     
     vod.setAll()
         

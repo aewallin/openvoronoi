@@ -57,7 +57,7 @@ def insert_polygon_points(vd, polygon):
     return id_list
 
 def insert_polygon_segments(vd,id_list):
-    #j=0
+    j=0
     #jmax=9999999 # for debugging, set jmax to the problematic case to stop algorithm in the middle
     print "inserting ",len(id_list)," line-segments:"
     for n in range(len(id_list)):
@@ -68,8 +68,26 @@ def insert_polygon_segments(vd,id_list):
         #if (j<jmax):
             #vd.debug_on()
         #print " ",j,"inserting segement ",id_list[n]," - ",id_list[n_nxt]
-        vd.addLineSite( id_list[n], id_list[n_nxt])
-        #j=j+1
+        if id_list[n]==1294: #j == 0:
+            print " ",j,"inserting segement ",id_list[n]," - ",id_list[n_nxt]
+            vd.addLineSite( id_list[n], id_list[n_nxt],4)
+            vod.setVDText2([1,1])
+            #ovd.PolygonInterior( vd.getGraph() , True )
+            #ovd.MedialAxis( vd.getGraph() )
+            vod.drawIncidentVertexIds()
+            for v in [1294, 1329]:
+                vod.drawVertexIdx(v)
+            for v in vd.getFaceVertices(3858):
+                vod.drawVertexIdx(v)
+                
+            vod.setAll()
+            print "PYTHON All DONE."
+            myscreen.render()   
+            myscreen.iren.Start()
+        else:
+            print " ",j,"inserting segement ",id_list[n]," - ",id_list[n_nxt]
+            vd.addLineSite( id_list[n], id_list[n_nxt])
+        j=j+1
 
 def modify_segments(segs):
     segs_mod =[]
@@ -147,14 +165,14 @@ if __name__ == "__main__":
     
     vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
     vod.drawFarCircle()
-    vod.textScale = 0.0002
+    vod.textScale = 0.00002
     vod.vertexRadius = 0.0011
     vod.drawVertices=0
     vod.drawVertexIndex=0
     vod.drawGenerators=0
-    vod.offsetEdges = 0
+    vod.offsetEdges = 1
     vod.drawNullEdges = 1
-    vd.setEdgeOffset(0.001)
+    vd.setEdgeOffset(0.0001)
     
     all_segs=segs #+segs2 #+segs3 +segs4+segs5
     #all_segs=segs

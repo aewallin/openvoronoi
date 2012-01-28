@@ -620,7 +620,7 @@ void print_face(Face f) {
         Vertex v = source(current);
         std::cout << g[v].index  << "(" << g[v].status  << ")-f"<< g[current].face << "-";
         num_e++;
-        assert(num_e<300000);
+        assert(num_e<300);
         current = g[current].next;
     } while ( current!=start );
     std::cout << "\n";

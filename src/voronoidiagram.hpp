@@ -113,6 +113,7 @@ class VoronoiDiagram {
         
         bool face_has_new_new_edge(HEFace f);
         HEEdge find_separator_edge( HEFace f );
+        HEVertex null_vertex_target( HEVertex v ); 
         
         void augment_vertex_set( Site* site);        
         bool predicate_c4(HEVertex v);

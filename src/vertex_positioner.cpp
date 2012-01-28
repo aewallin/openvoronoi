@@ -100,7 +100,7 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     std::vector<Solution> solutions;
     
     if ( g[edge].type == SEPARATOR && s1->isLine() && s2->isLine() ) {
-        // the parallell lineseg case
+        // the parallell lineseg case      v0 --s1 --> pt -- s2 --> v1
         if ( g[edge].has_null_face ) {
             s2 = g[ g[edge].null_face ].site;
             assert( s2->isPoint() ); // the sites of null-faces are allwais PointSite
@@ -111,6 +111,7 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
             k2 = +1;
         }
     } else if ( g[edge].type == SEPARATOR && s1->isPoint() && s2->isLine() ) {
+        // SEPARATOR case 
         // swap sites, so sep_solver can assume s1=line s2=point
         Site* tmp = s1;
         double k_tmp = k1;

@@ -40,9 +40,9 @@ def insert_polygon_segments(vd,id_list):
             n_nxt=0
         print " ",j,"inserting segement ",id_list[n]," - ",id_list[n_nxt]
         
-        if id_list[n] == 78238: # 47013:
+        if id_list[n] == 77647: # 47013:
             vd.debug_on()
-            vd.addLineSite( id_list[n], id_list[n_nxt], 12)  # fails: 47124/6, now 78238/13
+            vd.addLineSite( id_list[n], id_list[n_nxt], 10)  # fails:  now 78238/13
             vod.setVDText2([1,1])
             vod.setAll()
             #verts=[id_list[n], id_list[n_nxt], 117443,117445,117460,117454]
@@ -62,11 +62,11 @@ def insert_polygon_segments(vd,id_list):
             #myscreen.camera.SetFocalPoint( f.x, f.y, 0)
             myscreen.render()   
             myscreen.iren.Start()
-        elif  id_list[n] in [ 78206, 78241, 78225]:
+        elif  0: #id_list[n] in [ 78206, 78241, 78225]:
             vd.addLineSite( id_list[n], id_list[n_nxt])
         else:
-            pass
-            #vd.addLineSite( id_list[n], id_list[n_nxt])
+            #pass
+            vd.addLineSite( id_list[n], id_list[n_nxt])
         j=j+1
 
 def modify_segments(segs):

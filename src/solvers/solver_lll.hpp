@@ -64,7 +64,8 @@ int solve( Site* s1, double k1,
     qd_real d = chop( determinant( eq[i].a, eq[i].b, eq[i].k, 
                                             eq[j].a, eq[j].b, eq[j].k, 
                                             eq[k].a, eq[k].b, eq[k].k ) ); 
-    if (d != 0) {
+    double det_eps = 1e-6;
+    if ( fabs(d) > det_eps ) {
         qd_real t = determinant(  eq[i].a, eq[i].b, -eq[i].c, 
                                   eq[j].a, eq[j].b, -eq[j].c, 
                                   eq[k].a, eq[k].b, -eq[k].c ) / d ; 
@@ -79,7 +80,7 @@ int solve( Site* s1, double k1,
             return 1;
         }
     } else {
-        std::cout << "WARNING: LLLSolver determinant==0 ! no solutions. d= " << d <<"\n";
+        std::cout << "WARNING: LLLSolver small determinant! no solutions. d= " << d <<"\n";
         std::cout << " 0 : " << eq[0].a << " " << eq[0].b << " " << eq[0].c << " " << eq[0].k << "\n";
         std::cout << " 1 : " << eq[1].a << " " << eq[1].b << " " << eq[1].c << " " << eq[1].k << "\n";
         std::cout << " 2 : " << eq[2].a << " " << eq[2].b << " " << eq[2].c << " " << eq[2].k << "\n";

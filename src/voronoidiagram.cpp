@@ -573,11 +573,48 @@ std::pair<HEVertex,HEFace> VoronoiDiagram::process_null_edge(Point dir, HEEdge n
         
     } else {
         // Not an ENDPOINT vertex.
-        assert( g[adj].type != ENDPOINT ); 
+        assert( g[adj].type != ENDPOINT );
+        double mid(0);
+        bool seppoint_pred(false);
+        bool parallel_pred(false); 
+        if (next_prev) {
+            HEEdge next_next = g[next_edge].next; 
+            HEEdge next_prev = g.previous_edge(next_edge);
+            HEVertex next_trg = g.target(next_next); // source
+            mid = numeric::diangle_mid( g[src].alfa, g[next_trg].alfa  ); // prev_src, trg
+            seppoint_pred = ( g[next_trg].type != ENDPOINT );
+            HEVertex next_out_trg = null_vertex_target( g.target(next_edge) ); 
+            HEVertex prev_out_trg = null_vertex_target( g.source(next_prev) ); 
+            if (debug) std::cout << " " << g[g.target(next_edge)].index << " has out-vertex " << g[next_out_trg].index << " status=" << g[next_out_trg].status << "\n";
+            if (debug) std::cout << " " << g[g.source(next_prev)].index << " has out-vertex " << g[prev_out_trg].index << " status=" << g[prev_out_trg].status << "\n";
         
+            parallel_pred = ( ( ( g[ next_out_trg ].status == OUT ) || ( g[ next_out_trg ].status == NEW ) ) &&
+                              ( ( g[ prev_out_trg ].status == OUT ) || ( g[ prev_out_trg ].status == NEW ) )
+                            );
+        } else {
+            HEEdge prev_prev = g.previous_edge(next_edge);
+            HEEdge next_next2 = g[next_edge].next;
+            HEVertex prev_src = g.source(prev_prev);
+            mid = numeric::diangle_mid( g[prev_src].alfa, g[trg].alfa  );
+            seppoint_pred = ( g[prev_src].type != ENDPOINT );
+        
+            HEVertex next_out_trg2 = null_vertex_target( g.source(next_edge) ); 
+            HEVertex prev_out_trg2 = null_vertex_target( g.target(next_next2) ); 
+            if (debug) std::cout << " " << g[g.source(next_edge)].index << " has out-vertex " << g[next_out_trg2].index << " status=" << g[next_out_trg2].status << "\n";
+            if (debug) std::cout << " " << g[g.target(next_next2)].index << " has out-vertex " << g[prev_out_trg2].index << " status=" << g[prev_out_trg2].status << "\n";
+  
+            parallel_pred = ( ( ( g[ next_out_trg2 ].status == OUT ) || ( g[ next_out_trg2 ].status == NEW ) ) &&
+                              ( ( g[ prev_out_trg2 ].status == OUT ) || ( g[ prev_out_trg2 ].status == NEW ) )
+                            );
+
+        }
+
+
         // FIXME: don't use alfa!
-        if ( sep_alfa == g[adj].alfa && g[adj].type == SEPPOINT ) {
-            if (debug) std::cout << " identical SEPPOINT case!\n";
+        if ( parallel_pred && g[adj].type == SEPPOINT ) {
+            if (debug)  { std::cout << " identical SEPPOINT case!\n";
+                std::cout << " old alfa pred " << (sep_alfa == g[adj].alfa) << "\n";
+            }
             // assign face of separator-edge
             // mark separator target NEW
             HEEdge sep_edge=HEEdge();
@@ -632,25 +669,23 @@ std::pair<HEVertex,HEFace> VoronoiDiagram::process_null_edge(Point dir, HEEdge n
             return std::make_pair( sep_point, g.HFace() );
         } else {
             // target is not endpoint, and no room for separator, so we push it and convert it
-            double mid;
+            //double mid;
+            /*
             bool seppoint_pred;
             if (next_prev) {
                 HEEdge next_next = g[next_edge].next; // previous_edge
                 HEVertex next_trg = g.target(next_next); // source
                 mid = numeric::diangle_mid( g[src].alfa, g[next_trg].alfa  ); // prev_src, trg
-                // use in-circle!
-                //seppoint_pred = numeric::diangle_bracket( sep_alfa, mid  , g[next_trg].alfa );
                 seppoint_pred = ( g[next_trg].type != ENDPOINT );
             } else {
                 HEEdge prev_prev = g.previous_edge(next_edge);
                 HEVertex prev_src = g.source(prev_prev);
                 mid = numeric::diangle_mid( g[prev_src].alfa, g[trg].alfa  );
-                //seppoint_pred = numeric::diangle_bracket(mid,  sep_alfa, g[trg].alfa );
                 seppoint_pred = ( g[prev_src].type != ENDPOINT );
-            }
+            }*/
             
-            if ( seppoint_pred  ) { // mid, pos_sep_alfa, trg
-                // if mid is beyond the separator-position, the pushed vertex becomes a SEPPOINT
+            if ( seppoint_pred  ) { 
+                // the pushed vertex becomes a SEPPOINT
                 if (debug) {
                     std::cout << " pushed vertex " << g[adj].index << " becomes SEPPOINT\n";
                     std::cout << "   sep_alfa = " << sep_alfa << "\n";

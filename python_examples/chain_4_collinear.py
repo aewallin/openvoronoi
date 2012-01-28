@@ -12,7 +12,6 @@ import pickle
 import gzip
 
 if __name__ == "__main__":  
-    #print ocl.revision()
     #w=2500
     #h=1500
     

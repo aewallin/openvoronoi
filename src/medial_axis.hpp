@@ -22,9 +22,8 @@
 #include <string>
 #include <iostream>
 
-#include <boost/python.hpp>
-
 #include "graph.hpp"
+#include "common/numeric.hpp"
 #include "site.hpp"
 
 namespace ovd
@@ -126,11 +125,12 @@ private:
 };
 
 /// \brief From a voronoi-diagram, generate offset curve(s).
+/// argument dp_thr: dot-product threshold used to decide whether the segments
+/// that connect to a given Edge are nearly parallel
 class MedialAxis {
 public:
-    MedialAxis(HEGraph& gi): g(gi) {
-        medial_filter f(g);
-        medial_filter flt(g);
+    MedialAxis(HEGraph& gi, double dp_thr=0.8): g(gi) {
+        medial_filter flt(g, dp_thr);
         g.filter_graph(flt);
     }
 private:
@@ -138,23 +138,44 @@ private:
     HEGraph& g; // original graph
 };
 
-// when we want a toolpath along the medial axis we use this class
-// walk along the "valid" edges which are left in the diagram 
-// first find one valid edge that has a degree-1 vertex (i.e. a suitable start point for the path)
-// -- if there's only one choice for the next edge, go there
-// -- if there are two choices, take one of the choices
-// when done, find another valid start-edge
-// FIXME: this could probably be optimized to minimize rapid-traverses
+
+/// \brief Medial-axis point and associated clearance-disc radius.
+struct MedialPoint {
+    Point p;
+    double clearance_radius;
+    MedialPoint(Point pi, double r): p(pi), clearance_radius(r) {}
+};
+typedef std::list<MedialPoint> MedialPointList;
+typedef std::list<MedialPointList> MedialChain;
+typedef std::list<MedialChain> MedialChainList;
+
+// FIXME: MedialAxisWalk could probably be optimized to minimize rapid-traverses
+
+/// \brief Walk along the medial-axis edges of a voronoi-diagram.
+/// When we want a toolpath along the medial axis we use this class
+/// to walk along the "valid" edges which are left in the diagram.
+///
+/// argument edge_pts: number of points to subdivide parabolas.
+///
+/// Algorithm:
+/// first find one valid edge that has a degree-1 vertex (i.e. a suitable start point for the path)
+/// - if there's only one choice for the next edge, go there
+/// - if there are two choices, take one of the choices
+/// when done, find another valid start-edge.
 class MedialAxisWalk {
 public:
-    MedialAxisWalk(HEGraph& gi): g(gi) {}
+    MedialAxisWalk(HEGraph& gi, int edge_pts = 20): g(gi), _edge_points(edge_pts) {}
 
-    boost::python::list walk() {
-        out = boost::python::list();
+    void do_walk() {
+        out = MedialChainList();
         HEEdge start;
         while( find_start_edge(start) ) { // find a suitable start-edge
             medial_axis_walk(start); // from the start-edge, walk as far as possible
         }
+    }
+
+    MedialChainList walk() {
+        do_walk();
         return out;
     }
     
@@ -162,7 +183,7 @@ public:
     void medial_axis_walk(HEEdge start) {
         // begin chain with start.
         HEEdge next = start; // why does = HEEdge() cause Wuninitialized ?
-        boost::python::list chain;
+        MedialChain chain;
         append_edge(chain, start);
         set_invalid(start);
         while (next_edge(start, next)  ) {
@@ -172,46 +193,43 @@ public:
             set_invalid(start);
         }
         // end chain
-        out.append( chain );
+        out.push_back( chain );
     }
     
     // add the given edge to the current list of edges.
     // for line-edges we add only two endpoints
     // for parabolic edges we add many points
-    void append_edge(boost::python::list& list, HEEdge edge)  {
-        boost::python::list point_list; // the endpoints of each edge
+    void append_edge(MedialChain& chain, HEEdge edge)  {
+        MedialPointList point_list; // the endpoints of each edge
         HEVertex v1 = g.source( edge );
         HEVertex v2 = g.target( edge );
         // these edge-types are drawn as a single line from source to target.
         if (   (g[edge].type == LINELINE)  || (g[edge].type == PARA_LINELINE)) {
-            boost::python::list pt1;
-            pt1.append( g[v1].position ); pt1.append( g[v1].dist() );
-            point_list.append(pt1);
-            boost::python::list pt2;
-            pt2.append( g[v2].position ); pt2.append( g[v2].dist() );
-            point_list.append(pt2);
-        } else if ( (g[edge].type == PARABOLA) || (g[edge].type == LINE) ) { // these edge-types are drawn as polylines with edge_points number of points
+            MedialPoint pt1( g[v1].position, g[v1].dist() );
+            MedialPoint pt2( g[v2].position, g[v2].dist() );
+            point_list.push_back(pt1);
+            point_list.push_back(pt2);
+        } else if ( (g[edge].type == PARABOLA) || (g[edge].type == LINE) ) { // these edge-types are drawn as polylines with _edge_points number of points
             double t_src = g[v1].dist();
             double t_trg = g[v2].dist();
             double t_min = std::min(t_src,t_trg);
             double t_max = std::max(t_src,t_trg);
-            int _edge_points= 20; // number of points to subdivide parabolas. FIXME: make this adjustable
+            //_edge_points: number of points to subdivide parabolas.
             
             for (int n=0;n< _edge_points;n++) {
                 double t(0);
                 if (t_src<=t_trg) // increasing t-value
-                    t = t_min + ((t_max-t_min)/sq(_edge_points-1))*sq(n); // NOTE: quadratic t-dependece. More points at smaller t.
+                    t = t_min + ((t_max-t_min)/numeric::sq(_edge_points-1))*numeric::sq(n); // NOTE: quadratic t-dependece. More points at smaller t.
                 else if (t_trg<t_src) { // decreasing t-value
                     int m = _edge_points-1-n; // m goes from (N-1)...0   as n goes from 0...(N-1)
-                    t = t_min + ((t_max-t_min)/sq(_edge_points-1))*sq(m);
+                    t = t_min + ((t_max-t_min)/numeric::sq(_edge_points-1))*numeric::sq(m);
                 }
                 Point p = g[edge].point(t);
-                boost::python::list pt;
-                pt.append( p ); pt.append( t );
-                point_list.append(pt);
+                MedialPoint pt( p, t );
+                point_list.push_back(pt);
             }
         }
-        list.append( point_list );
+        chain.push_back( point_list );
     }
     // we are at target(e). find the next suitable edge.
     // return true if a next-edge was found, false otherwise.
@@ -233,7 +251,9 @@ public:
     
     void set_invalid(HEEdge e) {
         g[e].valid = false;
-        g[ g[e].twin ].valid = false;
+        if (g[e].twin != HEEdge()) {
+            g[ g[e].twin ].valid = false;
+        }
     }
     // loop through all edges and find an edge where we can start
     // valid edges have a source-vertex with exactly one valid out-edge.
@@ -264,10 +284,12 @@ public:
         }
         return (count==1);
     }
+protected:
+    MedialChainList out;
 private:
-    boost::python::list out;
     MedialAxisWalk(); // don't use.
     HEGraph& g; // original graph
+    int _edge_points; // number of points to subdivide parabolas.
 
 };
 

@@ -22,8 +22,6 @@
 #include <string>
 #include <iostream>
 
-#include <boost/python.hpp>
-
 #include "graph.hpp"
 #include "site.hpp"
 

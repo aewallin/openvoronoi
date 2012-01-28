@@ -194,7 +194,7 @@ if __name__ == "__main__":
     vod.setVDText2(times)
     
     ovd.PolygonInterior( vd.getGraph() , True )
-    ovd.MedialAxis( vd.getGraph() )
+    ovd.MedialAxis( vd.getGraph(), 0.90 )
     
     vod.setAll()
     print "PYTHON All DONE."

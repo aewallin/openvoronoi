@@ -819,6 +819,8 @@ VoronoiDiagram::find_null_face(HEVertex start, HEVertex other, Point left) {
 
         g[start].null_face = start_null_face;
         
+        // associate null-face with the PointSite here!!
+        
         return boost::make_tuple( seg_start, start_null_face, pos_sep_start, neg_sep_start, face_to_null);
     }
     

@@ -102,7 +102,7 @@ if __name__ == "__main__":
     vd.check()
     
     vd.debug_on()
-    vd.addLineSite( id_list[2], id_list[3],5)
+    vd.addLineSite( id_list[2], id_list[3],7)
     #vd.check()
     
     #vd.addLineSite( id_list[0], id_list[2] )
@@ -123,6 +123,8 @@ if __name__ == "__main__":
     # 2 add line-segment edges/sites to graph
     # 3 identify seed-vertex
     # 4 create delete-tree
+    # 5 add linesite/segments
+    
     # 5 create new vertices
     # 6 add startpoint pos separator
     # 7 add startoiubt neg separator

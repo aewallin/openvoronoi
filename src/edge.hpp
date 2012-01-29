@@ -32,10 +32,6 @@
 namespace ovd {
 
 #define OUT_EDGE_CONTAINER boost::listS 
-//#define OUT_EDGE_CONTAINER boost::vecS 
-
-
-// note: cannot use vecS since remove_vertex invalidates iterators/edge_descriptors (?)
 #define VERTEX_CONTAINER boost::listS
 #define EDGE_LIST_CONTAINER boost::listS
 
@@ -71,6 +67,7 @@ public:
     double k; // offset-direction from the adjacent site, either +1 or -1
     VoronoiEdgeType type;
     
+    // the edge-parametrization. see point(t) for how these are used to produce (x,y) points on an edge
     boost::array<double,8> x;
     boost::array<double,8> y;
     bool sign; // choose either +/- in front of sqrt()
@@ -94,8 +91,6 @@ private:
     void set_ll_parameters(Site* s1, Site* s2);
     void set_ll_para_parameters(Site* s1, Site* s2);
     void print_params() const;
-    
-
 };
 
 } // end namespace

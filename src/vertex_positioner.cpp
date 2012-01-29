@@ -147,7 +147,7 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
 
     
     
-    if ( solutions.size() == 1)
+    if ( solutions.size() == 1) // if only one solution is found, return that.
         return solutions[0];
     else if (solutions.size()>1) {
         // two or more points remain so we must further filter here!
@@ -188,10 +188,31 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     std::cout << g[ g.target(edge) ].index << "[" << g[ g.target(edge) ].type << "]{" << g[ g.target(edge) ].status<<"}\n";
     //std::cout << " t-vals t_min= " << t_min << " t_max= " << t_max << "\n";
     //std::cout << "  sites: " << s1->str() << "(k="<< k1<< ") " << s2->str() << "(k="<< k2 << ") new= " << s3->str() << "\n";
-    std::cout << "s1= " << s1->str2() << "(k=" << k1<< ")\n";
-    std::cout << "s2= " << s2->str2() << "(k=" << k2<< ")\n";
-    std::cout << "s3= " << s3->str2() << "\n";
-
+    std::cout << " s1= " << s1->str2() << "(k=" << k1<< ")\n";
+    std::cout << " s2= " << s2->str2() << "(k=" << k2<< ")\n";
+    std::cout << " s3= " << s3->str2() << "\n";
+    
+    if (s3->isLine() ) {
+        HEEdge le = s3->edge();
+        HEVertex src = g.source(le);
+        HEVertex trg = g.target(le);
+        std::cout << " s3 Linesite from " << g[src].index << " to " << g[trg].index << "\n";
+        // now from segment end-points get the null-vertex
+        HEEdge src_out;
+        BOOST_FOREACH(HEEdge e, g.out_edge_itr(src) ) {
+            if ( g[e].type == NULLEDGE )
+                src_out = e;
+        }
+        std::cout << " src null-edge"; g.print_edge(src_out); // << g[src].index << " to " << g[trg].index << "\n";
+        HEEdge src_out_twin = g[src_out].twin;
+        std::cout << " src null-edge twin "; g.print_edge(src_out_twin); // << g[src].index << " to " << g[trg].index << "\n";
+        HEFace src_null_face = g[src_out_twin].face;
+        std::cout << " src null-face " << src_null_face << "\n";
+        Site* src_site = g[src_null_face].site;
+        std::cout << src_site->str();
+        //HEVertex src_vertex = src_site->
+    }
+    
     // run the solver(s) one more time in order to print out un-filtered solution points for debugging
     std::vector<Solution> solutions2;
     solver_dispatch(s1,k1,s2,k2,s3,+1, solutions2);

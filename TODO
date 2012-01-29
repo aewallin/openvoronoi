@@ -57,6 +57,8 @@ Tests
 - Benchmark against libarea/kbool and libarea/Clipper (are there other FOSS offsetting codes?)
 - Compare against other VD codes (CGAL, boost-sweepline, others?)
 - Write software that generates test-cases (ttt is a good example)
+-- hilbert curve?
+-- GIS-data
 -- notes on random polygons:
 -- http://www.geometrylab.de/applet-29-en
 -- http://www.cgal.org/Manual/latest/doc_html/cgal_manual/Generator_ref/Function_random_polygon_2.html

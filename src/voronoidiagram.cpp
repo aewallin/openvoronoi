@@ -296,6 +296,11 @@ if (step==current_step) return false; current_step++;
         g[neg_face].edge = neg_edge;
         g[pos_edge].face = pos_face;
         g[neg_edge].face = neg_face;
+        
+        // associate sites with LINESITE edges
+        pos_site->e = pos_edge;
+        neg_site->e = neg_edge;
+        
         if (debug) std::cout << "created faces: pos_face=" << pos_face << " neg_face=" << neg_face << "\n";   
     }
 

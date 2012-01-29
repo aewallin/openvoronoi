@@ -66,42 +66,97 @@ namespace ovd {
 //  FIXME: what happens if we get a divide by zero situation ??
 //
 // Separator solver
-class SEPSolver : public Solver {
+class ALTSEPSolver : public Solver {
 public:
-
+virtual void set_type(int t) {type=t;}
 int solve( Site* s1, double k1, 
            Site* s2, double k2, 
            Site* s3, double k3, std::vector<Solution>& slns ) {
+    Site* lsite;
+    Site* psite;
+    Site* third_site;
+    double lsite_k, psite_k, third_site_k;
     // swap sites if necessary ?
+    if ( type == 0 ) {
+        //std::cout << "ALTSEPSolver type="<< type <<"\n";
+        lsite = s3; lsite_k = k3;
+        psite = s1; psite_k = k1;
+        third_site = s2; third_site_k = k2;
+    } else if ( type == 1 ) {
+        //std::cout << "ALTSEPSolver type="<< type <<"\n";
+        lsite = s1; lsite_k = k1;
+        psite = s3; psite_k = k3;
+        third_site = s2; third_site_k = k2;
+    } else if ( type == 2 ) {
+        //std::cout << "ALTSEPSolver type="<< type <<"\n";
+        lsite = s3; lsite_k = k3;
+        psite = s2; psite_k = k2;
+        third_site = s1; third_site_k = k1;
+    } else if ( type == 3 ) {
+        //std::cout << "ALTSEPSolver type="<< type <<"\n";
+        lsite = s2; lsite_k = k2;
+        psite = s3; psite_k = k3;
+        third_site = s1; third_site_k = k1;
+    } else {
+        std::cout << "ALTSEPSolver FATAL ERROR!\n";
+        exit(-1);
+        return 0;
+    }
     
-    assert( s1->isLine() && s2->isPoint() );
+    std::cout << "ALTSEPSolver type="<< type <<"\n";
+    std::cout << " s1= " << s1->str2() << "(k=" << k1<< ")\n";
+    std::cout << " s2= " << s2->str2() << "(k=" << k2<< ")\n";
+    std::cout << " s3= " << s3->str2() << "(k=" << k3<< ")\n";
+    
+    // now we should have this:
+    assert( lsite->isLine() && psite->isPoint() );
+    
     // separator direction
     Point sv(0,0);
-    if (k1 == -1) { // was k2?? but k2 is allways +1??
-        sv.x = s1->a(); //l1.a
-        sv.y = s1->b(); //l1.b
+    if (lsite_k == -1) {
+        sv.x = lsite->a();
+        sv.y = lsite->b();
     } else {
-        sv.x = -s1->a();
-        sv.y = -s1->b();
+        sv.x = -lsite->a();
+        sv.y = -lsite->b();
     }
-
+    std::cout << " sv= " << sv << "\n";
     double tsln(0);
-    if ( s3->isPoint() ) {
-        double dx = s2->x() - s3->x();
-        double dy = s2->y() - s3->y();
-        tsln = -(dx*dx+dy*dy) / (2*( dx*sv.x+dy*sv.y  )); // check for divide-by-zero?
-
-    } else if (s3->isLine()) {
-        tsln = -(s3->a()*s2->x()+s3->b()*s2->y()+s3->c()) / ( sv.x*s3->a() + sv.y*s3->b() + k3  );
+    //double k3_out;
+    
+    if ( third_site->isPoint() ) {
+        double dx = psite->x() - third_site->x();
+        double dy = psite->y() - third_site->y();
+        if ( fabs(2*( dx*sv.x+dy*sv.y  )) > 0 ) {
+            tsln = -(dx*dx+dy*dy) / (2*( dx*sv.x+dy*sv.y  )); // check for divide-by-zero?
+        } else {
+            std::cout << " no solutions. (isPoint)\n";
+            return 0;
+        }
+    } else if (third_site->isLine()) {
+        if ( fabs(( sv.x*third_site->a() + sv.y*third_site->b() + third_site_k )) > 0 ) {
+            tsln = -(third_site->a()*psite->x()+third_site->b()*psite->y()+third_site->c()) / 
+                ( sv.x*third_site->a() + sv.y*third_site->b() + third_site_k );
+            // figure out the correct k3 here.. ?
+        } else {
+            std::cout << " no solutions. (isLine)\n";
+            return 0;
+        }
     } else {
         assert(0);
         exit(-1);
     }
-    Point psln = Point(s2->x(), s2->y() ) + tsln * sv;
+    Point psln = Point(psite->x(), psite->y() ) + tsln * sv;
+    //if (tsln<0)
+    //    tsln = -tsln;
+    std::cout << "ALTSEPSolver tsln="<< tsln <<" p="<< psln << "\n";
+
     slns.push_back( Solution( psln, tsln, k3 ) );
     return 1;
 }
 
+private:
+    int type;
 };
 
 

@@ -162,7 +162,8 @@ int VoronoiDiagram::insert_point_site(const Point& p, int step) {
     assert( p.norm() < far_radius );     // only add vertices within the far_radius circle
     
     HEVertex new_vert = g.add_vertex( VoronoiVertex(p,OUT,POINTSITE) );
-    Site* new_site =  new PointSite(p);
+    PointSite* new_site =  new PointSite(p);
+    new_site->v = new_vert;
     vertex_map.insert( VertexMapPair(g[new_vert].index,new_vert) ); // so that we can find the descriptor later based on its index
 
     HEVertex v_seed = find_seed_vertex( fgrid->grid_find_closest_face( p ), new_site);
@@ -808,18 +809,17 @@ VoronoiDiagram::find_null_face(HEVertex start, HEVertex other, Point left) {
         // e1  ->  e2  ->  e3     on start_null_face, k=1
         // e1t <-  e2t <-  e3t   on g[start].face, k=1
         g.set_next_cycle( boost::assign::list_of(e1)(e2)(e3) , start_null_face, 1);
-        HEFace start_face=g[start].face;
+        HEFace start_face = g[start].face;
         HEEdge start_face_edge=g[start_face].edge; // crazy workaround, because set_next_cycles sets g[face].edge wrong here!
         g.set_next_cycle( boost::assign::list_of(e3_tw)(e2_tw)(e1_tw), g[start].face, 1);
         g[start_null_face].edge = e1;
-        g[start_face].edge=start_face_edge;
+        g[start_face].edge = start_face_edge;
         
         g[e1].type = NULLEDGE; g[e2].type = NULLEDGE; g[e3].type = NULLEDGE;
         g[e1_tw].type = NULLEDGE; g[e3_tw].type = NULLEDGE; g[e2_tw].type = NULLEDGE;
 
         g[start].null_face = start_null_face;
-        
-        // associate null-face with the PointSite here!!
+        g[start_null_face].site = g[start_face].site;
         
         return boost::make_tuple( seg_start, start_null_face, pos_sep_start, neg_sep_start, face_to_null);
     }

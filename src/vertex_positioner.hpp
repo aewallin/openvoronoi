@@ -25,6 +25,7 @@
 #include "graph.hpp"
 #include "vertex.hpp"
 #include "solvers/solution.hpp"
+//#include "solvers/solver_alt_sep.hpp"
 
 namespace ovd {
 
@@ -74,6 +75,7 @@ private:
     int solver_dispatch(Site* s1, double k1, 
                Site* s2, double k2, 
                Site* s3, double k3, std::vector<Solution>& slns ); 
+    bool detect_sep_case(Site* lsite, Site* psite);
 
 // geometry-checks
     bool solution_on_edge(Solution& s);
@@ -86,6 +88,7 @@ private:
     Solver* lll_solver;
     Solver* qll_solver;
     Solver* sep_solver;
+    Solver* alt_sep_solver;
 // DATA
     HEGraph& g; // reference to the VD graph.
     double t_min;

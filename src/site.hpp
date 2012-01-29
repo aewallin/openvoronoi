@@ -334,7 +334,9 @@ public:
         return out;
     }
     virtual bool in_region(const Point& ) const {return true;}
-    virtual double in_region_t(const Point& p) const {return -1;} 
+    virtual double in_region_t(const Point& p) const {return -1;}
+    virtual HEVertex vertex() {return v;}
+    HEVertex v;
 private:
     PointSite() {} // don't use!
     Point _p;

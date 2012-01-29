@@ -33,9 +33,14 @@ public:
     virtual int solve(Site* s1, double k1, 
                            Site* s2, double k2, 
                            Site* s3, double k3, std::vector<Solution>& slns ) {return 0;}
+    
+    // this is used by PPPSolver, when no k-values are needed
     virtual int solve(Site* s1, 
                            Site* s2,  
                            Site* s3,  std::vector<Solution>& slns ) {return 0;}
+    
+    // used by alt_sep_solver
+    virtual void set_type(int) {}
 };
 
 

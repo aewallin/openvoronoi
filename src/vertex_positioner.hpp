@@ -25,7 +25,6 @@
 #include "graph.hpp"
 #include "vertex.hpp"
 #include "solvers/solution.hpp"
-//#include "solvers/solver_alt_sep.hpp"
 
 namespace ovd {
 

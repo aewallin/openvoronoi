@@ -31,19 +31,19 @@ namespace ovd {
 // the input sites are thus s1=LineSite and s2=PointSite  (if arcs are supported in the future then s1=ArcSite is possible)
 // s3 can be either a LineSite or a PointSite (of arcs are supported, s3=ArcSite is possible)
 //
-//  s1 (LineSite) offset eq. is     a1 x + b1 y + c1 + k1 t = 0   (1)
-//  s2 (PointSite) offset eq. is    (x-x2)^2 + (y-y2)^2 = t^2     (2)
+//  s1 (LineSite) offset eq. is     a1 x + b1 y + c1 + k1 t = 0   
+//  s2 (PointSite) offset eq. is    (x-x2)^2 + (y-y2)^2 = t^2     
 // 
 // Two possibilities for s3:
-//   s3 (LineSite)   a3 x + b3 y + c3 + k3 t = 0
-//   s3 (PointSite)  (x-x3)^2 + (y-y3)^2 = t^2 
+//   s3 (LineSite)   a3 x + b3 y + c3 + k3 t = 0           (1)
+//   s3 (PointSite)  (x-x3)^2 + (y-y3)^2 = t^2             (2)
 // 
 // This configuration constrains the solution to lie on the separator edge.
 // The separator is given by
 // SEP = p2 + t* sv
 // where p2 is the location of s2, and the separator direction sv is 
 // sv = (-a1,-b1)   if k1=-1
-// sv = (a1,b1)   if k1=-1 
+// sv = (a1,b1)   if k1=+1 
 // thus points on the separator are located at:
 //
 //  x_sep = x2 + t*sv.x
@@ -77,32 +77,39 @@ int solve( Site* s1, double k1,
     Site* psite;
     Site* third_site;
     double k3_out(1.0);
-    double lsite_k; //,  third_site_k; // psite_k
-    // swap sites if necessary ?
+    double lsite_k,  third_site_k; // psite_k
+
+    // separator direction
+    Point sv(0,0);
+    
     if ( type == 0 ) {
         //std::cout << "ALTSEPSolver type="<< type <<"\n";
         lsite = s3; lsite_k = k3;
-        psite = s1; // psite_k = k1;
-        third_site = s2; //third_site_k = k2;
+        psite = s1; // psite_k = k1;    l3 / s1 form a separator
+        third_site = s2;      third_site_k = k2;
         k3_out = k3;
+        sv = (k3 == - 1) ? Point(lsite->a(),lsite->b()) : Point(-lsite->a(),-lsite->b()); 
     } else if ( type == 1 ) {
         //std::cout << "ALTSEPSolver type="<< type <<"\n";
-        lsite = s1; lsite_k = k1;
-        psite = s3; // psite_k = k3;
-        third_site = s2; //third_site_k = k2;
-        k3_out = +1;
+        //lsite = s1; lsite_k = k1;
+        //psite = s3; // psite_k = k3;   l1 / s3 form a separator ? ?possible? if we always insert all point-sites first??
+        //third_site = s2; third_site_k = k2;
+        //k3_out = +1;
+        exit(-1);
     } else if ( type == 2 ) {
         //std::cout << "ALTSEPSolver type="<< type <<"\n";
         lsite = s3; lsite_k = k3;
-        psite = s2; // psite_k = k2;
-        third_site = s1; //third_site_k = k1;
+        psite = s2; // psite_k = k2;    l3 / s2 form a separator
+        third_site = s1; third_site_k = k1; 
         k3_out = k3;
+        sv = (k3 == - 1) ? Point(lsite->a(),lsite->b()) : Point(-lsite->a(),-lsite->b());
     } else if ( type == 3 ) {
         //std::cout << "ALTSEPSolver type="<< type <<"\n";
-        lsite = s2; lsite_k = k2;
-        psite = s3; // psite_k = k3;
-        third_site = s1; //third_site_k = k1;
-        k3_out = +1;
+        //lsite = s2; lsite_k = k2;
+        //psite = s3; // psite_k = k3;   l2/s3 ?possible?
+        //third_site = s1; third_site_k = k1;
+        //k3_out = +1;
+        exit(-1);
     } else {
         std::cout << "ALTSEPSolver FATAL ERROR!\n";
         exit(-1);
@@ -118,14 +125,16 @@ int solve( Site* s1, double k1,
     assert( lsite->isLine() && psite->isPoint() );
 
     // separator direction
+    /*
     Point sv(0,0);
-    if (lsite_k == -1) {
+    if (k3 == - 1) { // lsite_k
         sv.x = lsite->a();
         sv.y = lsite->b();
     } else {
         sv.x = -lsite->a();
         sv.y = -lsite->b();
-    }
+    }*/
+    
     std::cout << " sv= " << sv << "\n";
     double tsln(0);
 
@@ -139,9 +148,9 @@ int solve( Site* s1, double k1,
             return 0;
         }
     } else if (third_site->isLine()) {
-        if ( fabs(( sv.x*third_site->a() + sv.y*third_site->b() + k3 )) > 0 ) {
+        if ( fabs(( sv.x*third_site->a() + sv.y*third_site->b() + third_site_k )) > 0 ) {
             tsln = -(third_site->a()*psite->x()+third_site->b()*psite->y()+third_site->c()) / 
-                ( sv.x*third_site->a() + sv.y*third_site->b() + k3 );
+                ( sv.x*third_site->a() + sv.y*third_site->b() + third_site_k );
             // figure out the correct k3 here.. ?
         } else {
             std::cout << " no solutions. (isLine)\n";
@@ -154,9 +163,9 @@ int solve( Site* s1, double k1,
     Point psln = Point(psite->x(), psite->y() ) + tsln * sv;
     //if (tsln<0)
     //    tsln = -tsln;
-    std::cout << "ALTSEPSolver tsln="<< tsln <<" p="<< psln << "\n";
+    std::cout << "ALTSEPSolver tsln="<< tsln <<" p="<< psln << " k3="<< k3 << " k3_o="<<k3_out<<"\n";
 
-    slns.push_back( Solution( psln, tsln, k3_out ) );
+    slns.push_back( Solution( psln, tsln, k3 ) );
     return 1;
 }
 

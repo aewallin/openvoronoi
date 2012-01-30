@@ -64,10 +64,10 @@ if __name__ == "__main__":
     vod.offsetEdges = 1
     vd.setEdgeOffset(0.001)
     
-    # Nmax = 128
+    Nmax = 128
     # Nmax = 256
     # Nmax = 512
-    Nmax = 1024
+    # Nmax = 1024
     # Nmax = 2048
     # Nmax = 4096
     # Nmax = 8192
@@ -125,9 +125,33 @@ if __name__ == "__main__":
     n=1
     t_before = time.time()
     for s in id_list:
-        if n<= nsegs and linesegs==1:
+        if s[0] == 119:
+            print n," adding line-segment",s[0]," - ",s[1]
+            vd.debug_on()
+            vd.addLineSite(s[0],s[1],7)
+            vod.setVDText2([1,1])
+            vod.setAll()
+            #verts=[id_list[n], id_list[n_nxt], 117443,117445,117460,117454]
+            #for v in verts:
+            #    print "drawing ",v
+                #print vod
+                #print dir(vod)
+            #    vod.drawVertexIdx(v)
+            vod.drawIncidentVertexIds()
+            # f4792   f4795
+            #for v in vd.getFaceVertices(18924):
+            #    vod.drawVertexIdx(v)
+            print "PYTHON All DONE."
+            #f = ovd.Point(0.055,-0.2437)
+            #myscreen.camera.SetPosition(f.x, f.y-float(1)/float(1000), 0.3) 
+            #myscreen.camera.SetClippingRange(-(zmult+1)*camPos,(zmult+1)*camPos)
+            #myscreen.camera.SetFocalPoint( f.x, f.y, 0)
+            myscreen.render()   
+            myscreen.iren.Start()
+        elif n<= nsegs and linesegs==1:
+            print n," adding line-segment",s[0]," - ",s[1]
             vd.addLineSite(s[0],s[1])
-            print n," added line-segment"
+            
         n=n+1
     t_after = time.time()
     times.append( t_after-t_before )

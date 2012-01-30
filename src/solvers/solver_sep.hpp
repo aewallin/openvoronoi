@@ -77,7 +77,7 @@ int solve( Site* s1, double k1,
     assert( s1->isLine() && s2->isPoint() );
     // separator direction
     Point sv(0,0);
-    if (k3 == -1) { // was k2?? but k2 is allways +1??
+    if (k2 == -1) { // was k2?? but k2 is allways +1??
         sv.x = s1->a(); //l1.a
         sv.y = s1->b(); //l1.b
     } else {

@@ -70,6 +70,7 @@ public:
 
     std::vector<double> get_stat() {return errstat;}
     double dist_error(HEEdge e, const Solution& sl, Site* s3);
+    void solver_debug(bool b);
 private:
     Solution position(Site* s1, double k1, Site* s2, double k2, Site* s3);
     int solver_dispatch(Site* s1, double k1, 
@@ -82,6 +83,7 @@ private:
     bool check_far_circle(Solution& s);
     bool check_dist(HEEdge e, const Solution& s, Site* s3);
     bool equal(double d1, double d2);
+    
     
 // solvers, to which we dispatch, depending on the input sites
     Solver* ppp_solver;

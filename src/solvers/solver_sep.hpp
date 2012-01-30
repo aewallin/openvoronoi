@@ -73,18 +73,18 @@ int solve( Site* s1, double k1,
            Site* s2, double k2, 
            Site* s3, double k3, std::vector<Solution>& slns ) {
     // swap sites if necessary ?
-    
+    if (debug) std::cout << "SEPSolver.\n";
     assert( s1->isLine() && s2->isPoint() );
     // separator direction
     Point sv(0,0);
-    if (k1 == -1) { // was k2?? but k2 is allways +1??
+    if (k3 == -1) { // was k2?? but k2 is allways +1??
         sv.x = s1->a(); //l1.a
         sv.y = s1->b(); //l1.b
     } else {
         sv.x = -s1->a();
         sv.y = -s1->b();
     }
-
+    if (debug) std::cout << " SEPSolver sv= "<< sv << "\n";
     double tsln(0);
     if ( s3->isPoint() ) {
         double dx = s2->x() - s3->x();

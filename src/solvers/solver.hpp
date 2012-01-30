@@ -41,6 +41,9 @@ public:
     
     // used by alt_sep_solver
     virtual void set_type(int) {}
+    void set_debug(bool b) {debug=b;}
+protected:
+    bool debug;
 };
 
 

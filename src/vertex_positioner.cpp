@@ -206,13 +206,16 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
         //psite = s1;
     //}
     
+    std::cout << "Running solvers again: \n";
+    solver_debug(true);
     // run the solver(s) one more time in order to print out un-filtered solution points for debugging
     std::vector<Solution> solutions2;
     solver_dispatch(s1,k1,s2,k2,s3,+1, solutions2);
     if (!s3->isPoint()) // for points k3=+1 allways
         solver_dispatch(s1,k1,s2,k2,s3,-1, solutions2); // for lineSite or ArcSite we try k3=-1 also    
+    solver_debug(false);
 
-    std::cout << " The failing " << solutions2.size() << " solutions are: \n";
+    std::cout << "The failing " << solutions2.size() << " solutions are: \n";
     BOOST_FOREACH(Solution s, solutions2 ) {
         std::cout << s.p << " t=" << s.t << " k3=" << s.k3  << " e_err=" << g[edge].error(s) <<"\n";
         std::cout << " min<t<max=" << ((s.t>=t_min) && (s.t<=t_max));
@@ -247,6 +250,14 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     std::cout << "WARNING: Returning desperate solution: \n";
     std::cout << desp.p << " t=" << desp.t << " k3=" << desp.k3  << " e_err=" << g[edge].error(desp) <<"\n";
     return desp;
+}
+
+void VertexPositioner::solver_debug(bool b) {
+    ppp_solver->set_debug(b);
+    lll_solver->set_debug(b);
+    qll_solver->set_debug(b);
+    sep_solver->set_debug(b);
+    alt_sep_solver->set_debug(b);
 }
 
 int VertexPositioner::solver_dispatch(Site* s1, double k1, Site* s2, double k2, Site* s3, double k3, std::vector<Solution>& solns) {
@@ -300,7 +311,7 @@ bool VertexPositioner::detect_sep_case(Site* lsite, Site* psite) {
     HEEdge le = lsite->edge();
     HEVertex src = g.source(le);
     HEVertex trg = g.target(le);
-    //std::cout << " Linesite from " << g[src].index << " to " << g[trg].index << "\n";
+    std::cout << " detect_sep_case() Linesite from " << g[src].index << " to " << g[trg].index << "\n";
     // now from segment end-points get the null-vertex
     HEEdge src_out;
     BOOST_FOREACH(HEEdge e, g.out_edge_itr(src) ) {
@@ -312,29 +323,66 @@ bool VertexPositioner::detect_sep_case(Site* lsite, Site* psite) {
         if ( g[e].type == NULLEDGE )
             trg_out = e;
     }
-    //std::cout << " src null-edge"; g.print_edge(src_out); // << g[src].index << " to " << g[trg].index << "\n";
-    HEEdge src_out_twin = g[src_out].twin;
-    HEEdge trg_out_twin = g[trg_out].twin;
-
-    //std::cout << " src null-edge twin "; g.print_edge(src_out_twin); // << g[src].index << " to " << g[trg].index << "\n";
-    HEFace src_null_face = g[src_out_twin].face;
-    HEFace trg_null_face = g[trg_out_twin].face;
-    //std::cout << " src null-face " << src_null_face << "\n";
+    std::cout << " detect_sep_case() src null-edge "; g.print_edge(src_out); // << g[src].index << " to " << g[trg].index << "\n";
+    std::cout << " detect_sep_case() trg null-edge "; g.print_edge(trg_out);
+    
+    HEFace src_null_face = g[src_out].face;
+    if (g[src_null_face].null == false ) {
+        // take twin face instead
+        HEEdge src_out_twin = g[src_out].twin;
+        src_null_face = g[src_out_twin].face;
+    }
+    
+    HEFace trg_null_face = g[trg_out].face;
+    if ( g[trg_null_face].null == false ) {
+        HEEdge trg_out_twin = g[trg_out].twin;
+        trg_null_face = g[trg_out_twin].face;
+    }
+    assert( g[src_null_face].null && g[trg_null_face].null );
+    
+    //std::cout << " detect_sep_case() src null-face " << src_null_face << "\n";
+    //g.print_face( src_null_face );
+    
+    // do we want src_out face??
+    // OR src_out_twin face??
+    // we want the null-face !
+    
+    //std::cout << " detect_sep_case() src null-edge twin "; g.print_edge(src_out_twin); // << g[src].index << " to " << g[trg].index << "\n";
+    //std::cout << " detect_sep_case() trg null-edge twin "; g.print_edge(trg_out_twin);
+    
+    //HEFace 
+    std::cout << " detect_sep_case() src null-face " << src_null_face << "\n";
+    g.print_face(src_null_face);
+    std::cout << " detect_sep_case() trg null-face " << trg_null_face << "\n";
+    g.print_face(trg_null_face);
+    
     Site* src_site = g[src_null_face].site;
     Site* trg_site = g[trg_null_face].site;
-    //std::cout << src_site->str();
+    if (src_site == NULL || trg_site == NULL ) {
+        exit(-1);
+    }
+    std::cout << " detect_sep_case() src PointSite is "  << src_site->str() << "\n"; // << src_site->vertex();
+    std::cout << " detect_sep_case() trg PointSite is "  << trg_site->str() << "\n";
     HEVertex src_vertex = src_site->vertex();
     HEVertex trg_vertex = trg_site->vertex();
-    //std::cout << " 1st end-point vertex is " << g[src_vertex].index << "\n";
-    //std::cout << " 2nd end-point vertex is " << g[trg_vertex].index << "\n";
+    std::cout << " detect_sep_case() 1st end-point vertex is " << g[src_vertex].index << "\n";
+    std::cout << " detect_sep_case() 2nd end-point vertex is " << g[trg_vertex].index << "\n";
+    std::cout << " detect_sep_case() psite is " << psite->str() << "\n";
+    std::cout << " detect_sep_case() psite is " << g[psite->vertex()].index << "\n"; // g[ psite->vertex()].index << "\n";
     if ( src_vertex == psite->vertex() ) {
-        //std::cout << " src separator case!";
+        std::cout << " detect_sep_case(): src separator case!\n";
+        std::cout << " detect_sep_case(): line is " << g[src].index << " - " << g[trg].index << " with psites " << g[src_vertex].index << " - " << g[trg_vertex].index << "\n";
+        std::cout << " detect_sep_case(): psite vertex is " << g[ psite->vertex() ].index << "\n";
         return true;
     }
     if ( trg_vertex == psite->vertex() ) {
-        //std::cout << " trg separator case!";
+        std::cout << " detect_sep_case(): trg separator case!\n";
+        std::cout << " detect_sep_case(): line is " << g[src].index << " - " << g[trg].index << " with psites " << g[src_vertex].index << " - " << g[trg_vertex].index << "\n";
+        std::cout << " detect_sep_case(): psite vertex is " << g[ psite->vertex() ].index << "\n";
+
         return true;
     }
+    std::cout << " detect_sep_case()   NOT a separator case.\n";
     return false;
 }
 

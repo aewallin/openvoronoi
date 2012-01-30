@@ -297,7 +297,11 @@ public:
         return -99;
     }
     virtual HEEdge edge() {return HEEdge();}
-    virtual HEVertex vertex() {return HEVertex();}
+    virtual HEVertex vertex() {
+        std::cout << " DON'T call Site::vertex() !! \n";
+        exit(-1); 
+        return HEVertex();
+    }
     typedef unsigned int HEFace;    
     HEFace face;
 protected:
@@ -307,7 +311,15 @@ protected:
 /// point, or vertex site.
 class PointSite : public Site {
 public:
-    PointSite( const Point& p, HEFace f=0): _p(p) {
+    PointSite( const Point& p, HEFace f=0): _p(p)  {
+        face = f;
+        eq.q = true;
+        eq.a = -2*p.x;
+        eq.b = -2*p.y;
+        eq.k = 0;
+        eq.c = p.x*p.x + p.y*p.y;
+    }
+    PointSite( const Point& p, HEFace f, HEVertex vert):  v(vert), _p(p) {
         face = f;
         eq.q = true;
         eq.a = -2*p.x;

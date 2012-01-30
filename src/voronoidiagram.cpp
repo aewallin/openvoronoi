@@ -67,10 +67,10 @@ void VoronoiDiagram::initialize() {
     HEVertex v01 = g.add_vertex( VoronoiVertex( vd1, OUT, OUTER, gen3) );
     HEVertex v02 = g.add_vertex( VoronoiVertex( vd2, OUT, OUTER, gen1) );
     HEVertex v03 = g.add_vertex( VoronoiVertex( vd3, OUT, OUTER, gen2) );
-    // add initial sites to graph (if vertex_descriptors not held, why do we do this??)
-    g.add_vertex( VoronoiVertex( gen1 , OUT, POINTSITE) );
-    g.add_vertex( VoronoiVertex( gen2 , OUT, POINTSITE) );
-    g.add_vertex( VoronoiVertex( gen3 , OUT, POINTSITE) );
+    // add initial sites to graph 
+    HEVertex vert1 = g.add_vertex( VoronoiVertex( gen1 , OUT, POINTSITE) );
+    HEVertex vert2 = g.add_vertex( VoronoiVertex( gen2 , OUT, POINTSITE) );
+    HEVertex vert3 = g.add_vertex( VoronoiVertex( gen3 , OUT, POINTSITE) );
 
     // apex-points on the three edges: 
     HEVertex a1 = g.add_vertex( VoronoiVertex( 0.5*(gen2+gen3), UNDECIDED, APEX, gen2 ) );
@@ -84,7 +84,7 @@ void VoronoiDiagram::initialize() {
     HEEdge e3_1 =  g.add_edge( v02, a2  ); 
     HEEdge e3_2 =  g.add_edge( a2 , v00 ); 
     HEFace f1   =  g.add_face(); 
-    g[f1].site  = new PointSite(gen3,f1);
+    g[f1].site  = new PointSite(gen3,f1, vert3);
     g[f1].status = NONINCIDENT;
     fgrid->add_face( g[f1] ); // for grid search
     g.set_next_cycle( list_of(e1_1)(e1_2)(e2)(e3_1)(e3_2) , f1 ,1);
@@ -96,7 +96,7 @@ void VoronoiDiagram::initialize() {
     HEEdge e6_1 = g.add_edge( v03, a3 );
     HEEdge e6_2 = g.add_edge( a3, v00 ); 
     HEFace f2   =  g.add_face();
-    g[f2].site  = new PointSite(gen1,f2);
+    g[f2].site  = new PointSite(gen1,f2, vert1);
     g[f2].status = NONINCIDENT;    
     fgrid->add_face( g[f2] );
     g.set_next_cycle( list_of(e4_1)(e4_2)(e5)(e6_1)(e6_2) , f2 ,1);
@@ -108,11 +108,16 @@ void VoronoiDiagram::initialize() {
     HEEdge e9_1 = g.add_edge( v01, a1  ); 
     HEEdge e9_2 = g.add_edge( a1 , v00 ); 
     HEFace f3   =  g.add_face();
-    g[f3].site  = new PointSite(gen2,f3); // this constructor needs f3...
+    g[f3].site  = new PointSite(gen2,f3, vert2); // this constructor needs f3...
     g[f3].status = NONINCIDENT;    
     fgrid->add_face( g[f3] );
     g.set_next_cycle( list_of(e7_1)(e7_2)(e8)(e9_1)(e9_2) , f3 , 1);    
-
+    
+    // associate sites with vertices!!
+    //g[f1].site->v = vert3;
+    //g[f2].site->v = vert1;
+    //g[f3].site->v = vert2;
+    
     // set type. (note that edge-params x[8] and y[8] are not set!
     g[e1_1].type = LINE;  g[e1_1].set_parameters(g[f1].site, g[f3].site, false);
     g[e1_2].type = LINE;  g[e1_2].set_parameters(g[f1].site, g[f3].site, true);
@@ -237,13 +242,7 @@ if (step==current_step) return false; current_step++;
     if (debug) std::cout << " start face seed  = " << g[v_seed].index << "\n";
     mark_vertex( v_seed, pos_site  );
 
-    // now safe to set the zero-face edge
-    // in the collinear case, set the edge for the face that "disappears" to a null edge
-    
-    //if (start_to_null!=g.HFace())
-    //    g[start_to_null].edge = start_null_edge; 
-    //if (end_to_null!=g.HFace())
-    //    g[end_to_null].edge = end_null_edge; 
+
     
     
 if (step==current_step) return false; current_step++;
@@ -273,6 +272,15 @@ if (step==current_step) return false; current_step++;
     boost::tie(seg_start, start_null_face, pos_sep_start, neg_sep_start, start_to_null) = find_null_face(start, end  , left);
     boost::tie(seg_end  , end_null_face  , pos_sep_end  , neg_sep_end, end_to_null  ) = find_null_face(end  , start, left);
 
+    // now safe to set the zero-face edge
+    // in the collinear case, set the edge for the face that "disappears" to a null edge
+    
+    //if (start_to_null!=g.HFace())
+    //    g[start_to_null].edge = start_null_edge; 
+    //if (end_to_null!=g.HFace())
+    //    g[end_to_null].edge = end_null_edge; 
+    
+    
 if (step==current_step) return false; current_step++;
     // create edges and faces
     HEFace pos_face, neg_face; 
@@ -770,7 +778,9 @@ VoronoiDiagram::find_null_face(HEVertex start, HEVertex other, Point left) {
         //
         //  neg_sep -> seg_endp -> pos_sep
         //
-        start_null_face = g.add_face(); //  this face to the left of start->end edge    
+        start_null_face = g.add_face(); //  this face to the left of start->end edge  
+        g[start_null_face].null = true;
+          
         if (debug) std::cout << " find_null_face() endp= " << g[start].index <<  " creating new null_face " << start_null_face << "\n";
         seg_start = g.add_vertex( VoronoiVertex(g[start].position,OUT,ENDPOINT) );
         g[seg_start].zero_dist();
@@ -1036,7 +1046,7 @@ void VoronoiDiagram::mark_vertex(HEVertex& v,  Site* site) {
                 // when pushing onto queue we also evaluate in_circle predicate so that we process vertices in the correct order
                 vertexQueue.push( VertexDetPair(w , g[w].in_circle(site->apex_point(g[w].position)) ) ); 
                 g[w].in_queue=true;
-                if (debug) std::cout << "  " << g[w].index << " queued (h=" << g[w].in_circle(site->apex_point(g[w].position)) << "\n";
+                if (debug) std::cout << "  " << g[w].index << " queued (h=" << g[w].in_circle(site->apex_point(g[w].position)) << " )\n";
         }
     }
 }
@@ -1249,7 +1259,12 @@ void VoronoiDiagram::add_vertices( Site* new_site ) {
     assert( !v0.empty() );
     EdgeVector q_edges = find_in_out_edges();       // new vertices generated on these IN-OUT edges
     for( unsigned int m=0; m<q_edges.size(); ++m )  {   
-
+        if (debug) {
+            HEVertex src = g.source(q_edges[m]);
+            HEVertex trg = g.target(q_edges[m]);
+            std::cout << " Position NEW vertex on " << g[src].index << " - " << g[trg].index << "\n";
+            vpos->solver_debug(true);
+        }
         Solution sl = vpos->position( q_edges[m], new_site ); // vertex_positioner.cpp
 
         if ( vpos->dist_error( q_edges[m], sl, new_site) > 1e-9 ) {

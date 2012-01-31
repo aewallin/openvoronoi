@@ -52,7 +52,7 @@ if __name__ == "__main__":
     vod.vertexRadius = 0.0031
     vod.drawVertices=0
     vod.drawVertexIndex=1
-    vod.drawGenerators=0
+    vod.drawGenerators=1
     vod.offsetEdges = 1
     vd.setEdgeOffset(0.05)
     
@@ -98,13 +98,23 @@ if __name__ == "__main__":
     #vd.debug_on()
     vd.addLineSite( id_list[0], id_list[1])
     
+    # 4 augment vertex set
+    # 5 process null-faces
+    # 6 create faces and pseudo-edges
+    # 7 add new vertices
+    # 8,9,10,11 separators
+    # 11, all separators added
+    # 12, add edges
+    # 13, remove delete-set
+    # 13, reset status, delete split-verts
     
     vd.check()
     
     #vd.debug_on()
     vd.addLineSite( id_list[1], id_list[2])
     vd.check()
-    
+
+        
     vd.addLineSite( id_list[2], id_list[3])
     vd.check()
     
@@ -142,8 +152,9 @@ if __name__ == "__main__":
             
     vod.setVDText2(times)
     
-    err = vd.getStat()
+    #err = vd.getStat()
     #print err 
+    """
     print "got errorstats for ",len(err)," points"
     if len(err)>1:
         minerr = min(err)
@@ -153,8 +164,8 @@ if __name__ == "__main__":
     
     print "num vertices: ",vd.numVertices() 
     print "num SPLIT vertices: ",vd.numSplitVertices() 
-        
-    calctime = t_after-t_before
+    """
+    #calctime = t_after-t_before
     
     vod.setAll()
         

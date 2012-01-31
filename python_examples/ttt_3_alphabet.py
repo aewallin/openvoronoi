@@ -40,9 +40,9 @@ def insert_polygon_segments(vd,id_list):
             n_nxt=0
         print " ",j,"inserting segement ",id_list[n]," - ",id_list[n_nxt]
         
-        if id_list[n] == 47124: # 47013:
+        if  id_list[n] == 78238: # 47013:
             vd.debug_on()
-            vd.addLineSite( id_list[n], id_list[n_nxt], 5)  # fails: 47124/6
+            vd.addLineSite( id_list[n], id_list[n_nxt], 13)  # fails:  now 78238/13
             vod.setVDText2([1,1])
             vod.setAll()
             #verts=[id_list[n], id_list[n_nxt], 117443,117445,117460,117454]
@@ -53,20 +53,20 @@ def insert_polygon_segments(vd,id_list):
             #    vod.drawVertexIdx(v)
             vod.drawIncidentVertexIds()
             # f4792   f4795
-            for v in vd.getFaceVertices(4792):
+            for v in vd.getFaceVertices(18924):
                 vod.drawVertexIdx(v)
             print "PYTHON All DONE."
-            f = ovd.Point(0.055,-0.2437)
-            myscreen.camera.SetPosition(f.x, f.y-float(1)/float(1000), 0.3) 
+            #f = ovd.Point(0.055,-0.2437)
+            #myscreen.camera.SetPosition(f.x, f.y-float(1)/float(1000), 0.3) 
             #myscreen.camera.SetClippingRange(-(zmult+1)*camPos,(zmult+1)*camPos)
-            myscreen.camera.SetFocalPoint( f.x, f.y, 0)
+            #myscreen.camera.SetFocalPoint( f.x, f.y, 0)
             myscreen.render()   
             myscreen.iren.Start()
-        elif  id_list[n] in [47113]:
+        elif  0: #id_list[n] in [ 78206, 78241, 78225]:
             vd.addLineSite( id_list[n], id_list[n_nxt])
         else:
-            pass
-            #vd.addLineSite( id_list[n], id_list[n_nxt])
+            #pass
+            vd.addLineSite( id_list[n], id_list[n_nxt])
         j=j+1
 
 def modify_segments(segs):
@@ -175,21 +175,21 @@ if __name__ == "__main__":
     vod = ovdvtk.VD(myscreen,vd,float(1), textscale=0.01, vertexradius=0.003)
     vod.drawFarCircle()
     #vod.textScale = 0.000002
-    vod.textScale = 0.00002
+    vod.textScale = 0.00005
     vod.vertexRadius = 0.0011
     vod.drawVertices=0
     vod.drawVertexIndex=0
     vod.drawGenerators=0
     vod.offsetEdges = 1
     vod.drawNullEdges = 1
-    vd.setEdgeOffset(0.0001)
+    vd.setEdgeOffset(0.00005)
     
     all_segs=segs+segs2 +segs3 +segs4+segs5
     #all_segs=segs
     #all_segs=segs3 #+segs4
     #all_segs = segs3
     times = insert_many_polygons(vd,all_segs)
-    assert( vd.check() )
+    vd.check()
     
     #ovd.PolygonInterior( vd.getGraph() , True )
     #ovd.MedialAxis( vd.getGraph() )
@@ -197,6 +197,10 @@ if __name__ == "__main__":
     vod.setVDText2(times)
     vod.setAll()
     
+    #for v in vd.getFaceVertices(14705):
+    #    print " drawing ", v
+    #    vod.drawVertexIdx(v)
+        
     print "PYTHON All DONE."
 
     myscreen.render()   

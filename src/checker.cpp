@@ -172,7 +172,7 @@ bool VoronoiDiagramChecker::in_circle_is_negative(  const Point& p, HEVertex min
 bool VoronoiDiagramChecker::all_faces_ok() {
     for(HEFace f=0;f< g.num_faces() ; f++ ) {
         if (!face_ok(f)) {
-            std::cout << " all_faces_ok() ERROR: f= " << f << "\n";
+            std::cout << "VoronoiDiagramChecker::all_faces_ok() ERROR: f= " << f << "\n";
             g.print_face(f);
             return false;
         }
@@ -187,7 +187,7 @@ bool VoronoiDiagramChecker::face_ok(HEFace f, bool debug) {
     HEEdge start_edge= current_edge;
     double k = g[current_edge].k;
     if ( !((k==1) || (k==-1)) ) {
-        std::cout << " face_ok " << f << " ERROR:\n";
+        std::cout << " VoronoiDiagramChecker::face_ok() f=" << f << " ERROR:\n";
         std::cout << " illegal k-value for edge:";
         std::cout << g[ g.source(current_edge)].index << " - "; 
         std::cout <<  g[ g.target(current_edge)].index  ;
@@ -197,8 +197,9 @@ bool VoronoiDiagramChecker::face_ok(HEFace f, bool debug) {
     if (g[f].site!=0) { // guard against null-faces that dont have Site
         if ( g[f].site->isPoint() ) {
             if ( !(k==1) ) {
-                std::cout << " face_ok() pointsite, but k!=1 ! \n";
-                std::cout << " f = " << f << "\n";
+                std::cout << " VoronoiDiagramChecker::face_ok() f=" << f << " ERROR:\n";
+                std::cout << " f = " << f << " site is " << g[f].site->str() << " but k=" << k  << "\n";
+                std::cout << " null? " << g[f].null << "\n";
                 return false;
             }
         }

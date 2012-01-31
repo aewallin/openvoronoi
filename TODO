@@ -16,7 +16,10 @@ Core algorithm
   that still causes failure. This would greatly help pinpoint problems in Solvers.
 - A segfault will result if the user tries to insert a line-segment that intersects with an already inserted
   line-segment. Try to fail more graciously, or warn the user. Probably same issue with identical point-sites.
-  
+- calling vd.check() after a "debug-mode" insert_line_site(id1,id2, step) (where e.g. step=5) causes a segfault
+  make this fail more gracefully.
+- chain_5_collinear2.py exposes a case where a desperate solution is returned, because we fail to detect this
+  as a case for the sep_solver.
 
 Solvers
 - geometric-filtering. try solver<double>, evaulate quality of solution, 
@@ -54,6 +57,8 @@ Tests
 - Benchmark against libarea/kbool and libarea/Clipper (are there other FOSS offsetting codes?)
 - Compare against other VD codes (CGAL, boost-sweepline, others?)
 - Write software that generates test-cases (ttt is a good example)
+-- hilbert curve?
+-- GIS-data
 -- notes on random polygons:
 -- http://www.geometrylab.de/applet-29-en
 -- http://www.cgal.org/Manual/latest/doc_html/cgal_manual/Generator_ref/Function_random_polygon_2.html

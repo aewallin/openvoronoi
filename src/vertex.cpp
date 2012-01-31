@@ -62,7 +62,11 @@ VoronoiVertex::VoronoiVertex( Point p, VoronoiVertexStatus st, VoronoiVertexType
 {   
     init(p,st,t,initDist,lk3);
 }
-
+VoronoiVertex::VoronoiVertex( Point p, VoronoiVertexStatus st, VoronoiVertexType t, double init_radius)
+{
+    init(p,st,t);
+    r = init_radius;
+}
 /// set index, increase count, initialize in_queue to false.
 void VoronoiVertex::init() {
     index = count;
@@ -71,6 +75,7 @@ void VoronoiVertex::init() {
     alfa=-1; // invalid/non-initialized alfa value
     null_face = std::numeric_limits<HEFace>::quiet_NaN();    
     type = NORMAL;
+    face = std::numeric_limits<HEFace>::quiet_NaN();  
     //status = UNDECIDED;
 }
 

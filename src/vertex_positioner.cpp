@@ -29,10 +29,13 @@
 #include "solvers/solver_lll.hpp"
 #include "solvers/solver_qll.hpp"
 #include "solvers/solver_sep.hpp"
+#include "solvers/solver_alt_sep.hpp"
 
 using namespace ovd::numeric; // sq() chop()
 
 namespace ovd {
+
+// #define ALT_SEP
 
 VertexPositioner::VertexPositioner(HEGraph& gi): g(gi) {
     ppp_solver = new PPPSolver<qd_real>();
@@ -40,15 +43,23 @@ VertexPositioner::VertexPositioner(HEGraph& gi): g(gi) {
     lll_solver = new LLLSolver();
     qll_solver = new QLLSolver();
     sep_solver = new SEPSolver();
+#ifdef ALT_SEP
+    alt_sep_solver = new ALTSEPSolver();
+#endif
     errstat.clear();
 }
 
 VertexPositioner::~VertexPositioner() {
+    std::cout << "~VertexPositioner()..";
     delete ppp_solver;
     delete lll_solver;
     delete qll_solver;
     delete sep_solver;
+#ifdef ALT_SEP
+    delete alt_sep_solver;
+#endif
     errstat.clear();
+    std::cout << "DONE.\n";
 }
 
 // calculate the position of a new vertex on the given edge e
@@ -100,7 +111,7 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     std::vector<Solution> solutions;
     
     if ( g[edge].type == SEPARATOR && s1->isLine() && s2->isLine() ) {
-        // the parallell lineseg case
+        // the parallell lineseg case      v0 --s1 --> pt -- s2 --> v1
         if ( g[edge].has_null_face ) {
             s2 = g[ g[edge].null_face ].site;
             assert( s2->isPoint() ); // the sites of null-faces are allwais PointSite
@@ -111,6 +122,7 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
             k2 = +1;
         }
     } else if ( g[edge].type == SEPARATOR && s1->isPoint() && s2->isLine() ) {
+        // SEPARATOR case 
         // swap sites, so sep_solver can assume s1=line s2=point
         Site* tmp = s1;
         double k_tmp = k1;
@@ -144,9 +156,7 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     if (solutions.empty() ) 
         std::cout << "WARNING t_filter() results in empty solution set!!\n";
 
-    
-    
-    if ( solutions.size() == 1)
+    if ( solutions.size() == 1) // if only one solution is found, return that.
         return solutions[0];
     else if (solutions.size()>1) {
         // two or more points remain so we must further filter here!
@@ -176,7 +186,8 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
         }
         //assert( min_error < 1e-6 );
         return min_solution;
-    } 
+    }
+    
 
     // either 0, or >= 2 solutions found. error.
     // std::cout << " None, or too many solutions found! solutions.size()=" << solutions.size() << "\n";
@@ -187,17 +198,32 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     std::cout << g[ g.target(edge) ].index << "[" << g[ g.target(edge) ].type << "]{" << g[ g.target(edge) ].status<<"}\n";
     //std::cout << " t-vals t_min= " << t_min << " t_max= " << t_max << "\n";
     //std::cout << "  sites: " << s1->str() << "(k="<< k1<< ") " << s2->str() << "(k="<< k2 << ") new= " << s3->str() << "\n";
-    std::cout << "s1= " << s1->str2() << "(k=" << k1<< ")\n";
-    std::cout << "s2= " << s2->str2() << "(k=" << k2<< ")\n";
-    std::cout << "s3= " << s3->str2() << "\n";
-
+    std::cout << " s1= " << s1->str2() << "(k=" << k1<< ")\n";
+    std::cout << " s2= " << s2->str2() << "(k=" << k2<< ")\n";
+    std::cout << " s3= " << s3->str2() << "\n";
+    
+    // if s1/s2 form a SEPARATOR-edge, this is dispatched automatically to sep-solver
+    // here we detect for a separator case between
+    // s1/s3
+    // s2/s3
+    //LineSite* lsite;
+    //PointSite* psite;
+    //if (s3->isLine() && s1->isPoint() ) {
+    //    bool sep_case = detect_sep_case(s3,s1);
+        //lsite = s3;
+        //psite = s1;
+    //}
+    
+    std::cout << "Running solvers again: \n";
+    solver_debug(true);
     // run the solver(s) one more time in order to print out un-filtered solution points for debugging
     std::vector<Solution> solutions2;
     solver_dispatch(s1,k1,s2,k2,s3,+1, solutions2);
     if (!s3->isPoint()) // for points k3=+1 allways
         solver_dispatch(s1,k1,s2,k2,s3,-1, solutions2); // for lineSite or ArcSite we try k3=-1 also    
+    solver_debug(false);
 
-    std::cout << " The failing " << solutions2.size() << " solutions are: \n";
+    std::cout << "The failing " << solutions2.size() << " solutions are: \n";
     BOOST_FOREACH(Solution s, solutions2 ) {
         std::cout << s.p << " t=" << s.t << " k3=" << s.k3  << " e_err=" << g[edge].error(s) <<"\n";
         std::cout << " min<t<max=" << ((s.t>=t_min) && (s.t<=t_max));
@@ -234,16 +260,140 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     return desp;
 }
 
+void VertexPositioner::solver_debug(bool b) {
+    ppp_solver->set_debug(b);
+    lll_solver->set_debug(b);
+    qll_solver->set_debug(b);
+    sep_solver->set_debug(b);
+#ifdef ALT_SEP
+    alt_sep_solver->set_debug(b);
+#endif
+}
+
 int VertexPositioner::solver_dispatch(Site* s1, double k1, Site* s2, double k2, Site* s3, double k3, std::vector<Solution>& solns) {
+
+
     if ( g[edge].type == SEPARATOR )
         return sep_solver->solve(s1,k1,s2,k2,s3,k3,solns); // we have previously set s1(line) s2(point)
     else if ( s1->isLine() && s2->isLine() && s3->isLine() ) 
         return lll_solver->solve( s1,k1,s2,k2,s3,k3, solns ); // all lines.
     else if ( s1->isPoint() && s2->isPoint() && s3->isPoint() )
         return ppp_solver->solve( s1,s2,s3, solns ); // all points, no need to specify k1,k2,k3, they are all +1
-    else
-        return qll_solver->solve( s1,k1,s2,k2,s3,k3, solns ); // general case solver
- 
+#ifdef ALT_SEP
+    else if ( (s3->isLine() && s1->isPoint() ) || 
+              (s1->isLine() && s3->isPoint() ) ||
+              (s3->isLine() && s2->isPoint() ) ||
+              (s2->isLine() && s3->isPoint() )
+            ) {
+        // if s1/s2 form a SEPARATOR-edge, this is dispatched automatically to sep-solver
+        // here we detect for a separator case between
+        // s1/s3
+        // s2/s3
+        //LineSite* lsite;
+        //PointSite* psite;
+        if (s3->isLine() && s1->isPoint() ) {
+            if ( detect_sep_case(s3,s1) ) {
+                alt_sep_solver->set_type(0);
+                return alt_sep_solver->solve(s1, k1, s2, k2, s3, k3, solns );
+            }
+        } else if (s1->isLine() && s3->isPoint() ) {
+            if ( detect_sep_case(s1,s3) ) {
+                alt_sep_solver->set_type(1);
+                return alt_sep_solver->solve(s1, k1, s2, k2, s3, k3, solns );
+            }
+        } else if (s3->isLine() && s2->isPoint() ) {
+            if ( detect_sep_case(s3,s2) ) {
+                alt_sep_solver->set_type(2);
+                return alt_sep_solver->solve(s1, k1, s2, k2, s3, k3, solns );
+            }
+        } else if (s2->isLine() && s3->isPoint() ) {
+            if ( detect_sep_case(s2,s3) ) {
+                alt_sep_solver->set_type(3);
+                return alt_sep_solver->solve(s1, k1, s2, k2, s3, k3, solns );
+            }
+        }
+
+    } 
+#endif
+    
+    // if we didn't dispatch to a solver above, we try the general solver
+    return qll_solver->solve( s1,k1,s2,k2,s3,k3, solns ); // general case solver
+    
+}
+
+bool VertexPositioner::detect_sep_case(Site* lsite, Site* psite) {
+    HEEdge le = lsite->edge();
+    HEVertex src = g.source(le);
+    HEVertex trg = g.target(le);
+    //std::cout << " detect_sep_case() Linesite from " << g[src].index << " to " << g[trg].index << "\n";
+    // now from segment end-points get the null-vertex
+    HEEdge src_out;
+    BOOST_FOREACH(HEEdge e, g.out_edge_itr(src) ) {
+        if ( g[e].type == NULLEDGE )
+            src_out = e;
+    }
+    HEEdge trg_out;
+    BOOST_FOREACH(HEEdge e, g.out_edge_itr(trg) ) {
+        if ( g[e].type == NULLEDGE )
+            trg_out = e;
+    }
+    //std::cout << " detect_sep_case() src null-edge "; g.print_edge(src_out); // << g[src].index << " to " << g[trg].index << "\n";
+    //std::cout << " detect_sep_case() trg null-edge "; g.print_edge(trg_out);
+    
+    HEFace src_null_face = g[src_out].face;
+    if (g[src_null_face].null == false ) {
+        // take twin face instead
+        HEEdge src_out_twin = g[src_out].twin;
+        src_null_face = g[src_out_twin].face;
+    }
+    
+    HEFace trg_null_face = g[trg_out].face;
+    if ( g[trg_null_face].null == false ) {
+        HEEdge trg_out_twin = g[trg_out].twin;
+        trg_null_face = g[trg_out_twin].face;
+    }
+    assert( g[src_null_face].null && g[trg_null_face].null );
+        
+    // do we want src_out face??
+    // OR src_out_twin face??
+    // we want the null-face !
+        
+    //std::cout << " detect_sep_case() src null-face " << src_null_face << "\n";
+    //g.print_face(src_null_face);
+    //std::cout << " detect_sep_case() trg null-face " << trg_null_face << "\n";
+    //g.print_face(trg_null_face);
+    
+    Site* src_site = g[src_null_face].site;
+    Site* trg_site = g[trg_null_face].site;
+    if (src_site == NULL || trg_site == NULL ) {
+        exit(-1);
+    }
+    if ( !src_site->isPoint() || !trg_site->isPoint() ) {
+        exit(-1);
+    }
+    //std::cout << " detect_sep_case() src PointSite is "  << src_site->str() << "\n"; // << src_site->vertex();
+    //std::cout << " detect_sep_case() trg PointSite is "  << trg_site->str() << "\n";
+    HEVertex src_vertex = src_site->vertex();
+    HEVertex trg_vertex = trg_site->vertex();
+    //std::cout << " detect_sep_case() 1st end-point vertex is " << g[src_vertex].index << "\n";
+    //std::cout << " detect_sep_case() 2nd end-point vertex is " << g[trg_vertex].index << "\n";
+    //std::cout << " detect_sep_case() psite is " << psite->str() << "\n";
+    //std::cout << " detect_sep_case() psite is " << g[psite->vertex()].index << "\n"; // g[ psite->vertex()].index << "\n";
+    if ( src_vertex == psite->vertex() ) {
+        //std::cout << " detect_sep_case(): src separator case!\n";
+        //std::cout << " detect_sep_case(): line is " << g[src].index << " - " << g[trg].index << " with psites " << g[src_vertex].index << " - " << g[trg_vertex].index << "\n";
+        //std::cout << " detect_sep_case(): psite vertex is " << g[ psite->vertex() ].index << "\n";
+        return true;
+    }
+    if ( trg_vertex == psite->vertex() ) {
+        //std::cout << " detect_sep_case(): trg separator case!\n";
+        //std::cout << " detect_sep_case(): line is " << g[src].index << " - " << g[trg].index << " with psites " << g[src_vertex].index << " - " << g[trg_vertex].index << "\n";
+        //std::cout << " detect_sep_case(): psite vertex is " << g[ psite->vertex() ].index << "\n";
+
+        return true;
+    }
+    //std::cout << " detect_sep_case()   NOT a separator case.\n";
+    return false;
 }
 
 bool VertexPositioner::solution_on_edge(Solution& s) {

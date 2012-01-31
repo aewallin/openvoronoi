@@ -81,7 +81,7 @@ class VoronoiDiagram {
 
         int insert_point_site(const Point& p, int step=0);
 
-        bool insert_line_site(int idx1, int idx2, int step=13);
+        bool insert_line_site(int idx1, int idx2, int step=99); // default step should make algorithm run until the end!
         /// return the far radius
         double get_far_radius() const {return far_radius;}
         /// return number of point sites in diagram
@@ -110,6 +110,12 @@ class VoronoiDiagram {
         HEFace find_pointsite_face(HEEdge start_edge);
         std::pair<HEVertex,HEVertex> find_endpoints(int idx1, int idx2);
         
+        
+        bool face_has_new_new_edge(HEFace f);
+        HEEdge find_separator_edge( HEFace f );
+        //HEVertex null_vertex_target( HEVertex v ); 
+        bool null_vertex_target( HEVertex v , HEVertex& trg);
+        
         void augment_vertex_set( Site* site);        
         bool predicate_c4(HEVertex v);
         bool predicate_c5(HEVertex v);
@@ -125,7 +131,7 @@ class VoronoiDiagram {
         void   add_edge(EdgeData ed, HEFace new1, HEFace new2=0);
         void   add_separator(HEFace f, HEFace nf, boost::tuple<HEEdge, HEVertex, HEEdge,bool> target, HEVertex endp, Site* s1, Site* s2);
         void   add_split_vertex(HEFace f, Site* s);
-        std::pair<HEFace,HEFace> add_linesite_edges(HEVertex seg_start, HEVertex seg_end, bool linesite_k_sign);
+        //std::pair<HEFace,HEFace> add_linesite_edges(HEVertex seg_start, HEVertex seg_end, bool linesite_k_sign);
         
         boost::tuple<HEVertex,HEFace,HEVertex,HEVertex,HEFace>
             find_null_face(HEVertex start, HEVertex other, Point l);
@@ -167,7 +173,9 @@ class VoronoiDiagram {
         VertexVector v0;
         /// queue of vertices to be processed
         VertexQueue vertexQueue; 
-        std::map<int,HEVertex> vertex_map;
+        typedef std::map<int,HEVertex> VertexMap;
+        typedef std::pair<int,HEVertex> VertexMapPair;
+        VertexMap vertex_map;
         bool debug;
 private:
         VoronoiDiagram(); // don't use.

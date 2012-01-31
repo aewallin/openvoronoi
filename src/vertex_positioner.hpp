@@ -69,11 +69,13 @@ public:
 
     std::vector<double> get_stat() {return errstat;}
     double dist_error(HEEdge e, const Solution& sl, Site* s3);
+    void solver_debug(bool b);
 private:
     Solution position(Site* s1, double k1, Site* s2, double k2, Site* s3);
     int solver_dispatch(Site* s1, double k1, 
                Site* s2, double k2, 
                Site* s3, double k3, std::vector<Solution>& slns ); 
+    bool detect_sep_case(Site* lsite, Site* psite);
 
 // geometry-checks
     bool solution_on_edge(Solution& s);
@@ -81,11 +83,13 @@ private:
     bool check_dist(HEEdge e, const Solution& s, Site* s3);
     bool equal(double d1, double d2);
     
+    
 // solvers, to which we dispatch, depending on the input sites
     Solver* ppp_solver;
     Solver* lll_solver;
     Solver* qll_solver;
     Solver* sep_solver;
+    Solver* alt_sep_solver;
 // DATA
     HEGraph& g; // reference to the VD graph.
     double t_min;

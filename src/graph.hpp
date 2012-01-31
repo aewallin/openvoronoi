@@ -37,9 +37,6 @@ namespace ovd {
 // vecS   5.72us * n log(n)
 // listS  6.18 * n log(n)
 #define OUT_EDGE_CONTAINER boost::listS 
-//#define OUT_EDGE_CONTAINER boost::vecS 
-
-// note: cannot use vecS since remove_vertex invalidates iterators/edge_descriptors (?)
 #define VERTEX_CONTAINER boost::listS
 #define EDGE_LIST_CONTAINER boost::listS
 
@@ -63,10 +60,11 @@ enum VoronoiFaceStatus {INCIDENT, NONINCIDENT};
 struct FaceProps {
     FaceProps() {
         site = 0;
+        null = false;
     }
     virtual ~FaceProps() {}
     /// create face with given edge, generator, and type
-    FaceProps( HEEdge e , Site* s, VoronoiFaceStatus st) : edge(e), site(s), status(st) {}
+    FaceProps( HEEdge e , Site* s, VoronoiFaceStatus st) : edge(e), site(s), status(st), null(false) {}
     /// operator for sorting faces
     bool operator<(const FaceProps& f) const {return (this->idx<f.idx);}
     /// face index
@@ -77,6 +75,7 @@ struct FaceProps {
     Site* site;
     /// face status (either incident or nonincident)
     VoronoiFaceStatus status;
+    bool null;
 };
 
 // the type of graph with which we construct the voronoi-diagram

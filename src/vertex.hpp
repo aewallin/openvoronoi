@@ -61,6 +61,7 @@ public:
     VoronoiVertex( Point p, VoronoiVertexStatus st);
     /// vertex with given position, status, and type
     VoronoiVertex( Point p, VoronoiVertexStatus st, VoronoiVertexType t);
+    VoronoiVertex( Point p, VoronoiVertexStatus st, VoronoiVertexType t, double init_radius);
     VoronoiVertex( Point pos, VoronoiVertexStatus st, VoronoiVertexType t, Point initDist);
     VoronoiVertex( Point pos, VoronoiVertexStatus st, VoronoiVertexType t, Point initDist, double k3);
     
@@ -76,7 +77,12 @@ public:
     void zero_dist() {r=0;}
     double dist() const { return r; }
     /// in-circle predicate 
-    double in_circle(const Point& p) const { return dist(p) - r; }
+    double in_circle(const Point& p) const {
+        //if ( r==0 && dist(p) == 0 ) 
+        //    return -1;
+        //else
+            return dist(p) - r; 
+    }
     static void reset_count() { count = 0; }
 // DATA
     int index;
@@ -92,7 +98,7 @@ public:
     double k3; // the offset-direction {-1,+1} to the newly inserted site.
     double alfa; // angle for a null-vertex
     HEFace null_face;
-    HEFace face;
+    HEFace face; // the face of this vertex, if the vertex is a point-site
 protected:
     void init();
     void init(Point p, VoronoiVertexStatus st);

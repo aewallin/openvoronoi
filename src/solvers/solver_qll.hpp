@@ -40,6 +40,9 @@ public:
 int solve( Site* s1, double k1, 
                 Site* s2, double k2, 
                 Site* s3, double k3, std::vector<Solution>& solns ) {
+    //if (debug) 
+        std::cout << "QLLSolver.\n";
+    
     std::vector< Eq<qd_real> > quads,lins; // equation-parameters, in quad-precision
     boost::array<Site*,3> sites = {{s1,s2,s3}};
     boost::array<double,3> kvals = {{k1,k2,k3}};

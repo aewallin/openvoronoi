@@ -54,7 +54,7 @@ namespace ovd {
 //  Insert into (1):
 //    a3 (x2 + t*sv.x) + b3 (y2 + t*sv.y) + c3 + k3 t = 0
 //      ==>
-//          t = -( a3*x2 + b3*y3 + c3 ) / (sv.x*a3 + sv.y*b3 + k3)
+//          t = -( a3*x2 + b3*y2 + c3 ) / (sv.x*a3 + sv.y*b3 + k3)
 //
 //  Insert into (2):
 //    (x2 + t*sv.x-x3)^2 + (y2 + t*sv.y-y3)^2 = t^2
@@ -72,18 +72,21 @@ public:
 int solve( Site* s1, double k1, 
            Site* s2, double k2, 
            Site* s3, double k3, std::vector<Solution>& slns ) {
-
+    // swap sites if necessary ?
+    //if (debug) 
+        std::cout << "SEPSolver.\n";
+    
     assert( s1->isLine() && s2->isPoint() );
     // separator direction
     Point sv(0,0);
-    if (k2 == -1) {
+    if (k2 == -1) { // was k2?? but k2 is allways +1??
         sv.x = s1->a(); //l1.a
         sv.y = s1->b(); //l1.b
     } else {
         sv.x = -s1->a();
         sv.y = -s1->b();
     }
-
+    if (debug) std::cout << " SEPSolver sv= "<< sv << "\n";
     double tsln(0);
     if ( s3->isPoint() ) {
         double dx = s2->x() - s3->x();

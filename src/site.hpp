@@ -79,6 +79,9 @@
 
 #pragma once
 
+#include <boost/graph/adjacency_list.hpp>
+
+
 #include <qd/qd_real.h> 
 #include <sstream>
 
@@ -86,6 +89,21 @@
 //#include "graph.hpp"
 
 namespace ovd {
+
+#define OUT_EDGE_CONTAINER boost::listS 
+#define VERTEX_CONTAINER boost::listS
+#define EDGE_LIST_CONTAINER boost::listS
+
+// type of edge-descriptors in the graph
+// FIXME, we whould really define these only once, somewhere else..
+typedef boost::adjacency_list_traits<OUT_EDGE_CONTAINER, 
+                                     VERTEX_CONTAINER, 
+                                     boost::bidirectionalS, 
+                                     EDGE_LIST_CONTAINER >::edge_descriptor HEEdge;
+typedef boost::adjacency_list_traits<OUT_EDGE_CONTAINER, 
+                                     VERTEX_CONTAINER, 
+                                     boost::bidirectionalS, 
+                                     EDGE_LIST_CONTAINER >::vertex_descriptor HEVertex;                                     
 
 /// equation-parameters
 /// the offset in direction k by a distance t of a general site (point,line,circle) can be expressed as
@@ -278,7 +296,12 @@ public:
     virtual double in_region_t_raw(const Point&) const {
         return -99;
     }
-    
+    virtual HEEdge edge() {return HEEdge();}
+    virtual HEVertex vertex() {
+        std::cout << " DON'T call Site::vertex() !! \n";
+        exit(-1); 
+        return HEVertex();
+    }
     typedef unsigned int HEFace;    
     HEFace face;
 protected:
@@ -288,7 +311,15 @@ protected:
 /// point, or vertex site.
 class PointSite : public Site {
 public:
-    PointSite( const Point& p, HEFace f=0): _p(p) {
+    PointSite( const Point& p, HEFace f=0): _p(p)  {
+        face = f;
+        eq.q = true;
+        eq.a = -2*p.x;
+        eq.b = -2*p.y;
+        eq.k = 0;
+        eq.c = p.x*p.x + p.y*p.y;
+    }
+    PointSite( const Point& p, HEFace f, HEVertex vert):  v(vert), _p(p) {
         face = f;
         eq.q = true;
         eq.a = -2*p.x;
@@ -315,7 +346,9 @@ public:
         return out;
     }
     virtual bool in_region(const Point& ) const {return true;}
-    virtual double in_region_t(const Point& p) const {return -1;} 
+    virtual double in_region_t(const Point& p) const {return -1;}
+    virtual HEVertex vertex() {return v;}
+    HEVertex v;
 private:
     PointSite() {} // don't use!
     Point _p;
@@ -325,7 +358,7 @@ private:
 class LineSite : public Site {
 public:
     /// create line-site between start and end Point.
-    LineSite( const Point& s, const Point& e, double koff, HEFace f = 0): _start(s), _end(e) {
+    LineSite( const Point& st, const Point& en, double koff, HEFace f = 0): _start(st), _end(en) {
         face = f;
         eq.q = false;
         eq.a = _end.y - _start.y;
@@ -337,9 +370,10 @@ public:
         eq.a /= d;
         eq.b /= d;
         eq.c /= d;
+        e = HEEdge();
         assert( fabs( eq.a*eq.a + eq.b*eq.b -1.0 ) < 1e-5);
     }
-    LineSite( Site& s ) {
+    LineSite( Site& s ) { // "downcast" like constructor? required??
         eq = s.eqp();
         face = s.face;
         _start = s.start();
@@ -406,10 +440,13 @@ public:
     }
     virtual const Point start() const {return _start;}
     virtual const Point end() const {return _end;}
+    virtual HEEdge edge() {return e;}
+    HEEdge e; // store an edge_descriptor to the LINESITE edge
 private:
     LineSite() {} // don't use!
     Point _start;
     Point _end;
+    
 };
 
 /// arc or circle site

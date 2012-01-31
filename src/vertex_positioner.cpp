@@ -35,23 +35,31 @@ using namespace ovd::numeric; // sq() chop()
 
 namespace ovd {
 
+// #define ALT_SEP
+
 VertexPositioner::VertexPositioner(HEGraph& gi): g(gi) {
     ppp_solver = new PPPSolver<qd_real>();
     //ppp_solver = new PPPSolver<double>(); // faster, but inaccurate
     lll_solver = new LLLSolver();
     qll_solver = new QLLSolver();
     sep_solver = new SEPSolver();
+#ifdef ALT_SEP
     alt_sep_solver = new ALTSEPSolver();
+#endif
     errstat.clear();
 }
 
 VertexPositioner::~VertexPositioner() {
+    std::cout << "~VertexPositioner()..";
     delete ppp_solver;
     delete lll_solver;
     delete qll_solver;
     delete sep_solver;
+#ifdef ALT_SEP
     delete alt_sep_solver;
+#endif
     errstat.clear();
+    std::cout << "DONE.\n";
 }
 
 // calculate the position of a new vertex on the given edge e
@@ -261,7 +269,7 @@ void VertexPositioner::solver_debug(bool b) {
 }
 
 int VertexPositioner::solver_dispatch(Site* s1, double k1, Site* s2, double k2, Site* s3, double k3, std::vector<Solution>& solns) {
-#define ALT_SEP
+
 
     if ( g[edge].type == SEPARATOR )
         return sep_solver->solve(s1,k1,s2,k2,s3,k3,solns); // we have previously set s1(line) s2(point)

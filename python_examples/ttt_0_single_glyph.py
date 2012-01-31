@@ -157,7 +157,7 @@ if __name__ == "__main__":
     myscreen.camera.SetClippingRange(-(zmult+1)*camPos,(zmult+1)*camPos)
     myscreen.camera.SetFocalPoint(0.0, 0, 0)
 
-    segs = ttt_segments(  "-", 25000)
+    segs = ttt_segments(  "A", 25000)
     segs = translate(segs, -0.5, -0.5)
     segs = modify_segments(segs)
     vd = ovd.VoronoiDiagram(far,120)

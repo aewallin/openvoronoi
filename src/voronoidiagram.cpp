@@ -45,9 +45,11 @@ VoronoiDiagram::VoronoiDiagram(double far, unsigned int n_bins) {
 }
 
 VoronoiDiagram::~VoronoiDiagram() { 
+    std::cout << "~VoronoiDiagram()\n";
     delete fgrid; 
     delete vd_checker;
     delete vpos;
+    std::cout << "~VoronoiDiagram() DONE.\n";
 }
 
 // add one vertex at origo and three vertices at 'infinity' and their associated edges

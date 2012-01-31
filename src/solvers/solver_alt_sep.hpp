@@ -85,7 +85,7 @@ int solve( Site* s1, double k1,
     if ( type == 0 ) {
         //std::cout << "ALTSEPSolver type="<< type <<"\n";
         lsite = s3; lsite_k = k3;
-        psite = s1; // psite_k = k1;    l3 / s1 form a separator
+        psite = s1; // psite_k = k1;    l3 / p1 form a separator
         third_site = s2;      third_site_k = k2;
         k3_out = k3;
         sv = (k3 == - 1) ? Point(lsite->a(),lsite->b()) : Point(-lsite->a(),-lsite->b()); 
@@ -99,7 +99,7 @@ int solve( Site* s1, double k1,
     } else if ( type == 2 ) {
         //std::cout << "ALTSEPSolver type="<< type <<"\n";
         lsite = s3; lsite_k = k3;
-        psite = s2; // psite_k = k2;    l3 / s2 form a separator
+        psite = s2; // psite_k = k2;    l3 / p2 form a separator
         third_site = s1; third_site_k = k1; 
         k3_out = k3;
         sv = (k3 == - 1) ? Point(lsite->a(),lsite->b()) : Point(-lsite->a(),-lsite->b());
@@ -120,7 +120,8 @@ int solve( Site* s1, double k1,
     std::cout << " s1= " << s1->str2() << "(k=" << k1<< ")\n";
     std::cout << " s2= " << s2->str2() << "(k=" << k2<< ")\n";
     std::cout << " s3= " << s3->str2() << "(k=" << k3<< ")\n";
-
+    std::cout << " lsite_k=" << lsite_k << "\n";
+    
     // now we should have this:
     assert( lsite->isLine() && psite->isPoint() );
 

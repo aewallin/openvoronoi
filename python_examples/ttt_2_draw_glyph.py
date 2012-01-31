@@ -62,11 +62,11 @@ def draw_ttt(myscreen, text, x,y,scale):
     wr.conic_line_subdivision = 10 # this increasesn nr of points to 366
     wr.cubic_biarc_subdivision = 10 # no effect?
     wr.cubic_line_subdivision = 10 # no effect?
-    
+    wr.setFont(3)
     s3 = ttt.ttt(text,wr) 
     ext = wr.extents
     print ext
-    dx = ext[1]-ext[0]
+    dx = ext.maxx-ext.minx
 
     segs = wr.get_segments()
     segs = translate(segs, x, y)
@@ -103,7 +103,7 @@ if __name__ == "__main__":
     # draw a unit-circle
     ca = ovdvtk.Circle(center=(0,0,0) , radius=1, color=(0,1,1), resolution=50 )
     myscreen.addActor(ca)   
-    draw_ttt(myscreen, "ausie", -0.5,0,80000)
+    draw_ttt(myscreen, "zj", -0.5,0,80000)
     #draw_ttt(myscreen, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", -0.5,0,80000)
     #draw_ttt(myscreen, "abcdefghijklmnopqrstuvwxyz", -0.5,-0.1,80000)
     #draw_ttt(myscreen, "1234567890*", -0.5,-0.2,80000)

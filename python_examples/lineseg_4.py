@@ -125,7 +125,7 @@ if __name__ == "__main__":
     n=1
     t_before = time.time()
     for s in id_list:
-        if 0: #s[0] == 119:
+        if 0: # s[0] == 119:
             print n," adding line-segment",s[0]," - ",s[1]
             vd.debug_on()
             vd.addLineSite(s[0],s[1],7)

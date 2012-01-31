@@ -72,11 +72,12 @@ virtual void set_type(int t) {type=t;}
 int solve( Site* s1, double k1, 
            Site* s2, double k2, 
            Site* s3, double k3, std::vector<Solution>& slns ) {
-    if (debug) std::cout << "ALTSEPSolver.\n";
+    //if (debug) 
+        std::cout << "ALTSEPSolver.\n";
     Site* lsite;
     Site* psite;
     Site* third_site;
-    double k3_out(1.0);
+    //double k3_out(1.0);
     double lsite_k,  third_site_k; // psite_k
 
     // separator direction
@@ -86,42 +87,33 @@ int solve( Site* s1, double k1,
         //std::cout << "ALTSEPSolver type="<< type <<"\n";
         lsite = s3; lsite_k = k3;
         psite = s1; // psite_k = k1;    l3 / p1 form a separator
-        third_site = s2;      third_site_k = k2;
-        k3_out = k3;
+        third_site = s2;      third_site_k = 1;
+        //k3_out = k3;
         sv = (k3 == - 1) ? Point(lsite->a(),lsite->b()) : Point(-lsite->a(),-lsite->b()); 
     } else if ( type == 1 ) {
-        //std::cout << "ALTSEPSolver type="<< type <<"\n";
-        //lsite = s1; lsite_k = k1;
-        //psite = s3; // psite_k = k3;   l1 / s3 form a separator ? ?possible? if we always insert all point-sites first??
-        //third_site = s2; third_site_k = k2;
-        //k3_out = +1;
         exit(-1);
     } else if ( type == 2 ) {
         //std::cout << "ALTSEPSolver type="<< type <<"\n";
         lsite = s3; lsite_k = k3;
         psite = s2; // psite_k = k2;    l3 / p2 form a separator
-        third_site = s1; third_site_k = k1; 
-        k3_out = k3;
+        third_site = s1; third_site_k = 1; 
+        //k3_out = k3;
         sv = (k3 == - 1) ? Point(lsite->a(),lsite->b()) : Point(-lsite->a(),-lsite->b());
     } else if ( type == 3 ) {
-        //std::cout << "ALTSEPSolver type="<< type <<"\n";
-        //lsite = s2; lsite_k = k2;
-        //psite = s3; // psite_k = k3;   l2/s3 ?possible?
-        //third_site = s1; third_site_k = k1;
-        //k3_out = +1;
         exit(-1);
     } else {
         std::cout << "ALTSEPSolver FATAL ERROR!\n";
         exit(-1);
         return 0;
     }
-
-    std::cout << "ALTSEPSolver type="<< type <<"\n";
-    std::cout << " s1= " << s1->str2() << "(k=" << k1<< ")\n";
-    std::cout << " s2= " << s2->str2() << "(k=" << k2<< ")\n";
-    std::cout << " s3= " << s3->str2() << "(k=" << k3<< ")\n";
-    std::cout << " lsite_k=" << lsite_k << "\n";
-    
+    if (debug) {
+        std::cout << "ALTSEPSolver type="<< type <<"\n";
+        std::cout << " s1= " << s1->str2() << "(k=" << k1<< ")\n";
+        std::cout << " s2= " << s2->str2() << "(k=" << k2<< ")\n";
+        std::cout << " s3= " << s3->str2() << "(k=" << k3<< ")\n";
+        std::cout << " lsite_k=" << lsite_k << "\n";
+        std::cout << " sv= " << sv << "\n";
+    }
     // now we should have this:
     assert( lsite->isLine() && psite->isPoint() );
 
@@ -136,7 +128,7 @@ int solve( Site* s1, double k1,
         sv.y = -lsite->b();
     }*/
     
-    std::cout << " sv= " << sv << "\n";
+   
     double tsln(0);
 
     if ( third_site->isPoint() ) {
@@ -164,7 +156,7 @@ int solve( Site* s1, double k1,
     Point psln = Point(psite->x(), psite->y() ) + tsln * sv;
     //if (tsln<0)
     //    tsln = -tsln;
-    std::cout << "ALTSEPSolver tsln="<< tsln <<" p="<< psln << " k3="<< k3 << " k3_o="<<k3_out<<"\n";
+    //std::cout << "ALTSEPSolver tsln="<< tsln <<" p="<< psln << " k3="<< k3 << " k3_o="<<k3_out<<"\n";
 
     slns.push_back( Solution( psln, tsln, k3 ) );
     return 1;

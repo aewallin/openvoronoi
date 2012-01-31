@@ -539,14 +539,22 @@ std::pair<HEVertex,HEFace> VoronoiDiagram::process_null_edge(Point dir, HEEdge n
             HEVertex next_trg = g.target(next_next); // source
             mid = numeric::diangle_mid( g[src].alfa, g[next_trg].alfa  ); // prev_src, trg
             seppoint_pred = ( g[next_trg].type != ENDPOINT );
-            HEVertex next_out_trg = null_vertex_target( g.target(next_edge) ); 
-            HEVertex prev_out_trg = null_vertex_target( g.source(next_previous) ); 
-            if (debug) std::cout << " " << g[g.target(next_edge)].index << " has out-vertex " << g[next_out_trg].index << " status=" << g[next_out_trg].status << "\n";
-            if (debug) std::cout << " " << g[g.source(next_previous)].index << " has out-vertex " << g[prev_out_trg].index << " status=" << g[prev_out_trg].status << "\n";
-        
-            parallel_pred = ( ( ( g[ next_out_trg ].status == OUT ) || ( g[ next_out_trg ].status == NEW ) ) &&
-                              ( ( g[ prev_out_trg ].status == OUT ) || ( g[ prev_out_trg ].status == NEW ) )
-                            );
+            if (debug) {
+                std::cout << " next edge : "; g.print_edge(next_edge);
+                std::cout << " next_previous edge : "; g.print_edge(next_previous);
+            }
+            HEVertex next_out_trg;
+            bool next_out_found = null_vertex_target( g.target(next_edge) , next_out_trg ); 
+            HEVertex prev_out_trg;
+            bool prev_out_found = null_vertex_target( g.source(next_previous), prev_out_trg ); 
+            if (next_out_found && prev_out_found) {
+                if (debug) std::cout << " " << g[g.target(next_edge)].index << " has out-vertex " << g[next_out_trg].index << " status=" << g[next_out_trg].status << "\n";
+                if (debug) std::cout << " " << g[g.source(next_previous)].index << " has out-vertex " << g[prev_out_trg].index << " status=" << g[prev_out_trg].status << "\n";
+            
+                parallel_pred = ( ( ( g[ next_out_trg ].status == OUT ) || ( g[ next_out_trg ].status == NEW ) ) &&
+                                  ( ( g[ prev_out_trg ].status == OUT ) || ( g[ prev_out_trg ].status == NEW ) )
+                                );
+            }
         } else {
             HEEdge prev_prev = g.previous_edge(next_edge);
             HEEdge next_next2 = g[next_edge].next;
@@ -554,14 +562,18 @@ std::pair<HEVertex,HEFace> VoronoiDiagram::process_null_edge(Point dir, HEEdge n
             mid = numeric::diangle_mid( g[prev_src].alfa, g[trg].alfa  );
             seppoint_pred = ( g[prev_src].type != ENDPOINT );
         
-            HEVertex next_out_trg2 = null_vertex_target( g.source(next_edge) ); 
-            HEVertex prev_out_trg2 = null_vertex_target( g.target(next_next2) ); 
-            if (debug) std::cout << " " << g[g.source(next_edge)].index << " has out-vertex " << g[next_out_trg2].index << " status=" << g[next_out_trg2].status << "\n";
-            if (debug) std::cout << " " << g[g.target(next_next2)].index << " has out-vertex " << g[prev_out_trg2].index << " status=" << g[prev_out_trg2].status << "\n";
-  
-            parallel_pred = ( ( ( g[ next_out_trg2 ].status == OUT ) || ( g[ next_out_trg2 ].status == NEW ) ) &&
-                              ( ( g[ prev_out_trg2 ].status == OUT ) || ( g[ prev_out_trg2 ].status == NEW ) )
-                            );
+            HEVertex next_out_trg2;
+            bool next_out_found2 = null_vertex_target( g.source(next_edge), next_out_trg2 ); 
+            HEVertex prev_out_trg2;
+            bool prev_out_found2 = null_vertex_target( g.target(next_next2), prev_out_trg2 );
+            if (next_out_found2 && prev_out_found2) { 
+                if (debug) std::cout << " " << g[g.source(next_edge)].index << " has out-vertex " << g[next_out_trg2].index << " status=" << g[next_out_trg2].status << "\n";
+                if (debug) std::cout << " " << g[g.target(next_next2)].index << " has out-vertex " << g[prev_out_trg2].index << " status=" << g[prev_out_trg2].status << "\n";
+      
+                parallel_pred = ( ( ( g[ next_out_trg2 ].status == OUT ) || ( g[ next_out_trg2 ].status == NEW ) ) &&
+                                  ( ( g[ prev_out_trg2 ].status == OUT ) || ( g[ prev_out_trg2 ].status == NEW ) )
+                                );
+            }
 
         }
 
@@ -609,7 +621,11 @@ std::pair<HEVertex,HEFace> VoronoiDiagram::process_null_edge(Point dir, HEEdge n
         //Site* next_edge_site = g[next_face].site;
         
 
-        HEVertex adj_out = null_vertex_target(adj);
+        HEVertex adj_out;
+        bool adj_out_found = null_vertex_target(adj, adj_out);
+        if (!adj_out_found) {
+            exit(-1);
+        }
         if (debug) std::cout << " " << g[adj].index << " has out-vertex " << g[adj_out].index << " status=" << g[adj_out].status << "\n";
         if ( g[adj_out].status == OUT || g[adj_out].status == UNDECIDED) {
             if (debug) {
@@ -692,13 +708,26 @@ HEEdge VoronoiDiagram::find_separator_edge( HEFace f ) {
     return out;
 }
 
-HEVertex VoronoiDiagram::null_vertex_target( HEVertex v ) {
+bool VoronoiDiagram::null_vertex_target( HEVertex v , HEVertex& trg) {
     HEEdge trg_out = HEEdge();
+    bool found(false);
     BOOST_FOREACH( HEEdge e, g.out_edge_itr( v ) ) { 
-        if ( g[e].type != NULLEDGE )
+        if ( g[e].type != NULLEDGE ) {
             trg_out = e;
+            found = true;
+        }
     }
-    return g.target(trg_out);
+    if (found) {
+        trg = g.target(trg_out);
+        return true;
+    } else {
+        return false;
+    }
+    //if ( !found ) {
+    //7    std::cout << " null_vertex_target() ERROR. No non-NULLEDGE out-edge for vertex " << g[v].index << " !! \n";
+    //    exit(-1);
+    //}
+    //return ;
 }
 
 //

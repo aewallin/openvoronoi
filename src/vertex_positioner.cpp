@@ -265,7 +265,9 @@ void VertexPositioner::solver_debug(bool b) {
     lll_solver->set_debug(b);
     qll_solver->set_debug(b);
     sep_solver->set_debug(b);
+#ifdef ALT_SEP
     alt_sep_solver->set_debug(b);
+#endif
 }
 
 int VertexPositioner::solver_dispatch(Site* s1, double k1, Site* s2, double k2, Site* s3, double k3, std::vector<Solution>& solns) {

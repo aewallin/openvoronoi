@@ -51,9 +51,9 @@ if __name__ == "__main__":
     vod.textScale = 0.02
     vod.vertexRadius = 0.0031
     vod.drawVertices=0
-    vod.drawVertexIndex=0
-    vod.drawGenerators=1
-    vod.offsetEdges = 0
+    vod.drawVertexIndex=1
+    vod.drawGenerators=0
+    vod.offsetEdges = 1
     vd.setEdgeOffset(0.05)
     
     

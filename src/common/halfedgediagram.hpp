@@ -132,11 +132,15 @@ public:
 
 virtual ~half_edge_diagram(){
     // sites are associated with faces. go through all faces and delete the site
+    std::cout << "~half_edge_diagram()...";
+    /*
     BOOST_FOREACH( TFaceProperties fprop, faces ) {
         if (fprop.site)
             delete fprop.site;
     }
     g.clear();
+    */
+    std::cout << "DONE.";
 }
 
 // One-liner wrappers around boost-graph-library functions:

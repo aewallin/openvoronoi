@@ -82,7 +82,7 @@ def ttt_segments(text,scale,conic_subdiv):
     wr.conic_line_subdivision = conic_subdiv # this increases nr of points 
     wr.cubic_biarc_subdivision = 10 # no effect?
     wr.cubic_line_subdivision = 10 # no effect?
-    wr.setFont(0)
+    wr.setFont(3)
     wr.scale = float(1)/float(scale)
     s3 = ttt.ttt(text,wr) 
     segs = wr.get_segments()

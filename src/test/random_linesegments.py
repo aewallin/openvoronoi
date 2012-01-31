@@ -5,13 +5,19 @@ import math
 import sys
 import pickle
 import gzip
+import os
 
-if __name__ == "__main__":  
-    Nmax  = int(sys.argv[1])
+def test(Nmax):
     vd = ovd.VoronoiDiagram(1,120)
     print "random_linesegments.py:  ",Nmax," random segments."
     sys.stdout.flush()
-    filename = "../src/test/data/randomsegments_{0}.pickle.gz".format(Nmax) #  load pre-computed segments 
+    f1 = "../src/test/data/randomsegments_{0}.pickle.gz".format(Nmax)
+    f2 = "data/randomsegments_{0}.pickle.gz".format(Nmax)
+    filename = ""
+    if os.path.exists( f1 ):
+        filename = f1 # "../src/test/data/randomsegments_{0}.pickle.gz".format(Nmax) #  load pre-computed segments 
+    elif os.path.exists( f2 ):
+        filename = f2
     # (produced with lineseg_dataset_generator.py)
     f = gzip.open(filename, 'rb')
     pstring = f.read()
@@ -32,9 +38,20 @@ if __name__ == "__main__":
     print "all line-sites inserted."
     c = vd.check()
     print " VD check: ", c
+    print sys.version
+    print ovd.version()
     if c:
-        exit(0)
+        print "Test passed."
+        #exit(0)
     else:
-        exit(-1)
+        print "Test failed."
+        #exit(-1)
+    print "end of test()"
     
+if __name__ == "__main__":  
+    Nmax = 128 
+    if len(sys.argv) == 2:
+        Nmax  = int(sys.argv[1])
+    test(Nmax)
+    print "end of script"
 

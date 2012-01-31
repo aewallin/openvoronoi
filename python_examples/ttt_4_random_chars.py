@@ -47,7 +47,7 @@ def insert_polygon_segments(vd,id_list):
             #vd.debug_on()
             print " ",j,"inserting segement ",id_list[n]," - ",id_list[n_nxt]
             
-            if 0: #id_list[n] == 51456:
+            if id_list[n] == 133711: # 51456:
                 vd.debug_on()
                 vd.addLineSite( id_list[n], id_list[n_nxt],6)
                 vod.setVDText2([1,1])
@@ -209,8 +209,8 @@ if __name__ == "__main__":
     vod.drawVertices=0
     vod.drawVertexIndex=0
     vod.drawGenerators=0
-    vod.offsetEdges = 1
-    vod.drawNullEdges = 1
+    vod.offsetEdges = 0
+    vod.drawNullEdges = 0
     vd.setEdgeOffset(0.001)
     
     times = insert_many_polygons(vd,segs)

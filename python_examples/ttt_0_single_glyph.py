@@ -68,9 +68,9 @@ def insert_polygon_segments(vd,id_list):
         #if (j<jmax):
             #vd.debug_on()
         #print " ",j,"inserting segement ",id_list[n]," - ",id_list[n_nxt]
-        if 0: #id_list[n]==1294: #j == 0:
+        if id_list[n]==90: #j == 0:
             print " ",j,"inserting segement ",id_list[n]," - ",id_list[n_nxt]
-            vd.addLineSite( id_list[n], id_list[n_nxt],5)
+            vd.addLineSite( id_list[n], id_list[n_nxt],7)
             vod.setVDText2([1,1])
             #ovd.PolygonInterior( vd.getGraph() , True )
             #ovd.MedialAxis( vd.getGraph() )
@@ -129,9 +129,10 @@ def ttt_segments(text,scale):
     wr.scale = float(1)/float(scale)
     # "L" has 36 points by default
     wr.conic_biarc_subdivision = 10 # this has no effect?
-    wr.conic_line_subdivision = 10 # =10 increasesn nr of points to 366, = 5 gives 729 pts
+    wr.conic_line_subdivision = 200 # =10 increasesn nr of points to 366, = 5 gives 729 pts
     wr.cubic_biarc_subdivision = 10 # no effect?
     wr.cubic_line_subdivision = 10 # no effect?
+    wr.setFont(1)
     s3 = ttt.ttt(text,wr) 
     segs = wr.get_segments()
     return segs
@@ -157,7 +158,7 @@ if __name__ == "__main__":
     myscreen.camera.SetClippingRange(-(zmult+1)*camPos,(zmult+1)*camPos)
     myscreen.camera.SetFocalPoint(0.0, 0, 0)
 
-    segs = ttt_segments(  "m", 25000)
+    segs = ttt_segments(  "+", 25000)
     segs = translate(segs, -0.5, -0.5)
     segs = modify_segments(segs)
     vd = ovd.VoronoiDiagram(far,120)

@@ -41,9 +41,9 @@ def insert_polygon_segments(vd,id_list):
             n_nxt=0
         print " ",j,"inserting segement ",id_list[n]," - ",id_list[n_nxt]
         
-        if   id_list[n] == 78238: # 47013:
+        if   id_list[n] == 31921: #78238: # 47013:
             vd.debug_on()
-            vd.addLineSite( id_list[n], id_list[n_nxt], 12)  # fails:  now 78238/13
+            vd.addLineSite( id_list[n], id_list[n_nxt], 2)  # fails:  now 78238/13
             vod.setVDText2([1,1])
             vod.setAll()
             #verts=[id_list[n], id_list[n_nxt], 117443,117445,117460,117454]
@@ -112,6 +112,7 @@ def ttt_segments(text,scale):
     wr.cubic_biarc_subdivision = 10 # no effect?
     wr.cubic_line_subdivision = 10 # no effect?
     wr.scale = float(1)/float(scale)
+    wr.setFont(3)
     s3 = ttt.ttt(text,wr) 
     segs = wr.get_segments()
     return segs

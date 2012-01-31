@@ -175,21 +175,21 @@ if __name__ == "__main__":
     vod = ovdvtk.VD(myscreen,vd,float(1), textscale=0.01, vertexradius=0.003)
     vod.drawFarCircle()
     #vod.textScale = 0.000002
-    vod.textScale = 0.00002
+    vod.textScale = 0.00005
     vod.vertexRadius = 0.0011
     vod.drawVertices=0
     vod.drawVertexIndex=0
     vod.drawGenerators=0
     vod.offsetEdges = 1
     vod.drawNullEdges = 1
-    vd.setEdgeOffset(0.0001)
+    vd.setEdgeOffset(0.00005)
     
     all_segs=segs+segs2 +segs3 +segs4+segs5
     #all_segs=segs
     #all_segs=segs3 #+segs4
     #all_segs = segs3
     times = insert_many_polygons(vd,all_segs)
-    assert( vd.check() )
+    vd.check()
     
     #ovd.PolygonInterior( vd.getGraph() , True )
     #ovd.MedialAxis( vd.getGraph() )
@@ -197,6 +197,10 @@ if __name__ == "__main__":
     vod.setVDText2(times)
     vod.setAll()
     
+    #for v in vd.getFaceVertices(14705):
+    #    print " drawing ", v
+    #    vod.drawVertexIdx(v)
+        
     print "PYTHON All DONE."
 
     myscreen.render()   

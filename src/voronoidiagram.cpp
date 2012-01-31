@@ -272,15 +272,15 @@ if (step==current_step) return false; current_step++;
     HEFace   end_to_null = g.HFace();
     // returns new seg_start/end vertices, new or existing null-faces, and separator endpoints (if separators should be added)
     boost::tie(seg_start, start_null_face, pos_sep_start, neg_sep_start, start_to_null) = find_null_face(start, end  , left);
-    boost::tie(seg_end  , end_null_face  , pos_sep_end  , neg_sep_end, end_to_null  ) = find_null_face(end  , start, left);
+    boost::tie(seg_end  , end_null_face  , pos_sep_end  , neg_sep_end  , end_to_null  ) = find_null_face(end  , start, left);
 
     // now safe to set the zero-face edge
     // in the collinear case, set the edge for the face that "disappears" to a null edge
     
-    //if (start_to_null!=g.HFace())
-    //    g[start_to_null].edge = start_null_edge; 
-    //if (end_to_null!=g.HFace())
-    //    g[end_to_null].edge = end_null_edge; 
+    if (start_to_null!=g.HFace())
+        g[start_to_null].edge = g[start_null_face].edge; 
+    if (end_to_null!=g.HFace())
+        g[end_to_null].edge = g[end_null_face].edge; 
     
     
 if (step==current_step) return false; current_step++;

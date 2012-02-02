@@ -32,6 +32,9 @@
 
 namespace ovd {
 
+// far is the radius of a circle within which all sites must be located. use far==1.0
+// n_bins is the number of bins for FaceGrid, the bucket-search for nearest-neighbors
+// used in insert_point_site()
 VoronoiDiagram::VoronoiDiagram(double far, unsigned int n_bins) {
     fgrid = new FaceGrid(far, n_bins); // helper-class for nearest-neighbor search 
     vd_checker = new VoronoiDiagramChecker( g ); // helper-class that checks topology/geometry
@@ -45,11 +48,11 @@ VoronoiDiagram::VoronoiDiagram(double far, unsigned int n_bins) {
 }
 
 VoronoiDiagram::~VoronoiDiagram() { 
-    std::cout << "~VoronoiDiagram()\n";
+    //std::cout << "~VoronoiDiagram()\n";
     delete fgrid; 
     delete vd_checker;
     delete vpos;
-    std::cout << "~VoronoiDiagram() DONE.\n";
+    //std::cout << "~VoronoiDiagram() DONE.\n";
 }
 
 // add one vertex at origo and three vertices at 'infinity' and their associated edges
@@ -244,9 +247,6 @@ if (step==current_step) return false; current_step++;
     if (debug) std::cout << " start face seed  = " << g[v_seed].index << "\n";
     mark_vertex( v_seed, pos_site  );
 
-
-    
-    
 if (step==current_step) return false; current_step++;
 
     augment_vertex_set( pos_site  ); // it should not matter if we use pos_site or neg_site here
@@ -522,7 +522,6 @@ std::pair<HEVertex,HEFace> VoronoiDiagram::process_null_edge(Point dir, HEEdge n
 
         }
 
-
         // parallel line-segments case
         if ( parallel_pred && g[adj].type == SEPPOINT ) {
             if (debug)  { std::cout << " identical SEPPOINT case!\n";
@@ -560,11 +559,6 @@ std::pair<HEVertex,HEFace> VoronoiDiagram::process_null_edge(Point dir, HEEdge n
             
             return std::make_pair( HEVertex(), g[pointsite_edge].face ); // no new separator-point returned
         }
-            
-        // not ENDPOINT. add SEPPOINT if there is room, and PointSite
-        //HEFace next_face = g[ g[next_edge].twin ].face;
-        //Site* next_edge_site = g[next_face].site;
-        
 
         HEVertex adj_out;
         bool adj_out_found = null_vertex_target(adj, adj_out);
@@ -581,7 +575,7 @@ std::pair<HEVertex,HEFace> VoronoiDiagram::process_null_edge(Point dir, HEEdge n
                 std::cout << "   trg alfa = " << g[trg].alfa << "\n"; 
             }
 
-            sep_point = add_separator_point(src, next_edge, sep_dir);
+            sep_point = add_separator_vertex(src, next_edge, sep_dir);
             g[sep_point].k3 = new_k3;
             return std::make_pair( sep_point, g.HFace() );
         } else {
@@ -611,7 +605,8 @@ std::pair<HEVertex,HEFace> VoronoiDiagram::process_null_edge(Point dir, HEEdge n
     }
 }
 
-HEVertex VoronoiDiagram::add_separator_point(HEVertex endp, HEEdge edge, Point sep_dir) {
+// add a separator vertex into the given null-edge
+HEVertex VoronoiDiagram::add_separator_vertex(HEVertex endp, HEEdge edge, Point sep_dir) {
     HEVertex sep = g.add_vertex( VoronoiVertex(g[endp].position,OUT,SEPPOINT) );
     g[sep].set_alfa(sep_dir);
     if (debug) {

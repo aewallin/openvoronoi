@@ -131,7 +131,7 @@ protected:
     boost::tuple<HEEdge,HEVertex,HEEdge,bool> find_separator_target(HEFace f, HEVertex endp);
 
     std::pair<HEVertex,HEFace> process_null_edge(Point dir, HEEdge next_edge , bool k3, bool next_prev);
-    HEVertex add_separator_point(HEVertex endp, HEEdge edge, Point sep_dir);
+    HEVertex add_separator_vertex(HEVertex endp, HEEdge edge, Point sep_dir);
     
     void repair_face( HEFace f );
     void repair_face( HEFace f , std::pair<HEVertex,HEVertex> segs,

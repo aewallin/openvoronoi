@@ -623,26 +623,16 @@ HEVertex VoronoiDiagram::add_separator_point(HEVertex endp, HEEdge edge, Point s
     return sep;
 }
 
+// find an adjacent vertex to v, along an edge that is not a NULLEDGE
+// return true if found, otherwise false.
 bool VoronoiDiagram::null_vertex_target( HEVertex v , HEVertex& trg) {
-    HEEdge trg_out = HEEdge();
-    bool found(false);
     BOOST_FOREACH( HEEdge e, g.out_edge_itr( v ) ) { 
         if ( g[e].type != NULLEDGE ) {
-            trg_out = e;
-            found = true;
+            trg = g.target(e);
+            return true;
         }
     }
-    if (found) {
-        trg = g.target(trg_out);
-        return true;
-    } else {
-        return false;
-    }
-    //if ( !found ) {
-    //7    std::cout << " null_vertex_target() ERROR. No non-NULLEDGE out-edge for vertex " << g[v].index << " !! \n";
-    //    exit(-1);
-    //}
-    //return ;
+    return false;
 }
 
 //

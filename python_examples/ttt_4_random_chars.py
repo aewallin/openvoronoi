@@ -47,17 +47,17 @@ def insert_polygon_segments(vd,id_list):
             #vd.debug_on()
             print " ",j,"inserting segement ",id_list[n]," - ",id_list[n_nxt]
             
-            if id_list[n] == 133711: # 51456:
+            if 0: #id_list[n] == 115869: # 51456: 115869
                 vd.debug_on()
                 vd.addLineSite( id_list[n], id_list[n_nxt],6)
                 vod.setVDText2([1,1])
                 vod.setAll()
-                verts=[92555, 51680,92624,52559,51474,92620,52805]
-                for v in verts:
+                #verts=[92555, 51680,92624,52559,51474,92620,52805]
+                #for v in verts:
                     #print "drawing ",v
                     #print vod
                     #print dir(vod)
-                    vod.drawVertexIdx(v)
+                #    vod.drawVertexIdx(v)
                 print "PYTHON All DONE."
                 myscreen.render()   
                 myscreen.iren.Start()
@@ -106,7 +106,7 @@ def ttt_segments(text,scale):
     wr.scale = float(1)/float(scale)
     # "L" has 36 points by default
     wr.conic_biarc_subdivision = 10 # this has no effect?
-    wr.conic_line_subdivision = 50 # =10 increasesn nr of points to 366, = 5 gives 729 pts
+    wr.conic_line_subdivision = 200 # =10 increasesn nr of points to 366, = 5 gives 729 pts
     wr.cubic_biarc_subdivision = 10 # no effect?
     wr.cubic_line_subdivision = 10 # no effect?
     s3 = ttt.ttt(text,wr) 
@@ -126,7 +126,7 @@ def scale_segs(segs, current_length, desired_length):
             seg2.append(p2)
             #seg2.append(seg[3] + y)
         out.append(seg2)
-    return out
+    return [out,scale]
     
 def get_random_row(row_length):
     # construct some random strings
@@ -134,27 +134,24 @@ def get_random_row(row_length):
     for n in range(row_length):
         c = random.choice(string.ascii_lowercase) # http://stackoverflow.com/questions/2823316/generate-a-random-letter-in-python
         chars+=c
+        chars+=" "
     return chars
 
-def get_scaled_translated_segs( chars, length, dx, n_row):
+def get_scaled_segs( chars, length):
     # generate segs with scale 1
     ret = ttt_segments(  chars , 1)
     extents = ret[0]
     segs = ret[1]
     # translate so lower left corner is at (0,0)
-    segs = translate(segs, -extents[0], -extents[2] )
+    segs = translate(segs, -extents.minx, -extents.miny )
     # scale to desired length
-    current_length = extents[1]-extents[0]
-    current_height = extents[3]-extents[2]
-    segs = scale_segs(segs, current_length, length)
-    # translate to final position
-    start_y=-0.5
-    dy = 1.5*float(length)/float(current_length)*current_height
-    print " row to y= ",start_y+n_row*dy
-    segs = translate(segs, dx, start_y+n_row*dy )
+    current_length = extents.maxx-extents.minx
+    current_height = extents.maxy-extents.miny
+    [segs,scale] = scale_segs(segs, current_length, length)
+    
     # remove duplicate points
     segs = modify_segments(segs)
-    return segs
+    return [segs, extents,scale]
     
 if __name__ == "__main__": 
     print ttt.version()
@@ -178,26 +175,24 @@ if __name__ == "__main__":
     myscreen.camera.SetClippingRange(-(zmult+1)*camPos,(zmult+1)*camPos)
     myscreen.camera.SetFocalPoint(0.0, 0, 0)
     
-    random.seed(42)
-    row_length = 13
-    n_rows = 4
-    # works (seed=42) 10/3 11/3 12/3
-    # segfaults: 
-    # length = 10 fits ca 4 rows
+    random.seed(45)
+    row_length = 15
+    n_rows = 10
     
     length = 1
     dx = -0.5
     #dy = 0.2
-    #starty = -0.5
-
+    start_y = -0.5
+    current_y = start_y
     segs=[]
     for n in range(n_rows):
         chars = get_random_row(row_length)
-        rowsegs = get_scaled_translated_segs( chars, length, dx, n)
-        segs+=rowsegs
+        [rowsegs, extents, scale] = get_scaled_segs( chars, length)
+        rowsegs_t = translate(rowsegs, dx, current_y )
+        print "y-height is ", (extents.maxy-extents.miny)
+        current_y = current_y + 1.1*(extents.maxy-extents.miny)*scale
+        segs+=rowsegs_t
         print chars
-    #exit()
-    #print chars
     
     vd = ovd.VoronoiDiagram(far,120)
     print ovd.version()

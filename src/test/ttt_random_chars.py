@@ -150,13 +150,7 @@ def get_scaled_segs( chars, length):
     current_length = extents.maxx-extents.minx
     current_height = extents.maxy-extents.miny
     [segs,scale] = scale_segs(segs, current_length, length)
-    
-    # translate to final position
-    #start_y=-0.5
-    #dy = 1.5*float(length)/float(current_length)*current_height
-    #print " row to y= ",start_y+n_row*dy
-    #segs = translate(segs, dx, start_y+n_row*dy )
-    
+
     # remove duplicate points
     segs = modify_segments(segs)
     return [segs, extents,scale]
@@ -166,73 +160,27 @@ if __name__ == "__main__":
     conic_subdiv = 200
     seed = 42
     if len(sys.argv) == 2:
-        seed  = int(sys.argv[1])
-        
-    #exit() 
-    #w=2500
-    #h=1500
-    
-    #w=1920
-    #h=1080
-    #w=1024
-    #h=1024
-    #myscreen = ovdvtk.VTKScreen(width=w, height=h) 
-    #ovdvtk.drawOCLtext(myscreen, rev_text=ovd.version() )
-    
-    #scale=1
-
-    #far = 1
-    #camPos = far
-    #zmult = 3
-    #myscreen.camera.SetPosition(0, -camPos/float(1000), zmult*camPos) 
-    #myscreen.camera.SetClippingRange(-(zmult+1)*camPos,(zmult+1)*camPos)
-    #myscreen.camera.SetFocalPoint(0.0, 0, 0)
+        seed  = int(sys.argv[1]) # if seed was specified on command-line, take it
     
     random.seed( seed )
     row_length = 15
     n_rows = 10
-    # works (seed=42) 10/3 11/3 12/3
-    # segfaults: 
-    # length = 10 fits ca 4 rows
     
     length = 1
     dx = -0.5
-    #dy = 0.2
     start_y = -0.5
     current_y = start_y
     segs=[]
     for n in range(n_rows):
         chars = get_random_row(row_length)
         [rowsegs, extents, scale] = get_scaled_segs( chars, length)
-        #dy = 1.5*float(length)/float(current_length)*current_height
-        #print " row to y= ",start_y+n_row*dy
         rowsegs_t = translate(rowsegs, dx, current_y )
-        #print "y-height is ", (extents.maxy-extents.miny)
         current_y = current_y + 1.1*(extents.maxy-extents.miny)*scale
         segs+=rowsegs_t
-        #print chars
-        #exit()
-    #exit()
-    #print chars
     
     vd = ovd.VoronoiDiagram(1,120)
     print ovd.version()
     
-    #vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
-    #vod.drawFarCircle()
-    #vod.textScale = 0.0002
-    #vod.vertexRadius = 0.0011
-    #vod.drawVertices=0
-    #vod.drawVertexIndex=0
-    #vod.drawGenerators=0
-    #vod.offsetEdges = 0
-    #vod.drawNullEdges = 0
-    #vd.setEdgeOffset(0.001)
-    
     times = insert_many_polygons(vd,segs)
     assert( vd.check() )
-    #vod.setVDText2(times)
-    #vod.setAll()
     print "PYTHON All DONE."
-    #myscreen.render()   
-    #myscreen.iren.Start()

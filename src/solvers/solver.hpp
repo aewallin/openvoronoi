@@ -19,12 +19,9 @@
 
 #pragma once
 
-
-
 namespace ovd {
 
 class Site;
-
 
 // abstract base-class for voronoi vertex-solvers
 // the input to the solver is three Sites (s1,s2,s3) and three offset-directions (k1,k2,k3) .

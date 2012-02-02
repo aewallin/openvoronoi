@@ -115,8 +115,10 @@ int solve( Site* s1, Site* s2, Site* s3,  std::vector<Solution>& slns ) {
                 (spj.x-spk.x)*( sq(spi.x-spk.x)+sq(spi.y-spk.y) )/2.0;
     Scalar J4 = (spi.x-spk.x)*(spj.y-spk.y) - (spj.x-spk.x)*(spi.y-spk.y);
     assert( J4 != 0.0 );
-    if (J4==0.0)
+    if (J4==0.0) {
         std::cout << " PPPSolver: Warning divide-by-zero!!\n";
+        exit(-1);
+    }
     scalar_pt<Scalar> pt( -J2/J4 + spk.x, J3/J4 + spk.y );
     Point sln_pt = Point( pt.getx(), pt.gety());
     double dist = (sln_pt-pi).norm();

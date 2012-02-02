@@ -23,13 +23,13 @@ def insert_polygon_points(vd, polygon):
     for p in polygon:
         pts.append( ovd.Point( p[0], p[1] ) )
     id_list = []
-    print "inserting ",len(pts)," point-sites:"
+    #print "inserting ",len(pts)," point-sites:"
     m=0
     for p in pts:
         id_list.append( vd.addVertexSite( p ) )
         #print " ",m," added vertex ", id_list[ len(id_list) -1 ]
         m=m+1    
-    print " all point-sites inserted." #inserting ",len(pts)," point-sites:"
+    print m," point-sites inserted." #inserting ",len(pts)," point-sites:"
     return id_list
 
 def insert_polygon_segments(vd,id_list):
@@ -41,7 +41,7 @@ def insert_polygon_segments(vd,id_list):
             n_nxt=0
         print " ",j,"inserting segement ",id_list[n]," - ",id_list[n_nxt]
         
-        if   id_list[n] == 31921: #78238: # 47013:
+        if  0: # id_list[n] == 31921: #78238: # 47013:
             vd.debug_on()
             vd.addLineSite( id_list[n], id_list[n_nxt], 2)  # fails:  now 78238/13
             vod.setVDText2([1,1])
@@ -108,7 +108,7 @@ def ttt_segments(text,scale):
     wr.conic = False
     wr.cubic = False
     wr.conic_biarc_subdivision = 10 # this has no effect?
-    wr.conic_line_subdivision = 100 # this increases nr of points 
+    wr.conic_line_subdivision = 25 # this increases nr of points 
     wr.cubic_biarc_subdivision = 10 # no effect?
     wr.cubic_line_subdivision = 10 # no effect?
     wr.scale = float(1)/float(scale)

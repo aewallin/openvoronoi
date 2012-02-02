@@ -72,7 +72,7 @@ virtual void set_type(int t) {type=t;}
 int solve( Site* s1, double k1, 
            Site* s2, double k2, 
            Site* s3, double k3, std::vector<Solution>& slns ) {
-    //if (debug) 
+    if (debug) 
         std::cout << "ALTSEPSolver.\n";
     Site* lsite;
     Site* psite;
@@ -137,7 +137,7 @@ int solve( Site* s1, double k1,
         if ( fabs(2*( dx*sv.x+dy*sv.y  )) > 0 ) {
             tsln = -(dx*dx+dy*dy) / (2*( dx*sv.x+dy*sv.y  )); // check for divide-by-zero?
         } else {
-            std::cout << " no solutions. (isPoint)\n";
+            //std::cout << " no solutions. (isPoint)\n";
             return 0;
         }
     } else if (third_site->isLine()) {
@@ -146,7 +146,7 @@ int solve( Site* s1, double k1,
                 ( sv.x*third_site->a() + sv.y*third_site->b() + third_site_k );
             // figure out the correct k3 here.. ?
         } else {
-            std::cout << " no solutions. (isLine)\n";
+            //std::cout << " no solutions. (isLine)\n";
             return 0;
         }
     } else {

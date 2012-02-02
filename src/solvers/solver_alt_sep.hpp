@@ -77,35 +77,24 @@ int solve( Site* s1, double k1,
     Site* lsite;
     Site* psite;
     Site* third_site;
-    //double k3_out(1.0);
-    double lsite_k,  third_site_k; // psite_k
-
-    // separator direction
-    Point sv(0,0);
+    double lsite_k,  third_site_k;
     
     if ( type == 0 ) {
-        //std::cout << "ALTSEPSolver type="<< type <<"\n";
         lsite = s3; lsite_k = k3;
         psite = s1; // psite_k = k1;    l3 / p1 form a separator
         third_site = s2;      third_site_k = 1;
-        //k3_out = k3;
-        sv = (k3 == - 1) ? Point(lsite->a(),lsite->b()) : Point(-lsite->a(),-lsite->b()); 
     } else if ( type == 1 ) {
-        exit(-1);
-    } else if ( type == 2 ) {
-        //std::cout << "ALTSEPSolver type="<< type <<"\n";
         lsite = s3; lsite_k = k3;
         psite = s2; // psite_k = k2;    l3 / p2 form a separator
         third_site = s1; third_site_k = 1; 
-        //k3_out = k3;
-        sv = (k3 == - 1) ? Point(lsite->a(),lsite->b()) : Point(-lsite->a(),-lsite->b());
-    } else if ( type == 3 ) {
-        exit(-1);
     } else {
-        std::cout << "ALTSEPSolver FATAL ERROR!\n";
+        std::cout << "ALTSEPSolver FATAL ERROR! type not known.\n";
         exit(-1);
         return 0;
     }
+    // separator direction
+    Point sv = (k3 == - 1) ? Point(lsite->a(),lsite->b()) : Point(-lsite->a(),-lsite->b());
+    
     if (debug) {
         std::cout << "ALTSEPSolver type="<< type <<"\n";
         std::cout << " s1= " << s1->str2() << "(k=" << k1<< ")\n";
@@ -114,21 +103,11 @@ int solve( Site* s1, double k1,
         std::cout << " lsite_k=" << lsite_k << "\n";
         std::cout << " sv= " << sv << "\n";
     }
+
+    
     // now we should have this:
     assert( lsite->isLine() && psite->isPoint() );
 
-    // separator direction
-    /*
-    Point sv(0,0);
-    if (k3 == - 1) { // lsite_k
-        sv.x = lsite->a();
-        sv.y = lsite->b();
-    } else {
-        sv.x = -lsite->a();
-        sv.y = -lsite->b();
-    }*/
-    
-   
     double tsln(0);
 
     if ( third_site->isPoint() ) {
@@ -144,7 +123,6 @@ int solve( Site* s1, double k1,
         if ( fabs(( sv.x*third_site->a() + sv.y*third_site->b() + third_site_k )) > 0 ) {
             tsln = -(third_site->a()*psite->x()+third_site->b()*psite->y()+third_site->c()) / 
                 ( sv.x*third_site->a() + sv.y*third_site->b() + third_site_k );
-            // figure out the correct k3 here.. ?
         } else {
             //std::cout << " no solutions. (isLine)\n";
             return 0;
@@ -154,10 +132,6 @@ int solve( Site* s1, double k1,
         exit(-1);
     }
     Point psln = Point(psite->x(), psite->y() ) + tsln * sv;
-    //if (tsln<0)
-    //    tsln = -tsln;
-    //std::cout << "ALTSEPSolver tsln="<< tsln <<" p="<< psln << " k3="<< k3 << " k3_o="<<k3_out<<"\n";
-
     slns.push_back( Solution( psln, tsln, k3 ) );
     return 1;
 }

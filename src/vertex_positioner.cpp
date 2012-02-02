@@ -289,36 +289,18 @@ int VertexPositioner::solver_dispatch(Site* s1, double k1, Site* s2, double k2, 
         // here we detect for a separator case between
         // s1/s3
         // s2/s3
-        //LineSite* lsite;
-        //PointSite* psite;
         if (s3->isLine() && s1->isPoint() ) {
             if ( detect_sep_case(s3,s1) ) {
                 alt_sep_solver->set_type(0);
                 return alt_sep_solver->solve(s1, k1, s2, k2, s3, k3, solns );
             }
         }
-        /* 
-        else if (s1->isLine() && s3->isPoint() ) {
-            if ( detect_sep_case(s1,s3) ) {
+        else if (s3->isLine() && s2->isPoint() ) {
+            if ( detect_sep_case(s3,s2) ) {
                 alt_sep_solver->set_type(1);
                 return alt_sep_solver->solve(s1, k1, s2, k2, s3, k3, solns );
             }
-        } 
-        */
-        else if (s3->isLine() && s2->isPoint() ) {
-            if ( detect_sep_case(s3,s2) ) {
-                alt_sep_solver->set_type(2);
-                return alt_sep_solver->solve(s1, k1, s2, k2, s3, k3, solns );
-            }
         }
-        /* 
-        else if (s2->isLine() && s3->isPoint() ) {
-            if ( detect_sep_case(s2,s3) ) {
-                alt_sep_solver->set_type(3);
-                return alt_sep_solver->solve(s1, k1, s2, k2, s3, k3, solns );
-            }
-        }*/
-
     } 
 #endif
     

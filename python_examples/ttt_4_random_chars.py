@@ -175,7 +175,7 @@ if __name__ == "__main__":
     myscreen.camera.SetClippingRange(-(zmult+1)*camPos,(zmult+1)*camPos)
     myscreen.camera.SetFocalPoint(0.0, 0, 0)
     
-    random.seed(45)
+    random.seed(0)
     row_length = 15
     n_rows = 10
     

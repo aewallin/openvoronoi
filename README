@@ -1,4 +1,3 @@
-
 The OpenVoronoi project aims to produce an algorithm for calculating
 the 2D voronoi-diagram for point, line-segment, and circular-arc sites.
 Currently point-sites work well and line-segment sites are being worked
@@ -8,14 +7,17 @@ and released under GPLv3 (see COPYING).
 
 Voronoi diagrams are used for many purposes in computational geometry,
 but the motivation for OpenVoronoi has mainly been 2D offset-generation
-(see offset.hpp) for cnc mill toolpath calcuations. An experimental approximate
-medial-axis filter (medial_axis.hpp) has been added.
+(see offset.hpp) for cnc mill toolpath calcuations. An experimental 
+approximate medial-axis filter (medial_axis.hpp) has been added.
 
 The OpenVoronoi project is at 
 https://github.com/aewallin/openvoronoi
 
 The mailing-list for OpenVoronoi is at
 https://groups.google.com/forum/?hl=en#!forum/opencamlib
+
+There is a gallery of voronoi diagrams produced with OpenVoronoi at
+https://picasaweb.google.com/106188605401091280402/OpenVoronoiExamples
 
 Dependencies
 python
@@ -26,9 +28,22 @@ Boost python (if python bindings are built)
 libQD (a quad-precision arithmetic library). Available as package 
 "liqd-dev" on ubuntu. See "http://crd.lbl.gov/~dhbailey/mpdist/
 
+most python-examples use VTK and the VTK python bindings to visualize
+the input geometry and the voronoi diagram. On ubuntu these are available 
+in the packages
+- libvtk (Ubuntu 11.10 has libvtk5.6)
+- python-vtk
+
+many examples use truetype-tracer (python module "ttt") for generating input data.
+https://github.com/aewallin/truetype-tracer
+
+some examples and tests use the 2-opt random polygon generator from CGAL.
+There is a boost-python module "rpg" which is used by these scripts.
+https://github.com/aewallin/CGAL_RPG
+
 Build/Install instructions
 
-From PPA (works on Ubuntu 11.10 oneiric)
+From PPA
 sudo add-apt-repository ppa:anders-e-e-wallin/cam
 sudo apt-get update
 sudo apt-get install openvoronoi
@@ -42,8 +57,12 @@ $ cmake ../src
 $ make
 $ sudo make install
 
-Working Platforms
-- Ubuntu 11.10 oneiric (gcc 4.6.1 with Boost 1.46.1)
+Tests
+There are a few python-scrits in src/test/ that can be run with CTest.
+In the build-directory either "make test" or "ctest" will run all tests. 
+You can run only tests that have e.g. "ttt" in the test-name with
+"ctest -R ttt"
+Currently the tests do not produce any output (png or svg output could be an option?)
 
 Organization
 doc/        has documentation in lyx format, with figures in asymptote format. 

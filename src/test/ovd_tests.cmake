@@ -27,7 +27,13 @@ foreach( CASE RANGE 25) # characters A..Z
     ADD_TEST(ttt_single_glyph_${CASE} python ../src/test/ttt_single_glyph.py ${CASE})
 endforeach()
 
-set( TTT_ALPHA_CASES 200 100 50 25 12 6 3) 
+set( TTT_ALPHA_CASES 200 100 50 25 )  # 12 6 3
+# comment out the small values so that test doesn't take forever!
+# cpu-times (t400s laptop):
+#   25== takes 23 seconds 
+#   12== takes ca 71 seconds
+#    6== takes ca 384 seconds
+#    3== takes ca ??  seconds
 foreach( CASE ${TTT_ALPHA_CASES}) # characters A..Z
     ADD_TEST(ttt_alphabet_${CASE} python ../src/test/ttt_alphabet.py ${CASE})
 endforeach()

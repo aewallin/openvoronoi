@@ -419,61 +419,6 @@ if (step==current_step) return false; current_step++;
     return true; 
 }
 
-// iterate around the (null)face to find the an edge belonging to a point-site
-HEFace VoronoiDiagram::find_pointsite_face(HEEdge start_edge) {
-    HEEdge current_e = start_edge;
-    HEEdge start_e = current_e;
-    HEFace start_face  = g[ g[start_edge].twin ].face;
-    do {
-        HEEdge twin = g[current_e].twin;
-        HEFace twin_f = g[twin].face;
-        Site* site = g[twin_f].site;
-        if (site) {
-            if (site->isPoint()) {
-                start_face = twin_f;
-            }
-        }
-        current_e = g[current_e].next;
-    } while (current_e!=start_e);
-    return start_face;
-}
-
-/*
-std::pair<HEFace,HEFace> VoronoiDiagram::add_linesite_edges(HEVertex seg_start, HEVertex seg_end, bool linesite_k_sign) 
-{
-    HEFace pos_face, neg_face;  
-    LineSite* pos_site;
-    LineSite* neg_site;
-    HEEdge pos_edge, neg_edge;
-    if ( linesite_k_sign ) {
-        pos_site = new LineSite( g[seg_start].position, g[seg_end  ].position , +1);
-        neg_site = new LineSite( g[seg_end  ].position, g[seg_start].position , -1);
-        boost::tie(pos_edge, neg_edge) = g.add_twin_edges( seg_start,   seg_end );
-        g[pos_edge].inserted_direction = true;
-        g[neg_edge].inserted_direction = false;
-    } else {
-        pos_site = new LineSite( g[seg_end  ].position, g[seg_start].position , +1);
-        neg_site = new LineSite( g[seg_start].position, g[seg_end  ].position , -1);
-        boost::tie( pos_edge, neg_edge) = g.add_twin_edges( seg_end  ,seg_start );
-        g[pos_edge].inserted_direction = false;
-        g[neg_edge].inserted_direction = true;
-    }
-    g[pos_edge].type = LINESITE;
-    g[neg_edge].type = LINESITE;
-    g[pos_edge].k = +1;
-    g[neg_edge].k = -1;
-    //g.twin_edges(pos_edge, neg_edge);
-    assert( vd_checker->check_edge(pos_edge) && vd_checker->check_edge(neg_edge) );
-    pos_face = add_face( pos_site ); //  this face to the left of start->end edge    
-    neg_face = add_face( neg_site ); //  this face is to the left of end->start edge
-    g[pos_face].edge = pos_edge;
-    g[neg_face].edge = neg_edge;
-    g[pos_edge].face = pos_face;
-    g[neg_edge].face = neg_face;
-    if (debug) std::cout << " pos_face=" << pos_face << " neg_face=" << neg_face << "\n";   
-    return std::make_pair(pos_face,neg_face);
-}*/
-
 // given indices idx1 and idx2, return the corresponding vertex descriptors
 // the vertex_map is populated in insert_point_site()
 std::pair<HEVertex,HEVertex> VoronoiDiagram::find_endpoints(int idx1, int idx2) {

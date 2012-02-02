@@ -106,12 +106,9 @@ class VoronoiDiagram {
         EdgeVector find_in_out_edges(); 
         EdgeData   find_edge_data(HEFace f, VertexVector startverts, std::pair<HEVertex,HEVertex> segment);
         EdgeVector find_split_edges(HEFace f, Point pt1, Point pt2);
-        bool find_split_vertex(HEFace f, HEVertex& v);
+        bool       find_split_vertex(HEFace f, HEVertex& v);
         std::pair<HEVertex,HEVertex> find_endpoints(int idx1, int idx2);
-        
-        bool face_has_new_new_edge(HEFace f);
-        HEEdge find_separator_edge( HEFace f );
-        
+
         bool null_vertex_target( HEVertex v , HEVertex& trg);
         
         void augment_vertex_set( Site* site);        

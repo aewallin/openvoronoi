@@ -623,36 +623,6 @@ HEVertex VoronoiDiagram::add_separator_point(HEVertex endp, HEEdge edge, Point s
     return sep;
 }
 
-bool VoronoiDiagram::face_has_new_new_edge(HEFace f) {
-    HEEdge current2 = g[f].edge;
-    HEEdge start_edge2 = current2;
-    //g[seg_start].set_alfa(dir);
-    bool found = false;
-    do {
-        HEVertex src = g.source(current2);
-        HEVertex trg = g.target(current2);
-        if ( g[src].status == NEW && g[trg].status == NEW ) { //numeric::diangle_bracket( g[src].alfa, alfa, g[trg].alfa ) ) {
-                found = true;
-        }
-        current2 = g[current2].next;
-    } while (current2!=start_edge2 && !found);
-    return found;
-}
-
-HEEdge VoronoiDiagram::find_separator_edge( HEFace f ) {
-    HEEdge current = g[f].edge;
-    HEEdge out = current;
-    // f is a null-face
-    // find a suitable place for a separator vertex.
-    HEEdge start = current;
-    do {
-        if ( g[ g.source(current) ].status == NEW)
-            out = current;
-        current = g[current].next;
-    } while (current!=start);
-    return out;
-}
-
 bool VoronoiDiagram::null_vertex_target( HEVertex v , HEVertex& trg) {
     HEEdge trg_out = HEEdge();
     bool found(false);

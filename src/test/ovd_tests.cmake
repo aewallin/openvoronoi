@@ -37,3 +37,7 @@ set( TTT_ALPHA_CASES 200 100 50 25 )  # 12 6 3
 foreach( CASE ${TTT_ALPHA_CASES}) # characters A..Z
     ADD_TEST(ttt_alphabet_${CASE} python ../src/test/ttt_alphabet.py ${CASE})
 endforeach()
+
+foreach( CASE RANGE 25) # seeds 1..25. These take about 4s each to run.
+    ADD_TEST(ttt_random_chars_${CASE} python ../src/test/ttt_random_chars.py ${CASE})
+endforeach()

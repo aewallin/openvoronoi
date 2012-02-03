@@ -18,8 +18,7 @@ Core algorithm
   line-segment. Try to fail more graciously, or warn the user. Probably same issue with identical point-sites.
 - calling vd.check() after a "debug-mode" insert_line_site(id1,id2, step) (where e.g. step=5) causes a segfault
   make this fail more gracefully.
-- chain_5_collinear2.py exposes a case where a desperate solution is returned, because we fail to detect this
-  as a case for the sep_solver.
+
 
 Solvers
 - geometric-filtering. try solver<double>, evaulate quality of solution, 
@@ -77,4 +76,6 @@ Packaging/Building etc
 
 
 DONE:
+- 2012-02-01 chain_5_collinear2.py exposes a case where a desperate solution is returned, because we fail to detect this
+  as a case for the sep_solver.
 - 2012-01-25 new SEPSolver when we have a line-segment site and its endpoint

@@ -35,7 +35,6 @@ using namespace ovd::numeric; // sq() chop()
 
 namespace ovd {
 
-#define ALT_SEP
 
 VertexPositioner::VertexPositioner(HEGraph& gi): g(gi) {
     ppp_solver = new PPPSolver<qd_real>();
@@ -43,23 +42,19 @@ VertexPositioner::VertexPositioner(HEGraph& gi): g(gi) {
     lll_solver = new LLLSolver();
     qll_solver = new QLLSolver();
     sep_solver = new SEPSolver();
-#ifdef ALT_SEP
     alt_sep_solver = new ALTSEPSolver();
-#endif
     errstat.clear();
 }
 
 VertexPositioner::~VertexPositioner() {
-    std::cout << "~VertexPositioner()..";
+    //std::cout << "~VertexPositioner()..";
     delete ppp_solver;
     delete lll_solver;
     delete qll_solver;
     delete sep_solver;
-#ifdef ALT_SEP
     delete alt_sep_solver;
-#endif
     errstat.clear();
-    std::cout << "DONE.\n";
+    //std::cout << "DONE.\n";
 }
 
 // calculate the position of a new vertex on the given edge e
@@ -265,9 +260,7 @@ void VertexPositioner::solver_debug(bool b) {
     lll_solver->set_debug(b);
     qll_solver->set_debug(b);
     sep_solver->set_debug(b);
-#ifdef ALT_SEP
     alt_sep_solver->set_debug(b);
-#endif
 }
 
 int VertexPositioner::solver_dispatch(Site* s1, double k1, Site* s2, double k2, Site* s3, double k3, std::vector<Solution>& solns) {
@@ -279,7 +272,6 @@ int VertexPositioner::solver_dispatch(Site* s1, double k1, Site* s2, double k2, 
         return lll_solver->solve( s1,k1,s2,k2,s3,k3, solns ); // all lines.
     else if ( s1->isPoint() && s2->isPoint() && s3->isPoint() )
         return ppp_solver->solve( s1,s2,s3, solns ); // all points, no need to specify k1,k2,k3, they are all +1
-#ifdef ALT_SEP
     else if ( (s3->isLine() && s1->isPoint() ) || 
               (s1->isLine() && s3->isPoint() ) ||
               (s3->isLine() && s2->isPoint() ) ||
@@ -302,7 +294,6 @@ int VertexPositioner::solver_dispatch(Site* s1, double k1, Site* s2, double k2, 
             }
         }
     } 
-#endif
     
     // if we didn't dispatch to a solver above, we try the general solver
     return qll_solver->solve( s1,k1,s2,k2,s3,k3, solns ); // general case solver

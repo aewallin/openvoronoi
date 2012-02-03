@@ -46,7 +46,9 @@ svg::Color get_edge_color(ovd::HEGraph& g, ovd::HEEdge e) {
     if ( g[e].type == ovd::LINESITE )
         return svg::Color::Yellow;
     if ( g[e].type == ovd::PARABOLA )
-        return svg::Color::Green;
+        return svg::Color::Cyan;
+    if ( g[e].type == ovd::SEPARATOR )
+        return svg::Color::Magenta;
     return svg::Color::Blue;
 }
 

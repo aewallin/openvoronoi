@@ -1,5 +1,6 @@
 
 Core algorithm
+- support "spikes", i.e. three or more line-segments connecting to the same vertex
 - add suport for arcs
 - better logging (logging levels, where we log, etc)
 - better error handling (exceptions?)
@@ -25,7 +26,18 @@ Solvers
   if it's good take it, if it's bad, call solver<qd_real> (which is a lot slower!)
 LLLSolver
 - alternative geometry for parallel line-segment case. See Patel's thesis, page 32.
-
+  -- l1 and l2 are two nearly parallel lines, some distance apart
+  -- draw a normal n1 to l1 from a point l1(u1) on the line.
+  -- draw another normal n2 to l2, that passes through l1(u1)
+  -- points on the bisector of l1/l2 are now given by
+  -- p1s + u1 p1t + t p1n     (p1s is the start-point of l1, p1t is a tangent-vector, p1n is a normal vector)
+  -- u1 is in [0,1]
+  -- when we have the lenghts n1 and n2 the t-value can be calculated as a function of u1
+  -- if the length of a normal from u1 is a, then t is
+  -- t = a * (n2 / (n1+n2) )
+  -- this gives the bisector point (xb, yb) and the offset distance t as a function of u1 along l1
+  -- insert this into the equation of the third site to find a solution u1
+  
 Offset
 - figure out how to nest offset-loops to generate a machining-graph
 -- the FaceOffset (in offset2.hpp) class is an attempt in this direction

@@ -27,6 +27,8 @@
 
 #include "solvers/solver_ppp.hpp"
 #include "solvers/solver_lll.hpp"
+#include "solvers/solver_lll_para.hpp"
+
 #include "solvers/solver_qll.hpp"
 #include "solvers/solver_sep.hpp"
 #include "solvers/solver_alt_sep.hpp"
@@ -43,6 +45,7 @@ VertexPositioner::VertexPositioner(HEGraph& gi): g(gi) {
     qll_solver = new QLLSolver();
     sep_solver = new SEPSolver();
     alt_sep_solver = new ALTSEPSolver();
+    lll_para_solver = new LLLPARASolver();
     errstat.clear();
 }
 
@@ -53,6 +56,8 @@ VertexPositioner::~VertexPositioner() {
     delete qll_solver;
     delete sep_solver;
     delete alt_sep_solver;
+    delete lll_para_solver;
+
     errstat.clear();
     //std::cout << "DONE.\n";
 }
@@ -104,35 +109,7 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     assert( (k1==1) || (k1 == -1) );
     assert( (k2==1) || (k2 == -1) );
     std::vector<Solution> solutions;
-    
-    // this is a SEPARATOR edge with two LineSites adjacent.
-    // find the PointSite that defines the SEPARATOR, so that one LineSite and one PointSite
-    // can be submitted to the Solver.
-    if ( g[edge].type == SEPARATOR && s1->isLine() && s2->isLine() ) {
-        // the parallell lineseg case      v0 --s1 --> pt -- s2 --> v1
-        // find t
-        if ( g[edge].has_null_face ) {
-            s2 = g[ g[edge].null_face ].site;
-            assert( s2->isPoint() ); // the sites of null-faces are allwais PointSite
-            k2 = +1;
-        } else if ( g[ g[edge].twin ].has_null_face ) {
-            s2 = g[ g[ g[edge].twin ].null_face ].site;
-            assert( s2->isPoint() );
-            k2 = +1;
-        }
-    } else if ( g[edge].type == SEPARATOR && s1->isPoint() && s2->isLine() ) {
-        // a normal SEPARATOR edge, defined by a PointSite and a LineSite 
-        // swap sites, so SEPSolver can assume s1=line s2=point
-        Site* tmp = s1;
-        double k_tmp = k1;
-        s1 = s2;
-        s2 = tmp;
-        k1 = k2;
-        k2 = k_tmp;
-        assert( s1->isLine() );
-        assert( s2->isPoint() );
-    }
-    
+        
     solver_dispatch(s1,k1,s2,k2,s3,+1, solutions); // a single k3=+1 call for s3->isPoint()
     
     if (!s3->isPoint()) 
@@ -265,17 +242,45 @@ void VertexPositioner::solver_debug(bool b) {
     qll_solver->set_debug(b);
     sep_solver->set_debug(b);
     alt_sep_solver->set_debug(b);
+    lll_para_solver->set_debug(b);
 }
 
 int VertexPositioner::solver_dispatch(Site* s1, double k1, Site* s2, double k2, Site* s3, double k3, std::vector<Solution>& solns) {
 
 
     if ( g[edge].type == SEPARATOR ) {
+        // this is a SEPARATOR edge with two LineSites adjacent.
+        // find the PointSite that defines the SEPARATOR, so that one LineSite and one PointSite
+        // can be submitted to the Solver.
+        if ( s1->isLine() && s2->isLine() ) {
+            // the parallell lineseg case      v0 --s1 --> pt -- s2 --> v1
+            // find t
+            if ( g[edge].has_null_face ) {
+                s2 = g[ g[edge].null_face ].site;
+                assert( s2->isPoint() ); // the sites of null-faces are allwais PointSite
+                k2 = +1;
+            } else if ( g[ g[edge].twin ].has_null_face ) {
+                s2 = g[ g[ g[edge].twin ].null_face ].site;
+                assert( s2->isPoint() );
+                k2 = +1;
+            }
+        } else if ( s1->isPoint() && s2->isLine() ) {
+            // a normal SEPARATOR edge, defined by a PointSite and a LineSite 
+            // swap sites, so SEPSolver can assume s1=line s2=point
+            Site* tmp = s1;
+            double k_tmp = k1;
+            s1 = s2;
+            s2 = tmp;
+            k1 = k2;
+            k2 = k_tmp;
+            assert( s1->isLine() );
+            assert( s2->isPoint() );
+        }
         assert( s1->isLine() && s2->isPoint() ); // we have previously set s1(line) s2(point)
         return sep_solver->solve(s1,k1,s2,k2,s3,k3,solns); 
     } else if ( g[edge].type == PARA_LINELINE ) { // an edge betwee parallel LineSites
-        std::cout << " para lineline! \n";
-        exit(-1);
+        //std::cout << " para lineline! \n";
+        return lll_para_solver->solve( s1,k1,s2,k2,s3,k3, solns );
     } else if ( s1->isLine() && s2->isLine() && s3->isLine() ) 
         return lll_solver->solve( s1,k1,s2,k2,s3,k3, solns ); // all lines.
     else if ( s1->isPoint() && s2->isPoint() && s3->isPoint() )

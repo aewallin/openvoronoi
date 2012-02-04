@@ -87,6 +87,7 @@ private:
 // solvers, to which we dispatch, depending on the input sites
     Solver* ppp_solver;
     Solver* lll_solver;
+    Solver* lll_para_solver;
     Solver* qll_solver;
     Solver* sep_solver;
     Solver* alt_sep_solver;

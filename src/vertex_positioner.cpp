@@ -104,7 +104,7 @@ Solution VertexPositioner::position(HEEdge e, Site* s3) {
             std::cout << " s2 dist = " << s2_dist << "\n";
             std::cout << " s3 dist = " << s3_dist << "\n";
             std::cout << " t       = " << sl.t << "\n";
-
+            exit(-1);
             //return fabs(t-s3_dist);
         }
     }

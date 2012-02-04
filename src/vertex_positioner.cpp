@@ -96,6 +96,11 @@ Solution VertexPositioner::position(HEEdge e, Site* s3) {
     {
         errstat.push_back( dist_error(edge, sl, s3) );
         if ( dist_error(edge, sl, s3) > 1e-9 ) {
+            // 2012-02-04: 1e-9 passes 79/79 tests
+            //             1e-10 passes 79/79
+            //             1e-12 passes 79/79
+            //             1e-13  17 FAILED out of 79
+            //             1e-14  38 FAILED out of 79
             std::cout << " VertexPositioner::position() WARNING; large dist_error = " << dist_error(edge,  sl, s3) << "\n";
             double s1_dist = (sl.p - s1->apex_point(sl.p)).norm();
             double s2_dist = (sl.p - s2->apex_point(sl.p)).norm();
@@ -233,18 +238,21 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
 // search numerically for a desperate solution along the solution-edge
 Solution VertexPositioner::desperate_solution(Site* s3) {
     VertexError err_functor(g, edge, s3);
-    HEFace face = g[edge].face;     
-    HEEdge twin = g[edge].twin;
-    HEFace twin_face = g[twin].face;
-    Site* s1 =  g[face].site;
-    Site* s2 = g[twin_face].site;
+    //HEFace face = g[edge].face;     
+    //HEEdge twin = g[edge].twin;
+    //HEFace twin_face = g[twin].face;
+    //Site* s1 =  g[face].site;
+    //Site* s2 = g[twin_face].site;
     HEVertex src = g.source(edge);
     HEVertex trg = g.target(edge);
     Point src_p = g[src].position;
     Point trg_p = g[trg].position;
+    
     std::cout << "VertexPositioner::desperate_solution() \n";
     std::cout << " edge: " << src_p << " - " << trg_p << "\n";
     std::cout << " dist(): " << g[src].dist() << " - " << g[trg].dist() << "\n";
+    
+    /*
     if (s1->isLine() && s2->isLine() ) {
         std::cout << s1->str2() << "\n";
         std::cout << s2->str2() << "\n";
@@ -264,6 +272,7 @@ Solution VertexPositioner::desperate_solution(Site* s3) {
         std::cout << "     s1_err=" << s1_err_functor(ts) << " s2_err=" << s2_err_functor(ts) << "\n";
 
     }
+    */
     
     typedef std::pair<double, double> Result;
     Result r = boost::math::tools::brent_find_minima( err_functor, t_min, t_max, 64);

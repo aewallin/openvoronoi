@@ -47,7 +47,7 @@ def insert_polygon_segments(vd,id_list):
             #vd.debug_on()
             print " ",j,"inserting segement ",id_list[n]," - ",id_list[n_nxt]
 
-            if id_list[n] == 22871: #102187: # 102187/7 #115869: # 51456: 115869
+            if 0: # id_list[n] == 22871: #102187: # 102187/7 #115869: # 51456: 115869
                 vd.debug_on()
                 vd.addLineSite( id_list[n], id_list[n_nxt],7)
                 vod.setVDText2([1,1])
@@ -216,5 +216,15 @@ if __name__ == "__main__":
     vod.setVDText2(times)
     vod.setAll()
     print "PYTHON All DONE."
+    
+    err = vd.getStat()
+    #print err 
+    print "got errorstats for ",len(err)," points"
+    if len(err)>1:
+        minerr = min(err)
+        maxerr = max(err)
+        print "min error= ",minerr
+        print "max error= ",maxerr
+        
     myscreen.render()   
     myscreen.iren.Start()

@@ -268,8 +268,8 @@ Solution VertexPositioner::desperate_solution(Site* s3) {
     typedef std::pair<double, double> Result;
     Result r = boost::math::tools::brent_find_minima( err_functor, t_min, t_max, 64);
     double t_sln = r.first;
-    Point p_sln = g[edge].point(t_sln);
-    
+    //Point p_sln = g[edge].point(t_sln);
+    Point p_sln = err_functor.edge_point(t_sln); //g[edge].point(t_sln);
     double desp_k3(0);
     if (s3->isPoint())
         desp_k3 = 1;

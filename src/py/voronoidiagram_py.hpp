@@ -116,6 +116,7 @@ public:
                 pd.append( g[v].status );
                 pd.append( g[v].index );
                 pd.append( g[v].type );
+                pd.append( g[v].max_error );
                 plist.append(pd);
             }
         }
@@ -129,6 +130,7 @@ public:
                 boost::python::list pd;
                 pd.append( g[v].position );
                 pd.append( g[v].dist() );
+                
                 plist.append(pd);
             }
         }

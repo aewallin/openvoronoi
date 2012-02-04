@@ -333,10 +333,10 @@ void EdgeProps::set_ll_parameters(Site* s1, Site* s2) {  // Held thesis p96
     assert( delta != 0 );       
     double alfa1 = ( s1->b()*s2->c()-s2->b()*s1->c() ) / delta;
     double alfa2 = ( s2->a()*s1->c()-s1->a()*s2->c() ) / delta;
-    //double alfa3 = ( s2->b()-s1->b() ) / delta;
-    //double alfa4 = ( s1->a()-s2->a() ) / delta;
-    double alfa3 = -( s2->b()*s1->k()-s1->b()*s2->k() ) / delta;
-    double alfa4 = -( s1->a()*s2->k()-s2->a()*s1->k() ) / delta;
+    double alfa3 = -( s2->b()-s1->b() ) / delta;
+    double alfa4 = -( s1->a()-s2->a() ) / delta;
+    //double alfa3 = -( s2->b()*s1->k()-s1->b()*s2->k() ) / delta;
+    //double alfa4 = -( s1->a()*s2->k()-s2->a()*s1->k() ) / delta;
     
     // point (alfa1,alfa2) is the intersection point between the line-segments
     // vector (-alfa3,-alfa4) is the direction/tangent of the bisector

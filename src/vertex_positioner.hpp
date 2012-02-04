@@ -112,6 +112,7 @@ public:
     {}
     
     double operator()(const double t) {
+        /*
         Point p;
         if ( g[edge].type == LINELINE ) { // this is a workaround because the LINELINE edge-parameters are wrong? at least in some cases?
             //HEFace face = g[edge].face;     
@@ -136,9 +137,37 @@ public:
             
         } else
             p = g[edge].point(t);
-            
+            */
+        Point p = edge_point(t);
         double s3_dist = (p - s3->apex_point(p)).norm();
         return fabs(t-s3_dist);
+    }
+    Point edge_point(const double t) {
+        Point p;
+        if ( g[edge].type == LINELINE ) { // this is a workaround because the LINELINE edge-parameters are wrong? at least in some cases?
+            //HEFace face = g[edge].face;     
+            HEEdge twin = g[edge].twin;
+            //HEFace twin_face = g[twin].face;
+            //Site* s1 =  g[face].site;
+            //Site* s2 = g[twin_face].site;
+            HEVertex src = g.source(edge);
+            HEVertex trg = g.target(edge);
+            Point src_p = g[src].position;
+            Point trg_p = g[trg].position;
+            double src_t = g[src].dist();
+            double trg_t = g[trg].dist();
+            // edge is src_p -> trg_p
+            if ( trg_t > src_t ) {
+                double frac = (t-src_t) / (trg_t-src_t);
+                p = src_p + frac*(trg_p-src_p);
+            } else {
+                double frac = (t-trg_t) / (src_t-trg_t);
+                p = trg_p + frac*(src_p-trg_p);
+            }
+            
+        } else
+            p = g[edge].point(t);
+        return p;
     }
 private:
     HEGraph& g;

@@ -1212,6 +1212,7 @@ void VoronoiDiagram::add_vertices( Site* new_site ) {
         HEVertex q = g.add_vertex( VoronoiVertex( sl.p, NEW, NORMAL, new_site->apex_point( sl.p ), sl.k3 ) );
         modified_vertices.insert(q);
         g.add_vertex_in_edge( q, q_edges[m] );
+        g[q].max_error = vpos->dist_error( q_edges[m], sl, new_site);
         if (debug) {
             HEVertex src = g.source(q_edges[m]);
             HEVertex trg = g.target(q_edges[m]);

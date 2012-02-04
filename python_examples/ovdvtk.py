@@ -290,6 +290,27 @@ class VD:
                 self.verts.append(cir_actor)
                 self.myscreen.addActor(cir_actor)
         self.myscreen.render() 
+
+    def drawErrorVertices(self):
+        #print "drawVertexIdx ", index
+        for pt in self.vd.getVoronoiVertices():
+            p = pt[0] # self.scale*
+            vcolor = cyan
+            status = pt[2]
+            idx = pt[3]
+            # 4 type
+            err = pt[5]
+            if err > 1e-6:
+                #id_text = str(idx)
+                print "drawErrorVertex ", idx, " pos= ", p, " err=",err
+                #factor = FollowerText( text=id_text,center=(p.x,p.y,0), scale = self.textScale, color=vcolor)
+                #self.verts.append(factor)
+                actor = Sphere( center=(p.x,p.y, 0), radius=self.vertexRadius, color= pink )
+                self.verts.append(actor)
+                self.myscreen.addActor( actor )
+                
+                #self.myscreen.addActor( factor )
+        
     
     def drawVertexIdx(self, index):
         #print "drawVertexIdx ", index

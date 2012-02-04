@@ -47,11 +47,12 @@ def insert_polygon_segments(vd,id_list):
             #vd.debug_on()
             print " ",j,"inserting segement ",id_list[n]," - ",id_list[n_nxt]
 
-            if 0: #id_list[n] ==  102187: # 102187/7 #115869: # 51456: 115869
+            if id_list[n] == 22871: #102187: # 102187/7 #115869: # 51456: 115869
                 vd.debug_on()
                 vd.addLineSite( id_list[n], id_list[n_nxt],7)
                 vod.setVDText2([1,1])
                 vod.setAll()
+                vod.drawErrorVertices()
                 #verts=[92555, 51680,92624,52559,51474,92620,52805]
                 #for v in verts:
                     #print "drawing ",v
@@ -175,7 +176,7 @@ if __name__ == "__main__":
     myscreen.camera.SetClippingRange(-(zmult+1)*camPos,(zmult+1)*camPos)
     myscreen.camera.SetFocalPoint(0.0, 0, 0)
     
-    random.seed(0)
+    random.seed(42)
     row_length = 15
     n_rows = 10
     
@@ -202,7 +203,7 @@ if __name__ == "__main__":
     vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
     vod.drawFarCircle()
     vod.textScale = 0.0002
-    vod.vertexRadius = 0.0011
+    vod.vertexRadius = 0.011
     vod.drawVertices=0
     vod.drawVertexIndex=0
     vod.drawGenerators=0

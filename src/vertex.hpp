@@ -46,6 +46,8 @@ enum VoronoiVertexStatus {OUT, IN, UNDECIDED, NEW };
 /// APEX vertices split quadratic edges at their apex(closest point to site)
 enum VoronoiVertexType {OUTER, NORMAL, POINTSITE, ENDPOINT, SEPPOINT, APEX, SPLIT};
 
+//enum VoronoiVertexSolver {PPP, DESPERATE};
+
 /// a map of this type is used by topology-checker to check that all vertices
 /// have the expected (correct) degree (i.e. number of edges)
 typedef std::map<VoronoiVertexType, unsigned int> VertexDegreeMap;
@@ -90,6 +92,8 @@ public:
     /// vertices are marked: undecided, in, out, or new
     VoronoiVertexStatus status;
     VoronoiVertexType type;
+    //VoronoiVertexSolver solver;
+    double max_error;
     bool in_queue;
     /// the position of the vertex
     Point position;

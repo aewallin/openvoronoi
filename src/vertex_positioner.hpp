@@ -77,7 +77,11 @@ private:
                Site* s3, double k3, std::vector<Solution>& slns ); 
     bool detect_sep_case(Site* lsite, Site* psite);
 
+// solution-filtering
+    double edge_error(Solution& sl);
+    Point projection_point(Solution& sl);
 // geometry-checks
+    
     bool solution_on_edge(Solution& s);
     bool check_far_circle(Solution& s);
     bool check_dist(HEEdge e, const Solution& s, Site* s3);

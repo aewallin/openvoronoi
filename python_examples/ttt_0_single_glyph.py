@@ -68,7 +68,7 @@ def insert_polygon_segments(vd,id_list):
         #if (j<jmax):
             #vd.debug_on()
         #print " ",j,"inserting segement ",id_list[n]," - ",id_list[n_nxt]
-        if id_list[n]==90: #j == 0:
+        if 0: #id_list[n]==90: #j == 0:
             print " ",j,"inserting segement ",id_list[n]," - ",id_list[n_nxt]
             vd.addLineSite( id_list[n], id_list[n_nxt],7)
             vod.setVDText2([1,1])

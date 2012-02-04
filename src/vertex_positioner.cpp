@@ -141,7 +141,7 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
         Solution min_solution(Point(0,0),0,0);
         //std::cout << " edge_error filter: \n";
         BOOST_FOREACH(Solution s, solutions) {
-            double err = g[edge].error(s);
+            double err = edge_error(s); //g[edge].error(s);
             //std::cout << s.p << " k3=" << s.k3 << " t=" <<  s.t << " err=" << err << "\n";
             if ( err < min_error) {
                 min_solution = s;
@@ -201,7 +201,7 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
 
     std::cout << "The failing " << solutions2.size() << " solutions are: \n";
     BOOST_FOREACH(Solution s, solutions2 ) {
-        std::cout << s.p << " t=" << s.t << " k3=" << s.k3  << " e_err=" << g[edge].error(s) <<"\n";
+        std::cout << s.p << " t=" << s.t << " k3=" << s.k3  << " e_err=" << edge_error(s) <<"\n";
         std::cout << " min<t<max=" << ((s.t>=t_min) && (s.t<=t_max));
         std::cout << " s3.in_region=" << s3->in_region(s.p);
         std::cout <<  " region-t=" << s3->in_region_t(s.p) << "\n";
@@ -232,7 +232,7 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     Solution desp( p_mid, t_mid, desp_k3 ); // FIXME k3=1 is not correct here!
     
     std::cout << "WARNING: Returning desperate solution: \n";
-    std::cout << desp.p << " t=" << desp.t << " k3=" << desp.k3  << " e_err=" << g[edge].error(desp) <<"\n";
+    std::cout << desp.p << " t=" << desp.t << " k3=" << desp.k3  << " e_err=" << edge_error(desp) <<"\n";
     return desp;
 }
 
@@ -388,8 +388,41 @@ bool VertexPositioner::detect_sep_case(Site* lsite, Site* psite) {
     return false;
 }
 
+double VertexPositioner::edge_error(Solution& sl) {
+    Point p;
+    if (g[edge].type==PARA_LINELINE) {
+        p = projection_point( sl );
+    } else {
+        p = g[edge].point( sl.t );
+    }
+    return (p-sl.p).norm();
+}
+
+// the edge is not parametrized by t-value as normal edges
+// so we need a projection of sl onto the edge instead
+
+Point VertexPositioner::projection_point(Solution& sl) {
+    assert( g[edge].type == PARA_LINELINE );
+    // edge given by
+    // p = p0 + t * (p1-p0)   with t in [0,1]
+    Point p0( g[ g.source(edge) ].position );
+    Point p1( g[ g.target(edge) ].position ); 
+    //std::cout << " edge is  " << p0 << " - " << p1 << "\n";
+    //std::cout << " edge direction: " << v << "\n";
+    Point v = p1-p0;
+    
+    double t = (sl.p - p0).dot(v) / v.dot(v);
+    // clamp to [0,1]
+    if ( t>1)
+        t=1;
+    else if (t<0)
+        t=0;
+    //std::cout << " projection of solution " << sl.p << " is " << (p0+v*t) << "\n";
+    return (p0+v*t);
+}
+
 bool VertexPositioner::solution_on_edge(Solution& s) {
-    double err = g[edge].error(s);
+    double err = edge_error(s);
     double limit = 9E-4;
     if ( err>=limit ) {
         std::cout << "solution_on_edge() ERROR err= " << err << "\n";

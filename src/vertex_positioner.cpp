@@ -216,8 +216,16 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     
     Solution desp = desperate_solution(s3);  // ( p_mid, t_mid, desp_k3 ); 
     
+    VertexError s1_err_functor(g, edge, s1);
+    VertexError s2_err_functor(g, edge, s2);
+    VertexError s3_err_functor(g, edge, s3);
+
     std::cout << "WARNING: Returning desperate solution: \n";
     std::cout << desp.p << " t=" << desp.t << " k3=" << desp.k3  << " e_err=" << edge_error(desp) <<"\n";
+    std::cout << "     s1_err= " << s1_err_functor(desp.t) << "\n";
+    std::cout << "     s2_err= " << s2_err_functor(desp.t) << "\n";
+    std::cout << "     s3_err= " << s3_err_functor(desp.t) << "\n";
+
     //exit(-1);
     return desp;
 }

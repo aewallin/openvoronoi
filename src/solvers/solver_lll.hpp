@@ -58,8 +58,8 @@ int solve( Site* s1, double k1,
     assert( s1->isLine() && s2->isLine() && s3->isLine() );
     
     std::vector< Eq<qd_real> > eq; // equation-parameters, in quad-precision
-    boost::array<Site*,3> sites = {{s1,s2,s3}};    
-    boost::array<double,3> kvals = {{k1,k2,k3}};
+    boost::array<Site*,3> sites = {{s3,s2,s1}};    
+    boost::array<double,3> kvals = {{k3,k2,k1}};
     for (unsigned int i=0;i<3;i++)
         eq.push_back( sites[i]->eqp_qd( kvals[i] ) );
     
@@ -84,13 +84,13 @@ int solve( Site* s1, double k1,
         }
     } else {
         std::cout << "WARNING: LLLSolver small determinant! no solutions. d= " << d <<"\n";
-        std::cout << " 0 : " << eq[0].a << " " << eq[0].b << " " << eq[0].c << " " << eq[0].k << "\n";
-        std::cout << " 1 : " << eq[1].a << " " << eq[1].b << " " << eq[1].c << " " << eq[1].k << "\n";
-        std::cout << " 2 : " << eq[2].a << " " << eq[2].b << " " << eq[2].c << " " << eq[2].k << "\n";
-        std::cout << " 0==1? " << (eq[0]==eq[1]) << "\n";
-        std::cout << "da = " << (eq[0].a-eq[1].a) << "\n";
-        std::cout << "db = " << (eq[0].b-eq[1].b) << "\n";
-        std::cout << "dc = " << (eq[0].c-eq[1].c) << "\n";
+        std::cout << " s1 : " << eq[0].a << " " << eq[0].b << " " << eq[0].c << " " << eq[0].k << "\n";
+        std::cout << " s2 : " << eq[1].a << " " << eq[1].b << " " << eq[1].c << " " << eq[1].k << "\n";
+        std::cout << " s3 : " << eq[2].a << " " << eq[2].b << " " << eq[2].c << " " << eq[2].k << "\n";
+        //std::cout << " 0==1? " << (eq[0]==eq[1]) << "\n";
+        //std::cout << "da = " << (eq[0].a-eq[1].a) << "\n";
+        //std::cout << "db = " << (eq[0].b-eq[1].b) << "\n";
+        //std::cout << "dc = " << (eq[0].c-eq[1].c) << "\n";
         
     }
     return 0; // no solution if determinant zero, or t-value negative

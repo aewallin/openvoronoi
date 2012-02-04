@@ -105,8 +105,12 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     assert( (k2==1) || (k2 == -1) );
     std::vector<Solution> solutions;
     
+    // this is a SEPARATOR edge with two LineSites adjacent.
+    // find the PointSite that defines the SEPARATOR, so that one LineSite and one PointSite
+    // can be submitted to the Solver.
     if ( g[edge].type == SEPARATOR && s1->isLine() && s2->isLine() ) {
         // the parallell lineseg case      v0 --s1 --> pt -- s2 --> v1
+        // find t
         if ( g[edge].has_null_face ) {
             s2 = g[ g[edge].null_face ].site;
             assert( s2->isPoint() ); // the sites of null-faces are allwais PointSite
@@ -117,8 +121,8 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
             k2 = +1;
         }
     } else if ( g[edge].type == SEPARATOR && s1->isPoint() && s2->isLine() ) {
-        // SEPARATOR case 
-        // swap sites, so sep_solver can assume s1=line s2=point
+        // a normal SEPARATOR edge, defined by a PointSite and a LineSite 
+        // swap sites, so SEPSolver can assume s1=line s2=point
         Site* tmp = s1;
         double k_tmp = k1;
         s1 = s2;
@@ -184,7 +188,7 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     }
     
 
-    // either 0, or >= 2 solutions found. error.
+    // either 0, or >= 2 solutions found. This is an error.
     // std::cout << " None, or too many solutions found! solutions.size()=" << solutions.size() << "\n";
     std::cout << " solution edge: " << g[ g.source(edge) ].position << "[" << g[ g.source(edge) ].type << "](t=" << g[ g.source(edge) ].dist() << ")";
     std::cout << " - " << g[ g.target(edge) ].position << "[" << g[ g.target(edge) ].type << "](t=" << g[ g.target(edge) ].dist() << ") \n";
@@ -266,9 +270,13 @@ void VertexPositioner::solver_debug(bool b) {
 int VertexPositioner::solver_dispatch(Site* s1, double k1, Site* s2, double k2, Site* s3, double k3, std::vector<Solution>& solns) {
 
 
-    if ( g[edge].type == SEPARATOR )
-        return sep_solver->solve(s1,k1,s2,k2,s3,k3,solns); // we have previously set s1(line) s2(point)
-    else if ( s1->isLine() && s2->isLine() && s3->isLine() ) 
+    if ( g[edge].type == SEPARATOR ) {
+        assert( s1->isLine() && s2->isPoint() ); // we have previously set s1(line) s2(point)
+        return sep_solver->solve(s1,k1,s2,k2,s3,k3,solns); 
+    } else if ( g[edge].type == PARA_LINELINE ) { // an edge betwee parallel LineSites
+        std::cout << " para lineline! \n";
+        exit(-1);
+    } else if ( s1->isLine() && s2->isLine() && s3->isLine() ) 
         return lll_solver->solve( s1,k1,s2,k2,s3,k3, solns ); // all lines.
     else if ( s1->isPoint() && s2->isPoint() && s3->isPoint() )
         return ppp_solver->solve( s1,s2,s3, solns ); // all points, no need to specify k1,k2,k3, they are all +1

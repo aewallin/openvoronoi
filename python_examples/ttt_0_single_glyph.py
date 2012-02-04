@@ -129,7 +129,7 @@ def ttt_segments(text,scale):
     wr.scale = float(1)/float(scale)
     # "L" has 36 points by default
     wr.conic_biarc_subdivision = 10 # this has no effect?
-    wr.conic_line_subdivision = 200 # =10 increasesn nr of points to 366, = 5 gives 729 pts
+    wr.conic_line_subdivision = 50 # =10 increasesn nr of points to 366, = 5 gives 729 pts
     wr.cubic_biarc_subdivision = 10 # no effect?
     wr.cubic_line_subdivision = 10 # no effect?
     wr.setFont(1)
@@ -137,7 +137,7 @@ def ttt_segments(text,scale):
     segs = wr.get_segments()
     return segs
     
-    
+
 if __name__ == "__main__":  
     #w=2500
     #h=1500
@@ -158,7 +158,8 @@ if __name__ == "__main__":
     myscreen.camera.SetClippingRange(-(zmult+1)*camPos,(zmult+1)*camPos)
     myscreen.camera.SetFocalPoint(0.0, 0, 0)
 
-    segs = ttt_segments(  "+", 25000)
+    tscale = 1 / 2.5095362377e-4
+    segs = ttt_segments(  "f j", tscale) # 25000
     segs = translate(segs, -0.5, -0.5)
     segs = modify_segments(segs)
     vd = ovd.VoronoiDiagram(far,120)

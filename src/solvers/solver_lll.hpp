@@ -58,8 +58,8 @@ int solve( Site* s1, double k1,
     assert( s1->isLine() && s2->isLine() && s3->isLine() );
     
     std::vector< Eq<qd_real> > eq; // equation-parameters, in quad-precision
-    boost::array<Site*,3> sites = {{s3,s2,s1}};    
-    boost::array<double,3> kvals = {{k3,k2,k1}};
+    boost::array<Site*,3> sites = {{s1,s2,s3}};    
+    boost::array<double,3> kvals = {{k1,k2,k3}};
     for (unsigned int i=0;i<3;i++)
         eq.push_back( sites[i]->eqp_qd( kvals[i] ) );
     
@@ -79,6 +79,9 @@ int solve( Site* s1, double k1,
             qd_real sol_y = determinant(  eq[i].a, -eq[i].c, eq[i].k, 
                                           eq[j].a, -eq[j].c, eq[j].k, 
                                           eq[k].a, -eq[k].c, eq[k].k ) / d ; 
+            if (debug) 
+                std::cout << " solution: " << Point( to_double(sol_x), to_double(sol_y) ) << " t=" << to_double(t) << " k3=" << k3 << " det=" << to_double(d) << "\n";
+            
             slns.push_back( Solution( Point( to_double(sol_x), to_double(sol_y) ), to_double(t), k3 ) ); // kk3 just passes through without any effect!?
             return 1;
         }

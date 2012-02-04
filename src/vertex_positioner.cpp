@@ -20,6 +20,7 @@
 #include <algorithm> // std::erase()
 
 #include <boost/array.hpp>
+#include <boost/math/tools/minima.hpp> // brent_find_minima
 
 #include "vertex_positioner.hpp"
 #include "voronoidiagram.hpp"
@@ -96,6 +97,15 @@ Solution VertexPositioner::position(HEEdge e, Site* s3) {
         errstat.push_back( dist_error(edge, sl, s3) );
         if ( dist_error(edge, sl, s3) > 1e-9 ) {
             std::cout << " VertexPositioner::position() WARNING; large dist_error = " << dist_error(edge,  sl, s3) << "\n";
+            double s1_dist = (sl.p - s1->apex_point(sl.p)).norm();
+            double s2_dist = (sl.p - s2->apex_point(sl.p)).norm();
+            double s3_dist = (sl.p - s3->apex_point(sl.p)).norm();
+            std::cout << " s1 dist = " << s1_dist << "\n";
+            std::cout << " s2 dist = " << s2_dist << "\n";
+            std::cout << " s3 dist = " << s3_dist << "\n";
+            std::cout << " t       = " << sl.t << "\n";
+
+            //return fabs(t-s3_dist);
         }
     }
     
@@ -178,18 +188,6 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     std::cout << " s2= " << s2->str2() << "(k=" << k2<< ")\n";
     std::cout << " s3= " << s3->str2() << "\n";
     
-    // if s1/s2 form a SEPARATOR-edge, this is dispatched automatically to sep-solver
-    // here we detect for a separator case between
-    // s1/s3
-    // s2/s3
-    //LineSite* lsite;
-    //PointSite* psite;
-    //if (s3->isLine() && s1->isPoint() ) {
-    //    bool sep_case = detect_sep_case(s3,s1);
-        //lsite = s3;
-        //psite = s1;
-    //}
-    
     std::cout << "Running solvers again: \n";
     solver_debug(true);
     // run the solver(s) one more time in order to print out un-filtered solution points for debugging
@@ -198,23 +196,72 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     if (!s3->isPoint()) // for points k3=+1 allways
         solver_dispatch(s1,k1,s2,k2,s3,-1, solutions2); // for lineSite or ArcSite we try k3=-1 also    
     solver_debug(false);
-
-    std::cout << "The failing " << solutions2.size() << " solutions are: \n";
-    BOOST_FOREACH(Solution s, solutions2 ) {
-        std::cout << s.p << " t=" << s.t << " k3=" << s.k3  << " e_err=" << edge_error(s) <<"\n";
-        std::cout << " min<t<max=" << ((s.t>=t_min) && (s.t<=t_max));
-        std::cout << " s3.in_region=" << s3->in_region(s.p);
-        std::cout <<  " region-t=" << s3->in_region_t(s.p) << "\n";
-        std::cout <<  " t - t_min= " << s.t - t_min << "\n";
-        std::cout <<  " t_max - t= " << t_max - s.t << "\n";
-        //std::cout << std::scientific;
+    
+    if ( !solutions2.empty() ) {
+        std::cout << "The failing " << solutions2.size() << " solutions are: \n";
+        BOOST_FOREACH(Solution s, solutions2 ) {
+            std::cout << s.p << " t=" << s.t << " k3=" << s.k3  << " e_err=" << edge_error(s) <<"\n";
+            std::cout << " min<t<max=" << ((s.t>=t_min) && (s.t<=t_max));
+            std::cout << " s3.in_region=" << s3->in_region(s.p);
+            std::cout <<  " region-t=" << s3->in_region_t(s.p) << "\n";
+            std::cout <<  " t - t_min= " << s.t - t_min << "\n";
+            std::cout <<  " t_max - t= " << t_max - s.t << "\n";
+            std::cout <<  " edge type : " << g[edge].type << "\n"; //std::scientific;
+        }   
+    } else {
+        std::cout << "No solutions found by solvers!\n";
     }
 
     assert(0); // in Debug mode, stop here.
     
-    // try a desperate solution
-    double t_mid = 0.5*(t_min+t_max);
-    Point p_mid = g[edge].point(t_mid);
+    Solution desp = desperate_solution(s3);  // ( p_mid, t_mid, desp_k3 ); 
+    
+    std::cout << "WARNING: Returning desperate solution: \n";
+    std::cout << desp.p << " t=" << desp.t << " k3=" << desp.k3  << " e_err=" << edge_error(desp) <<"\n";
+    //exit(-1);
+    return desp;
+}
+
+// search numerically for a desperate solution along the solution-edge
+Solution VertexPositioner::desperate_solution(Site* s3) {
+    VertexError err_functor(g, edge, s3);
+    HEFace face = g[edge].face;     
+    HEEdge twin = g[edge].twin;
+    HEFace twin_face = g[twin].face;
+    Site* s1 =  g[face].site;
+    Site* s2 = g[twin_face].site;
+    HEVertex src = g.source(edge);
+    HEVertex trg = g.target(edge);
+    Point src_p = g[src].position;
+    Point trg_p = g[trg].position;
+    std::cout << "VertexPositioner::desperate_solution() \n";
+    std::cout << " edge: " << src_p << " - " << trg_p << "\n";
+    std::cout << " dist(): " << g[src].dist() << " - " << g[trg].dist() << "\n";
+    if (s1->isLine() && s2->isLine() ) {
+        std::cout << s1->str2() << "\n";
+        std::cout << s2->str2() << "\n";
+        std::cout << s3->str2() << "\n";
+    }
+    boost::array<double,8> x = g[edge].x;
+    boost::array<double,8> y = g[edge].y;
+    for (unsigned int n=0 ; n < 8 ; n++ ) {
+        std::cout << n << "  " << x[n] << "  " << y[n] << "\n";
+    }
+    
+    for (int n=0 ; n < 20 ; n++ ) {
+        VertexError s1_err_functor(g, edge, s1);
+        VertexError s2_err_functor(g, edge, s2);
+        double ts = t_min + ((t_max-t_min)/(20-1))*n;
+        std::cout << n << " ts=" << ts << " s3_error= " << err_functor(ts) << " p="<< g[edge].point(ts) << "\n";
+        std::cout << "     s1_err=" << s1_err_functor(ts) << " s2_err=" << s2_err_functor(ts) << "\n";
+
+    }
+    
+    typedef std::pair<double, double> Result;
+    Result r = boost::math::tools::brent_find_minima( err_functor, t_min, t_max, 64);
+    double t_sln = r.first;
+    Point p_sln = g[edge].point(t_sln);
+    
     double desp_k3(0);
     if (s3->isPoint())
         desp_k3 = 1;
@@ -222,17 +269,14 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
         // find out on which side the desperate solution lies
         Point src_se = s3->start();
         Point trg_se = s3->end();
-        Point left = 0.5*(src_se+trg_se) + (trg_se-src_se).xy_perp(); // this is used below and in find_null_face()
-        if (p_mid.is_right(src_se,trg_se)) {
+        Point left = 0.5*(src_se+trg_se) + (trg_se-src_se).xy_perp(); 
+        if (p_sln.is_right(src_se,trg_se)) {
             desp_k3 = (s3->k()==1) ? -1 : 1;
         } else {
             desp_k3 = (s3->k()==1) ? 1 : -1;
         }
     }
-    Solution desp( p_mid, t_mid, desp_k3 ); // FIXME k3=1 is not correct here!
-    
-    std::cout << "WARNING: Returning desperate solution: \n";
-    std::cout << desp.p << " t=" << desp.t << " k3=" << desp.k3  << " e_err=" << edge_error(desp) <<"\n";
+    Solution desp( p_sln, t_sln, desp_k3 ); 
     return desp;
 }
 

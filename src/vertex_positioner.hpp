@@ -87,7 +87,8 @@ private:
     bool check_dist(HEEdge e, const Solution& s, Site* s3);
     bool equal(double d1, double d2);
     
-    
+    Solution desperate_solution(Site* s3);
+
 // solvers, to which we dispatch, depending on the input sites
     Solver* ppp_solver;
     Solver* lll_solver;
@@ -101,6 +102,24 @@ private:
     double t_max;
     HEEdge edge;
     std::vector<double> errstat;
+};
+
+// error function to minimize when solving by searching for a point on the solution-edge
+class VertexError {
+public:
+    VertexError(HEGraph& gi, HEEdge sln_edge, Site* si3) :
+    g(gi),  edge(sln_edge), s3(si3)
+    {}
+    
+    double operator()(const double t) {
+        Point p = g[edge].point(t);
+        double s3_dist = (p - s3->apex_point(p)).norm();
+        return fabs(t-s3_dist);
+    }
+private:
+    HEGraph& g;
+    HEEdge edge;
+    Site* s3;
 };
 
 }

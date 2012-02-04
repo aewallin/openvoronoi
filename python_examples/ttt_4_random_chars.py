@@ -42,14 +42,14 @@ def insert_polygon_segments(vd,id_list):
         n_nxt = n+1
         if n==(len(id_list)-1):
             n_nxt=0
-        
+
         if (j<jmax):
             #vd.debug_on()
             print " ",j,"inserting segement ",id_list[n]," - ",id_list[n_nxt]
-            
-            if 0: #id_list[n] == 115869: # 51456: 115869
+
+            if 0: #id_list[n] ==  102187: # 102187/7 #115869: # 51456: 115869
                 vd.debug_on()
-                vd.addLineSite( id_list[n], id_list[n_nxt],6)
+                vd.addLineSite( id_list[n], id_list[n_nxt],7)
                 vod.setVDText2([1,1])
                 vod.setAll()
                 #verts=[92555, 51680,92624,52559,51474,92620,52805]
@@ -190,9 +190,11 @@ if __name__ == "__main__":
         [rowsegs, extents, scale] = get_scaled_segs( chars, length)
         rowsegs_t = translate(rowsegs, dx, current_y )
         print "y-height is ", (extents.maxy-extents.miny)
+        print "scale is ", scale
         current_y = current_y + 1.1*(extents.maxy-extents.miny)*scale
         segs+=rowsegs_t
         print chars
+    #exit()
     
     vd = ovd.VoronoiDiagram(far,120)
     print ovd.version()

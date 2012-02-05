@@ -361,7 +361,7 @@ int VertexPositioner::solver_dispatch(Site* s1, double k1, Site* s2, double k2, 
                 return alt_sep_solver->solve(s1, k1, s2, k2, s3, k3, solns );
             }
         }
-        else if (s3->isLine() && s2->isPoint() ) {
+        if (s3->isLine() && s2->isPoint() ) {
             if ( detect_sep_case(s3,s2) ) {
                 alt_sep_solver->set_type(1);
                 return alt_sep_solver->solve(s1, k1, s2, k2, s3, k3, solns );

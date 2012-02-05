@@ -108,11 +108,11 @@ def ttt_segments(text,scale):
     wr.conic = False
     wr.cubic = False
     wr.conic_biarc_subdivision = 10 # this has no effect?
-    wr.conic_line_subdivision = 100 # this increases nr of points 
+    wr.conic_line_subdivision = 25 # this increases nr of points 
     wr.cubic_biarc_subdivision = 10 # no effect?
     wr.cubic_line_subdivision = 10 # no effect?
     wr.scale = float(1)/float(scale)
-    wr.setFont(0)
+    wr.setFont(3)
     # 0 OK   freeserif
     # 1 OK   freeserif bold
     # 2 err  freeserif italic   (has "VX" overlap!)

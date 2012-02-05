@@ -41,7 +41,7 @@ def insert_polygon_segments(vd,id_list):
             n_nxt=0
         print " ",j,"inserting segement ",id_list[n]," - ",id_list[n_nxt]
         
-        if  0: # id_list[n] == 31921: #78238: # 47013:
+        if  0: #id_list[n] == 31921: #78238: # 47013:
             vd.debug_on()
             vd.addLineSite( id_list[n], id_list[n_nxt], 2)  # fails:  now 78238/13
             vod.setVDText2([1,1])
@@ -113,6 +113,17 @@ def ttt_segments(text,scale):
     wr.cubic_line_subdivision = 10 # no effect?
     wr.scale = float(1)/float(scale)
     wr.setFont(3)
+    # 0 OK   freeserif
+    # 1 OK   freeserif bold
+    # 2 err  freeserif italic   (has "VX" overlap!)
+    # 3 OK   freeserif bold italic
+    # 4  OK  fonts.push_back( "/usr/share/fonts/truetype/freefont/FreeMonoBold.ttf" );
+    # 5  err fonts.push_back( "/usr/share/fonts/truetype/freefont/FreeMonoBoldOblique.ttf" );  PPPSolver error?
+    # 6  err fonts.push_back( "/usr/share/fonts/truetype/freefont/FreeMonoOblique.ttf" ) error?
+    # 7  OK  fonts.push_back( "/usr/share/fonts/truetype/freefont/FreeSans.ttf" );
+    # 8  err fonts.push_back( "/usr/share/fonts/truetype/freefont/FreeSansBold.ttf" );
+    # 9  err fonts.push_back( "/usr/share/fonts/truetype/freefont/FreeSansBoldOblique.ttf" );
+    # 10 err fonts.push_back( "/usr/share/fonts/truetype/freefont/FreeSansOblique.ttf" );
     s3 = ttt.ttt(text,wr) 
     segs = wr.get_segments()
     return segs
@@ -182,7 +193,7 @@ if __name__ == "__main__":
     vod.drawVertices=0
     vod.drawVertexIndex=0
     vod.drawGenerators=0
-    vod.offsetEdges = 1
+    vod.offsetEdges = 0
     vod.drawNullEdges = 1
     vd.setEdgeOffset(0.00005)
     
@@ -202,7 +213,7 @@ if __name__ == "__main__":
     #for v in vd.getFaceVertices(14705):
     #    print " drawing ", v
     #    vod.drawVertexIdx(v)
-    
+
     err = vd.getStat()
     #print err 
     print "got errorstats for ",len(err)," points"

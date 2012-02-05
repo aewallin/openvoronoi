@@ -77,16 +77,22 @@ private:
                Site* s3, double k3, std::vector<Solution>& slns ); 
     bool detect_sep_case(Site* lsite, Site* psite);
 
+// solution-filtering
+    double edge_error(Solution& sl);
+    Point projection_point(Solution& sl);
 // geometry-checks
+    
     bool solution_on_edge(Solution& s);
     bool check_far_circle(Solution& s);
     bool check_dist(HEEdge e, const Solution& s, Site* s3);
     bool equal(double d1, double d2);
     
-    
+    Solution desperate_solution(Site* s3);
+
 // solvers, to which we dispatch, depending on the input sites
     Solver* ppp_solver;
     Solver* lll_solver;
+    Solver* lll_para_solver;
     Solver* qll_solver;
     Solver* sep_solver;
     Solver* alt_sep_solver;
@@ -96,6 +102,46 @@ private:
     double t_max;
     HEEdge edge;
     std::vector<double> errstat;
+};
+
+// error function to minimize when solving by searching for a point on the solution-edge
+class VertexError {
+public:
+    VertexError(HEGraph& gi, HEEdge sln_edge, Site* si3) :
+    g(gi),  edge(sln_edge), s3(si3)
+    {}
+    
+    double operator()(const double t) {
+        Point p = edge_point(t);
+        double s3_dist = (p - s3->apex_point(p)).norm();
+        return fabs(t-s3_dist);
+    }
+    Point edge_point(const double t) {
+        Point p;
+        if ( g[edge].type == LINELINE ) { // this is a workaround because the LINELINE edge-parameters are wrong? at least in some cases?
+            HEVertex src = g.source(edge);
+            HEVertex trg = g.target(edge);
+            Point src_p = g[src].position;
+            Point trg_p = g[trg].position;
+            double src_t = g[src].dist();
+            double trg_t = g[trg].dist();
+            // edge is src_p -> trg_p
+            if ( trg_t > src_t ) {
+                double frac = (t-src_t) / (trg_t-src_t);
+                p = src_p + frac*(trg_p-src_p);
+            } else {
+                double frac = (t-trg_t) / (src_t-trg_t);
+                p = trg_p + frac*(src_p-trg_p);
+            }
+            
+        } else
+            p = g[edge].point(t);
+        return p;
+    }
+private:
+    HEGraph& g;
+    HEEdge edge;
+    Site* s3;
 };
 
 }

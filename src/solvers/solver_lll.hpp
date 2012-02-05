@@ -79,18 +79,21 @@ int solve( Site* s1, double k1,
             qd_real sol_y = determinant(  eq[i].a, -eq[i].c, eq[i].k, 
                                           eq[j].a, -eq[j].c, eq[j].k, 
                                           eq[k].a, -eq[k].c, eq[k].k ) / d ; 
+            if (debug) 
+                std::cout << " solution: " << Point( to_double(sol_x), to_double(sol_y) ) << " t=" << to_double(t) << " k3=" << k3 << " det=" << to_double(d) << "\n";
+            
             slns.push_back( Solution( Point( to_double(sol_x), to_double(sol_y) ), to_double(t), k3 ) ); // kk3 just passes through without any effect!?
             return 1;
         }
     } else {
         std::cout << "WARNING: LLLSolver small determinant! no solutions. d= " << d <<"\n";
-        std::cout << " 0 : " << eq[0].a << " " << eq[0].b << " " << eq[0].c << " " << eq[0].k << "\n";
-        std::cout << " 1 : " << eq[1].a << " " << eq[1].b << " " << eq[1].c << " " << eq[1].k << "\n";
-        std::cout << " 2 : " << eq[2].a << " " << eq[2].b << " " << eq[2].c << " " << eq[2].k << "\n";
-        std::cout << " 0==1? " << (eq[0]==eq[1]) << "\n";
-        std::cout << "da = " << (eq[0].a-eq[1].a) << "\n";
-        std::cout << "db = " << (eq[0].b-eq[1].b) << "\n";
-        std::cout << "dc = " << (eq[0].c-eq[1].c) << "\n";
+        std::cout << " s1 : " << eq[0].a << " " << eq[0].b << " " << eq[0].c << " " << eq[0].k << "\n";
+        std::cout << " s2 : " << eq[1].a << " " << eq[1].b << " " << eq[1].c << " " << eq[1].k << "\n";
+        std::cout << " s3 : " << eq[2].a << " " << eq[2].b << " " << eq[2].c << " " << eq[2].k << "\n";
+        //std::cout << " 0==1? " << (eq[0]==eq[1]) << "\n";
+        //std::cout << "da = " << (eq[0].a-eq[1].a) << "\n";
+        //std::cout << "db = " << (eq[0].b-eq[1].b) << "\n";
+        //std::cout << "dc = " << (eq[0].c-eq[1].c) << "\n";
         
     }
     return 0; // no solution if determinant zero, or t-value negative

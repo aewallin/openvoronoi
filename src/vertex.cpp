@@ -76,6 +76,8 @@ void VoronoiVertex::init() {
     null_face = std::numeric_limits<HEFace>::quiet_NaN();    
     type = NORMAL;
     face = std::numeric_limits<HEFace>::quiet_NaN();  
+    max_error = 0;
+    //solver = PPP;
     //status = UNDECIDED;
 }
 

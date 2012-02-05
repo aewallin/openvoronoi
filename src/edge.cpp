@@ -45,6 +45,7 @@ Point EdgeProps::point(double t, Solution& ) const {
     return point(t);
 }*/
 
+/*
 double EdgeProps::error(Solution& sl) const {
     Point p;
     if (type==PARA_LINELINE) {
@@ -53,10 +54,11 @@ double EdgeProps::error(Solution& sl) const {
         p = point( sl.t );
     }
     return (p-sl.p).norm();
-}
+}*/
 
 // the edge is not parametrized by t-value as normal edges
 // so we need a projection of sl onto the edge instead
+/*
 Point EdgeProps::projection_point(Solution& sl) const {
     assert( type == PARA_LINELINE );
     // edge given by
@@ -68,15 +70,18 @@ Point EdgeProps::projection_point(Solution& sl) const {
     // t = (p-p0).dot(v) / v.dot(v)
     Point p0(x[0],y[0]);
     Point v(x[1],y[1]);
+    std::cout << " edge is from " << p0 << "\n";
+    std::cout << " edge direction: " << v << "\n";
+    
     double t = (sl.p - p0).dot(v) / v.dot(v);
     // clamp to [0,1]
     if ( t>1)
         t=1;
     else if (t<0)
         t=0;
-        
+    std::cout << " projection of solution " << sl.p << " is " << (p0+v*t) << "\n";
     return (p0+v*t);
-}
+}*/
 
 Point EdgeProps::point(double t) const {
     double discr1 =  chop( sq(x[4]+x[5]*t) - sq(x[6]+x[7]*t), 1e-14 );
@@ -266,7 +271,7 @@ void EdgeProps::set_ll_para_parameters(Site* s1, Site* s2) {
         std::cout << " s2->c() = " << s2->c() << "\n";
     }*/
     
-    // find a point on the line s1
+    // find a point (x1,y1) on the line s1
     // ax+by+c=0
     double x1(0),y1(0);
     if ( fabs( s1->a() ) >  fabs( s1->b() ) ) {
@@ -277,7 +282,7 @@ void EdgeProps::set_ll_para_parameters(Site* s1, Site* s2) {
         y1=-s1->c()/s1->b();
     }
     
-    // find a point on the line s2
+    // find a point (x2,y2) on the line s2
     // ax+by+c=0
     double x2(0),y2(0);
     if ( fabs( s2->a() ) >  fabs( s2->b() ) ) {
@@ -287,13 +292,14 @@ void EdgeProps::set_ll_para_parameters(Site* s1, Site* s2) {
         x2=0;
         y2=-s2->c()/s2->b();
     }
+    
     // now e.g. the s2 line is given by
     // p = (x2,y2) + t*(-b2, a)
     // and we can find the projection of (x1,y1) onto s2 as
     // p1 = p2 = p0 + t*v
     Point p1(x1,y1);
     Point p2(x2,y2);
-    Point v(-s2->b(),s2->a());
+    Point v(-s2->b(),s2->a() );
     double t = (p1-p2).dot(v) / v.dot(v);
     Point p1_proj = p2+t*v;
 
@@ -308,9 +314,10 @@ void EdgeProps::set_ll_para_parameters(Site* s1, Site* s2) {
 
     x[0]=  x1;
     x[1]= -s1->b();
-    x[2]=0;x[3]=0;x[4]=0;x[5]=0;x[6]=0;x[7]=0;
     y[0]= y1;
     y[1]= s1->a();
+    
+    x[2]=0;x[3]=0;x[4]=0;x[5]=0;x[6]=0;x[7]=0;
     y[2]=0;y[3]=0;y[4]=0;y[5]=0;y[6]=0;y[7]=0;
 }
 
@@ -328,6 +335,8 @@ void EdgeProps::set_ll_parameters(Site* s1, Site* s2) {  // Held thesis p96
     double alfa2 = ( s2->a()*s1->c()-s1->a()*s2->c() ) / delta;
     double alfa3 = -( s2->b()-s1->b() ) / delta;
     double alfa4 = -( s1->a()-s2->a() ) / delta;
+    //double alfa3 = -( s2->b()*s1->k()-s1->b()*s2->k() ) / delta;
+    //double alfa4 = -( s1->a()*s2->k()-s2->a()*s1->k() ) / delta;
     
     // point (alfa1,alfa2) is the intersection point between the line-segments
     // vector (-alfa3,-alfa4) is the direction/tangent of the bisector

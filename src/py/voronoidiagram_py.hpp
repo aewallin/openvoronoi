@@ -116,6 +116,7 @@ public:
                 pd.append( g[v].status );
                 pd.append( g[v].index );
                 pd.append( g[v].type );
+                pd.append( g[v].max_error );
                 plist.append(pd);
             }
         }
@@ -129,6 +130,7 @@ public:
                 boost::python::list pd;
                 pd.append( g[v].position );
                 pd.append( g[v].dist() );
+                
                 plist.append(pd);
             }
         }
@@ -146,10 +148,10 @@ public:
                 // these edge-types are drawn as a single line from source to target.
                 if ( (g[edge].type == SEPARATOR) || (g[edge].type == LINE) || 
                      (g[edge].type == LINESITE) || (g[edge].type == OUTEDGE) || 
-                     (g[edge].type == LINELINE)  || (g[edge].type == PARA_LINELINE)) {
+                     (g[edge].type == LINELINE)  || (g[edge].type == PARA_LINELINE)) { // 
                     point_list.append( g[v1].position );
                     point_list.append( g[v2].position );
-                } else if ( g[edge].type == PARABOLA ) { // these edge-types are drawn as polylines with edge_points number of points
+                } else if ( g[edge].type == PARABOLA  ) { // these edge-types are drawn as polylines with edge_points number of points
                     double t_src = g[v1].dist();
                     double t_trg = g[v2].dist();
                     double t_min = std::min(t_src,t_trg);

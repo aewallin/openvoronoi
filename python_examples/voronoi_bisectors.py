@@ -527,7 +527,7 @@ if __name__ == "__main__":
     
     #drawLinePointTest() # point-line bisector is a PARABOLA
     
-    #drawLineLineTest() # line-line bisector is LINE(LINE)
+    drawLineLineTest() # line-line bisector is LINE(LINE)
     
-    drawSeparatorSolver1(4.3)
+    #drawSeparatorSolver1(4.3)
     #drawSeparatorSolver2(4.3)

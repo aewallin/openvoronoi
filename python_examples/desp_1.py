@@ -48,27 +48,33 @@ if __name__ == "__main__":
     vod.drawFarCircle()
 
     
-    vod.textScale = 0.02
+    vod.textScale = 0.0002
     vod.vertexRadius = 0.0031
     vod.drawVertices=0
     vod.drawVertexIndex=1
     vod.drawGenerators=0
-    vod.offsetEdges = 0
-    vd.setEdgeOffset(0.05)
+    vod.offsetEdges = 1
+    vd.setEdgeOffset(0.0001)
     
     
     linesegs = 1 # switch to turn on/off line-segments
     
     segs = []
     #ovd.Point(1,1)
-    eps=0.9
-    p1=ovd.Point(-0.1,-0.2)
-    p2=ovd.Point(0.2,0.1)
-    p3=ovd.Point(0.4,0.2)
-    p4=ovd.Point(0.6,0.6)
-    p5=ovd.Point(-0.6,0.3)
+    #eps=0.9
+    p1=ovd.Point(0.200412, 0.406533) # l1  l2
+    p2=ovd.Point(0.196948, 0.406213) # l1
+    p3=ovd.Point(0.201566, 0.40664)  #     l2    l3
+    p4=ovd.Point(0.204032, 0.405097) #           l3
+#    p5=ovd.Point(-0.6,0.3)
+    
+    """
+    LineSite: (0.200412, 0.406533) - (0.196948, 0.406213)
+    LineSite: (0.201566, 0.40664) - (0.200412, 0.406533)
+    LineSite: (0.204032, 0.405097) - (0.201566, 0.40664)
+    """
 
-    pts = [p1,p2,p3,p4,p5]
+    pts = [p1,p2,p3,p4]
     
     #t_after = time.time()
     #print ".done in {0:.3f} s.".format( t_after-t_before )
@@ -76,8 +82,7 @@ if __name__ == "__main__":
     id_list = []
     m=0
     t_before = time.time()
-    for p in pts:
-        
+    for p in pts:        
         id_list.append( vd.addVertexSite( p ) )
         #print m," added vertex", seg_id[0]
         m=m+1
@@ -102,19 +107,19 @@ if __name__ == "__main__":
     vd.check()
     
     #vd.debug_on()
-    vd.addLineSite( id_list[1], id_list[2])
+    vd.addLineSite( id_list[2], id_list[0])
     vd.check()
     
-    vd.addLineSite( id_list[2], id_list[3])
+    vd.addLineSite( id_list[3], id_list[2])
     vd.check()
     
     #vd.debug_on()
     
-    vd.addLineSite( id_list[3], id_list[4])
-    vd.check()
+    #vd.addLineSite( id_list[3], id_list[4])
+    #vd.check()
     
-    vd.addLineSite( id_list[4], id_list[0])
-    vd.check()
+    #vd.addLineSite( id_list[4], id_list[0])
+    #vd.check()
     
     t_after = time.time()
     line_time = t_after-t_before

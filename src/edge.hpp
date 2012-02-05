@@ -73,7 +73,7 @@ public:
     bool sign; // choose either +/- in front of sqrt()
     
     Point point(double t) const; 
-    double error(Solution& sl) const;
+    //double error(Solution& sl) const;
     double minimum_t( Site* s1, Site* s2);
     void copy_parameters(EdgeProps& other);   
     void set_parameters(Site* s1, Site* s2, bool sig);
@@ -82,7 +82,7 @@ public:
     bool valid; // for filtering graph
     bool inserted_direction; // true if linesite-edge inserted in this direction
 private:
-    Point projection_point(Solution& sl) const;
+    //Point projection_point(Solution& sl) const;
     double minimum_pp_t(Site* s1, Site* s2);
     double minimum_pl_t(Site* s1, Site* s2);
 

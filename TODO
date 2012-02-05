@@ -50,7 +50,11 @@ Offset
 - provide an alternative zigzag-pocketing toolpath (see optimization papers by Held/Arkin)
 - Look at HSM-literature and try to implement one or many HSM-strategies.
   See Held's slides www.cosy.sbg.ac.at/~held/teaching/seminar/seminar_2010-11/hsm.pdf
-  
+- There is a bug in Offset which causes erratic behaviour if the offset-distance is chosen
+  so that it exactly matches the offset-distance of a LINELINE or PARA_LINELINE edge (these edges 
+  cannot sensibly be parametrized with the t-value). The correct behavior is probably not to output an 
+  offset loop at all for this t-value.
+
 Medial-Axis
 - is the current medial-axis-walk a sound machining strategy? can it be improved.
 - fix medial-axis-walk case where we don't find a start-edge if the medial axis is e.g. O-shaped
@@ -85,7 +89,8 @@ Packaging/Building etc
 - build(and install on github?) doxygen html documentation
 - Windows package/installer with cmake/NSIS?
 - automate source-package building from github and periodic upload to launchpad (?)
-
+- src/test/data now has 3Mb of data-files for tests. These could/should(?) be in a separate debian package "openvoronoi-test-data"
+  so that the size of the "openvoronoi" package is as small as possible (for non developers who do not need to run tests)
 
 DONE:
 - 2012-02-01 chain_5_collinear2.py exposes a case where a desperate solution is returned, because we fail to detect this

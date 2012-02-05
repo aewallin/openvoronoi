@@ -182,7 +182,7 @@ if __name__ == "__main__":
     segs5 = translate(segs5, xt*dx, -0.32*dx)
     segs5 = modify_segments(segs5)
     
-    vd = ovd.VoronoiDiagram(far,120)
+    vd = ovd.VoronoiDiagram(far,400)
     print ovd.version()
     
     vod = ovdvtk.VD(myscreen,vd,float(1), textscale=0.01, vertexradius=0.003)

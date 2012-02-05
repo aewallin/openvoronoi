@@ -202,6 +202,15 @@ if __name__ == "__main__":
     #for v in vd.getFaceVertices(14705):
     #    print " drawing ", v
     #    vod.drawVertexIdx(v)
+    
+    err = vd.getStat()
+    #print err 
+    print "got errorstats for ",len(err)," points"
+    if len(err)>1:
+        minerr = min(err)
+        maxerr = max(err)
+        print "min error= ",minerr
+        print "max error= ",maxerr
         
     print "PYTHON All DONE."
 

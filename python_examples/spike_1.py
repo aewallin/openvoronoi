@@ -141,7 +141,7 @@ if __name__ == "__main__":
     
     # 5 create new vertices
     # 6 add startpoint pos separator
-    # 7 add startoiubt neg separator
+    # 7 add startpoint neg separator
     # 8 add end-point pos separator
     # 9 add end-point neg separator
     # 10 add new edges

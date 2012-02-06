@@ -65,7 +65,7 @@ public:
 int solve( Site* s1, double k1, 
            Site* s2, double k2, 
            Site* s3, double k3, std::vector<Solution>& slns ) {
-    //if (debug)
+    if (debug)
         std::cout << "LLLPARASolver.\n";    
     assert( s1->isLine() && s2->isLine() && s3->isLine() );
     Eq<double> bis;

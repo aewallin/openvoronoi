@@ -21,7 +21,7 @@
 
 #include <boost/python.hpp>
 
-#include "medial_axis.hpp"
+#include "medial_axis_walk.hpp"
 #include "voronoidiagram.hpp"
 
 namespace ovd

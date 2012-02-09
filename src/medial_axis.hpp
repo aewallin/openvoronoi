@@ -29,6 +29,9 @@
 namespace ovd
 {
 
+/// \brief From a voronoi-diagram, generate offset curve(s).
+/// argument dp_thr: dot-product threshold used to decide whether the segments
+/// that connect to a given Edge are nearly parallel
 // (approximate) medial-axis filter
 // marks the valid-property true for edges belonging to the medial axis
 // and false for other edges.
@@ -119,182 +122,11 @@ private:
         }
         return endp;
     }
-    
 
-    //HEGraph& g;
     double _dot_product_threshold;
 };
 
-/// \brief From a voronoi-diagram, generate offset curve(s).
-/// argument dp_thr: dot-product threshold used to decide whether the segments
-/// that connect to a given Edge are nearly parallel
-/*
-class MedialAxis {
-public:
-    MedialAxis(HEGraph& gi, double dp_thr=0.8): g(gi) {
-        medial_filter flt(g, dp_thr);
-        g.filter_graph(flt);
-    }
-private:
-    MedialAxis(); // don't use.
-    HEGraph& g; // original graph
-};*/
-
-
-/// \brief Medial-axis point and associated clearance-disc radius.
-struct MedialPoint {
-    Point p;
-    double clearance_radius;
-    MedialPoint(Point pi, double r): p(pi), clearance_radius(r) {}
-};
-typedef std::list<MedialPoint> MedialPointList;
-typedef std::list<MedialPointList> MedialChain;
-typedef std::list<MedialChain> MedialChainList;
-
-// FIXME: MedialAxisWalk could probably be optimized to minimize rapid-traverses
-
-/// \brief Walk along the medial-axis edges of a voronoi-diagram.
-/// When we want a toolpath along the medial axis we use this class
-/// to walk along the "valid" edges which are left in the diagram.
-///
-/// argument edge_pts: number of points to subdivide parabolas.
-///
-/// Algorithm:
-/// first find one valid edge that has a degree-1 vertex (i.e. a suitable start point for the path)
-/// - if there's only one choice for the next edge, go there
-/// - if there are two choices, take one of the choices
-/// when done, find another valid start-edge.
-class MedialAxisWalk {
-public:
-    MedialAxisWalk(HEGraph& gi, int edge_pts = 20): g(gi), _edge_points(edge_pts) {}
-
-    void do_walk() {
-        out = MedialChainList();
-        HEEdge start;
-        while( find_start_edge(start) ) { // find a suitable start-edge
-            medial_axis_walk(start); // from the start-edge, walk as far as possible
-        }
-    }
-
-    MedialChainList walk() {
-        do_walk();
-        return out;
-    }
-    
-    // start at source of Edge start, and walk as far as possible
-    void medial_axis_walk(HEEdge start) {
-        // begin chain with start.
-        HEEdge next = start; // why does = HEEdge() cause Wuninitialized ?
-        MedialChain chain;
-        append_edge(chain, start);
-        set_invalid(start);
-        while (next_edge(start, next)  ) {
-            assert( g.target( start ) == g.source( next ) );             
-            append_edge(chain, next);
-            start=next; 
-            set_invalid(start);
-        }
-        // end chain
-        out.push_back( chain );
-    }
-    
-    // add the given edge to the current list of edges.
-    // for line-edges we add only two endpoints
-    // for parabolic edges we add many points
-    void append_edge(MedialChain& chain, HEEdge edge)  {
-        MedialPointList point_list; // the endpoints of each edge
-        HEVertex v1 = g.source( edge );
-        HEVertex v2 = g.target( edge );
-        // these edge-types are drawn as a single line from source to target.
-        if (   (g[edge].type == LINELINE)  || (g[edge].type == PARA_LINELINE)) {
-            MedialPoint pt1( g[v1].position, g[v1].dist() );
-            MedialPoint pt2( g[v2].position, g[v2].dist() );
-            point_list.push_back(pt1);
-            point_list.push_back(pt2);
-        } else if ( (g[edge].type == PARABOLA) || (g[edge].type == LINE) ) { // these edge-types are drawn as polylines with _edge_points number of points
-            double t_src = g[v1].dist();
-            double t_trg = g[v2].dist();
-            double t_min = std::min(t_src,t_trg);
-            double t_max = std::max(t_src,t_trg);
-            //_edge_points: number of points to subdivide parabolas.
-            
-            for (int n=0;n< _edge_points;n++) {
-                double t(0);
-                if (t_src<=t_trg) // increasing t-value
-                    t = t_min + ((t_max-t_min)/numeric::sq(_edge_points-1))*numeric::sq(n); // NOTE: quadratic t-dependece. More points at smaller t.
-                else if (t_trg<t_src) { // decreasing t-value
-                    int m = _edge_points-1-n; // m goes from (N-1)...0   as n goes from 0...(N-1)
-                    t = t_min + ((t_max-t_min)/numeric::sq(_edge_points-1))*numeric::sq(m);
-                }
-                Point p = g[edge].point(t);
-                MedialPoint pt( p, t );
-                point_list.push_back(pt);
-            }
-        }
-        chain.push_back( point_list );
-    }
-    // we are at target(e). find the next suitable edge.
-    // return true if a next-edge was found, false otherwise.
-    bool next_edge(HEEdge e, HEEdge& next) {
-        HEVertex trg = g.target(e);
-        EdgeVector out_edges = g.out_edges(trg);
-        std::vector<HEEdge> valid_edges;
-        BOOST_FOREACH( HEEdge oe, out_edges) {
-            if ( valid_next_edge(oe) ) {
-                valid_edges.push_back(oe);
-            }
-        }
-        if (!valid_edges.empty() ) {
-            next = valid_edges[0]; // return the first valid one
-            return true;
-        }
-        return false; 
-    }
-    
-    void set_invalid(HEEdge e) {
-        g[e].valid = false;
-        if (g[e].twin != HEEdge()) {
-            g[ g[e].twin ].valid = false;
-        }
-    }
-    // loop through all edges and find an edge where we can start
-    // valid edges have a source-vertex with exactly one valid out-edge.
-    bool find_start_edge(HEEdge& start) {
-        BOOST_FOREACH(HEEdge e, g.edges() ) { 
-            if ( valid_next_edge(e) ) {
-                if (degree_one_source(e)) {
-                    start = e;
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-    // we can follow an edge if it is valid, and not a LINESITE or NULLEDGE
-    bool valid_next_edge(HEEdge e) {
-        return ( (g[e].type != LINESITE) && (g[e].type !=NULLEDGE) && (g[e].valid) );
-    }
-    // check if the source of the edge is a valid starting-point for a path
-    bool degree_one_source(HEEdge e) {
-        HEVertex src = g.source(e);
-        EdgeVector out_edges = g.out_edges(src);
-        int count(0);
-        BOOST_FOREACH( HEEdge oe, out_edges) {
-            if ( valid_next_edge(oe) ) {
-                count++;
-            }
-        }
-        return (count==1);
-    }
-protected:
-    MedialChainList out;
-private:
-    MedialAxisWalk(); // don't use.
-    HEGraph& g; // original graph
-    int _edge_points; // number of points to subdivide parabolas.
-
-};
 
 } // end namespace
 
-// end file medial_axis.hpp
+// end file 

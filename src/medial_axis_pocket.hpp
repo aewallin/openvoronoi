@@ -133,6 +133,7 @@ public:
             }
         }
         std::cout << " start edge is: "; g.print_edge(current_edge);
+        new_branch=false;
         return out;
     }
     
@@ -141,7 +142,7 @@ public:
         boost::python::list out;
         if ( current_edge == HEEdge() ) {
             std::cout << "nxt_mic() end of operation. Nothing to do.\n";
-            return out;
+            return boost::python::list();
         }
         // find a point on current-edge so that we get the desired 
         // cut-width
@@ -159,40 +160,76 @@ public:
             std::cout << " searching on the current ege "; g.print_edge(current_edge);
             // find a point on the current edge
             double next_radius = find_next_radius();
-            std::cout << " next_radius = " << next_radius << "\n";
-            
-            out.append( g[current_edge].point(next_radius) );
-            out.append( next_radius );
-            current_radius = next_radius;
-            current_center = g[current_edge].point(next_radius);
-            return out;
+            return output_next_mic(next_radius, new_branch);
         } else {
             // mark edge DONE. this means we have machined all MICs on this edge.
             edge_data[current_edge].done = true;
             edge_data[ g[current_edge].twin ].done = true;
-            
-            std::cout << "Finding new edge !\n";// g.print_edge(current_edge);
-             // move to the next edge
-            current_edge = find_next_edge();
+            std::cout << "Finding new edge !\n";
+            current_edge = find_next_edge();              // move to the next edge
             if ( current_edge == HEEdge() ) { // invalid edge marks end of operation
                 std::cout << "nxt_mic() end of operation.\n";
-                //exit(-1);
                 return boost::python::list();
             }
-            //current_radius = g[ g.source(current_edge) ].dist();
-            
             double next_radius = find_next_radius();
-            std::cout << " next_radius = " << next_radius << "\n";
-            
-            out.append( g[current_edge].point(next_radius) );
-            out.append( next_radius );
-            current_radius = next_radius;
-            current_center = g[current_edge].point(next_radius);
-           
-            //exit(-1);
-            return out;
+            if (new_branch) {
+                new_branch=false;
+                return output_next_mic(next_radius, true);
+            } else {
+                return output_next_mic(next_radius, false);
+            }
+            //return out;
         }
         
+    }
+    boost::python::list output_next_mic(double next_radius, bool branch) {
+        boost::python::list out;
+        std::cout << " next_radius = " << next_radius << "\n";
+        out.append( g[current_edge].point(next_radius) );
+        out.append( next_radius );
+        Point c1 = current_center;
+        Point c2 = g[current_edge].point(next_radius);
+        double r1 = current_radius;
+        double r2 = next_radius;
+        current_radius = next_radius;
+        current_center = g[current_edge].point(next_radius);
+        
+        // find the bi-tangents and return them too.
+        // see voronoi_bisectors.py
+        double detM = c1.x*c2.y - c2.x*c1.y;
+        double m = ( c1.y-c2.y ) / detM;
+        double p = ( c2.x-c1.x ) / detM;
+        double n = ( c2.y*r1 - c1.y*r2 ) / detM;
+        double q = ( c1.x*r2 - c2.x*r1 ) / detM;
+        std::vector<double> roots = numeric::quadratic_roots( m*m+p*p, 2*(m*n+p*q),  n*n+q*q-1);
+        BOOST_FOREACH(double r, roots) {
+            std::cout << " root " << r << "\n";
+        }
+        // bi-tangent lines are now
+        // ax +  by + c = 0
+        // with
+        // C = root
+        // A = m*C+n
+        // B = p*C+q
+        double lc1 = roots[0];
+        double a1 = m*lc1+n;
+        double b1 = p*lc1+q;
+        double lc2 = roots[1];
+        double a2 = m*lc2+n;
+        double b2 = p*lc2+q;
+        // the bi-tangent points are given by
+        Point tang1 = c1 - r1*Point( a1, b1 );
+        Point tang2 = c1 - r1*Point( a2, b2 );
+        Point tang3 = c2 - r2*Point( a1, b1 );
+        Point tang4 = c2 - r2*Point( a2, b2 );
+        out.append(tang1);
+        out.append(tang2);
+        out.append(tang3);
+        out.append(tang4);
+        out.append(c1);
+        out.append(r1);
+        out.append(branch);
+        return out;
     }
     
     HEEdge find_next_branch() {
@@ -205,6 +242,7 @@ public:
             unvisited.pop();
             current_center = out.current_center;
             current_radius = out.current_radius;
+            new_branch = true;
             return out.next_edge;
         }
     }
@@ -279,6 +317,7 @@ private:
     double current_radius;
     Point current_center;
     double max_width;
+    bool new_branch;
 };
 
 } // end namespace

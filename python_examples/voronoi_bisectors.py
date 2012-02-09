@@ -527,6 +527,8 @@ def drawSeparatorSolver2(px=10,py=20):
     myscreen.render()
     myscreen.iren.Start()
 
+# solve: a x^2 + b x + c = 0
+# copied from c-code in numeric.hpp
 def quadratic_roots( a,  b,  c):
     roots = []
     if ((a == 0) and (b == 0)):

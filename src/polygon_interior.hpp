@@ -22,6 +22,7 @@
 #include <string>
 #include <iostream>
 
+#include "filter.hpp"
 #include "graph.hpp"
 #include "site.hpp"
 
@@ -34,64 +35,66 @@ namespace ovd
 //
 // a polygon/pocket boundary shoud be specified in CW order
 // islands within the polygon should be specified in CCW order
-struct interior_filter {
-    interior_filter(HEGraph& gi, bool side=true) : g(gi), _side(side) { }
+class polygon_interior_filter : public Filter {
+public:
+    polygon_interior_filter( bool side=true) : _side(side) { }
     
     // determine if an edge is valid or not
-    bool operator()(const HEEdge& e) const {
-        if (g[e].type == LINESITE || g[e].type == NULLEDGE) 
+    virtual bool operator()(const HEEdge& e) const {
+        if ( (*g)[e].type == LINESITE || (*g)[e].type == NULLEDGE) 
             return true;
         
         // if polygon inserted ccw  as (id1->id2), then the linesite should occur on valid faces as id1->id2
         // for islands and the outside the edge is id2->id1
-        HEFace f = g[e].face;
-        Site* s = g[f].site;
+        HEFace f = (*g)[e].face;
+        Site* s = (*g)[f].site;
         if ( s->isLine() && linesite_ccw(f) ) 
             return true;
         else if ( s->isPoint() ) {
             // we need to search for an adjacent linesite. (? can we have a situation where this fails?)
             HEEdge linetwin = find_adjacent_linesite(f);
-            HEEdge twin = g[linetwin].twin;
-            HEFace twin_face = g[twin].face;
+            HEEdge twin = (*g)[linetwin].twin;
+            HEFace twin_face = (*g)[twin].face;
             if (linesite_ccw(twin_face))
                 return true;
         } 
         return false;
     }
-    HEEdge find_adjacent_linesite( HEFace f ) const {
-        HEEdge current = g[f].edge;
+private:
+    HEEdge find_adjacent_linesite(  HEFace f ) const {
+        HEEdge current = (*g)[f].edge;
         HEEdge start = current;
         
         do {
-            HEEdge twin = g[current].twin;
+            HEEdge twin = (*g)[current].twin;
             if (twin != HEEdge() ) {
-                HEFace twf = g[twin].face;
-                if ( g[twf].site->isLine() )
+                HEFace twf = (*g)[twin].face;
+                if ( (*g)[twf].site->isLine() )
                     return current;
             }
-            current = g[current].next;
+            current = (*g)[current].next;
         } while(current!=start);
         return HEEdge();
     }
         
-    bool linesite_ccw( HEFace f ) const {
-        HEEdge current = g[f].edge;
+    bool linesite_ccw(  HEFace f ) const {
+        HEEdge current = (*g)[f].edge;
         HEEdge start = current;
         do {
-            if ( (_side && g[current].type == LINESITE && g[current].inserted_direction) ||
-                  (!_side && g[current].type == LINESITE && !g[current].inserted_direction)  )
+            if ( (_side && (*g)[current].type == LINESITE && (*g)[current].inserted_direction) ||
+                  (!_side && (*g)[current].type == LINESITE && !(*g)[current].inserted_direction)  )
                 return true;
                 
-            current = g[current].next;
+            current = (*g)[current].next;
         } while(current!=start);
         return false;
     }
     
-    HEGraph& g;
     bool _side;
 };
 
-/// \brief From a voronoi-diagram, generate offset curve(s).
+
+/*
 class PolygonInterior {
 public:
     PolygonInterior(HEGraph& gi, bool side): g(gi) {
@@ -103,7 +106,7 @@ private:
     HEGraph& g; // original graph
     
 };
-
+*/
 
 } // end namespace
 

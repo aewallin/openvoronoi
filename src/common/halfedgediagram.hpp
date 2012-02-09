@@ -595,19 +595,6 @@ std::pair<Edge,Edge> find_next_prev(Face f, Vertex endp) {
     return std::make_pair(next_edge, prev_edge);
 }
 
-template <class Filter>
-void filter_graph(Filter f) {
-    BOOST_FOREACH(Edge e, boost::edges(g)) {
-        if (!f(e))
-            g[e].valid = false;
-    }
-}
-
-void filter_reset() {
-    BOOST_FOREACH(Edge e, boost::edges(g)) {
-        g[e].valid = true;
-    }
-}
 
 void print_faces() {
     for( Face f=0;f<g.num_faces();f++) {

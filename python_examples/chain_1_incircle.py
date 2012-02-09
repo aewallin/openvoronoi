@@ -53,7 +53,7 @@ if __name__ == "__main__":
     vod.drawVertices=0
     vod.drawVertexIndex=1
     vod.drawGenerators=1
-    vod.offsetEdges = 1
+    vod.offsetEdges = 0
     vd.setEdgeOffset(0.05)
     
     
@@ -166,6 +166,9 @@ if __name__ == "__main__":
     print "num SPLIT vertices: ",vd.numSplitVertices() 
     """
     #calctime = t_after-t_before
+    
+    pi = ovd.PolygonInterior(True)
+    vd.filter_graph(pi)
     
     vod.setAll()
         

@@ -26,6 +26,7 @@
 #include "common/point.hpp"
 #include "graph.hpp"
 #include "vertex_positioner.hpp"
+#include "filter.hpp"
 
 namespace ovd
 {
@@ -98,7 +99,21 @@ public:
     void debug_on() {debug=true;}
     bool check();
     HEGraph& get_graph_reference() {return g;}
-    void filter_reset() {g.filter_reset();}
+    
+    void filter( Filter* flt) {
+        flt->set_graph(&g);
+        BOOST_FOREACH(HEEdge e, g.edges() ) {
+            if ( ! (*flt)(e) )
+                g[e].valid = false;
+        }
+    }
+    
+    void filter_reset() { // this sets valid=true for all edges 
+        BOOST_FOREACH(HEEdge e, g.edges() ) {
+            g[e].valid = true;
+        }
+    }
+
 protected:
     /// initialize the diagram with three generators
     void initialize();

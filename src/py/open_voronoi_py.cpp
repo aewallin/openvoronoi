@@ -23,8 +23,8 @@
 
 #include "common/point.hpp"
 #include "face_offset_py.hpp"
-#include "island_filter.hpp"
-#include "medial_axis_walk_py.hpp"
+//#include "island_filter.hpp"
+//#include "medial_axis_walk_py.hpp"
 #include "offset_py.hpp"
 #include "polygon_interior.hpp"
 #include "utility/vd2svg.hpp"
@@ -75,6 +75,7 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         .staticmethod("reset_vertex_count")
         .def("getStat", &VoronoiDiagram_py::getStat)
         .def("filterReset", &VoronoiDiagram_py::filter_reset)
+        .def("filter_graph", &VoronoiDiagram_py::filter) // "filter" is a built-in function in Python!
         .def("getFaceStats", &VoronoiDiagram_py::getFaceStats)
         .def("getGraph", &VoronoiDiagram_py::get_graph_reference, bp::return_value_policy<bp::reference_existing_object>())
     ;
@@ -139,9 +140,13 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         .def("offset", &FaceOffset_py::offset_py )
         .def("str", &FaceOffset_py::print )
     ; 
-    bp::class_<PolygonInterior, boost::noncopyable >("PolygonInterior", bp::no_init)
-        .def(bp::init<HEGraph&, bool>())
+    
+    bp::class_< Filter >(" Filter_base", bp::no_init)
     ;
+    bp::class_<polygon_interior_filter, bp::bases<Filter> >("PolygonInterior")
+        .def(bp::init<bool>())
+    ;
+    /*
     bp::class_<MedialAxis, boost::noncopyable >("MedialAxis", bp::no_init)
         .def(bp::init<HEGraph&>())
         .def(bp::init<HEGraph&, double>())
@@ -153,5 +158,5 @@ BOOST_PYTHON_MODULE(openvoronoi) {
     ;
     bp::class_<IslandFilter, boost::noncopyable >("IslandFilter", bp::no_init)
         .def(bp::init<HEGraph&>())
-    ; 
+    ; */
 }

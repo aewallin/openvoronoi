@@ -343,7 +343,8 @@ if __name__ == "__main__":
     print "all sites inserted. "
     print "VD check: ", vd.check()
     
-    ovd.PolygonInterior( vd.getGraph(), True )
+    pi = ovd.PolygonInterior(  True )
+    vd.filter_graph(pi)
     ovd.MedialAxis( vd.getGraph() )
     
     vod.setVDText2(times)

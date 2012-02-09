@@ -134,8 +134,8 @@ if __name__ == "__main__":
     #print ofs
     #drawOffsets(myscreen, ofs)
     
-    pi = ovd.PolygonInterior( vd.getGraph(), True )
-    
+    pi = ovd.PolygonInterior(  True )
+    vd.filter_graph(pi)
     
     of = ovd.Offset( vd.getGraph() ) # pass the created graph to the Offset class
     

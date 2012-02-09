@@ -193,8 +193,10 @@ if __name__ == "__main__":
     #vd.check()
     vod.setVDText2(times)
     
-    ovd.PolygonInterior( vd.getGraph() , True )
-    ovd.MedialAxis( vd.getGraph(), 0.90 )
+    pi = ovd.PolygonInterior(  True )
+    vd.filter_graph(pi)
+    ma = ovd.MedialAxis( 0.90 )
+    vd.filter_graph(ma)
     
     vod.setAll()
     print "PYTHON All DONE."

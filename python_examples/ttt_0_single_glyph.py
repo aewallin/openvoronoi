@@ -172,7 +172,7 @@ if __name__ == "__main__":
     vod.drawVertices=0
     vod.drawVertexIndex=0
     vod.drawGenerators=0
-    vod.offsetEdges = 1
+    vod.offsetEdges = 0
     vod.drawNullEdges = 1
     vd.setEdgeOffset(0.0001)
     
@@ -185,8 +185,10 @@ if __name__ == "__main__":
     #vd.check()
     vod.setVDText2(times)
     
-    ovd.PolygonInterior( vd.getGraph() , True )
-    ovd.MedialAxis( vd.getGraph() )
+    pi = ovd.PolygonInterior(  True )
+    vd.filter_graph(pi)
+    ma = ovd.MedialAxis()
+    vd.filter_graph(ma)
     
     vod.setAll()
     print "PYTHON All DONE."

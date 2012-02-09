@@ -339,8 +339,8 @@ if __name__ == "__main__":
     
     #ovd.PolygonInterior( vd.getGraph() , True )
     #ovd.MedialAxis( vd.getGraph() )
-    ovd.PolygonInterior( vd.getGraph(), False )
-
+    pi_filt = ovd.PolygonInterior(  False )
+    vd.filter_graph(pi_filt)
     
     of = ovd.Offset( vd.getGraph() ) # pass the created graph to the Offset class
     ofs_list=[]
@@ -363,7 +363,8 @@ if __name__ == "__main__":
     myscreen.addActor(oftext)
     
     # turn off vd
-    ovd.PolygonInterior( vd.getGraph(), True )
+    pi_filt = ovd.PolygonInterior(  True )
+    vd.filter_graph(pi_filt)
     
     vod.setVDText2(times)
     vod.setAll()

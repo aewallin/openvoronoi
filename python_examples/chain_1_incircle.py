@@ -167,10 +167,10 @@ if __name__ == "__main__":
     """
     #calctime = t_after-t_before
     
-    pi = ovd.PolygonInterior(False)
-    vd.filter_graph(pi)
-    pi = ovd.IslandFilter()
-    vd.filter_graph(pi)
+    #pi = ovd.PolygonInterior(False)
+    #vd.filter_graph(pi)
+    #pi = ovd.IslandFilter()
+    #vd.filter_graph(pi)
     
     vod.setAll()
         

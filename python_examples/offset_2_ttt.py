@@ -343,7 +343,8 @@ if __name__ == "__main__":
     print "all sites inserted. "
     print "VD check: ", vd.check()
     
-    pi = ovd.PolygonInterior( vd.getGraph(), False )
+    pi = ovd.PolygonInterior( False )
+    vd.filter_graph(pi)
     #pi.str()
     
     of = ovd.Offset( vd.getGraph() ) # pass the created graph to the Offset class
@@ -370,7 +371,8 @@ if __name__ == "__main__":
     myscreen.addActor(oftext)
 
     # turn off the whole VD so we can more clearly see the offsets
-    ovd.PolygonInterior( vd.getGraph(), True )
+    pi = ovd.PolygonInterior(  True )
+    vd.filter_graph(pi)
     
     vod.setVDText2(times)
     vod.setAll()

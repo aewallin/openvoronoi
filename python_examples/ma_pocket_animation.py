@@ -19,10 +19,10 @@ if __name__ == "__main__":
     #w=2500
     #h=1500
     
-    #w=1920
-    #h=1080
-    w=1024
-    h=1024
+    w=1920
+    h=1080
+    #w=1024
+    #h=1024
     myscreen = ovdvtk.VTKScreen(width=w, height=h) 
     ovdvtk.drawOCLtext(myscreen, rev_text=ovd.version() )
     
@@ -38,11 +38,11 @@ if __name__ == "__main__":
     random.seed(42)
     far = 1
     camPos = far
-    zmult = 3
+    zmult = 1.8
     # camPos/float(1000)
     myscreen.camera.SetPosition(0, -camPos/float(1000), zmult*camPos) 
     myscreen.camera.SetClippingRange(-(zmult+1)*camPos,(zmult+1)*camPos)
-    myscreen.camera.SetFocalPoint(0.0, 0, 0)
+    myscreen.camera.SetFocalPoint(0.0, 0.22, 0)
     
     vd = ovd.VoronoiDiagram(far,120)
     print ovd.version()
@@ -55,7 +55,7 @@ if __name__ == "__main__":
     vod.textScale = 0.02
     vod.vertexRadius = 0.0031
     vod.drawVertices=0
-    vod.drawVertexIndex=1
+    vod.drawVertexIndex=0
     vod.drawGenerators=0
     vod.offsetEdges = 0
     vd.setEdgeOffset(0.05)
@@ -88,35 +88,16 @@ if __name__ == "__main__":
    
     t_after = time.time()
     times.append( t_after-t_before )
-    #exit()
     
-    #print "   ",2*Nmax," point-sites sites took {0:.3f}".format(times[0])," seconds, {0:.2f}".format( 1e6*float( times[0] )/(float(2*Nmax)*float(math.log10(2*Nmax))) ) ,"us/n*log(n)"
     print "all point sites inserted. "
     vd.check()
     
-    #nsegs = Nmax
-    #nsegs = 5 #Nmax
-    #n=1
     t_before = time.time()
     
-    #vd.debug_on()
     vd.addLineSite( id_list[0], id_list[1])
-    
-    
-    vd.check()
-    
-    #vd.debug_on()
     vd.addLineSite( id_list[1], id_list[2])
-    vd.check()
-    
     vd.addLineSite( id_list[2], id_list[3])
-    vd.check()
-    
-    #vd.debug_on()
-    
     vd.addLineSite( id_list[3], id_list[4])
-    vd.check()
-    
     vd.addLineSite( id_list[4], id_list[0])
     vd.check()
     
@@ -148,20 +129,6 @@ if __name__ == "__main__":
             drawCircle( myscreen, mic[0], mic[1] , ovdvtk.green )
     print "mic done."
     vod.setVDText2(times)
-    
-    err = vd.getStat()
-    #print err 
-    """
-    print "got errorstats for ",len(err)," points"
-    if len(err)>1:
-        minerr = min(err)
-        maxerr = max(err)
-        print "min error= ",minerr
-        print "max error= ",maxerr
-    
-    print "num vertices: ",vd.numVertices() 
-    print "num SPLIT vertices: ",vd.numSplitVertices() 
-    """
     
     calctime = t_after-t_before
     

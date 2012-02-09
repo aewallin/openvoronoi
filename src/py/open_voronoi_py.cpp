@@ -31,9 +31,9 @@
 #include "version.hpp"
 
 // filters:
-#include "polygon_interior.hpp"
+#include "polygon_interior_filter.hpp"
 #include "island_filter.hpp"
-#include "medial_axis.hpp"
+#include "medial_axis_filter.hpp"
 
 /*
  *  Boost::Python wrapping of voronoi diagram and related classes.

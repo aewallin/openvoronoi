@@ -2,10 +2,10 @@
 #include <string>
 #include <iostream>
 
-#include <openvoronoi/medial_axis.hpp>
+#include <openvoronoi/medial_axis_filter.hpp>
 #include <openvoronoi/medial_axis_walk.hpp>
 #include <openvoronoi/voronoidiagram.hpp>
-#include <openvoronoi/polygon_interior.hpp>
+#include <openvoronoi/polygon_interior_filter.hpp>
 #include <openvoronoi/utility/vd2svg.hpp>
 #include <openvoronoi/version.hpp>
 

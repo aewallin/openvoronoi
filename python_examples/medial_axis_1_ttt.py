@@ -345,7 +345,8 @@ if __name__ == "__main__":
     
     pi = ovd.PolygonInterior(  True )
     vd.filter_graph(pi)
-    ovd.MedialAxis( vd.getGraph() )
+    ma = ovd.MedialAxis()
+    vd.filter_graph(ma)
     
     vod.setVDText2(times)
     vod.setAll()

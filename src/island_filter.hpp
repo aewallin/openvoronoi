@@ -26,40 +26,30 @@
 
 #include "graph.hpp"
 #include "site.hpp"
+#include "filter.hpp"
 
 namespace ovd
 {
 
-struct island_filter {
-    island_filter(HEGraph& gi) : g(gi)  { }
-    bool operator()(const HEEdge& e) const {
+struct island_filter : public Filter {
+    island_filter() { }
+    virtual bool operator()(const HEEdge& e) const {
 
         if (both_endpoints_positive(e)) // these are interior edges which we keep.
             return true;
 
         return false; // otherwise we keep the edge
     }
+private:
     // return true if this is an internal edge, i.e. both endpoints have a nonzero clearance-disk radius 
     bool both_endpoints_positive(HEEdge e) const {
-        HEVertex src = g.source(e);
-        HEVertex trg = g.target(e);
-        return (g[src].dist()>0) && (g[trg].dist()>0);
+        HEVertex src = g->source(e);
+        HEVertex trg = g->target(e);
+        return ( (*g)[src].dist()>0) && ( (*g)[trg].dist()>0);
     }
-private:
-    HEGraph& g;
 };
 
-/// \brief From a voronoi-diagram, generate offset curve(s).
-class IslandFilter {
-public:
-    IslandFilter(HEGraph& gi): g(gi) {
-        island_filter flt(g);
-        g.filter_graph(flt);
-    }
-private:
-    IslandFilter(); // don't use.
-    HEGraph& g; // original graph
-};
+
 
 } // end namespace
 

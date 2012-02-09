@@ -93,21 +93,6 @@ private:
     bool _side;
 };
 
-
-/*
-class PolygonInterior {
-public:
-    PolygonInterior(HEGraph& gi, bool side): g(gi) {
-        interior_filter flt(g,side);
-        g.filter_graph(flt);
-    }
-private:
-    PolygonInterior(); // don't use.
-    HEGraph& g; // original graph
-    
-};
-*/
-
 } // end namespace
 
 // end file polygon_interior.hpp

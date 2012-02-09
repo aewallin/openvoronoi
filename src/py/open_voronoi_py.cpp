@@ -23,12 +23,17 @@
 
 #include "common/point.hpp"
 #include "face_offset_py.hpp"
-//#include "island_filter.hpp"
-//#include "medial_axis_walk_py.hpp"
+
+#include "medial_axis_walk_py.hpp"
 #include "offset_py.hpp"
-#include "polygon_interior.hpp"
+
 #include "utility/vd2svg.hpp"
 #include "version.hpp"
+
+// filters:
+#include "polygon_interior.hpp"
+#include "island_filter.hpp"
+#include "medial_axis.hpp"
 
 /*
  *  Boost::Python wrapping of voronoi diagram and related classes.
@@ -146,17 +151,18 @@ BOOST_PYTHON_MODULE(openvoronoi) {
     bp::class_<polygon_interior_filter, bp::bases<Filter> >("PolygonInterior")
         .def(bp::init<bool>())
     ;
-    /*
-    bp::class_<MedialAxis, boost::noncopyable >("MedialAxis", bp::no_init)
-        .def(bp::init<HEGraph&>())
-        .def(bp::init<HEGraph&, double>())
+    bp::class_<island_filter,  bp::bases<Filter> >("IslandFilter")
     ; 
+    
+    bp::class_< medial_axis_filter, bp::bases<Filter> >("MedialAxis")
+        .def(bp::init<double>())
+    ; 
+    
+    
     bp::class_<MedialAxisWalk_py, boost::noncopyable >("MedialAxisWalk", bp::no_init)
         .def(bp::init<HEGraph&>())
         .def(bp::init<HEGraph&, int>())
         .def("walk", &MedialAxisWalk_py::walk_py)
     ;
-    bp::class_<IslandFilter, boost::noncopyable >("IslandFilter", bp::no_init)
-        .def(bp::init<HEGraph&>())
-    ; */
+
 }

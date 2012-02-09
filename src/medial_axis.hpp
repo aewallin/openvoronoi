@@ -25,6 +25,7 @@
 #include "graph.hpp"
 #include "common/numeric.hpp"
 #include "site.hpp"
+#include "filter.hpp"
 
 namespace ovd
 {

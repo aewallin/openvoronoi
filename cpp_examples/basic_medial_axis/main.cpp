@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include <openvoronoi/medial_axis.hpp>
+#include <openvoronoi/medial_axis_walk.hpp>
 #include <openvoronoi/voronoidiagram.hpp>
 #include <openvoronoi/polygon_interior.hpp>
 #include <openvoronoi/utility/vd2svg.hpp>
@@ -36,15 +37,18 @@ int main() {
     vd->insert_line_site(id4, id0);
     vd->check();
 
-    ovd::HEGraph& g = vd->get_graph_reference();
+    
     // try commenting-out the line below; massive exterior clearance discs will
     // be drawn!
-    ovd::PolygonInterior pi(g, true);
-    ovd::MedialAxis ma(g);
+    ovd::polygon_interior_filter pi(true);
+    vd->filter(&pi);
+    ovd::medial_axis_filter ma;
+    vd->filter(&ma);
 
     // save drawing to svg file.
     svg::Dimensions dimensions(1024, 1024);
     svg::Document doc("medial_axis.svg", svg::Layout(dimensions, svg::Layout::BottomLeft));
+    ovd::HEGraph& g = vd->get_graph_reference();
     BOOST_FOREACH( ovd::HEEdge e, g.edges() ) {
         if( g[e].valid ) write_edge_to_svd(g,doc,e);
     }

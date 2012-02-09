@@ -93,27 +93,35 @@ if __name__ == "__main__":
     vd.check()
     
     t_before = time.time()
-    
     vd.addLineSite( id_list[0], id_list[1])
     vd.addLineSite( id_list[1], id_list[2])
     vd.addLineSite( id_list[2], id_list[3])
     vd.addLineSite( id_list[3], id_list[4])
     vd.addLineSite( id_list[4], id_list[0])
+    t_after = time.time()
+    times.append( t_after-t_before )
     vd.check()
     
-    t_after = time.time()
-    line_time = t_after-t_before
-    if line_time < 1e-3:
-        line_time = 1
-    times.append( line_time )
-
     pi = ovd.PolygonInterior(True)
     vd.filter_graph(pi)
     ma = ovd.MedialAxis()
     vd.filter_graph(ma)
     
+    vod.setVDText2(times)
+    
+    vod.setAll()
+    
+    """
+    t_after = time.time()
+    line_time = t_after-t_before
+    if line_time < 1e-3:
+        line_time = 1
+    times.append( line_time )
+    """
+
+    
     mapocket = ovd.MedialAxisPocket(vd.getGraph())
-    mapocket.setWidth(0.01)
+    mapocket.setWidth(0.005)
     
     maxmic = mapocket.maxMic()
     
@@ -122,23 +130,26 @@ if __name__ == "__main__":
     #print maxmic
     
     drawCircle( myscreen, maxmic[0], maxmic[1] , ovdvtk.red )
-    
-    for n in range(100):
+    nframe=0
+    while True:
         mic = mapocket.nxtMic()
         if len(mic) == 2:
             drawCircle( myscreen, mic[0], mic[1] , ovdvtk.green )
+            w2if.Modified()
+            lwr.SetFileName("frames/%06d.png" % ( nframe ) )
+            #lwr.Write()
+        else:
+            break
+        nframe = nframe+1
+        
     print "mic done."
-    vod.setVDText2(times)
     
-    calctime = t_after-t_before
     
-    vod.setAll()
+
         
     print "PYTHON All DONE."
 
     myscreen.render()   
-    #w2if.Modified()
-    #lwr.SetFileName("{0}.png".format(Nmax))
-    #lwr.Write()
+
      
     myscreen.iren.Start()

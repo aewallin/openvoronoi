@@ -35,6 +35,8 @@
 #include "island_filter.hpp"
 #include "medial_axis_filter.hpp"
 
+#include "medial_axis_pocket.hpp"
+
 /*
  *  Boost::Python wrapping of voronoi diagram and related classes.
  */
@@ -164,5 +166,11 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         .def(bp::init<HEGraph&, int>())
         .def("walk", &MedialAxisWalk_py::walk_py)
     ;
-
+    
+    bp::class_<medial_axis_pocket, boost::noncopyable >("MedialAxisPocket", bp::no_init)
+        .def(bp::init<HEGraph&>())
+        .def("maxMic", &medial_axis_pocket::max_mic)
+        .def("nxtMic", &medial_axis_pocket::nxt_mic)
+        .def("setWidth", &medial_axis_pocket::set_width)
+    ;
 }

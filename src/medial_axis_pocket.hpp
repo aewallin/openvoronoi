@@ -115,6 +115,8 @@ public:
         out.append(max_mic_radius);
         current_radius = max_mic_radius;
         current_center = max_mic_pos;
+        previous_branch_center = max_mic_pos;
+        previous_branch_radius = max_mic_radius;
         
         // find the edge on which we start machining.
         // stash the other out-edges for visiting later
@@ -157,7 +159,7 @@ public:
         double w_target = ( c2-c1 ).norm() + r2 - r1;
         std::cout << "nxt_mic() target width " << w_target << "\n";
         if ( w_target > max_width ) {
-            std::cout << " searching on the current ege "; g.print_edge(current_edge);
+            std::cout << " searching on the current edge "; g.print_edge(current_edge);
             // find a point on the current edge
             double next_radius = find_next_radius();
             return output_next_mic(next_radius, new_branch);
@@ -202,9 +204,9 @@ public:
         double n = ( c2.y*r1 - c1.y*r2 ) / detM;
         double q = ( c1.x*r2 - c2.x*r1 ) / detM;
         std::vector<double> roots = numeric::quadratic_roots( m*m+p*p, 2*(m*n+p*q),  n*n+q*q-1);
-        BOOST_FOREACH(double r, roots) {
-            std::cout << " root " << r << "\n";
-        }
+        //BOOST_FOREACH(double r, roots) {
+        //    std::cout << " root " << r << "\n";
+        //}
         // bi-tangent lines are now
         // ax +  by + c = 0
         // with
@@ -226,9 +228,12 @@ public:
         out.append(tang2);
         out.append(tang3);
         out.append(tang4);
-        out.append(c1);
-        out.append(r1);
-        out.append(branch);
+        out.append(c1); // previous MIC center
+        out.append(r1); // previous MIC radius
+        out.append(branch); // true/false flag for new branch
+        out.append(previous_branch_center);
+        out.append(previous_branch_radius);
+        
         return out;
     }
     
@@ -240,6 +245,9 @@ public:
             branch_point out = unvisited.top();
             std::cout << "find_next_branch(): next branch is "; g.print_edge(out.next_edge);
             unvisited.pop();
+            previous_branch_center = current_center;
+            previous_branch_radius = current_radius;
+            
             current_center = out.current_center;
             current_radius = out.current_radius;
             new_branch = true;
@@ -316,8 +324,15 @@ private:
     HEEdge current_edge;
     double current_radius;
     Point current_center;
-    double max_width;
+
+    // flag for indicating new branch
     bool new_branch;
+    Point previous_branch_center;
+    double previous_branch_radius;
+    
+    // the max cutting-width
+    double max_width; 
+    
 };
 
 } // end namespace

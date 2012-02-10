@@ -208,7 +208,8 @@ if __name__ == "__main__":
     print "all sites inserted. "
     print "VD check: ", vd.check()
     
-    pi = ovd.PolygonInterior( vd.getGraph(), True )
+    pi = ovd.PolygonInterior( True )
+    vd.filter_graph(pi)
     
     of = ovd.FaceOffset( vd.getGraph() ) # pass the created graph to the Offset class
     

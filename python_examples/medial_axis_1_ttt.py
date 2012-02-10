@@ -46,15 +46,6 @@ def drawArc(myscreen, pt1, pt2, r, cen,cw,arcColor):
         myscreen.addActor( ovdvtk.Line(p1=(previous.x,previous.y,0),p2=(current.x,current.y,0),color=arcColor) )
         previous = current 
 
-# rotate by cos/sin. from emc2 gcodemodule.cc
-"""
-def rotate(x, y,  c,  s):
-    tx = x * c - y * s;
-    y = x * s + y * c;
-    x = tx;
-    return [x,y]
-"""
-
 def drawOffsets(myscreen, ofs):
     # draw loops
     nloop = 0
@@ -343,8 +334,10 @@ if __name__ == "__main__":
     print "all sites inserted. "
     print "VD check: ", vd.check()
     
-    ovd.PolygonInterior( vd.getGraph(), True )
-    ovd.MedialAxis( vd.getGraph() )
+    pi = ovd.PolygonInterior(  True )
+    vd.filter_graph(pi)
+    ma = ovd.MedialAxis()
+    vd.filter_graph(ma)
     
     vod.setVDText2(times)
     vod.setAll()

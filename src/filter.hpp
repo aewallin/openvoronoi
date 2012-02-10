@@ -22,35 +22,28 @@
 #include <string>
 #include <iostream>
 
-#include <boost/python.hpp>
-
 #include "graph.hpp"
+#include "common/numeric.hpp"
 #include "site.hpp"
-#include "filter.hpp"
 
 namespace ovd
 {
 
-struct island_filter : public Filter {
-    island_filter() { }
-    virtual bool operator()(const HEEdge& e) const {
-
-        if (both_endpoints_positive(e)) // these are interior edges which we keep.
-            return true;
-
-        return false; // otherwise we keep the edge
-    }
-private:
-    // return true if this is an internal edge, i.e. both endpoints have a nonzero clearance-disk radius 
-    bool both_endpoints_positive(HEEdge e) const {
-        HEVertex src = g->source(e);
-        HEVertex trg = g->target(e);
-        return ( (*g)[src].dist()>0) && ( (*g)[trg].dist()>0);
-    }
+// base-class for filters
+class Filter {
+public:
+    Filter()   { }
+    void set_graph(HEGraph* gi) {g=gi;}
+    // does this edge belong to the filtered graph?
+    virtual bool operator()(const HEEdge& e) const {exit(-1); return true;}
+protected:
+    HEGraph* g;
 };
+
+
 
 
 
 } // end namespace
 
-// end file island_filter.hpp
+// end file 

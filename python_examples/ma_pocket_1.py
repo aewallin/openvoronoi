@@ -1,5 +1,6 @@
 import openvoronoi as ovd
 import ovdvtk
+
 import time
 import vtk
 import datetime
@@ -9,43 +10,11 @@ import os
 import sys
 import pickle
 import gzip
-import ovdgenerators as gens
 
-def drawLine(myscreen, pt1, pt2, lineColor):
-    myscreen.addActor( ovdvtk.Line(p1=(pt1.x,pt1.y,0),p2=(pt2.x,pt2.y,0),color=lineColor) ) 
-
-def drawArc(myscreen, pt1, pt2, r, arcColor):
-    myscreen.addActor( ovdvtk.Line(p1=(pt1.x,pt1.y,0),p2=(pt2.x,pt2.y,0),color=arcColor) ) 
-
-def drawOffsets(myscreen, ofs):
-    # draw loops
-    nloop = 0
-    lineColor = ovdvtk.green
-    arcColor = ovdvtk.grass
-    for lop in ofs:
-        n = 0
-        N = len(lop)
-        first_point=[]
-        previous=[]
-        for p in lop:
-            # p[0] is the Point
-            # p[1] is -1 for lines, and r for arcs
-            if n==0: # don't draw anything on the first iteration
-                previous=p[0]
-                #first_point = p[0]
-            else:
-                r=p[1]
-                p=p[0]
-                if r==-1:
-                    drawLine(myscreen, previous, p, lineColor)
-                else:
-                    drawArc(myscreen, previous, p, r, arcColor)
-                #myscreen.addActor( ovdvtk.Line(p1=(previous.x,previous.y,0),p2=(p.x,p.y,0),color=loopColor) )
-                previous=p
-            n=n+1
-        print "rendered loop ",nloop, " with ", len(lop), " points"
-        nloop = nloop+1
-
+def drawCircle(myscreen, c, r, circlecolor):
+    ca = ovdvtk.Circle(center=(c.x,c.y,0) , radius=r, color=circlecolor, resolution=50 )
+    myscreen.addActor(ca)
+    
 if __name__ == "__main__":  
     #w=2500
     #h=1500
@@ -55,7 +24,14 @@ if __name__ == "__main__":
     w=1024
     h=1024
     myscreen = ovdvtk.VTKScreen(width=w, height=h) 
-    ovdvtk.drawOCLtext(myscreen, rev_text=ovd.version() )   
+    ovdvtk.drawOCLtext(myscreen, rev_text=ovd.version() )
+    
+    w2if = vtk.vtkWindowToImageFilter()
+    w2if.SetInput(myscreen.renWin)
+    lwr = vtk.vtkPNGWriter()
+    lwr.SetInput( w2if.GetOutput() )
+    #w2if.Modified()
+    #lwr.SetFileName("tux1.png")
     
     scale=1
     myscreen.render()
@@ -80,10 +56,16 @@ if __name__ == "__main__":
     vod.vertexRadius = 0.0031
     vod.drawVertices=0
     vod.drawVertexIndex=1
-    vod.drawGenerators=1
+    vod.drawGenerators=0
     vod.offsetEdges = 0
     vd.setEdgeOffset(0.05)
     
+    
+    linesegs = 1 # switch to turn on/off line-segments
+    
+    segs = []
+    #ovd.Point(1,1)
+    eps=0.9
     p1=ovd.Point(-0.1,-0.2)
     p2=ovd.Point(0.2,0.1)
     p3=ovd.Point(0.4,0.2)
@@ -110,15 +92,31 @@ if __name__ == "__main__":
     
     #print "   ",2*Nmax," point-sites sites took {0:.3f}".format(times[0])," seconds, {0:.2f}".format( 1e6*float( times[0] )/(float(2*Nmax)*float(math.log10(2*Nmax))) ) ,"us/n*log(n)"
     print "all point sites inserted. "
-    print "VD check: ", vd.check()
+    vd.check()
     
-
+    #nsegs = Nmax
+    #nsegs = 5 #Nmax
+    #n=1
     t_before = time.time()
     
+    #vd.debug_on()
     vd.addLineSite( id_list[0], id_list[1])
+    
+    
+    vd.check()
+    
+    #vd.debug_on()
     vd.addLineSite( id_list[1], id_list[2])
+    vd.check()
+    
     vd.addLineSite( id_list[2], id_list[3])
+    vd.check()
+    
+    #vd.debug_on()
+    
     vd.addLineSite( id_list[3], id_list[4])
+    vd.check()
+    
     vd.addLineSite( id_list[4], id_list[0])
     vd.check()
     
@@ -127,27 +125,53 @@ if __name__ == "__main__":
     if line_time < 1e-3:
         line_time = 1
     times.append( line_time )
-    
-    #of = ovd.Offset( vd.getGraph() ) # pass the created graph to the Offset class
-    #of.str()
-    #ofs = of.offset(0.123)
-    #print ofs
-    #drawOffsets(myscreen, ofs)
-    
-    pi = ovd.PolygonInterior(  True )
-    vd.filter_graph(pi)
-    
-    of = ovd.Offset( vd.getGraph() ) # pass the created graph to the Offset class
-    
-    ofs = of.offset(0.123)
-    #print ofs
-    ovdvtk.drawOffsets(myscreen, ofs)
-    
-    #of.offset(0.125)
 
-            
+    pi = ovd.PolygonInterior(True)
+    vd.filter_graph(pi)
+    ma = ovd.MedialAxis()
+    vd.filter_graph(ma)
+    
+    mapocket = ovd.MedialAxisPocket(vd.getGraph())
+    mapocket.setWidth(0.01)
+    
+    maxmic = mapocket.maxMic()
+    
+    
+    
+    #print maxmic
+    
+    drawCircle( myscreen, maxmic[0], maxmic[1] , ovdvtk.red )
+    
+    for n in range(100):
+        mic = mapocket.nxtMic()
+        if len(mic) == 2:
+            drawCircle( myscreen, mic[0], mic[1] , ovdvtk.green )
+    print "mic done."
     vod.setVDText2(times)
+    
+    err = vd.getStat()
+    #print err 
+    """
+    print "got errorstats for ",len(err)," points"
+    if len(err)>1:
+        minerr = min(err)
+        maxerr = max(err)
+        print "min error= ",minerr
+        print "max error= ",maxerr
+    
+    print "num vertices: ",vd.numVertices() 
+    print "num SPLIT vertices: ",vd.numSplitVertices() 
+    """
+    
+    calctime = t_after-t_before
+    
     vod.setAll()
+        
     print "PYTHON All DONE."
+
     myscreen.render()   
+    #w2if.Modified()
+    #lwr.SetFileName("{0}.png".format(Nmax))
+    #lwr.Write()
+     
     myscreen.iren.Start()

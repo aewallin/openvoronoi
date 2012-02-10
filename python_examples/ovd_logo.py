@@ -273,8 +273,10 @@ if __name__ == "__main__":
     #vd.check()
     vod.setVDText2(times)
     
-    ovd.PolygonInterior( vd.getGraph(), True )
-    ovd.MedialAxis( vd.getGraph() )
+    pi_filt = ovd.PolygonInterior(  True )
+    vd.filter_graph(pi_filt)
+    ma_filt = ovd.MedialAxis(  )
+    vd.filter_graph(ma_filt)
     vod.setAll() # this draws the medial-axis interior to the letters
     
     vd.filterReset()
@@ -289,11 +291,15 @@ if __name__ == "__main__":
     vod2.offsetEdges = 0
     vod2.drawNullEdges = 1
     #vd.setEdgeOffset(0.001)
-    ovd.PolygonInterior( vd.getGraph(), False )
-    ovd.IslandFilter( vd.getGraph() )
+    pi_filt = ovd.PolygonInterior( False )
+    is_filt = ovd.IslandFilter(  )
+    vd.filter_graph(pi_filt)
+    vd.filter_graph(is_filt)
     vod2.setAll() 
     vd.filterReset()
-    ovd.PolygonInterior( vd.getGraph(), False )
+    pi_filt = ovd.PolygonInterior(  False )
+    vd.filter_graph(pi_filt)
+    
     # some offsets
     of = ovd.Offset( vd.getGraph() ) # pass the created graph to the Offset class
     #of.str()

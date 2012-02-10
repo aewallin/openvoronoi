@@ -169,7 +169,7 @@ unsigned int num_edges(Face f) { return face_edges(f).size(); }
 Edge add_edge(Vertex v1, Vertex v2) { return boost::add_edge( v1, v2, g).first; }
 /// add an edge with given properties between vertices v1-v2
 Edge add_edge( Vertex v1, Vertex  v2, const TEdgeProperties& prop ) { return boost::add_edge( v1, v2, prop, g).first; }
-std::pair<OutEdgeItr, OutEdgeItr> out_edge_itr( Vertex v ) { return boost::out_edges( v, g ); }
+std::pair<OutEdgeItr, OutEdgeItr> out_edge_itr( Vertex v ) { return boost::out_edges( v, g ); } // FIXME: change name to out_edges!!
 /// return true if v1-v2 edge exists
 bool has_edge( Vertex v1, Vertex v2) { return boost::edge( v1, v2, g ).second; }
 /// return v1-v2 Edge
@@ -595,19 +595,6 @@ std::pair<Edge,Edge> find_next_prev(Face f, Vertex endp) {
     return std::make_pair(next_edge, prev_edge);
 }
 
-template <class Filter>
-void filter_graph(Filter f) {
-    BOOST_FOREACH(Edge e, boost::edges(g)) {
-        if (!f(e))
-            g[e].valid = false;
-    }
-}
-
-void filter_reset() {
-    BOOST_FOREACH(Edge e, boost::edges(g)) {
-        g[e].valid = true;
-    }
-}
 
 void print_faces() {
     for( Face f=0;f<g.num_faces();f++) {

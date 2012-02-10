@@ -78,7 +78,7 @@ if __name__ == "__main__":
     
     scale=1
     myscreen.render()
-    random.seed(42)
+    random.seed(2)
     far = 1
     camPos = far
     zmult = 4
@@ -105,7 +105,7 @@ if __name__ == "__main__":
     vod.offsetEdges = 0
     vd.setEdgeOffset(0.05)
     
-    Nmax = 4
+    Nmax = 6
     
     plist = randomGenerators(far, Nmax)
     #plist = regularGridGenerators(far, Nmax)
@@ -119,11 +119,12 @@ if __name__ == "__main__":
     #+ regularGridGenerators(far, Nmax) + circleGenerators(far, Nmax)
 
     #plist = [ovd.Point(0,0)]
+    print plist
     times=[]
     t_before = time.time() 
     n=0
     id_list=[]
-    vd.debug_on()
+    #vd.debug_on()
     for p in plist: 
         print n," adding ",p
         id_list.append( vd.addVertexSite( p ) )
@@ -132,15 +133,15 @@ if __name__ == "__main__":
     calctime = t_after-t_before
     times.append(calctime)
     
-    id1 = id_list[0]
-    id2 = id_list[1]
-    id3 = id_list[2]
-    id4 = id_list[3]
-    print "add segment ",id1, " to ", id2
+    #id1 = id_list[0]
+    #id2 = id_list[1]
+    #id3 = id_list[2]
+    #id4 = id_list[3]
+    #print "add segment ",id1, " to ", id2
     vd.debug_on()
-    vd.addLineSite( id1, id2 )
+    #vd.addLineSite( id1, id2 )
     
-    vd.addLineSite( id3, id4 )
+    #vd.addLineSite( id3, id4 )
     t_after = time.time()
     calctime = t_after-t_before
     times.append(calctime)

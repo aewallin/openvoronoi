@@ -23,12 +23,19 @@
 
 #include "common/point.hpp"
 #include "face_offset_py.hpp"
-#include "island_filter.hpp"
+
 #include "medial_axis_walk_py.hpp"
 #include "offset_py.hpp"
-#include "polygon_interior.hpp"
+
 #include "utility/vd2svg.hpp"
 #include "version.hpp"
+
+// filters:
+#include "polygon_interior_filter.hpp"
+#include "island_filter.hpp"
+#include "medial_axis_filter.hpp"
+
+#include "medial_axis_pocket.hpp"
 
 /*
  *  Boost::Python wrapping of voronoi diagram and related classes.
@@ -75,6 +82,7 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         .staticmethod("reset_vertex_count")
         .def("getStat", &VoronoiDiagram_py::getStat)
         .def("filterReset", &VoronoiDiagram_py::filter_reset)
+        .def("filter_graph", &VoronoiDiagram_py::filter) // "filter" is a built-in function in Python!
         .def("getFaceStats", &VoronoiDiagram_py::getFaceStats)
         .def("getGraph", &VoronoiDiagram_py::get_graph_reference, bp::return_value_policy<bp::reference_existing_object>())
     ;
@@ -123,7 +131,8 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         .def("normalize", &Point::normalize)
         .def("dot", &Point::dot)
         .def("cross", &Point::cross)
-        .def("is_ight", &Point::is_right)
+        .def("is_right", &Point::is_right)
+        .def("xy_perp", &Point::xy_perp)
         .def("__str__", &Point::str)
         .def_readwrite("x", &Point::x)
         .def_readwrite("y", &Point::y)
@@ -139,19 +148,30 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         .def("offset", &FaceOffset_py::offset_py )
         .def("str", &FaceOffset_py::print )
     ; 
-    bp::class_<PolygonInterior, boost::noncopyable >("PolygonInterior", bp::no_init)
-        .def(bp::init<HEGraph&, bool>())
+    
+    bp::class_< Filter >(" Filter_base", bp::no_init)
     ;
-    bp::class_<MedialAxis, boost::noncopyable >("MedialAxis", bp::no_init)
-        .def(bp::init<HEGraph&>())
-        .def(bp::init<HEGraph&, double>())
+    bp::class_<polygon_interior_filter, bp::bases<Filter> >("PolygonInterior")
+        .def(bp::init<bool>())
+    ;
+    bp::class_<island_filter,  bp::bases<Filter> >("IslandFilter")
     ; 
+    
+    bp::class_< medial_axis_filter, bp::bases<Filter> >("MedialAxis")
+        .def(bp::init<double>())
+    ; 
+    
+    
     bp::class_<MedialAxisWalk_py, boost::noncopyable >("MedialAxisWalk", bp::no_init)
         .def(bp::init<HEGraph&>())
         .def(bp::init<HEGraph&, int>())
         .def("walk", &MedialAxisWalk_py::walk_py)
     ;
-    bp::class_<IslandFilter, boost::noncopyable >("IslandFilter", bp::no_init)
+    
+    bp::class_<medial_axis_pocket, boost::noncopyable >("MedialAxisPocket", bp::no_init)
         .def(bp::init<HEGraph&>())
-    ; 
+        .def("maxMic", &medial_axis_pocket::max_mic)
+        .def("nxtMic", &medial_axis_pocket::nxt_mic)
+        .def("setWidth", &medial_axis_pocket::set_width)
+    ;
 }

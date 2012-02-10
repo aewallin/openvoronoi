@@ -204,8 +204,8 @@ if __name__ == "__main__":
     times = insert_many_polygons(vd,all_segs)
     vd.check()
     
-    #ovd.PolygonInterior( vd.getGraph() , True )
-    #ovd.MedialAxis( vd.getGraph() )
+    #ovd.PolygonInterior( True )
+    #ovd.MedialAxis()
     
     vod.setVDText2(times)
     vod.setAll()

@@ -8,8 +8,13 @@ import math
 #import random
 
 """
-This script does not use OpenVoronoi, it is used merely for drawing
-bisectors and verifying the parametric equations for bisectors
+This script does not use OpenVoronoi, it is used merely for drawing and
+verifying solutions etc.
+There are functions for:
+- voronoi-bisectors and verifying the parametric equations for bisectors
+- voronoi-vertex solvers (separator-solver)
+- bi-tangent lines/points (for medial-axis pocketing)
+
 
 """
 
@@ -521,13 +526,154 @@ def drawSeparatorSolver2(px=10,py=20):
     drawCircle(myscreen, p2, tsln, ovdvtk.red )
     myscreen.render()
     myscreen.iren.Start()
+
+# solve: a x^2 + b x + c = 0
+# copied from c-code in numeric.hpp
+def quadratic_roots( a,  b,  c):
+    roots = []
+    if ((a == 0) and (b == 0)):
+        return roots;
+    
+    if (a == 0):
+        roots.append( -c / b )
+        return roots
+    
+    if (b == 0):
+        sqr = -c / a
+        if (sqr > 0): 
+            roots.append( math.sqrt(sqr) )
+            roots.append( -roots[0] )
+            return roots
+        elif (sqr == 0): 
+            roots.append( 0 )
+            return roots
+        else:
+            return roots
+        
+    disc = b*b - 4*a*c # discriminant
+    if (disc > 0): 
+        q=0
+        if (b > 0):
+            q = (b + math.sqrt(disc)) / -2
+        else:
+            q = (b - math.sqrt(disc)) / -2
+        roots.append( q / a )
+        roots.append( c / q ) 
+        return roots
+    elif (disc == 0): 
+        roots.append( -b / (2*a) )
+        return roots
+
+    return roots # no real roots
+    
+    
+def drawBitangents():
+    myscreen = ovdvtk.VTKScreen()
+    myscreen.camera.SetPosition(0.01, 0,  100 ) 
+    myscreen.camera.SetFocalPoint(0, 0, 0)
+    myscreen.camera.SetClippingRange(-100,3000)
+    
+    c1 = ovd.Point(10,20)
+    r1=20
+    
+    c2 = ovd.Point(6,13)
+    r2=23
+    drawCircle(myscreen, c1, r1, ovdvtk.red)
+    drawCircle(myscreen, c2, r2, ovdvtk.green)
+    
+    # when machining c2 the maximum cut-width is 
+    # w_max = | c2 - c1 | + r2 - r1
+    
+    # we are looking for the bi-tangents of the two circles, given by
+    # A x + B y + C = 0
+    # with the constraint A^2 + B^2 = 1
+    # the line-should be a bi-tangent, so:
+    # +/- r1 = A c1x + B c1y + C
+    # +/- r2 = A c2x + B c2y + C
+    # which in matrix form is
+    #   Mc=v  
+    # ( c1x c1y ) ( A ) = ( +/- r1 - C )
+    # ( c2x c2y ) ( B ) = ( +/- r2 - C )
+    #
+    # now solve for A and B using Cramers rule
+    #
+    #  A = det(M_1) / det(M) =  det ( +/-r1-C   c1y ) / det(M)  =  mC + n
+    #                               ( +/-r2-C   c2y )
+    # and
+    #  B = det(M_2) / det(M) = det ( c1x  +/-r1-C ) / det(M) = pC + q
+    #                              ( c2x  +/-r2-C )
+    # this can be inserted into the constraint
+    # A^2 + B^2 = 1 
+    # (mC + n )^2 + (pC+q)^2
+    # m^2 C^2 + 2mnC + n^2 + p^2 C^2 + 2pqC + q^2 =1
+    #
+    # C^2 ( m^2 + p^2 ) + C 2(mn+pq) + n^2 + q^2 = 1
+    #
+    # +r1 +r2 case:
+    #  det( r1-C c1y ) = (r1-C)c2y - (r2-C)c1y = C (c1y-c2y) + (c2y*r1 - c1y*r2)
+    #     ( r2-C c2y )
+    #  det( c1x r1-C ) = c1x(r2-C) - c2x(r1-C) = C ( c2x-c1x ) + (c1x*r2 - c2x*r1)
+    #     ( c2x r2-C )
+    lines = []
+    detM = c1.x*c2.y - c2.x*c1.y
+    print "detM= ",detM
+    m = ( c1.y-c2.y ) / detM
+    p = ( c2.x-c1.x ) / detM
+    
+    n = ( c2.y*r1 - c1.y*r2 ) / detM
+    q = ( c1.x*r2 - c2.x*r1 ) / detM
+    roots1 = quadratic_roots( m*m+p*p, 2*(m*n+p*q),  n*n+q*q-1)
+    print "roots1 ", roots1
+    for r in roots1:
+        lines.append( root_to_line(r,m,n,p,q) )
+    """
+    n = ( c2.y*(-1)*r1 - c1.y*(-1)*r2 ) / detM
+    q = ( c1.x*(-1)*r2 - c2.x*(-1)*r1 ) / detM
+    roots2 = quadratic_roots( m*m+p*p, 2*(m*n+p*q),  n*n+q*q-1)
+    print "roots2 ", roots2
+    for r in roots2:
+        lines.append( root_to_line(r,m,n,p,q) )
+    """
+
+    for l in lines:
+        drawLine( myscreen, l, ovdvtk.yellow )
+        
+    # now figure out the tangent points
+    # this is the point on the tangent closest to the center.
+    # Ax + By + C = 0
+    # (xc-x^2) + (yc-y^2) = r^2
+    #
+    # from C, go a distance r along the normal to the line.
+    p1 = c1 - r1*ovd.Point(lines[0].a,lines[0].b)
+    p2 = c1 - r1*ovd.Point(lines[1].a,lines[1].b)
+    drawCircle(myscreen,p1,0.5,ovdvtk.pink)
+    drawCircle(myscreen,p2,0.5,ovdvtk.pink)
+    
+    p3 = c2 - r2*ovd.Point(lines[0].a,lines[0].b)
+    p4 = c2 - r2*ovd.Point(lines[1].a,lines[1].b)
+    drawCircle(myscreen,p3,0.5,ovdvtk.pink)
+    drawCircle(myscreen,p4,0.5,ovdvtk.pink)
+    
+    #drawLine( myscreen, l2, ovdvtk.orange )
+    #print roots
+    
+    myscreen.render()
+    myscreen.iren.Start()
+def root_to_line(root,m,n,p,q):
+    C = root
+    A = m*C+n
+    B = p*C+q
+    print A, " ", B, " ", C ," ", A*A+B*B
+    l = Line(A,B,C,1)
+    return l
     
 if __name__ == "__main__":  
     #drawPointPointTest()# point-point bisector is a LINE
     
     #drawLinePointTest() # point-line bisector is a PARABOLA
     
-    drawLineLineTest() # line-line bisector is LINE(LINE)
+    #drawLineLineTest() # line-line bisector is LINE(LINE)
     
     #drawSeparatorSolver1(4.3)
     #drawSeparatorSolver2(4.3)
+    drawBitangents()

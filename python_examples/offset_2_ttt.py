@@ -37,23 +37,12 @@ def drawArc(myscreen, pt1, pt2, r, cen,cw,arcColor):
     previous = pt1
     tr = [start.x, start.y]
     for i in range(steps):
-        #f = (i+1) * rsteps #; // varies from 1/rsteps..1 (?)
-        #theta = theta1 + i* dtheta
         tr = rotate(tr[0], tr[1], dc, ds) #; // rotate center-start vector by a small amount
         x = cen.x + tr[0] 
         y = cen.y + tr[1] 
         current = ovd.Point(x,y)
         myscreen.addActor( ovdvtk.Line(p1=(previous.x,previous.y,0),p2=(current.x,current.y,0),color=arcColor) )
         previous = current 
-
-# rotate by cos/sin. from emc2 gcodemodule.cc
-"""
-def rotate(x, y,  c,  s):
-    tx = x * c - y * s;
-    y = x * s + y * c;
-    x = tx;
-    return [x,y]
-"""
 
 def drawOffsets(myscreen, ofs):
     # draw loops
@@ -85,7 +74,7 @@ def drawOffsets(myscreen, ofs):
             n=n+1
         print "rendered loop ",nloop, " with ", len(lop), " points"
         nloop = nloop+1
-        
+
 # rotate by cos/sin. from emc2 gcodemodule.cc
 def rotate(x, y,  c,  s):
     tx = x * c - y * s;
@@ -135,6 +124,7 @@ def arc_pts(  pt1, pt2, r, cen,cw): # (start, end, radius, center, cw )
         previous = current 
     return pts
 
+# faster drawing of offsets using vtkPolyData
 def drawOffsets2(myscreen, ofs):
     # draw loops
     nloop = 0
@@ -154,10 +144,10 @@ def drawOffsets2(myscreen, ofs):
                 previous=p[0]
                 #first_point = p[0]
             else:
-                cw=p[3]
-                cen=p[2]
-                r=p[1]
-                p=p[0]
+                cw=p[3]  # cw/ccw flag
+                cen=p[2] # center
+                r=p[1]   # radius
+                p=p[0]   # target point
                 if r==-1: # r=-1 means line-segment
                     points.extend( [previous,p] ) #drawLine(myscreen, previous, p, lineColor)
                 else: # otherwise we have an arc
@@ -282,7 +272,6 @@ def ttt_segments(text,scale):
     segs = wr.get_segments()
     return segs
 
-
 def modify_segments(segs):
     segs_mod =[]
     for seg in segs:
@@ -332,8 +321,7 @@ if __name__ == "__main__":
     vod.drawGenerators=0
     vod.offsetEdges = 0
     vd.setEdgeOffset(0.05)
-    
-    
+
     # segments from ttt
     segs = ttt_segments(  "LinuxCNC", 40000)
     segs = translate(segs, -0.06, 0.05)
@@ -343,17 +331,16 @@ if __name__ == "__main__":
     print "all sites inserted. "
     print "VD check: ", vd.check()
     
-    pi = ovd.PolygonInterior( vd.getGraph(), False )
-    #pi.str()
+    pi = ovd.PolygonInterior( False )
+    vd.filter_graph(pi)
     
     of = ovd.Offset( vd.getGraph() ) # pass the created graph to the Offset class
-    #of.str()
     ofs_list=[]
     t_before = time.time()
     for t in [0.002*x for x in range(1,20)]:
         ofs = of.offset(t)
         ofs_list.append(ofs)
-    
+
     t_after = time.time()
     oftime = t_after-t_before
     print len(ofs_list)," offsets to draw:"
@@ -362,7 +349,7 @@ if __name__ == "__main__":
         print m," / ",len(ofs_list)
         drawOffsets2(myscreen, ofs)
         m=m+1
-    
+
     oftext  = ovdvtk.Text()
     oftext.SetPos( (50, 100) )
     oftext_text = "Offset in {0:.3f} s CPU time.".format( oftime )
@@ -370,8 +357,9 @@ if __name__ == "__main__":
     myscreen.addActor(oftext)
 
     # turn off the whole VD so we can more clearly see the offsets
-    ovd.PolygonInterior( vd.getGraph(), True )
-    
+    pi = ovd.PolygonInterior(  True )
+    vd.filter_graph(pi)
+
     vod.setVDText2(times)
     vod.setAll()
     print "PYTHON All DONE."

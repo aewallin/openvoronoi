@@ -153,7 +153,7 @@ def spiral_clear(myscreen, out_tangent, in_tangent, c1, r1, c2, r2, out1, in1):
     print "in1 = ",in1
     print " end theta = ",in1_theta
     drawPoint( myscreen, c1, ovdvtk.red )
-    drawPoint( myscreen, in1, ovdvtk.blue, 0.006 )
+    #drawPoint( myscreen, in1, ovdvtk.blue, 0.006 )
     # width = 2*pi*b
     # => b = width/(2*pi)
     b=0.01/(2*math.pi)
@@ -179,6 +179,7 @@ def spiral_clear(myscreen, out_tangent, in_tangent, c1, r1, c2, r2, out1, in1):
     Npts = int(Npts)
     print "spiral has ",Npts," points"
     p = ovd.Point(c1)
+    theta_end = 0
     for n in range(Npts+1):
         theta = theta_min + n*dtheta
         r = a + b*theta
@@ -186,7 +187,274 @@ def spiral_clear(myscreen, out_tangent, in_tangent, c1, r1, c2, r2, out1, in1):
         trg = c1 + r*ovd.Point( -math.cos(theta), math.sin(theta) )
         ovdvtk.drawLine(myscreen, p,trg,ovdvtk.pink)
         p = trg
+        theta_end = theta
     
+    
+    # add a complete circle after the spiral.
+    Npts = (2*math.pi)/dtheta
+    Npts = int(Npts)
+    for n in range(Npts+2):
+        theta = theta_end + (n+1)*dtheta
+        #theta = theta_min + n*dtheta
+        r = r1 #a + b*theta
+        #theta = theta - 2* abs(in1_theta - math.pi/2 )
+        trg = c1 + r*ovd.Point( -math.cos(theta), math.sin(theta) )
+        ovdvtk.drawLine(myscreen, p,trg,ovdvtk.pink)
+        if n != Npts+1:
+            drawPoint(myscreen, trg, ovdvtk.orange)
+        else:
+            drawPoint(myscreen, trg, ovdvtk.orange,0.004)
+        p = trg
+        #if n == Npts-2:
+        #    break
+    
+# rotate by cos/sin. from emc2 gcodemodule.cc
+def rotate(x, y,  c,  s):
+    tx = x * c - y * s;
+    y = x * s + y * c;
+    x = tx;
+    return [x,y]
+
+# return a list of points corresponding to an arc
+def arc_pts(  pt1, pt2, r, cen,cw): # (start, end, radius, center, cw )
+    # draw arc as many line-segments
+    start = pt1-cen
+    end = pt2-cen
+    theta1 = math.atan2(start.x,start.y)
+    theta2 = math.atan2(end.x,end.y)
+    alfa=[] # the list of angles
+    da=0.1
+    CIRCLE_FUZZ = 1e-9
+    # idea from emc2 / cutsim g-code interp G2/G3
+    if (cw == False ): 
+        while ( (theta2 - theta1) > -CIRCLE_FUZZ): 
+            theta2 -= 2*math.pi
+    else:
+        while( (theta2 - theta1) < CIRCLE_FUZZ): 
+            theta2 += 2*math.pi
+    
+    dtheta = theta2-theta1
+    arclength = r*dtheta
+    dlength = min(0.001, arclength/10)
+    steps = int( float(arclength) / float(dlength))
+    rsteps = float(1)/float(steps)
+    dc = math.cos(-dtheta*rsteps) # delta-cos  
+    ds = math.sin(-dtheta*rsteps) # delta-sin
+    
+    previous = pt1
+    tr = [start.x, start.y]
+    pts=[]
+    for i in range(steps):
+        #f = (i+1) * rsteps #; // varies from 1/rsteps..1 (?)
+        #theta = theta1 + i* dtheta
+        tr = rotate(tr[0], tr[1], dc, ds) #; // rotate center-start vector by a small amount
+        x = cen.x + tr[0] 
+        y = cen.y + tr[1] 
+        
+        current = ovd.Point(x,y)
+        #myscreen.addActor( ovdvtk.Line(p1=(previous.x,previous.y,0),p2=(current.x,current.y,0),color=arcColor) )
+        pts.extend([previous, current])
+        previous = current 
+    return pts
+
+# return a list of points corresponding to an arc
+# don't return the initial points, we already have that!
+def arc_pts2(  pt1, pt2, r, cen,cw): # (start, end, radius, center, cw )
+    # draw arc as many line-segments
+    start = pt1-cen
+    end = pt2-cen
+    theta1 = math.atan2(start.x,start.y)
+    theta2 = math.atan2(end.x,end.y)
+    alfa=[] # the list of angles
+    da=0.1
+    CIRCLE_FUZZ = 1e-9
+    # idea from emc2 / cutsim g-code interp G2/G3
+    if (cw == False ): 
+        while ( (theta2 - theta1) > -CIRCLE_FUZZ): 
+            theta2 -= 2*math.pi
+    else:
+        while( (theta2 - theta1) < CIRCLE_FUZZ): 
+            theta2 += 2*math.pi
+    
+    dtheta = theta2-theta1
+    arclength = r*dtheta
+    dlength = min(0.001, arclength/10)
+    steps = int( float(arclength) / float(dlength))
+    rsteps = float(1)/float(steps)
+    dc = math.cos(-dtheta*rsteps) # delta-cos  
+    ds = math.sin(-dtheta*rsteps) # delta-sin
+    
+    previous = pt1
+    tr = [start.x, start.y]
+    pts=[]
+    for i in range(steps):
+        #f = (i+1) * rsteps #; // varies from 1/rsteps..1 (?)
+        #theta = theta1 + i* dtheta
+        tr = rotate(tr[0], tr[1], dc, ds) #; // rotate center-start vector by a small amount
+        x = cen.x + tr[0] 
+        y = cen.y + tr[1] 
+        
+        current = ovd.Point(x,y)
+        pts.append(current)
+        previous = current 
+    return pts
+    
+# faster drawing of offsets using vtkPolyData
+def drawOffsets2(myscreen, ofs):
+    # draw loops
+    nloop = 0
+    lineColor = ovdvtk.lgreen
+    arcColor = ovdvtk.green #grass
+    ofs_points=[]
+    for lop in ofs:
+        points=[]
+        n = 0
+        N = len(lop)
+        first_point=[]
+        previous=[]
+        for p in lop:
+            # p[0] is the Point
+            # p[1] is -1 for lines, and r for arcs
+            if n==0: # don't draw anything on the first iteration
+                previous=p[0]
+                #first_point = p[0]
+            else:
+                cw=p[3]  # cw/ccw flag
+                cen=p[2] # center
+                r=p[1]   # radius
+                p=p[0]   # target point
+                if r==-1: # r=-1 means line-segment
+                    points.extend( [previous,p] ) #drawLine(myscreen, previous, p, lineColor)
+                else: # otherwise we have an arc
+                    points.extend( arc_pts( previous, p, r,cen,cw) )
+
+                previous=p
+            n=n+1
+        ofs_points.append(points)
+        #print "rendered loop ",nloop, " with ", len(lop), " points"
+        nloop = nloop+1
+        
+    # now draw each loop with polydata
+    oPoints = vtk.vtkPoints()
+    lineCells=vtk.vtkCellArray()
+    #self.colorLUT = vtk.vtkLookupTable()
+    print len(ofs_points)," loops to render:"
+    idx = 0
+    last_idx = 0
+        
+    for of in ofs_points:
+        epts  = of 
+        segs=[]
+        first = 1
+        print " loop with ", len(epts)," points"
+        for p in epts:
+            oPoints.InsertNextPoint( p.x, p.y, 0)
+            if first==0:
+                seg = [last_idx,idx]
+                segs.append(seg)
+            first = 0
+            last_idx = idx
+            idx = idx + 1
+            
+        # create line and cells
+        for seg in segs:
+            line = vtk.vtkLine()
+            line.GetPointIds().SetId(0, seg[0])
+            line.GetPointIds().SetId(1, seg[1])
+            #print " indexes: ", seg[0]," to ",seg[1]
+            lineCells.InsertNextCell(line)
+    
+    linePolyData = vtk.vtkPolyData()
+    linePolyData.SetPoints(oPoints)
+    linePolyData.SetLines(lineCells)
+    linePolyData.Modified() 
+    linePolyData.Update()
+    mapper = vtk.vtkPolyDataMapper()
+    mapper.SetInput(linePolyData)
+    edge_actor = vtk.vtkActor()
+    edge_actor.SetMapper(mapper)
+    edge_actor.GetProperty().SetColor( ovdvtk.lgreen)
+    myscreen.addActor( edge_actor )
+
+
+def insert_polygon_points(vd, pts):
+    #pts=[]
+    #for p in polygon:
+    #    pts.append( ovd.Point( p[0], p[1] ) )
+    id_list = []
+    
+    print "inserting ",len(pts)," point-sites:"
+    m=0
+    for p in pts:
+        
+        id_list.append( vd.addVertexSite( p ) )
+        print " ",m," added vertex ", id_list[ len(id_list) -1 ], " at ",p
+        m=m+1   
+        
+    print "id list is ", id_list
+    return id_list
+
+def insert_polygon_segments(vd,id_list):
+    j=0
+    print "inserting ",len(id_list)," line-segments:"
+    for n in range(len(id_list)):
+        n_nxt = n+1
+        if n==(len(id_list)-1):
+            n_nxt=0
+        print " ",j,"inserting segement ",id_list[n]," - ",id_list[n_nxt]
+        vd.addLineSite( id_list[n], id_list[n_nxt])
+        j=j+1
+
+# give ofsets ofs
+# insert points and line-segments in the vd
+def insert_offset_loop(vd,ofs):
+    polygon_ids =[]
+    
+    # create segs from ofs
+    
+    segs = []
+    previous = ovd.Point()
+    for ofloop in ofs:
+        loop = []
+        first = True
+        for of in ofloop:
+            print of
+            if first:
+                #loop.append( of[0] )
+                previous = of[0]
+                first = False
+            else:
+                cw=of[3]  # cw/ccw flag
+                cen=of[2] # center
+                r=of[1]   # radius
+                p=of[0]   # target point
+                if r==-1: # r=-1 means line-segment
+                    loop.append(p) #points.extend( [previous,p] ) #drawLine(myscreen, previous, p, lineColor)
+                else: # otherwise we have an arc
+                    loop.extend( arc_pts2( previous, p, r,cen,cw) )
+                    #points.extend( arc_pts( previous, p, r,cen,cw) )
+                previous = p
+                #loop.append(p)
+    
+        segs.append(loop)
+        
+    print segs
+    t_before = time.time()
+    for poly in segs:
+        poly_id = insert_polygon_points(vd,poly)
+        polygon_ids.append(poly_id)
+    t_after = time.time()
+    pt_time = t_after-t_before
+    
+    t_before = time.time()
+    for ids in polygon_ids:
+        insert_polygon_segments(vd,ids)
+    
+    t_after = time.time()
+    seg_time = t_after-t_before
+    
+    return [pt_time, seg_time]
+
 if __name__ == "__main__":  
     #w=2500
     #h=1500
@@ -220,15 +488,15 @@ if __name__ == "__main__":
     print ovd.version()
     
     # for vtk visualization
-    vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
-    vod.drawFarCircle()
+    #vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
+    #vod.drawFarCircle()
     
-    vod.textScale = 0.02
-    vod.vertexRadius = 0.0031
-    vod.drawVertices=0
-    vod.drawVertexIndex=0
-    vod.drawGenerators=0
-    vod.offsetEdges = 0
+    #vod.textScale = 0.02
+    #vod.vertexRadius = 0.0031
+    #vod.drawVertices=0
+    #vod.drawVertexIndex=0
+    #vod.drawGenerators=0
+    #vod.offsetEdges = 0
     vd.setEdgeOffset(0.05)
     
     linesegs = 1 # switch to turn on/off line-segments
@@ -271,17 +539,65 @@ if __name__ == "__main__":
     t_after = time.time()
     times.append( t_after-t_before )
     vd.check()
+    #vod.setVDText2(times)
     
     pi = ovd.PolygonInterior(True)
     vd.filter_graph(pi)
+    
+    of = ovd.Offset( vd.getGraph() ) # pass the created graph to the Offset class
+    ofs_list=[]
+    t_before = time.time()
+
+    ofs = of.offset(0.03)
+    print " offset is len=",len(ofs)
+    print ofs
+    
+    #drawOffsets2(myscreen, ofs)
+    #vod.setAll()
+    
+    # now create a new VD from the offset
+    vd2 = ovd.VoronoiDiagram(1,120)
+    insert_offset_loop(vd2,ofs)
+    #vod2 = ovdvtk.VD(myscreen,vd2,float(scale), textscale=0.01, vertexradius=0.003)
+    #vod.drawFarCircle()
+    #vod2.textScale = 0.02
+    #vod2.vertexRadius = 0.0031
+    #vod2.drawVertices=0
+    #vod2.drawVertexIndex=0
+    #vod2.drawGenerators=0
+    #vod2.offsetEdges = 0
+    #vod2.setAll()
+    
+    # now offset outward
+    pi = ovd.PolygonInterior(True)
+    vd2.filter_graph(pi)
+    of = ovd.Offset( vd2.getGraph() ) # pass the created graph to the Offset class
+    ofs = of.offset(0.03)
+    drawOffsets2(myscreen, ofs)
+    
+    # now create the VD for pocketing
+    vd3 = ovd.VoronoiDiagram(1,120)
+    times = insert_offset_loop(vd3,ofs)
+    vod3 = ovdvtk.VD(myscreen,vd3,float(scale), textscale=0.01, vertexradius=0.003)
+    #vod.drawFarCircle()
+    vod3.textScale = 0.0002
+    vod3.vertexRadius = 0.0031
+    vod3.drawVertices=0
+    vod3.drawVertexIndex=1
+    vod3.drawGenerators=0
+    vod3.offsetEdges = 0
+    
+    vod3.setVDText2(times)
+    
+    pi = ovd.PolygonInterior(True)
+    vd3.filter_graph(pi)
     ma = ovd.MedialAxis()
-    vd.filter_graph(ma)
+    vd3.filter_graph(ma)
     
-    vod.setVDText2(times)
+    vod3.setAll()
     
-    vod.setAll()
     
-    mapocket = ovd.MedialAxisPocket(vd.getGraph())
+    mapocket = ovd.MedialAxisPocket(vd3.getGraph())
     mapocket.setWidth(0.01)
     
     maxmic = mapocket.maxMic()
@@ -292,7 +608,7 @@ if __name__ == "__main__":
     cl = ovd.Point(0,0)
     
     # the initial largest MIC. to be cleared with a spiral-path
-    drawCircle( myscreen, maxmic[0], maxmic[1] , ovdvtk.red )
+    #drawCircle( myscreen, maxmic[0], maxmic[1] , ovdvtk.red )
     
     # the rest of the MICs are then cleared
     nframe=0
@@ -302,7 +618,7 @@ if __name__ == "__main__":
     in_tangent = ovd.Point()
     while True:
         mic = mapocket.nxtMic()
-        if 0: #nframe == 5:
+        if 0: #nframe == 30:
             break
         if len(mic) >= 2:
             cen2 = mic[0]

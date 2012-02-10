@@ -165,8 +165,11 @@ public:
             return output_next_mic(next_radius, new_branch);
         } else {
             // mark edge DONE. this means we have machined all MICs on this edge.
-            edge_data[current_edge].done = true;
-            edge_data[ g[current_edge].twin ].done = true;
+            //edge_data[current_edge].done = true;
+            //edge_data[ g[current_edge].twin ].done = true;
+            
+            mark_done(current_edge);
+            
             std::cout << "Finding new edge !\n";
             current_edge = find_next_edge();              // move to the next edge
             if ( current_edge == HEEdge() ) { // invalid edge marks end of operation
@@ -263,23 +266,87 @@ public:
                 out_edges.push_back(e);
             }
         }
-        std::cout << "find_next_edge(): " << out_edges.size() << " potential next-edges\n";
+        //std::cout << "find_next_edge(): " << out_edges.size() << " potential next-edges\n";
         if (out_edges.empty() ) {
             std::cout << "find_next_edge(): no out_edges. end of branch.\n";
-            return find_next_branch();
+            HEEdge e = find_next_branch();
+            if (e==HEEdge())
+                return e; // this is end-of-operation.
+                
+            if (has_next_radius(e)) {
+                std::cout << "find_next_edge(): next-branch only one out-edge: "; g.print_edge(e);
+                return e;
+            } else {
+                std::cout << "find_next_edge(): next-branch only one out-edge, but not valid\n"; 
+                mark_done( e );
+                current_edge = e; // jump to the next edge
+                return find_next_edge(); // and try to see if that edge is valid.
+            } 
         } else if ( out_edges.size() == 1 ) {
-            std::cout << "find_next_edge(): only one out-edge: "; g.print_edge(out_edges[0]);
-            return out_edges[0];
+            
+            if (has_next_radius(out_edges[0])) {
+                std::cout << "find_next_edge(): only one out-edge: "; g.print_edge(out_edges[0]);
+                return out_edges[0];
+            } else {
+                std::cout << "find_next_edge(): one out-edge, but not valid\n"; 
+                mark_done( out_edges[0] );
+                current_edge = out_edges[0]; // jump to the next edge
+                return find_next_edge(); // and try to see if that edge is valid.
+            } 
         } else if (out_edges.size() == 2 ) {
-            std::cout << "find_next_edge(): two out-edges, returning first: "; g.print_edge(out_edges[0]);
+            
             // FIXME: some smarter way of selecting next-edge
             unvisited.push( branch_point(current_center, current_radius, out_edges[1] ) );
-            return out_edges[0];
+            
+            if (has_next_radius(out_edges[0])) {
+                std::cout << "find_next_edge(): two out-edges, returning first: "; g.print_edge(out_edges[0]);
+                return out_edges[0];
+            } else {
+                mark_done( out_edges[0] ); //].done = true;
+                current_edge = out_edges[0]; // jump to the next edge
+                return find_next_edge(); // and try to see if that edge is valid.
+            } 
+            
+            //return out_edges[0];
         } else {
             std::cout << "find_next_edge(): too many out-edges. ERROR.\n";
             exit(-1);
             return HEEdge();
         }
+    }
+    
+    void mark_done(HEEdge e) {
+        edge_data[ e ].done = true;
+        edge_data[ g[e].twin ].done = true;
+    }
+    
+    bool has_next_radius(HEEdge e) {
+        // check if the edge e is one where we continue
+        
+        Point c1 = g[current_edge].point(current_radius); 
+        double r1 = current_radius;
+        
+        double target_radius = g[ g.target(e) ].dist();
+        Point c2 = g[e].point(target_radius);
+        double r2 = target_radius;
+        double w_target = ( c2-c1 ).norm() + r2 - r1;
+        std::cout << " has_next_radius() " << w_target << "\n";
+        if (w_target<=0)
+            return false;
+            
+        if ( w_target > max_width )
+            return true;
+        else
+            return false;
+        /*
+        double operator()(const double x) {
+        // w_max = | c2 - c1 | + r2 - r1
+        Point c2 = g[e].point(x);
+        double r2 = x;
+        double w = (c2-c1).norm() + r2 - r1;
+        return w-w_max;
+        }*/
+    
     }
     
     // on the current edge, move from current_radius towards target_radius

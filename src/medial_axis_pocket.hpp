@@ -91,6 +91,7 @@ public:
         }
         current_edge = HEEdge();
         max_width = 0.05;
+        debug = false;
     }
     void set_width(double w) {max_width=w;}
     
@@ -134,7 +135,7 @@ public:
                 unvisited.push( branch_point(current_center, current_radius, e ) );
             }
         }
-        std::cout << " start edge is: "; g.print_edge(current_edge);
+        if (debug) { std::cout << " start edge is: "; g.print_edge(current_edge); }
         new_branch=false;
         return out;
     }
@@ -143,7 +144,7 @@ public:
     boost::python::list nxt_mic() {
         boost::python::list out;
         if ( current_edge == HEEdge() ) {
-            std::cout << "nxt_mic() end of operation. Nothing to do.\n";
+            if (debug) std::cout << "nxt_mic() end of operation. Nothing to do.\n";
             return boost::python::list();
         }
         // find a point on current-edge so that we get the desired 
@@ -157,9 +158,9 @@ public:
         Point c2 = g[current_edge].point(target_radius);
         double r2 = target_radius;
         double w_target = ( c2-c1 ).norm() + r2 - r1;
-        std::cout << "nxt_mic() target width " << w_target << "\n";
+        if (debug) std::cout << "nxt_mic() target width " << w_target << "\n";
         if ( w_target > max_width ) {
-            std::cout << " searching on the current edge "; g.print_edge(current_edge);
+            if (debug) {  std::cout << " searching on the current edge "; g.print_edge(current_edge); }
             // find a point on the current edge
             double next_radius = find_next_radius();
             return output_next_mic(next_radius, new_branch);
@@ -170,10 +171,10 @@ public:
             
             mark_done(current_edge);
             
-            std::cout << "Finding new edge !\n";
+            if (debug) std::cout << "Finding new edge !\n";
             current_edge = find_next_edge();              // move to the next edge
             if ( current_edge == HEEdge() ) { // invalid edge marks end of operation
-                std::cout << "nxt_mic() end of operation.\n";
+                if (debug)  std::cout << "nxt_mic() end of operation.\n";
                 return boost::python::list();
             }
             double next_radius = find_next_radius();
@@ -189,7 +190,7 @@ public:
     }
     boost::python::list output_next_mic(double next_radius, bool branch) {
         boost::python::list out;
-        std::cout << " next_radius = " << next_radius << "\n";
+        if (debug) std::cout << " next_radius = " << next_radius << "\n";
         out.append( g[current_edge].point(next_radius) );
         out.append( next_radius );
         Point c1 = current_center;
@@ -242,11 +243,11 @@ public:
     
     HEEdge find_next_branch() {
         if (unvisited.empty() ) {
-            std::cout << "find_next_branch(): no un-machined branches. end operation.\n";
+            if (debug) std::cout << "find_next_branch(): no un-machined branches. end operation.\n";
             return HEEdge();
         } else {
             branch_point out = unvisited.top();
-            std::cout << "find_next_branch(): next branch is "; g.print_edge(out.next_edge);
+            if (debug) { std::cout << "find_next_branch(): next branch is "; g.print_edge(out.next_edge); }
             unvisited.pop();
             previous_branch_center = current_center;
             previous_branch_radius = current_radius;
@@ -268,16 +269,16 @@ public:
         }
         //std::cout << "find_next_edge(): " << out_edges.size() << " potential next-edges\n";
         if (out_edges.empty() ) {
-            std::cout << "find_next_edge(): no out_edges. end of branch.\n";
+            if (debug) std::cout << "find_next_edge(): no out_edges. end of branch.\n";
             HEEdge e = find_next_branch();
             if (e==HEEdge())
                 return e; // this is end-of-operation.
                 
             if (has_next_radius(e)) {
-                std::cout << "find_next_edge(): next-branch only one out-edge: "; g.print_edge(e);
+                if (debug) { std::cout << "find_next_edge(): next-branch only one out-edge: "; g.print_edge(e); }
                 return e;
             } else {
-                std::cout << "find_next_edge(): next-branch only one out-edge, but not valid\n"; 
+                if (debug) { std::cout << "find_next_edge(): next-branch only one out-edge, but not valid\n"; }
                 mark_done( e );
                 current_edge = e; // jump to the next edge
                 return find_next_edge(); // and try to see if that edge is valid.
@@ -285,10 +286,10 @@ public:
         } else if ( out_edges.size() == 1 ) {
             
             if (has_next_radius(out_edges[0])) {
-                std::cout << "find_next_edge(): only one out-edge: "; g.print_edge(out_edges[0]);
+                if (debug) { std::cout << "find_next_edge(): only one out-edge: "; g.print_edge(out_edges[0]); }
                 return out_edges[0];
             } else {
-                std::cout << "find_next_edge(): one out-edge, but not valid\n"; 
+                if (debug) std::cout << "find_next_edge(): one out-edge, but not valid\n"; 
                 mark_done( out_edges[0] );
                 current_edge = out_edges[0]; // jump to the next edge
                 return find_next_edge(); // and try to see if that edge is valid.
@@ -299,7 +300,7 @@ public:
             unvisited.push( branch_point(current_center, current_radius, out_edges[1] ) );
             
             if (has_next_radius(out_edges[0])) {
-                std::cout << "find_next_edge(): two out-edges, returning first: "; g.print_edge(out_edges[0]);
+                if (debug) { std::cout << "find_next_edge(): two out-edges, returning first: "; g.print_edge(out_edges[0]); }
                 return out_edges[0];
             } else {
                 mark_done( out_edges[0] ); //].done = true;
@@ -309,7 +310,7 @@ public:
             
             //return out_edges[0];
         } else {
-            std::cout << "find_next_edge(): too many out-edges. ERROR.\n";
+            if (debug) std::cout << "find_next_edge(): too many out-edges. ERROR.\n";
             exit(-1);
             return HEEdge();
         }
@@ -330,7 +331,7 @@ public:
         Point c2 = g[e].point(target_radius);
         double r2 = target_radius;
         double w_target = ( c2-c1 ).norm() + r2 - r1;
-        std::cout << " has_next_radius() " << w_target << "\n";
+        if (debug) std::cout << " has_next_radius() " << w_target << "\n";
         if (w_target<=0)
             return false;
             
@@ -363,7 +364,7 @@ public:
         //std::cout << " error at target = " << t(target_radius) << "\n";
         double trg_err = t(target_radius);
         double cur_err = t(current_radius);
-        if ( !(trg_err*cur_err < 0) ) {
+        if ( !(trg_err*cur_err < 0)  ) {
             std::cout << " current rad = " << current_radius << "\n";
             std::cout << " target rad = " << target_radius << "\n";
             std::cout << " error at current = " << t(current_radius) << "\n";
@@ -383,6 +384,7 @@ public:
     }
     
 private:
+    bool debug;
     std::vector<HEEdge> ma_edges; // the edges of the medial-axis
     std::map<HEEdge, edata> edge_data;
     HEGraph& g; // VD graph

@@ -48,6 +48,7 @@ ia = vtk.vtkImageActor()
 ia.SetInput(vol)
 ia.VisibilityOn()
 ia.InterpolateOff()
+myscreen.addActor(ia)
 
 myscreen.render()   
 
@@ -60,10 +61,10 @@ for n in range(512):
             col = black
             for c in range(3):
                 scalars.SetValue( n*(512*3) + m*3 +c, chr(col[c]) )
-vol.GetPointData().SetScalars(scalars)
+#vol.GetPointData().SetScalars(scalars)
 vol.Update()
 
-myscreen.addActor(ia)
+
 myscreen.render()   
 
  

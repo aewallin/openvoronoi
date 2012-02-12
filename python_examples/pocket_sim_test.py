@@ -15,6 +15,7 @@ myscreen.camera.SetPosition(0, -camPos/float(1000), zmult*camPos)
 myscreen.camera.SetClippingRange(-(zmult+1)*camPos,(zmult+1)*camPos)
 
 ovdvtk.drawOCLtext(myscreen, rev_text=ovd.version() )
+myscreen.render()   
 
 ps = pocket_sim.PocketSim(myscreen)
 ps.drawFarCircle()

@@ -556,7 +556,7 @@ if __name__ == "__main__":
     pi = ovd.PolygonInterior(True)
     vd2.filter_graph(pi)
     of = ovd.Offset( vd2.getGraph() ) # pass the created graph to the Offset class
-    ofs = of.offset(0.03)
+    ofs = of.offset(0.015)
     drawOffsets2(myscreen, ofs)
     
     # now create the VD for pocketing

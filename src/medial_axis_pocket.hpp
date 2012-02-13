@@ -81,7 +81,7 @@ class medial_axis_pocket {
 public:
     medial_axis_pocket(HEGraph& gi): g(gi) {
         BOOST_FOREACH( HEEdge e, g.edges() ) {
-            if ( g[e].valid && g[e].type != LINESITE && g[e].type != NULLEDGE) {
+            if ( g[e].valid && g[e].type != LINESITE && g[e].type != NULLEDGE && g[e].type != OUTEDGE) {
                 ma_edges.push_back(e);
                 edata ed;
                 edge_data.insert( Edata(e, ed ) );
@@ -122,7 +122,7 @@ public:
         double max_adj_radius(-1);
         BOOST_FOREACH( HEEdge e, g.out_edge_itr(max_mic_vertex) ) {
             //std::cout << "potential start edge: "; g.print_edge(e);
-            if ( g[ g.target(e) ].dist() > max_adj_radius ) {
+            if ( (g[ g.target(e) ].dist() > max_adj_radius) && g[e].valid && g[e].type != OUTEDGE ) {
                 max_adj_radius = g[ g.target(e) ].dist();
                 current_edge = e;
             }
@@ -164,6 +164,8 @@ public:
             if (debug) {  std::cout << " searching on the current edge "; g.print_edge(current_edge); }
             // find a point on the current edge
             double next_radius = find_next_radius();
+            if (debug) {  std::cout << " next_radius = " << next_radius << "\n"; }
+        
             return output_next_mic(next_radius, new_branch);
         } else {
             // moving to the target edge does not give a cut-width that is large enough
@@ -218,7 +220,7 @@ public:
         HEVertex trg = g.target(current_edge);
         EdgeVector out_edges;
         BOOST_FOREACH(HEEdge e, g.out_edge_itr(trg) ) {
-            if ( e != g[current_edge].twin && g[e].valid && g[e].type != NULLEDGE ) {
+            if ( e != g[current_edge].twin && g[e].valid && g[e].type != NULLEDGE && g[e].type != OUTEDGE ) {
                 out_edges.push_back(e);
             }
         }
@@ -270,7 +272,7 @@ public:
                 if (debug) { std::cout << "find_next_edge(): two out-edges, returning first: "; g.print_edge(out_edges[0]); }
                 return std::make_pair(out_edges[0],false);
             } else {
-                mark_done( out_edges[0] ); //].done = true;
+                mark_done( out_edges[0] ); 
                 current_edge = out_edges[0]; // jump to the next edge
                 return find_next_edge(); // and try to see if that edge is valid.
             }
@@ -295,7 +297,10 @@ public:
         Point c2 = g[e].point(r2);
 
         double w_target = ( c2-c1 ).norm() + r2 - r1;
-        if (debug) std::cout << " has_next_radius() " << w_target << "\n";
+        if (debug) {
+            std::cout << "has_next_radius() "; g.print_edge(e);
+            std::cout << " taget width = " << w_target << "\n";
+        }
         if (w_target<=0)
             return false;
             
@@ -317,6 +322,8 @@ public:
         double trg_err = t(target_radius);
         double cur_err = t(current_radius);
         if ( debug ||  ( !(trg_err*cur_err < 0) ) ) {
+            std::cout << "find_next_radius():\n";
+            std::cout << " current edge: "; g.print_edge(current_edge);// << current_radius << "\n";
             std::cout << " current rad = " << current_radius << "\n";
             std::cout << " target rad = " << target_radius << "\n";
             std::cout << " error at current = " << t(current_radius) << "\n";
@@ -332,7 +339,7 @@ public:
     // that lays out the pattern: lead-out, rapid, lead-in, bi-tangent, cut-arc, bi-tangent
     boost::python::list output_next_mic(double next_radius, bool branch) {
         boost::python::list out;
-        if (debug) std::cout << " next_radius = " << next_radius << "\n";
+        if (debug) std::cout << "output_next_mic() next_radius = " << next_radius << "\n";
         out.append( g[current_edge].point(next_radius) );
         out.append( next_radius );
         Point c1 = current_center;
@@ -350,6 +357,15 @@ public:
         double n = ( c2.y*r1 - c1.y*r2 ) / detM;
         double q = ( c1.x*r2 - c2.x*r1 ) / detM;
         std::vector<double> roots = numeric::quadratic_roots( m*m+p*p, 2*(m*n+p*q),  n*n+q*q-1);
+        if (debug) {
+            std::cout << " c1 = " << c1 << "\n";
+            std::cout << " r1 = " << r1 << "\n";
+            std::cout << " c2 = " << c2 << "\n";
+            std::cout << " r2 = " << r2 << "\n";
+            std::cout << " cutwidth = " << (c1-c2).norm()+r2-r1 << "\n";
+            std::cout << " " << roots.size() << " bi-tangent roots\n"; //output_next_mic() next_radius = " << next_radius << "\n";
+        }
+
         // bi-tangent lines are now
         // ax +  by + c = 0
         // with
@@ -379,7 +395,7 @@ public:
         
         return out;
     }
-    
+    void set_debug(bool b) {debug=b;}
 private:
     bool debug;
     std::vector<HEEdge> ma_edges; // the edges of the medial-axis

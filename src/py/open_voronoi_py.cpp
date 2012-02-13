@@ -173,5 +173,6 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         .def("maxMic", &medial_axis_pocket::max_mic)
         .def("nxtMic", &medial_axis_pocket::nxt_mic)
         .def("setWidth", &medial_axis_pocket::set_width)
+        .def("debug", &medial_axis_pocket::set_debug)
     ;
 }

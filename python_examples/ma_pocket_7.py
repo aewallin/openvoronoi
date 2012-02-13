@@ -470,10 +470,10 @@ class WritableObject:
 if __name__ == "__main__":  
     #w=2500
     #h=1500
-    w=1920
-    h=1080
-    #w=1024
-    #h=1024
+    #w=1920
+    #h=1080
+    w=1024
+    h=1024
     myscreen = ovdvtk.VTKScreen(width=w, height=h) 
     ovdvtk.drawOCLtext(myscreen, rev_text=ovd.version() )
 
@@ -561,9 +561,9 @@ if __name__ == "__main__":
     ofs_list=[]
     t_before = time.time()
 
-    ofs = of.offset(0.03)
+    ofs = of.offset(0.015)
     drawPocket(myscreen, pts)
-    drawOffsets2(myscreen, ofs)
+    #drawOffsets2(myscreen, ofs)
     
     #myscreen.render()   
     #myscreen.iren.Start()
@@ -572,16 +572,18 @@ if __name__ == "__main__":
     #print ofs
     
     # now create a new VD from the offset
-    #vd2 = ovd.VoronoiDiagram(1,120)
-    #insert_offset_loop(vd2,ofs)
+    vd2 = ovd.VoronoiDiagram(1,120)
+    insert_offset_loop(vd2,ofs)
 
-    # now offset outward
-    #pi = ovd.PolygonInterior(False)
-    #vd2.filter_graph(pi)
-    #of = ovd.Offset( vd2.getGraph() ) # pass the created graph to the Offset class
-    #ofs = of.offset(0.015)
+    # now offset inward
+    pi = ovd.PolygonInterior(True)
+    vd2.filter_graph(pi)
+    of = ovd.Offset( vd2.getGraph() ) # pass the created graph to the Offset class
+    ofs = of.offset(0.015)
     #drawOffsets2(myscreen, ofs)
     
+    #myscreen.render()   
+    #myscreen.iren.Start()
 
     
     
@@ -590,7 +592,7 @@ if __name__ == "__main__":
     times = insert_offset_loop(vd3,ofs)
     vod3 = ovdvtk.VD(myscreen,vd3,float(scale), textscale=0.01, vertexradius=0.003)
 
-    vod3.textScale = 0.0002
+    vod3.textScale = 0.02
     vod3.vertexRadius = 0.0031
     vod3.drawVertices=0
     vod3.drawVertexIndex=1
@@ -599,20 +601,21 @@ if __name__ == "__main__":
     
     vod3.setVDText2(times)
     
-    pi = ovd.PolygonInterior(False)
+    pi = ovd.PolygonInterior(True)
     vd3.filter_graph(pi)
-    #ma = ovd.MedialAxis()
-    #vd3.filter_graph(ma)
+    ma = ovd.MedialAxis()
+    vd3.filter_graph(ma)
     
     vod3.setAll()
     
-    myscreen.render()   
-    myscreen.iren.Start()
     
     mapocket = ovd.MedialAxisPocket(vd3.getGraph())
     mapocket.setWidth(0.01)
     
+    mapocket.debug(True)
+    
     maxmic = mapocket.maxMic()
+    
     
     #print maxmic
     previous_center = maxmic[0]
@@ -620,7 +623,10 @@ if __name__ == "__main__":
     cl = ovd.Point(0,0)
     
     # the initial largest MIC. to be cleared with a spiral-path
-    #drawCircle( myscreen, maxmic[0], maxmic[1] , ovdvtk.red )
+    drawCircle( myscreen, maxmic[0], maxmic[1] , ovdvtk.red )
+
+    #myscreen.render()   
+    #myscreen.iren.Start()
     
     # the rest of the MICs are then cleared
     nframe=0
@@ -629,8 +635,9 @@ if __name__ == "__main__":
     out_tangent = ovd.Point()
     in_tangent = ovd.Point()
     while True:
+        print nframe
         mic = mapocket.nxtMic()
-        if 0: #nframe == 30:
+        if nframe == 0:
             break
         if len(mic) >= 2:
             cen2 = mic[0]

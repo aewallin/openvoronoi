@@ -572,12 +572,20 @@ def drawBitangents():
     myscreen.camera.SetPosition(0.01, 0,  100 ) 
     myscreen.camera.SetFocalPoint(0, 0, 0)
     myscreen.camera.SetClippingRange(-100,3000)
-    
+    """
     c1 = ovd.Point(10,20)
     r1=20
-    
     c2 = ovd.Point(6,13)
     r2=23
+    """
+    
+    # external ma-pocket fails with this input:
+    c1 = ovd.Point(0, -18)
+    r1 = 16.7033
+    c2 = ovd.Point(0, -17.2167)
+    r2 = 15.9299
+
+
     drawCircle(myscreen, c1, r1, ovdvtk.red)
     drawCircle(myscreen, c2, r2, ovdvtk.green)
     
@@ -626,6 +634,7 @@ def drawBitangents():
     print "roots1 ", roots1
     for r in roots1:
         lines.append( root_to_line(r,m,n,p,q) )
+        
     """
     n = ( c2.y*(-1)*r1 - c1.y*(-1)*r2 ) / detM
     q = ( c1.x*(-1)*r2 - c2.x*(-1)*r1 ) / detM

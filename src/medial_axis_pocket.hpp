@@ -173,20 +173,7 @@ public:
             mark_done(current_edge);
             if (debug) std::cout << "Finding new edge !\n";
             
-            // check for end-of-branch and output a final MIC at the end of a branch.
-            // output a final MIC at the end of the branch
-            // so that no uncut-material will remain
-            /*
-            EdgeVector out_edges = find_out_edges();
-            std::cout << " out_edges: " << out_edges.size() << " \n";
-            if ( out_edges.empty() ) { // end of branch
-                std::cout << " end-of-branch MIC at " << g[g.target(current_edge)].index << " \n";
-                std::cout << " current_radius = " << current_radius << "\n";
-                std::cout << " target radius =  " << g[ g.target(current_edge) ].dist() << "\n";
-
-            }*/
-            
-            bool end_branch_mic=false;
+            bool end_branch_mic;
             boost::tie( current_edge, end_branch_mic) = find_next_edge(); // move to the next edge
             if ( current_edge == HEEdge() ) { // invalid edge marks end of operation
                 if (debug)  std::cout << "nxt_mic() end of operation.\n";
@@ -194,7 +181,7 @@ public:
             }
             
             if ( end_branch_mic )
-                return output_next_mic(current_radius, true);
+                return output_next_mic(current_radius, false);
             
             double next_radius = find_next_radius();
             if (new_branch) {
@@ -216,20 +203,17 @@ public:
             return HEEdge();
         } else {
             branch_point out = unvisited.top();
-            //debug = true;
             if (debug) { std::cout << "find_next_branch(): next branch is "; g.print_edge(out.next_edge); }
-            //debug = false;
             unvisited.pop();
             previous_branch_center = current_center;
-            previous_branch_radius = current_radius;
-            
+            previous_branch_radius = current_radius;            
             current_center = out.current_center;
             current_radius = out.current_radius;
             new_branch = true;
             return out.next_edge;
         }
     }
-    
+
     EdgeVector find_out_edges() {
         HEVertex trg = g.target(current_edge);
         EdgeVector out_edges;
@@ -241,24 +225,16 @@ public:
         return out_edges;
     }
     
+    // output the next edge
+    // return true if we need a final MIC at the end of a branch
     std::pair<HEEdge,bool> find_next_edge() {
-        //HEVertex trg = g.target(current_edge);
         EdgeVector out_edges = find_out_edges();
-        //BOOST_FOREACH(HEEdge e, g.out_edge_itr(trg) ) {
-        //    if ( e != g[current_edge].twin && g[e].valid && g[e].type != NULLEDGE ) {
-        //        out_edges.push_back(e);
-        //    }
-        //}
-        //std::cout << "find_next_edge(): " << out_edges.size() << " potential next-edges\n";
         if (out_edges.empty() ) {
             if (debug) std::cout << "find_next_edge(): no out_edges. end of branch.\n";
             
             if ( current_radius > g[ g.target(current_edge) ].dist() ) {
-                //std::cout << " end-of-branch MIC ! \n";
                 current_radius = g[ g.target(current_edge) ].dist();
-                return std::make_pair(current_edge,true);
-                // how do we force an output here?
-                //return output_next_mic( current_radius , false);
+                return std::make_pair(current_edge,true); // this outputs a final MIC at the end of a branch
             }
             
             HEEdge e = find_next_branch();
@@ -297,9 +273,7 @@ public:
                 mark_done( out_edges[0] ); //].done = true;
                 current_edge = out_edges[0]; // jump to the next edge
                 return find_next_edge(); // and try to see if that edge is valid.
-            } 
-            
-            //return out_edges[0];
+            }
         } else {
             if (debug) std::cout << "find_next_edge(): too many out-edges. ERROR.\n";
             exit(-1);
@@ -315,11 +289,11 @@ public:
     // does HEEdge e have the next MIC we want ?
     bool has_next_radius(HEEdge e) {
         // check if the edge e is one where we continue
-        Point c1 = g[current_edge].point(current_radius); 
         double r1 = current_radius;
+        Point c1 = g[current_edge].point(r1); 
         double r2 = g[ g.target(e) ].dist();
         Point c2 = g[e].point(r2);
-        //double r2 = target_radius;
+
         double w_target = ( c2-c1 ).norm() + r2 - r1;
         if (debug) std::cout << " has_next_radius() " << w_target << "\n";
         if (w_target<=0)
@@ -334,8 +308,7 @@ public:
     // on the current edge, move from current_radius towards target_radius
     // and find a radius-value that satisfies the cut-width constraint.
     double find_next_radius() {
-        // HEGraph& gi, double wmax, HEEdge search_edge, Point cen1, double rad1)
-        CutWidthError t(g,max_width, current_edge, current_center, current_radius);
+        CutWidthError t(g, max_width, current_edge, current_center, current_radius);
         typedef std::pair<double, double> Result;
         boost::uintmax_t max_iter=500;
         boost::math::tools::eps_tolerance<double> tol(30);
@@ -377,9 +350,6 @@ public:
         double n = ( c2.y*r1 - c1.y*r2 ) / detM;
         double q = ( c1.x*r2 - c2.x*r1 ) / detM;
         std::vector<double> roots = numeric::quadratic_roots( m*m+p*p, 2*(m*n+p*q),  n*n+q*q-1);
-        //BOOST_FOREACH(double r, roots) {
-        //    std::cout << " root " << r << "\n";
-        //}
         // bi-tangent lines are now
         // ax +  by + c = 0
         // with

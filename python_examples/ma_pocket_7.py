@@ -20,7 +20,16 @@ def drawPoint( myscreen, c, pcolor , rad = 0.002):
     ca = ovdvtk.Sphere(center=(c.x,c.y,0) , radius=rad, color=pcolor)
     myscreen.addActor(ca)
 
-
+def drawPocket(myscreen, pts, pocketcolor=ovdvtk.orange):
+    
+    for n in range(len(pts)):
+        src = pts[n]
+        if (n!= len(pts)-1):
+            trg=pts[n+1]
+        else:
+            trg=pts[0]
+        ovdvtk.drawLine(myscreen,src,trg,pocketcolor)
+    
 # rotate by cos/sin. from emc2 gcodemodule.cc
 def rotate(x, y,  c,  s):
     tx = x * c - y * s;
@@ -494,11 +503,19 @@ if __name__ == "__main__":
     #ngc_writer.preamble()
     
     
-    linesegs = 1 # switch to turn on/off line-segments
+    #linesegs = 1 # switch to turn on/off line-segments
     
-    segs = []
+    # draw a stock-box
+    sp1=ovd.Point(-0.7,-0.4)
+    sp2=ovd.Point(-0.7,0.7)
+    sp3=ovd.Point(0.7,0.7)
+    sp4=ovd.Point(0.7,-0.4)
+    stock_pts = [sp1,sp2,sp3,sp4]
+    drawPocket(myscreen,stock_pts,ovdvtk.red)
+    
+    #segs = []
     #ovd.Point(1,1)
-    eps=0.9
+    #eps=0.9
     p1=ovd.Point(-0.1,-0.2)
     p2=ovd.Point(0.2,0.1)
     p3=ovd.Point(0.4,0.2)
@@ -537,27 +554,36 @@ if __name__ == "__main__":
     vd.check()
     #vod.setVDText2(times)
     
-    pi = ovd.PolygonInterior(True)
+    # offset outwards
+    pi = ovd.PolygonInterior(False)
     vd.filter_graph(pi)
-    
     of = ovd.Offset( vd.getGraph() ) # pass the created graph to the Offset class
     ofs_list=[]
     t_before = time.time()
 
     ofs = of.offset(0.03)
+    drawPocket(myscreen, pts)
+    drawOffsets2(myscreen, ofs)
+    
+    #myscreen.render()   
+    #myscreen.iren.Start()
+    
     #print " offset is len=",len(ofs)
     #print ofs
     
     # now create a new VD from the offset
-    vd2 = ovd.VoronoiDiagram(1,120)
-    insert_offset_loop(vd2,ofs)
+    #vd2 = ovd.VoronoiDiagram(1,120)
+    #insert_offset_loop(vd2,ofs)
 
     # now offset outward
-    pi = ovd.PolygonInterior(True)
-    vd2.filter_graph(pi)
-    of = ovd.Offset( vd2.getGraph() ) # pass the created graph to the Offset class
-    ofs = of.offset(0.015)
+    #pi = ovd.PolygonInterior(False)
+    #vd2.filter_graph(pi)
+    #of = ovd.Offset( vd2.getGraph() ) # pass the created graph to the Offset class
+    #ofs = of.offset(0.015)
     #drawOffsets2(myscreen, ofs)
+    
+
+    
     
     # now create the VD for pocketing
     vd3 = ovd.VoronoiDiagram(1,120)
@@ -573,12 +599,15 @@ if __name__ == "__main__":
     
     vod3.setVDText2(times)
     
-    pi = ovd.PolygonInterior(True)
+    pi = ovd.PolygonInterior(False)
     vd3.filter_graph(pi)
-    ma = ovd.MedialAxis()
-    vd3.filter_graph(ma)
+    #ma = ovd.MedialAxis()
+    #vd3.filter_graph(ma)
     
     vod3.setAll()
+    
+    myscreen.render()   
+    myscreen.iren.Start()
     
     mapocket = ovd.MedialAxisPocket(vd3.getGraph())
     mapocket.setWidth(0.01)

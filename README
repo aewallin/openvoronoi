@@ -105,7 +105,7 @@ http://www.cosy.sbg.ac.at/~held/projects/vroni/vroni.html
 Patel (see References) seems to have independently implemented the
 same algorithm, we don't know where this code is or under what license it is.
 
-References
+References, Voronoi Diagram algorithms
 
 Sugihara and Iri, (1992) "construction of the voronoi diagram for one 
 million generators in single-precision arithmetic" 
@@ -131,13 +131,6 @@ computation of Voronoi diagrams of circular arcs and straight-line
 segments", Computer-Aided Design, Volume 41, Issue 5, May 2009, Pages 327-338
 http://dx.doi.org/10.1016/j.cad.2008.08.004
 
-Martin Held, Christian Spielberger (2009). "A smooth spiral tool path for 
-high speed machining of 2D pockets", Computer-Aided Design, Volume 41, 
-Issue 7, July 2009, Pages 539-550
-http://dx.doi.org/10.1016/j.cad.2009.04.002
-See also www.cosy.sbg.ac.at/~cspiel/projects/hsm/isvd08.pdf 
-and www.cosy.sbg.ac.at/~held/teaching/seminar/seminar_2010-11/hsm.pdf
-
 Nirav B. Patel (2005), "Voronoi diagrams, robust and efficient implementation", Binghamton
 University, State University of New York, 2005, MSc thesis. (this thesis is not
 accompanied by code, or much implementation detail)
@@ -145,10 +138,6 @@ accompanied by code, or much implementation detail)
 Kim D-S, (1998), "Polygon offsetting using a Voronoi diagram and two stacks"
 Computer Aided Design, Vol. 30, No. 14, pp 1069-1076
 http://dx.doi.org/10.1016/S0010-4485(98)00063-3
-
-Gershon Elber, Elaine Cohen, Sam Drake, "MATHSM: medial axis trasform toward high speed machining
-of pockets", Computer Aided Design 37 (2004) 241-250
-http://dx.doi.org/10.1016/j.cad.2004.05.008
 
 Chen, Fu
 "An optimal approach to multiple tool selection and their numerical control path generation for 
@@ -158,3 +147,23 @@ http://dx.doi.org/10.1016/j.cad.2011.01.020
 
 
 todo: Burnikel-papers? 
+
+References, HSM or Trochoidal paths:
+
+Martin Held, Christian Spielberger (2009). "A smooth spiral tool path for 
+high speed machining of 2D pockets", Computer-Aided Design, Volume 41, 
+Issue 7, July 2009, Pages 539-550
+http://dx.doi.org/10.1016/j.cad.2009.04.002
+See also www.cosy.sbg.ac.at/~cspiel/projects/hsm/isvd08.pdf 
+and www.cosy.sbg.ac.at/~held/teaching/seminar/seminar_2010-11/hsm.pdf
+
+Gershon Elber, Elaine Cohen, Sam Drake, "MATHSM: medial axis trasform toward high speed machining
+of pockets", Computer Aided Design 37 (2004) 241-250
+http://dx.doi.org/10.1016/j.cad.2004.05.008
+
+Rauch et al. (2009) "Improving trochoidal tool paths generation and implementation using process constraints modelling"
+http://dx.doi.org/10.1016/j.ijmachtools.2008.12.006
+This paper has formulas for maximum depth of cut for circular and trochoidal clearing paths
+
+Ibaraki (2010) "On the removal of critical cutting regions by trochoidal grooving"
+http://dx.doi.org/10.1016/j.precisioneng.2010.01.007

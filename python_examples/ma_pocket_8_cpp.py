@@ -481,11 +481,11 @@ if __name__ == "__main__":
     
     # redirect stdout to file
     # example with redirection of sys.stdout
-    #foo = WritableObject()                   # a writable object
-    #sys.stdout = foo                         # redirection
+    foo = WritableObject()                   # a writable object
+    sys.stdout = foo                         # redirection
 
     print "( Medial-Axis pocketing. Proof-of-principle. 2012-02-12 )"
-    print "( OpenVoronoi ",ovd.version()," )"
+    print "( OpenVoronoi %s  )" % (ovd.version())
     print "( TOOL/MILL,10,0,50 ) "
     print "( COLOR,0,255,255 ) "
     print "( STOCK/BLOCK,700.0000,400.0000,10.0000,350.0000,160.0000,5.0000 ) "
@@ -531,7 +531,7 @@ if __name__ == "__main__":
     t_after = time.time()
     times.append( t_after-t_before )
     vd.check()
-    print "( VD1 done in ", 1e3*(sum(times))," milliseconds.  )"
+    print "( VD1 done in   %.3f s.  )" % (sum(times))
     #vod.setVDText2(times)
     
     pi = ovd.PolygonInterior(True)
@@ -542,15 +542,16 @@ if __name__ == "__main__":
     t_before = time.time()
     ofs = of.offset(0.03)
     t_after = time.time()
-    print "( VD1 OFFSET in ", 1e3*(t_after-t_before)," milliseconds.  )"
-    
+    #print "( VD1 OFFSET in ", 1e3*(t_after-t_before)," milliseconds.  )"
+    print "( VD1 OFFSET in %.3f s.  )" % (1e3*(t_after-t_before))
     #print " offset is len=",len(ofs)
     #print ofs
     
     # now create a new VD from the offset
     vd2 = ovd.VoronoiDiagram(1,120)
     tim2 = insert_offset_loop(vd2,ofs)
-    print "( VD2 done in ", 1e3*(sum(tim2))," milliseconds.  )"
+    #print "( VD2 done in ", 1e3*(sum(tim2))," milliseconds.  )"
+    print "( VD2 done in   %.3f s.  )" % (sum(tim2))
     # now offset outward
     pi = ovd.PolygonInterior(True)
     vd2.filter_graph(pi)
@@ -558,15 +559,15 @@ if __name__ == "__main__":
     t_before = time.time()
     ofs = of.offset(0.015)
     t_after = time.time()
-    print "( VD2 OFFSET in ", 1e3*(t_after-t_before)," milliseconds.  )"
-    
+    #print "( VD2 OFFSET in ", 1e3*(t_after-t_before)," milliseconds.  )"
+    print "( VD2 OFFSET in %.3f s.  )" % (1e3*(t_after-t_before))
     drawOffsets2(myscreen, ofs)
     
     # now create the VD for pocketing
     vd3 = ovd.VoronoiDiagram(1,120)
     times = insert_offset_loop(vd3,ofs)
-    print "( VD3 done in ", 1e3*(sum(times))," milliseconds.  )"
-    
+    #print "( VD3 done in ", 1e3*(sum(times))," milliseconds.  )"
+    print "( VD3 done in   %.3f s.  )" % (sum(times))
     vod3 = ovdvtk.VD(myscreen,vd3,float(scale), textscale=0.01, vertexradius=0.003)
 
     vod3.textScale = 0.0002
@@ -587,13 +588,13 @@ if __name__ == "__main__":
     
     mapocket = ovd.MedialAxisPocket(vd3.getGraph())
     mapocket.setWidth(0.01)
-    mapocket.debug(True)
+    mapocket.debug(False)
     t_before = time.time()
     mapocket.run()
     mic_list = mapocket.get_mic_list()
     t_after = time.time()
-    print "( ma-pocket done in ", 1e3*(t_after-t_before)," milliseconds. got ",  len(mic_list)," MICs )"
-   
+    #print "( ma-pocket done in ", 1e3*(t_after-t_before)," milliseconds. got ",  len(mic_list)," MICs )"
+    print "( MA-pocket done in %.3f s. Got %d MICs )" % ((t_after-t_before),len(mic_list) )
     
     maxmic = mic_list[0] 
     
@@ -683,17 +684,17 @@ if __name__ == "__main__":
     
     #print "PYTHON All DONE."
     
-    #ngc_writer.postamble()
+    ngc_writer.postamble()
     
-    #sys.stdout = sys.__stdout__              # remember to reset sys.stdout!
+    sys.stdout = sys.__stdout__              # remember to reset sys.stdout!
     
-    #f = open('output.nc', 'w')
-    #for item in foo.content:
-    #    if item != '\n':
-    #        print>>f, item
-    #f.close()
+    f = open('output.nc', 'w')
+    for item in foo.content:
+        if item != '\n':
+            print>>f, item
+    f.close()
     
-
+    print "python done."
     
     myscreen.render()   
 

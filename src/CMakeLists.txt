@@ -118,6 +118,7 @@ set(OVD_SRC
     ${OpenVoronoi_SOURCE_DIR}/common/point.cpp
     ${OpenVoronoi_SOURCE_DIR}/vertex_positioner.cpp
     ${OpenVoronoi_SOURCE_DIR}/common/numeric.cpp
+    ${OpenVoronoi_SOURCE_DIR}/medial_axis_pocket.cpp
 )
 
 set( OVD_INCLUDE_FILES

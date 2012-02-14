@@ -490,9 +490,6 @@ if __name__ == "__main__":
     print "( COLOR,0,255,255 ) "
     print "( STOCK/BLOCK,700.0000,400.0000,10.0000,350.0000,160.0000,5.0000 ) "
     
-
-    
-    
     linesegs = 1 # switch to turn on/off line-segments
     
     segs = []
@@ -591,8 +588,8 @@ if __name__ == "__main__":
     mapocket = ovd.MedialAxisPocket(vd3.getGraph())
     mapocket.setWidth(0.01)
     mapocket.debug(True)
-    mapocket.run()
     t_before = time.time()
+    mapocket.run()
     mic_list = mapocket.get_mic_list()
     t_after = time.time()
     print "( ma-pocket done in ", 1e3*(t_after-t_before)," milliseconds. got ",  len(mic_list)," MICs )"
@@ -647,11 +644,7 @@ if __name__ == "__main__":
             in2 = mic[5]
             out2 = mic[4]
             out1 = mic[2]
-            
-        #drawPoint( myscreen, in1, ovdvtk.red )
-        #drawPoint( myscreen, out1, ovdvtk.pink )
-        #drawPoint( myscreen, in2, ovdvtk.green )
-        #drawPoint( myscreen, out2, ovdvtk.grass )
+
         in_tangent = in2-in1
         # rapid traverse to in1
         if not first:

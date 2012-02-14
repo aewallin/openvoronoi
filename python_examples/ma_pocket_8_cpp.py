@@ -590,7 +590,7 @@ if __name__ == "__main__":
     
     mapocket = ovd.MedialAxisPocket(vd3.getGraph())
     mapocket.setWidth(0.01)
-    #mapocket.debug(True)
+    mapocket.debug(True)
     mapocket.run()
     t_before = time.time()
     mic_list = mapocket.get_mic_list()
@@ -625,64 +625,65 @@ if __name__ == "__main__":
         mic = mic_list[n] #apocket.nxtMic()
         if 0: #nframe == 40:
             break
-        if len(mic) >= 2:
-            cen2 = mic[0]
-            r2 = mic[1]
-            #drawCircle( myscreen, mic[0], mic[1] , ovdvtk.green )
             
-            previous_center = mic[6]
-            previous_radius = mic[7]
-            
-            new_branch = mic[8] # true/false indicates if we are starting on new branch
-            prev_branch_center = mic[9]
-            prev_branch_radius = mic[10] # old branch MIC radius
+        cen2 = mic[0]
+        r2 = mic[1]
+        #drawCircle( myscreen, mic[0], mic[1] , ovdvtk.green )
+        
+        previous_center = mic[6]
+        previous_radius = mic[7]
+        
+        new_branch = mic[8] # true/false indicates if we are starting on new branch
+        prev_branch_center = mic[9]
+        prev_branch_radius = mic[10] # old branch MIC radius
 
-            if mic[2].is_right( previous_center, cen2 ):
-                in1 = mic[2]
-                in2 = mic[4]
-                out2 = mic[5]
-                out1 = mic[3]
-            else:
-                in1 = mic[3]
-                in2 = mic[5]
-                out2 = mic[4]
-                out1 = mic[2]
-                
-            drawPoint( myscreen, in1, ovdvtk.red )
-            drawPoint( myscreen, out1, ovdvtk.pink )
-            drawPoint( myscreen, in2, ovdvtk.green )
-            drawPoint( myscreen, out2, ovdvtk.grass )
-            in_tangent = in2-in1
-            # rapid traverse to in1
-            if not first:
-                if new_branch:
-                    # new branch re-position move
-                    rapid_to_new_branch(myscreen, out_tangent, in_tangent, prev_branch_center, prev_branch_radius , cen2, r2, previous_out1, in1)
-                else:
-                    # normal arc-rapid-arc to next MIC
-                    rapid_to_next(myscreen, out_tangent, in_tangent, previous_center, previous_radius, cen2, r2, previous_out1, in1)
-            else:
-                # spiral-clear the start-MIC. The spiral should end at in1
-                spiral_clear(myscreen, out_tangent, in_tangent, previous_center, previous_radius, cen2, r2, previous_out1, in1)
-                #print "No rapid-move on first-iteration."
-                first = False
-
-            # in bi-tangent
-            ovdvtk.drawLine(myscreen, in1, in2, ovdvtk.green)
-            ngc_writer.xy_line_to(in2.x,in2.y)
-            # draw arc
-            drawArc(myscreen, in2, out2, r2, cen2, True, ovdvtk.green)
-            # out bi-tangent
-            ovdvtk.drawLine(myscreen, out2, out1, ovdvtk.green)
-            ngc_writer.xy_line_to(out1.x,out1.y)
-            
-            previous_out1 = out1 # this is used as the start-point for the rapid on the next iteration
-            out_tangent = out1-out2
+        if not mic[2].is_right( previous_center, cen2 ):
+            in1 = mic[2]
+            in2 = mic[4]
+            out2 = mic[5]
+            out1 = mic[3]
         else:
+            in1 = mic[3]
+            in2 = mic[5]
+            out2 = mic[4]
+            out1 = mic[2]
+            
+        #drawPoint( myscreen, in1, ovdvtk.red )
+        #drawPoint( myscreen, out1, ovdvtk.pink )
+        #drawPoint( myscreen, in2, ovdvtk.green )
+        #drawPoint( myscreen, out2, ovdvtk.grass )
+        in_tangent = in2-in1
+        # rapid traverse to in1
+        if not first:
+            if new_branch:
+                # new branch re-position move
+                rapid_to_new_branch(myscreen, out_tangent, in_tangent, prev_branch_center, prev_branch_radius , cen2, r2, previous_out1, in1)
+            else:
+                # normal arc-rapid-arc to next MIC
+                rapid_to_next(myscreen, out_tangent, in_tangent, previous_center, previous_radius, cen2, r2, previous_out1, in1)
+        else:
+            # spiral-clear the start-MIC. The spiral should end at in1
+            spiral_clear(myscreen, out_tangent, in_tangent, previous_center, previous_radius, cen2, r2, previous_out1, in1)
+            #print "No rapid-move on first-iteration."
+            first = False
+
+        # in bi-tangent
+        ovdvtk.drawLine(myscreen, in1, in2, ovdvtk.green)
+        ngc_writer.xy_line_to(in2.x,in2.y)
+        # draw arc
+        drawArc(myscreen, in2, out2, r2, cen2, True, ovdvtk.green)
+        # out bi-tangent
+        ovdvtk.drawLine(myscreen, out2, out1, ovdvtk.green)
+        ngc_writer.xy_line_to(out1.x,out1.y)
+        
+        previous_out1 = out1 # this is used as the start-point for the rapid on the next iteration
+        out_tangent = out1-out2
+        
+        if n == len(mic_list)-1:
             # end of operation. do a final lead-out arc.
             final_lead_out(myscreen, out_tangent, in_tangent, previous_center, previous_radius, cen2, r2, previous_out1, in1)
             #print "Final lead-out arc"
-            break
+
         nframe = nframe+1
         
     #print "mic-pocket done."

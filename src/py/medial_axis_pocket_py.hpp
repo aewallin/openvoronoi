@@ -34,14 +34,14 @@ public:
         boost::python::list out;
         BOOST_FOREACH(MIC mic, mic_list) {
             boost::python::list m;
-            m.append( mic.c1 );          //0
-            m.append( mic.r1 );          //1
+            m.append( mic.c2 );          //0
+            m.append( mic.r2 );          //1
             m.append( mic.t1 );         //2
             m.append( mic.t2 );         //3
             m.append( mic.t3 );         //4
             m.append( mic.t4 );         //5
-            m.append( mic.c2 );          //6
-            m.append( mic.r2 );          //7
+            m.append( mic.c1 );          //6
+            m.append( mic.r1 );          //7
             m.append( mic.new_branch ); //8
             m.append( mic.c_prev );     //9
             m.append( mic.r_prev );     //10

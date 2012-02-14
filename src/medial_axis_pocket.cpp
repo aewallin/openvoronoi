@@ -25,7 +25,10 @@ namespace ovd
 /// the input graph should be a voronoi diagram passed through medial_axis_filter
 medial_axis_pocket::medial_axis_pocket(HEGraph& gi): g(gi) {
     BOOST_FOREACH( HEEdge e, g.edges() ) {
-        if ( g[e].valid && g[e].type != LINESITE && g[e].type != NULLEDGE && g[e].type != OUTEDGE) {
+        if ( g[e].valid && 
+             g[e].type != LINESITE && 
+             g[e].type != NULLEDGE && 
+             g[e].type != OUTEDGE   ) {
             ma_edges.push_back(e);
             edata ed;
             edge_data.insert( Edata(e, ed ) );
@@ -35,6 +38,7 @@ medial_axis_pocket::medial_axis_pocket(HEGraph& gi): g(gi) {
     max_width = 0.05;
     debug = false;
 }
+
 
 /// set the maximum cut width
 void medial_axis_pocket::set_width(double w) {max_width=w;}
@@ -138,7 +142,9 @@ bool medial_axis_pocket::find_next_mic() {
         }
         
         if ( end_branch_mic ) {
-            output_next_mic(current_radius, false);
+            if (debug)  std::cout << "find_next_mic() end-of-branch MIC.\n";
+            // this is unreliable, so comment out for now
+            //output_next_mic(current_radius, false);
             return true;
         }
         
@@ -299,18 +305,41 @@ void medial_axis_pocket::output_next_mic(double next_radius, bool branch) {
     MIC mic;
     if (debug) std::cout << "output_next_mic() next_radius = " << next_radius << "\n";
 
-    mic.c2 = g[current_edge].point(next_radius);
-    mic.r2 = next_radius;
-    mic.c1 = current_center;
-    mic.r1 = current_radius;
+    //mic.c2 = g[current_edge].point(next_radius);
+    //mic.r2 = next_radius;
+    
+    //mic.c1 = current_center;
+    //mic.r1 = current_radius;
     Point c1 = current_center;
     Point c2 = g[current_edge].point(next_radius);
     double r1 = current_radius;
     double r2 = next_radius;
+    
+    mic.c1 = c1;
+    mic.r1 = r1;
+    mic.c2 = c2;
+    mic.r2 = r2;
+    
+    if (c1 != c2) {
+        std::vector<Point> tangents = bitangent_points(c1,r1,c2,r2);
+        mic.t1 = tangents[0]; //tang1; //2
+        mic.t2 = tangents[1]; //3
+        mic.t3 = tangents[2]; //4
+        mic.t4 = tangents[3]; //5
+    }
+    mic.new_branch = branch;
+    mic.c_prev = previous_branch_center;
+    mic.r_prev = previous_branch_radius;
+
+    mic_list.push_back(mic);
+    
     current_radius = next_radius;
     current_center = g[current_edge].point(next_radius);
     
-    // find the bi-tangents and return them too.
+}
+
+std::vector<Point> medial_axis_pocket::bitangent_points(Point c1, double r1, Point c2, double r2) {
+        // find the bi-tangents and return them too.
     // see voronoi_bisectors.py
     double detM = c1.x*c2.y - c2.x*c1.y;
     double m = ( c1.y-c2.y ) / detM;
@@ -325,7 +354,7 @@ void medial_axis_pocket::output_next_mic(double next_radius, bool branch) {
         std::cout << " c2 = " << c2 << "\n";
         std::cout << " r2 = " << r2 << "\n";
         std::cout << " cutwidth = " << (c1-c2).norm()+r2-r1 << "\n";
-        std::cout << " " << roots.size() << " bi-tangent roots\n"; //output_next_mic() next_radius = " << next_radius << "\n";
+        std::cout << " " << roots.size() << " bi-tangent roots\n"; 
     }
 
     // bi-tangent lines are now
@@ -345,33 +374,67 @@ void medial_axis_pocket::output_next_mic(double next_radius, bool branch) {
     Point tang2 = c1 - r1*Point( a2, b2 );
     Point tang3 = c2 - r2*Point( a1, b1 );
     Point tang4 = c2 - r2*Point( a2, b2 );
-    
-    /*
-     *  sort the bi-tangents here?
-     *  special sorting-rule required for very short c1-c2 distance (e.g. end-of-branch MIC)
-        if mic[2].is_right( previous_center, cen2 ):
-            in1 = mic[2]
-            in2 = mic[4]
-            out2 = mic[5]
-            out1 = mic[3]
-        else:
-            in1 = mic[3]
-            in2 = mic[5]
-            out2 = mic[4]
-            out1 = mic[2]
-    */
-    
-    mic.t1 = tang1; //2
-    mic.t2 = tang2; //3
-    mic.t3 = tang3; //4
-    mic.t4 = tang4; //5
-    mic.new_branch = branch;
-    mic.c_prev = previous_branch_center;
-    mic.r_prev = previous_branch_radius;
-
-    mic_list.push_back(mic);
+    std::vector<Point> out;
+    out.push_back(tang1);
+    out.push_back(tang2);
+    out.push_back(tang3);
+    out.push_back(tang4);
+    return out;
 }
 
+// try a more robust solution approach
+/*
+std::vector<Point> medial_axis_pocket::bitangent_points2(Point c1, double r1, Point c2, double r2) {
+    BitangentError t(c1,r1,c2,r2);
+    Point dir = c2-c1;
+    double dir_alfa = numeric::diangle( dir.x, dir.y );
+    Point dir_1 = dir.xy_perp();
+    Point dir_2 = -1*dir_1;
+    double dir_1_alfa = numeric::diangle( dir_1.x, dir_1.y );
+    double dir_2_alfa = numeric::diangle( dir_2.x, dir_2.y );
+    
+    typedef std::pair<double, double> Result;
+    boost::uintmax_t max_iter=500;
+    boost::math::tools::eps_tolerance<double> tol(30);
+
+    double trg_err = t(dir_alfa);
+    double cur_err = t(dir_1_alfa);
+    if ( debug ||  ( !(trg_err*cur_err < 0) ) ) {
+        std::cout << "bitangent_points2()\n";
+        std::cout << " c1 = " << c1 << " r1= " << r1 << "\n";
+        std::cout << " c2 = " << c2 << " r2= " << r2 << "\n";
+        std::cout << " dir = " << dir << "\n";
+        std::cout << " error 1 = " << t(dir_alfa) << "\n";
+        std::cout << " error 2 = " << t(dir_1_alfa) << "\n";
+    }
+    double min_alfa = std::min(dir_alfa, dir_1_alfa);
+    double max_alfa = std::max(dir_alfa, dir_1_alfa);
+    Result res1 = boost::math::tools::toms748_solve(t, min_alfa, max_alfa, tol, max_iter);
+    double a1,b1;
+    boost::tie(a1,b1) = numeric::diangle_xy(res1.first);
+    
+    min_alfa = std::min(dir_alfa, dir_2_alfa);
+    max_alfa = std::max(dir_alfa, dir_2_alfa);
+    Result res2 = boost::math::tools::toms748_solve(t, min_alfa, max_alfa, tol, max_iter);
+    double a2,b2;
+    boost::tie(a2,b2) = numeric::diangle_xy(res2.first);
+    
+    //std::cout <<  res.first << "\n";
+    
+    Point tang1 = c1 - r1*Point( a1, b1 );
+    Point tang2 = c1 - r1*Point( a2, b2 );
+    Point tang3 = c2 - r2*Point( a1, b1 );
+    Point tang4 = c2 - r2*Point( a2, b2 );
+    std::vector<Point> out;
+    out.push_back(tang1);
+    out.push_back(tang2);
+    out.push_back(tang3);
+    out.push_back(tang4);
+    
+    //std::vector<Point> out;
+    return out;
+}
+*/
 
 } // end namespace
 

@@ -86,7 +86,7 @@ private:
     double r1; // previous MIC radius
 };
 
-// experimental medial-axis pocketing
+/// experimental medial-axis pocketing
 class medial_axis_pocket {
 public:
     medial_axis_pocket(HEGraph& gi);
@@ -114,7 +114,9 @@ protected:
     HEEdge current_edge;
     double current_radius;
     Point current_center;
-
+    //double previous_radius;
+    //Point previous_center;
+    
     // flag for indicating new branch
     bool new_branch;
     Point previous_branch_center;

@@ -117,6 +117,9 @@ int solve( Site* s1, Site* s2, Site* s3,  std::vector<Solution>& slns ) {
     assert( J4 != 0.0 );
     if (J4==0.0) {
         std::cout << " PPPSolver: Warning divide-by-zero!!\n";
+        std::cout << " pi = " << pi << "\n";
+        std::cout << " pj = " << pj << "\n";
+        std::cout << " pk = " << pk << "\n";
         exit(-1);
     }
     scalar_pt<Scalar> pt( -J2/J4 + spk.x, J3/J4 + spk.y );

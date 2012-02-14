@@ -11,14 +11,18 @@ import sys
 import pickle
 import gzip
 
+def drawCircle(myscreen, c, r, circlecolor):
+    ca = ovdvtk.Circle(center=(c.x,c.y,0) , radius=r, color=circlecolor, resolution=50 )
+    myscreen.addActor(ca)
+    
 if __name__ == "__main__":  
     #w=2500
     #h=1500
     
-    #w=1920
-    #h=1080
-    w=1024
-    h=1024
+    w=1920
+    h=1080
+    #w=1024
+    #h=1024
     myscreen = ovdvtk.VTKScreen(width=w, height=h) 
     ovdvtk.drawOCLtext(myscreen, rev_text=ovd.version() )
     
@@ -34,11 +38,11 @@ if __name__ == "__main__":
     random.seed(42)
     far = 1
     camPos = far
-    zmult = 3
+    zmult = 1.8
     # camPos/float(1000)
     myscreen.camera.SetPosition(0, -camPos/float(1000), zmult*camPos) 
     myscreen.camera.SetClippingRange(-(zmult+1)*camPos,(zmult+1)*camPos)
-    myscreen.camera.SetFocalPoint(0.0, 0, 0)
+    myscreen.camera.SetFocalPoint(0.0, 0.22, 0)
     
     vd = ovd.VoronoiDiagram(far,120)
     print ovd.version()
@@ -51,9 +55,9 @@ if __name__ == "__main__":
     vod.textScale = 0.02
     vod.vertexRadius = 0.0031
     vod.drawVertices=0
-    vod.drawVertexIndex=1
+    vod.drawVertexIndex=0
     vod.drawGenerators=0
-    vod.offsetEdges = 1
+    vod.offsetEdges = 0
     vd.setEdgeOffset(0.05)
     
     
@@ -84,93 +88,68 @@ if __name__ == "__main__":
    
     t_after = time.time()
     times.append( t_after-t_before )
-    #exit()
     
-    #print "   ",2*Nmax," point-sites sites took {0:.3f}".format(times[0])," seconds, {0:.2f}".format( 1e6*float( times[0] )/(float(2*Nmax)*float(math.log10(2*Nmax))) ) ,"us/n*log(n)"
-    print "all point sites inserted. ",
+    print "all point sites inserted. "
     vd.check()
     
-    #nsegs = Nmax
-    #nsegs = 5 #Nmax
-    #n=1
     t_before = time.time()
-    
-    #vd.debug_on()
     vd.addLineSite( id_list[0], id_list[1])
-    
-    
-    #vd.check()
-    
-    #vd.debug_on()
     vd.addLineSite( id_list[1], id_list[2])
-    #vd.check()
+    vd.addLineSite( id_list[2], id_list[3])
+    vd.addLineSite( id_list[3], id_list[4])
+    vd.addLineSite( id_list[4], id_list[0])
+    t_after = time.time()
+    times.append( t_after-t_before )
+    vd.check()
     
-    #vd.addLineSite( id_list[2], id_list[3])
-    #vd.check()
+    pi = ovd.PolygonInterior(True)
+    vd.filter_graph(pi)
+    ma = ovd.MedialAxis()
+    vd.filter_graph(ma)
     
-    #vd.debug_on()
+    vod.setVDText2(times)
     
-    #vd.addLineSite( id_list[3], id_list[4])
-    #vd.check()
-    vd.debug_on()
-    vd.addLineSite( id_list[4], id_list[1],9)
-    #vd.check()
+    vod.setAll()
     
+    """
     t_after = time.time()
     line_time = t_after-t_before
     if line_time < 1e-3:
         line_time = 1
     times.append( line_time )
+    """
+
     
-    #s = id_list[nsegs]
-    #vd.debug_on()
-    #vd.addLineSite( s[0], s[1], 10) 
-    #seg = id_list[nsegs]
-    #vd.addLineSite(seg[0],seg[1],10)
-    # 1 identify start/endvert
-    # 2 add line-segment edges/sites to graph
-    # 3 identify seed-vertex
-    # 4 create delete-tree
-    # 5 process/create null faces at start/end
-    # 6 create LineSite and add pseudo-edges
-    # 7 create NEW vertices on IN-OUT edges
-    # 8 add positive/start separator edge
-    # 9 add negative/start separator edge
-    # 10 add positive/end separator edge
+    mapocket = ovd.MedialAxisPocket(vd.getGraph())
+    mapocket.setWidth(0.005)
+    
+    maxmic = mapocket.maxMic()
     
     
-    # 5 create new vertices
-    # 6 add startpoint pos separator
-    # 7 add startpoint neg separator
-    # 8 add end-point pos separator
-    # 9 add end-point neg separator
-    # 10 add new edges
-    # 11 delete delete-tree edges
-    # 12 reset status
-            
-    vod.setVDText2(times)
     
-    err = vd.getStat()
-    #print err 
-    print "got errorstats for ",len(err)," points"
-    if len(err)>1:
-        minerr = min(err)
-        maxerr = max(err)
-        print "min error= ",minerr
-        print "max error= ",maxerr
+    #print maxmic
     
-    print "num vertices: ",vd.numVertices() 
-    print "num SPLIT vertices: ",vd.numSplitVertices() 
+    drawCircle( myscreen, maxmic[0], maxmic[1] , ovdvtk.red )
+    nframe=0
+    while True:
+        mic = mapocket.nxtMic()
+        if len(mic) == 2:
+            drawCircle( myscreen, mic[0], mic[1] , ovdvtk.green )
+            w2if.Modified()
+            lwr.SetFileName("frames/%06d.png" % ( nframe ) )
+            #lwr.Write()
+        else:
+            break
+        nframe = nframe+1
         
-    calctime = t_after-t_before
+    print "mic done."
     
-    vod.setAll()
+    
+
         
     print "PYTHON All DONE."
 
     myscreen.render()   
-    #w2if.Modified()
-    #lwr.SetFileName("{0}.png".format(Nmax))
-    #lwr.Write()
+
      
     myscreen.iren.Start()

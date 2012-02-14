@@ -118,6 +118,7 @@ set(OVD_SRC
     ${OpenVoronoi_SOURCE_DIR}/common/point.cpp
     ${OpenVoronoi_SOURCE_DIR}/vertex_positioner.cpp
     ${OpenVoronoi_SOURCE_DIR}/common/numeric.cpp
+    ${OpenVoronoi_SOURCE_DIR}/medial_axis_pocket.cpp
 )
 
 set( OVD_INCLUDE_FILES
@@ -136,6 +137,7 @@ set( OVD_INCLUDE_FILES
     ${OpenVoronoi_SOURCE_DIR}/filter.hpp
     ${OpenVoronoi_SOURCE_DIR}/medial_axis_filter.hpp
     ${OpenVoronoi_SOURCE_DIR}/medial_axis_walk.hpp
+    ${OpenVoronoi_SOURCE_DIR}/medial_axis_pocket.hpp
     ${OpenVoronoi_SOURCE_DIR}/polygon_interior_filter.hpp
     ${OpenVoronoi_SOURCE_DIR}/island_filter.hpp
     

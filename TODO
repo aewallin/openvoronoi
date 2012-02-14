@@ -60,6 +60,13 @@ Medial-Axis
 - fix medial-axis-walk case where we don't find a start-edge if the medial axis is e.g. O-shaped
 - optimize the order of toolpath so that "pen_up, rapid_traverse, pen_down" jumps are minimized
 
+Medial-Axis pocket
+- better G-code output
+- micro-lift and clearance-height lifts for rapids
+- end-of-branch MICs are now left unmachined if they result in a cut-width less than max-cut-width.
+- deal with loops in the MA.
+- exterior ma-pocketing
+
 Input/Output
 - Write a class that makes it simpler to insert a polygon (with islands), and/or many polygons
 - SVG, DXF output for vd and offsets

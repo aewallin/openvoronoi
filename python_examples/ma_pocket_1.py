@@ -134,36 +134,19 @@ if __name__ == "__main__":
     mapocket = ovd.MedialAxisPocket(vd.getGraph())
     mapocket.setWidth(0.01)
     
-    maxmic = mapocket.maxMic()
+    mapocket.run()
+    mic_list = mapocket.get_mic_list()
     
-    
-    
-    #print maxmic
-    
-    drawCircle( myscreen, maxmic[0], maxmic[1] , ovdvtk.red )
-    
-    for n in range(100):
-        mic = mapocket.nxtMic()
-        if len(mic) == 2:
+    for n in range( len(mic_list) ):
+        mic = mic_list[n]
+        if n == 0:
+            print "hello", mic[0]," r = ",mic[1]
+            drawCircle( myscreen, mic[0], mic[1] , ovdvtk.red )
+        else:
             drawCircle( myscreen, mic[0], mic[1] , ovdvtk.green )
     print "mic done."
     vod.setVDText2(times)
-    
-    err = vd.getStat()
-    #print err 
-    """
-    print "got errorstats for ",len(err)," points"
-    if len(err)>1:
-        minerr = min(err)
-        maxerr = max(err)
-        print "min error= ",minerr
-        print "max error= ",maxerr
-    
-    print "num vertices: ",vd.numVertices() 
-    print "num SPLIT vertices: ",vd.numSplitVertices() 
-    """
-    
-    calctime = t_after-t_before
+
     
     vod.setAll()
         

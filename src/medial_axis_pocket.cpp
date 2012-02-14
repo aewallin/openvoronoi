@@ -68,8 +68,10 @@ void medial_axis_pocket::find_initial_mic() {
             max_mic_vertex = src;
         }
     }
-    mic.c1 = max_mic_pos;
-    mic.r1 = max_mic_radius;
+    mic.c2 = max_mic_pos;
+    mic.r2 = max_mic_radius;
+    mic.c1 = mic.c2;
+    mic.r1 = mic.r1;
     current_radius = max_mic_radius;
     current_center = max_mic_pos;
     previous_branch_center = max_mic_pos;
@@ -356,7 +358,11 @@ std::vector<Point> medial_axis_pocket::bitangent_points(Point c1, double r1, Poi
         std::cout << " cutwidth = " << (c1-c2).norm()+r2-r1 << "\n";
         std::cout << " " << roots.size() << " bi-tangent roots\n"; 
     }
-
+    if ( roots.empty() ) {
+        std::cout << "bitangent_points() ERROR: " << roots.size() << " bi-tangent roots\n"; 
+        assert(0);
+        exit(-1);
+    }
     // bi-tangent lines are now
     // ax +  by + c = 0
     // with

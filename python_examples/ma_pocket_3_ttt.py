@@ -201,7 +201,7 @@ if __name__ == "__main__":
     vod.offsetEdges = 0
     vd.setEdgeOffset(0.05)
     
-    [segs, extents, scale] = get_scaled_segs( "L", 0.6)
+    [segs, extents, scale] = get_scaled_segs( "s", 0.6)
     dx = -0.3
     dy = 0
     segs = translate(segs, dx, dy )
@@ -230,13 +230,33 @@ if __name__ == "__main__":
 
     
     mapocket = ovd.MedialAxisPocket(vd.getGraph())
+    mapocket.debug(True)
     mapocket.setWidth(0.005)
     
-    maxmic = mapocket.maxMic()
+    #maxmic = mapocket.maxMic()
+    mapocket.run()
+    mic_list = mapocket.get_mic_list()
     
     #print maxmic
     
-    drawCircle( myscreen, maxmic[0], maxmic[1] , ovdvtk.red )
+    #drawCircle( myscreen, maxmic[0], maxmic[1] , ovdvtk.red )
+    nframe=0
+    
+    for n in range( len(mic_list) ):
+        mic = mic_list[n]
+        if n == 0:
+            print "hello", mic[0]," r = ",mic[1]
+            drawCircle( myscreen, mic[0], mic[1] , ovdvtk.red )
+        else:
+            drawCircle( myscreen, mic[0], mic[1] , ovdvtk.green )
+        w2if.Modified()
+        lwr.SetFileName("frames/%06d.png" % ( nframe ) )
+        #lwr.Write()
+        time.sleep(0.1)
+        myscreen.render()
+    print "mic done."
+    
+    """
     nframe=0
     while True:
         mic = mapocket.nxtMic()
@@ -252,7 +272,7 @@ if __name__ == "__main__":
         nframe = nframe+1
         
     print "mic done."
-    
+    """
     
 
         

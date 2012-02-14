@@ -136,6 +136,7 @@ set( OVD_INCLUDE_FILES
     ${OpenVoronoi_SOURCE_DIR}/filter.hpp
     ${OpenVoronoi_SOURCE_DIR}/medial_axis_filter.hpp
     ${OpenVoronoi_SOURCE_DIR}/medial_axis_walk.hpp
+    ${OpenVoronoi_SOURCE_DIR}/medial_axis_pocket.hpp
     ${OpenVoronoi_SOURCE_DIR}/polygon_interior_filter.hpp
     ${OpenVoronoi_SOURCE_DIR}/island_filter.hpp
     

@@ -23,7 +23,6 @@
 #include <iostream>
 #include <stack>
 
-#include <boost/python.hpp>
 #include <boost/math/tools/roots.hpp>
 
 #include "graph.hpp"
@@ -54,6 +53,17 @@ struct branch_point {
     double current_radius;
     HEEdge next_edge;
 };
+
+struct MIC {
+    Point c1,c2;  // center
+    double r1,r2; // radius
+    Point t1,t2,t3,t4; // bi-tangent points
+    bool new_branch;
+    Point c_prev;
+    double r_prev;
+};
+
+typedef std::list<MIC> MICList;
 
 // error functor for numerically finding the next MIC
 class CutWidthError  {
@@ -93,11 +103,14 @@ public:
     }
     void set_width(double w) {max_width=w;}
     
-    // return the maximum mic
-    // clear this with a spiral-path before proceeding.
-    boost::python::list max_mic() {
-        boost::python::list out;
-        
+    void run() {
+        find_initial_mic();
+        while (find_next_mic()) {}
+        if (debug) std::cout << "medial_axis_pocket::run() done. generated " << mic_list.size() << " MICs \n";
+    }
+    
+    void find_initial_mic() {
+        MIC mic;
         // find the vertex with the maximum radius mic
         double max_mic_radius(-1);
         Point max_mic_pos(0,0);
@@ -110,40 +123,39 @@ public:
                 max_mic_vertex = src;
             }
         }
-        out.append(max_mic_pos);
-        out.append(max_mic_radius);
+        mic.c1 = max_mic_pos;
+        mic.r1 = max_mic_radius;
         current_radius = max_mic_radius;
         current_center = max_mic_pos;
         previous_branch_center = max_mic_pos;
         previous_branch_radius = max_mic_radius;
-        
+        mic.c_prev = max_mic_pos;
+        mic.r_prev = max_mic_radius;
         // find the edge on which we start machining.
-        // stash the other out-edges for visiting later
         double max_adj_radius(-1);
         BOOST_FOREACH( HEEdge e, g.out_edge_itr(max_mic_vertex) ) {
-            //std::cout << "potential start edge: "; g.print_edge(e);
             if ( (g[ g.target(e) ].dist() > max_adj_radius) && g[e].valid && g[e].type != OUTEDGE ) {
                 max_adj_radius = g[ g.target(e) ].dist();
                 current_edge = e;
             }
         }
+        // stash the other out-edges for visiting later
         BOOST_FOREACH( HEEdge e, g.out_edge_itr(max_mic_vertex) ) {
-            //std::cout << "potential start edge: "; g.print_edge(e);
             if ( e != current_edge ) {
                 unvisited.push( branch_point(current_center, current_radius, e ) );
             }
         }
         if (debug) { std::cout << " start edge is: "; g.print_edge(current_edge); }
         new_branch=false;
-        return out;
+        mic.new_branch = new_branch;
+        mic_list.push_back(mic);
     }
-    
-    // get the next mic
-    boost::python::list nxt_mic() {
-        
+    // return true if next mic was found and added to list
+    // false means end-of-operation
+    bool find_next_mic() {
         if ( current_edge == HEEdge() ) {
-            if (debug) std::cout << "nxt_mic() end of operation. Nothing to do.\n";
-            return boost::python::list();
+            if (debug) std::cout << "find_next_mic() end of operation. Nothing to do.\n";
+            return false;
         }
         // find a point on current-edge so that we get the desired 
         // cut-width
@@ -156,8 +168,8 @@ public:
         Point c2 = g[current_edge].point(target_radius);
         double r2 = target_radius;
         double w_target = ( c2-c1 ).norm() + r2 - r1;
-        if (debug) std::cout << "nxt_mic() target width " << w_target << "\n";
-        
+        if (debug) std::cout << "find_next_mic() target width " << w_target << "\n";
+
         if ( w_target > max_width ) {
             // since moving to the target vertex would give too large cut-width
             // we search on the current edge for the next MIC
@@ -165,8 +177,8 @@ public:
             // find a point on the current edge
             double next_radius = find_next_radius();
             if (debug) {  std::cout << " next_radius = " << next_radius << "\n"; }
-        
-            return output_next_mic(next_radius, new_branch);
+            output_next_mic(next_radius, new_branch);
+            return true;
         } else {
             // moving to the target edge does not give a cut-width that is large enough
             // we need to find a new edge for the next MIC
@@ -178,23 +190,25 @@ public:
             bool end_branch_mic;
             boost::tie( current_edge, end_branch_mic) = find_next_edge(); // move to the next edge
             if ( current_edge == HEEdge() ) { // invalid edge marks end of operation
-                if (debug)  std::cout << "nxt_mic() end of operation.\n";
-                return boost::python::list();
+                if (debug)  std::cout << "find_next_mic() end of operation.\n";
+                return false;
             }
             
-            if ( end_branch_mic )
-                return output_next_mic(current_radius, false);
+            if ( end_branch_mic ) {
+                output_next_mic(current_radius, false);
+                return true;
+            }
             
             double next_radius = find_next_radius();
             if (new_branch) {
                 new_branch=false;
-                return output_next_mic(next_radius, true);
+                output_next_mic(next_radius, true);
+                return true;
             } else {
-                return output_next_mic(next_radius, false);
+                output_next_mic(next_radius, false);
+                return true;
             }
-            
         }
-        
     }
 
     // pop an unvisited edge from the stack
@@ -226,7 +240,7 @@ public:
         }
         return out_edges;
     }
-    
+
     // output the next edge
     // return true if we need a final MIC at the end of a branch
     std::pair<HEEdge,bool> find_next_edge() {
@@ -236,6 +250,7 @@ public:
             
             if ( current_radius > g[ g.target(current_edge) ].dist() ) {
                 current_radius = g[ g.target(current_edge) ].dist();
+                current_center = g[ g.target(current_edge) ].position; //point(current_radius);
                 return std::make_pair(current_edge,true); // this outputs a final MIC at the end of a branch
             }
             
@@ -292,9 +307,9 @@ public:
     bool has_next_radius(HEEdge e) {
         // check if the edge e is one where we continue
         double r1 = current_radius;
-        Point c1 = g[current_edge].point(r1); 
+        Point  c1 = g[current_edge].point(r1); 
         double r2 = g[ g.target(e) ].dist();
-        Point c2 = g[e].point(r2);
+        Point  c2 = g[e].point(r2);
 
         double w_target = ( c2-c1 ).norm() + r2 - r1;
         if (debug) {
@@ -337,11 +352,15 @@ public:
     
     // output the next MIC, for processing by a downstream algorithm
     // that lays out the pattern: lead-out, rapid, lead-in, bi-tangent, cut-arc, bi-tangent
-    boost::python::list output_next_mic(double next_radius, bool branch) {
-        boost::python::list out;
+    void output_next_mic(double next_radius, bool branch) {
+        //boost::python::list out;
+        MIC mic;
         if (debug) std::cout << "output_next_mic() next_radius = " << next_radius << "\n";
-        out.append( g[current_edge].point(next_radius) );
-        out.append( next_radius );
+
+        mic.c2 = g[current_edge].point(next_radius);
+        mic.r2 = next_radius;
+        mic.c1 = current_center;
+        mic.r1 = current_radius;
         Point c1 = current_center;
         Point c2 = g[current_edge].point(next_radius);
         double r1 = current_radius;
@@ -383,26 +402,28 @@ public:
         Point tang2 = c1 - r1*Point( a2, b2 );
         Point tang3 = c2 - r2*Point( a1, b1 );
         Point tang4 = c2 - r2*Point( a2, b2 );
-        out.append(tang1); // bi-tangent points
-        out.append(tang2);
-        out.append(tang3);
-        out.append(tang4);
-        out.append(c1); // previous MIC center
-        out.append(r1); // previous MIC radius
-        out.append(branch); // true/false flag for new branch
-        out.append(previous_branch_center);
-        out.append(previous_branch_radius);
-        
-        return out;
+
+        mic.t1 = tang1;
+        mic.t2 = tang2;
+        mic.t3 = tang3;
+        mic.t4 = tang4;
+        mic.new_branch = branch;
+        mic.c_prev = previous_branch_center;
+        mic.r_prev = previous_branch_radius;
+
+        mic_list.push_back(mic);
     }
+
     void set_debug(bool b) {debug=b;}
-private:
+    MICList get_mic_list() {return mic_list;}
+
+protected:
     bool debug;
     std::vector<HEEdge> ma_edges; // the edges of the medial-axis
     std::map<HEEdge, edata> edge_data;
     HEGraph& g; // VD graph
     std::stack<branch_point> unvisited;
-    
+
     HEEdge current_edge;
     double current_radius;
     Point current_center;
@@ -413,8 +434,9 @@ private:
     double previous_branch_radius;
     
     // the max cutting-width
-    double max_width; 
-    
+    double max_width;
+    // the result of the operation is alist of MICs 
+    MICList mic_list;
 };
 
 } // end namespace

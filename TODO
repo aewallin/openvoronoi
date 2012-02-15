@@ -75,11 +75,11 @@ Input/Output
 Tests
 - Write more tests! ( also in c++? )
 - Test for memory-leaks with valgrind
-- Code-coverage for tests
+- Code-coverage for tests (gcov, trucov?)
 - Benchmark against libarea/kbool and libarea/Clipper (are there other FOSS offsetting codes?)
 - Compare against other VD codes (CGAL, boost-sweepline, others?)
 - Write software that generates test-cases (ttt is a good example)
--- hilbert curve?
+
 -- GIS-data
 -- notes on random polygons:
 -- http://www.geometrylab.de/applet-29-en
@@ -100,6 +100,7 @@ Packaging/Building etc
   so that the size of the "openvoronoi" package is as small as possible (for non developers who do not need to run tests)
 
 DONE:
+- 2012-02-10 hilbert curve demo-script
 - 2012-02-01 chain_5_collinear2.py exposes a case where a desperate solution is returned, because we fail to detect this
   as a case for the sep_solver.
 - 2012-01-25 new SEPSolver when we have a line-segment site and its endpoint

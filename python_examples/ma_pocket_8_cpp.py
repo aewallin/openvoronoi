@@ -634,17 +634,21 @@ if __name__ == "__main__":
         new_branch = mic[8] # true/false indicates if we are starting on new branch
         prev_branch_center = mic[9]
         prev_branch_radius = mic[10] # old branch MIC radius
-
+        
+        """
         if not mic[2].is_right( previous_center, cen2 ):
+            exit()
             in1 = mic[2]
             in2 = mic[4]
             out2 = mic[5]
             out1 = mic[3]
         else:
-            in1 = mic[3]
-            in2 = mic[5]
-            out2 = mic[4]
-            out1 = mic[2]
+            #exit()
+        """
+        in1 = mic[3]
+        in2 = mic[5]
+        out2 = mic[4]
+        out1 = mic[2]
 
         in_tangent = in2-in1
         # rapid traverse to in1

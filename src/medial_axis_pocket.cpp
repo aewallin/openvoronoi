@@ -323,7 +323,7 @@ void medial_axis_pocket::output_next_mic(double next_radius, bool branch) {
     mic.r2 = r2;
     
     if (c1 != c2) {
-        std::vector<Point> tangents = bitangent_points(c1,r1,c2,r2);
+        std::vector<Point> tangents = bitangent_points2(c1,r1,c2,r2);
         mic.t1 = tangents[0]; //tang1; //2
         mic.t2 = tangents[1]; //3
         mic.t3 = tangents[2]; //4
@@ -389,58 +389,47 @@ std::vector<Point> medial_axis_pocket::bitangent_points(Point c1, double r1, Poi
 }
 
 // try a more robust solution approach
-/*
-std::vector<Point> medial_axis_pocket::bitangent_points2(Point c1, double r1, Point c2, double r2) {
-    BitangentError t(c1,r1,c2,r2);
-    Point dir = c2-c1;
-    double dir_alfa = numeric::diangle( dir.x, dir.y );
-    Point dir_1 = dir.xy_perp();
-    Point dir_2 = -1*dir_1;
-    double dir_1_alfa = numeric::diangle( dir_1.x, dir_1.y );
-    double dir_2_alfa = numeric::diangle( dir_2.x, dir_2.y );
-    
-    typedef std::pair<double, double> Result;
-    boost::uintmax_t max_iter=500;
-    boost::math::tools::eps_tolerance<double> tol(30);
 
-    double trg_err = t(dir_alfa);
-    double cur_err = t(dir_1_alfa);
-    if ( debug ||  ( !(trg_err*cur_err < 0) ) ) {
-        std::cout << "bitangent_points2()\n";
-        std::cout << " c1 = " << c1 << " r1= " << r1 << "\n";
-        std::cout << " c2 = " << c2 << " r2= " << r2 << "\n";
-        std::cout << " dir = " << dir << "\n";
-        std::cout << " error 1 = " << t(dir_alfa) << "\n";
-        std::cout << " error 2 = " << t(dir_1_alfa) << "\n";
-    }
-    double min_alfa = std::min(dir_alfa, dir_1_alfa);
-    double max_alfa = std::max(dir_alfa, dir_1_alfa);
-    Result res1 = boost::math::tools::toms748_solve(t, min_alfa, max_alfa, tol, max_iter);
-    double a1,b1;
-    boost::tie(a1,b1) = numeric::diangle_xy(res1.first);
-    
-    min_alfa = std::min(dir_alfa, dir_2_alfa);
-    max_alfa = std::max(dir_alfa, dir_2_alfa);
-    Result res2 = boost::math::tools::toms748_solve(t, min_alfa, max_alfa, tol, max_iter);
-    double a2,b2;
-    boost::tie(a2,b2) = numeric::diangle_xy(res2.first);
-    
-    //std::cout <<  res.first << "\n";
-    
-    Point tang1 = c1 - r1*Point( a1, b1 );
-    Point tang2 = c1 - r1*Point( a2, b2 );
-    Point tang3 = c2 - r2*Point( a1, b1 );
-    Point tang4 = c2 - r2*Point( a2, b2 );
+std::vector<Point> medial_axis_pocket::bitangent_points2(Point c1, double r1, Point c2, double r2) {
     std::vector<Point> out;
-    out.push_back(tang1);
-    out.push_back(tang2);
-    out.push_back(tang3);
-    out.push_back(tang4);
-    
-    //std::vector<Point> out;
+    Point bd1,bd2;
+    if ( r1 == r2 ) {
+        Point c1c2 = c2-c1;
+        c1c2.normalize();
+        bd1 = c1c2.xy_perp();
+        bd2 = -1*c1c2.xy_perp();
+    } else {
+        double c1c2_dist = (c1-c2).norm();
+        double dr = fabs(r1-r2);
+        double bitang_length = sqrt( c1c2_dist*c1c2_dist + dr*dr );
+        double area = dr*bitang_length;
+        double height = area / c1c2_dist;
+        double bitang_c1c2 = sqrt( bitang_length*bitang_length - height*height );
+        Point cdir =  c2-c1;
+        if (r1>r2)
+            cdir = c1-c2;
+        cdir.normalize(); 
+        // the bitangents
+        Point bit1 = bitang_c1c2*cdir + height*cdir.xy_perp();
+        Point bit2 = bitang_c1c2*cdir - height*cdir.xy_perp();
+        
+        if (r1>r2) {
+            bd1 = bit1.xy_perp(); 
+            bd2 = -1*bit2.xy_perp(); 
+        } else {
+            bd1 = -1*bit2.xy_perp(); 
+            bd2 = bit1.xy_perp(); 
+        }
+        bd1.normalize();
+        bd2.normalize();
+    }
+    out.push_back( c1 + r1*bd1 );
+    out.push_back( c1 + r1*bd2 );
+    out.push_back( c2 + r2*bd1 );
+    out.push_back( c2 + r2*bd2 );
     return out;
 }
-*/
+
 
 } // end namespace
 

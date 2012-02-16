@@ -86,24 +86,6 @@ private:
     double r1; // previous MIC radius
 };
 
-// error functor for bitangent points
-/*
-class BitangentError {
-public:
-    BitangentError( Point ci1, double ri1, Point ci2, double ri2):
-    c1(ci1), c2(ci2), r1(ri1),  r2(ri2) {}
-    double operator()(const double x) {
-        std::pair<double,double> dir = numeric::diangle_xy(x);
-        Point rad1 = r1*Point(dir.first,dir.second);
-        Point t1 = c1 + r1*Point(dir.first,dir.second);
-        Point t2 = c2 + r2*Point(dir.first,dir.second);
-        return rad1.dot(t2-t1);
-    }
-private:
-    Point c1,c2;
-    double r1,r2;
-};*/
-
 /// experimental medial-axis pocketing
 class medial_axis_pocket {
 public:
@@ -123,7 +105,7 @@ protected:
     double find_next_radius();
     void output_next_mic(double next_radius, bool branch);
     std::vector<Point> bitangent_points(Point c1, double r1, Point c2, double r2);
-    //std::vector<Point> bitangent_points2(Point c1, double r1, Point c2, double r2);
+    std::vector<Point> bitangent_points2(Point c1, double r1, Point c2, double r2);
 //DATA
     bool debug;
     std::vector<HEEdge> ma_edges; // the edges of the medial-axis

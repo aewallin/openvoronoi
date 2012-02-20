@@ -308,11 +308,6 @@ void medial_axis_pocket::output_next_mic(double next_radius, bool branch) {
     MIC mic;
     if (debug) std::cout << "output_next_mic() next_radius = " << next_radius << "\n";
 
-    //mic.c2 = g[current_edge].point(next_radius);
-    //mic.r2 = next_radius;
-    
-    //mic.c1 = current_center;
-    //mic.r1 = current_radius;
     Point c1 = current_center;
     Point c2 = g[current_edge].point(next_radius);
     double r1 = current_radius;
@@ -322,7 +317,7 @@ void medial_axis_pocket::output_next_mic(double next_radius, bool branch) {
     mic.r1 = r1;
     mic.c2 = c2;
     mic.r2 = r2;
-    
+
     if (c1 != c2) {
         std::vector<Point> tangents = bitangent_points2(c1,r1,c2,r2);
         mic.t1 = tangents[0]; //tang1; //2
@@ -333,61 +328,11 @@ void medial_axis_pocket::output_next_mic(double next_radius, bool branch) {
     mic.new_branch = branch;
     mic.c_prev = previous_branch_center;
     mic.r_prev = previous_branch_radius;
-
     mic_list.push_back(mic);
-    
     current_radius = next_radius;
     current_center = g[current_edge].point(next_radius);
-    
 }
 
-std::vector<Point> medial_axis_pocket::bitangent_points(Point c1, double r1, Point c2, double r2) {
-        // find the bi-tangents and return them too.
-    // see voronoi_bisectors.py
-    double detM = c1.x*c2.y - c2.x*c1.y;
-    double m = ( c1.y-c2.y ) / detM;
-    double p = ( c2.x-c1.x ) / detM;
-    double n = ( c2.y*r1 - c1.y*r2 ) / detM;
-    double q = ( c1.x*r2 - c2.x*r1 ) / detM;
-    // this quadratic will give the C-values for the lines
-    std::vector<double> roots = numeric::quadratic_roots( m*m+p*p, 2*(m*n+p*q),  n*n+q*q-1);
-    if (debug) {
-        std::cout << " c1 = " << c1 << "\n";
-        std::cout << " r1 = " << r1 << "\n";
-        std::cout << " c2 = " << c2 << "\n";
-        std::cout << " r2 = " << r2 << "\n";
-        std::cout << " cutwidth = " << (c1-c2).norm()+r2-r1 << "\n";
-        std::cout << " " << roots.size() << " bi-tangent roots\n"; 
-    }
-    if ( roots.empty() ) {
-        std::cout << "bitangent_points() ERROR: " << roots.size() << " bi-tangent roots\n"; 
-        assert(0);
-        exit(-1);
-    }
-    // bi-tangent lines are now
-    // ax +  by + c = 0
-    // with
-    // C = root
-    // A = m*C+n
-    // B = p*C+q
-    double lc1 = roots[0];
-    double a1 = m*lc1+n;
-    double b1 = p*lc1+q;
-    double lc2 = roots[1];
-    double a2 = m*lc2+n;
-    double b2 = p*lc2+q;
-    // the bi-tangent points are given by
-    Point tang1 = c1 - r1*Point( a1, b1 );
-    Point tang2 = c1 - r1*Point( a2, b2 );
-    Point tang3 = c2 - r2*Point( a1, b1 );
-    Point tang4 = c2 - r2*Point( a2, b2 );
-    std::vector<Point> out;
-    out.push_back(tang1);
-    out.push_back(tang2);
-    out.push_back(tang3);
-    out.push_back(tang4);
-    return out;
-}
 
 // try a more robust solution approach
 

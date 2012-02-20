@@ -69,8 +69,7 @@ typedef std::list<MIC> MICList;
 class CutWidthError  {
 public:
     CutWidthError(HEGraph& gi, double wmax, HEEdge search_edge, Point cen1, double rad1) 
-    : g(gi), w_max(wmax), e(search_edge), c1(cen1), r1(rad1) {
-    }
+    : g(gi), w_max(wmax), e(search_edge), c1(cen1), r1(rad1) {}
     double operator()(const double x) {
         // w_max = | c2 - c1 | + r2 - r1
         Point c2 = g[e].point(x); // current MIC center
@@ -104,7 +103,7 @@ protected:
     bool has_next_radius(HEEdge e); 
     double find_next_radius();
     void output_next_mic(double next_radius, bool branch);
-    std::vector<Point> bitangent_points(Point c1, double r1, Point c2, double r2);
+    //std::vector<Point> bitangent_points(Point c1, double r1, Point c2, double r2);
     std::vector<Point> bitangent_points2(Point c1, double r1, Point c2, double r2);
 //DATA
     bool debug;
@@ -116,8 +115,6 @@ protected:
     HEEdge current_edge;
     double current_radius;
     Point current_center;
-    //double previous_radius;
-    //Point previous_center;
     
     // flag for indicating new branch
     bool new_branch;

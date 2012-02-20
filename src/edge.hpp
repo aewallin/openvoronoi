@@ -43,9 +43,27 @@ typedef boost::adjacency_list_traits<OUT_EDGE_CONTAINER,
                                      
 typedef unsigned int HEFace;
 
-#define stringify( name ) # name
-enum VoronoiEdgeType {LINE, LINELINE, PARA_LINELINE, OUTEDGE, PARABOLA, ELLIPSE, HYPERBOLA, SEPARATOR, NULLEDGE, LINESITE};
-
+enum VoronoiEdgeType {
+    LINE,          // PontSite PointSite
+    LINELINE,      // LineSite LineSite
+    PARA_LINELINE, // LineSite LineSite
+    OUTEDGE, 
+    PARABOLA,      // LineSite PointSite
+    ELLIPSE, 
+    HYPERBOLA, 
+    SEPARATOR,     // LineSite PointSite(endpoint) 
+    NULLEDGE, 
+    LINESITE
+    };
+/*
+* bisector formulas
+* x = x1 - x2 - x3*t +/- x4 * sqrt( square(x5+x6*t) - square(x7+x8*t) )
+* (same formula for y-coordinate)
+* line (line/line)
+* parabola (circle/line)
+* hyperbola (circle/circle)
+* ellipse (circle/circle)
+*/
 
 
 /// properties of an edge in the voronoi diagram
@@ -73,9 +91,9 @@ public:
     boost::array<double,8> x;
     boost::array<double,8> y;
     bool sign; // choose either +/- in front of sqrt()
-    
+
     Point point(double t) const; 
-    //double error(Solution& sl) const;
+
     double minimum_t( Site* s1, Site* s2);
     void copy_parameters(EdgeProps& other);   
     void set_parameters(Site* s1, Site* s2, bool sig);

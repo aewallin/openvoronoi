@@ -201,7 +201,7 @@ if __name__ == "__main__":
     vod.offsetEdges = 0
     vd.setEdgeOffset(0.05)
     
-    [segs, extents, scale] = get_scaled_segs( "s", 0.6)
+    [segs, extents, scale] = get_scaled_segs( "L", 0.3)
     dx = -0.3
     dy = 0
     segs = translate(segs, dx, dy )
@@ -211,7 +211,7 @@ if __name__ == "__main__":
     #vod.setVDText2(times)
     #vod.setAll()
     
-    pi = ovd.PolygonInterior(False)
+    pi = ovd.PolygonInterior(True)
     vd.filter_graph(pi)
     ma = ovd.MedialAxis()
     vd.filter_graph(ma)
@@ -220,13 +220,8 @@ if __name__ == "__main__":
     
     vod.setAll()
     
-    """
-    t_after = time.time()
-    line_time = t_after-t_before
-    if line_time < 1e-3:
-        line_time = 1
-    times.append( line_time )
-    """
+    #myscreen.render()        
+    #myscreen.iren.Start()
 
     
     mapocket = ovd.MedialAxisPocket(vd.getGraph())
@@ -245,7 +240,7 @@ if __name__ == "__main__":
     for n in range( len(mic_list) ):
         mic = mic_list[n]
         if n == 0:
-            print "hello", mic[0]," r = ",mic[1]
+            print "maxmic at ", mic[0]," r = ",mic[1]
             drawCircle( myscreen, mic[0], mic[1] , ovdvtk.red )
         else:
             drawCircle( myscreen, mic[0], mic[1] , ovdvtk.green )

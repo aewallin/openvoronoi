@@ -43,7 +43,9 @@ typedef boost::adjacency_list_traits<OUT_EDGE_CONTAINER,
                                      
 typedef unsigned int HEFace;
 
+#define stringify( name ) # name
 enum VoronoiEdgeType {LINE, LINELINE, PARA_LINELINE, OUTEDGE, PARABOLA, ELLIPSE, HYPERBOLA, SEPARATOR, NULLEDGE, LINESITE};
+
 
 
 /// properties of an edge in the voronoi diagram
@@ -81,6 +83,7 @@ public:
     EdgeProps &operator=(const EdgeProps &p);
     bool valid; // for filtering graph
     bool inserted_direction; // true if linesite-edge inserted in this direction
+    std::string type_str() const;
 private:
     //Point projection_point(Solution& sl) const;
     double minimum_pp_t(Site* s1, Site* s2);

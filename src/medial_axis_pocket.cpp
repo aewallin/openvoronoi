@@ -290,6 +290,7 @@ double medial_axis_pocket::find_next_radius() {
     if ( debug ||  ( !(trg_err*cur_err < 0) ) ) {
         std::cout << "find_next_radius():\n";
         std::cout << " current edge: "; g.print_edge(current_edge);// << current_radius << "\n";
+        std::cout << "    edge type: " << g[current_edge].type_str() << "\n";
         std::cout << " current rad = " << current_radius << "\n";
         std::cout << " target rad = " << target_radius << "\n";
         std::cout << " error at current = " << t(current_radius) << "\n";

@@ -31,6 +31,25 @@ EdgeProps::EdgeProps() {
     valid=true;
 }
 
+const char* edgeTypeNames[] = {
+  stringify( LINE ),
+  stringify( LINELINE ),
+  stringify( PARA_LINELINE ),
+  stringify( OUTEDGE ),
+  stringify( PARABOLA ),
+  stringify( ELLIPSE ),
+  stringify( HYPERBOLA ),
+  stringify( SEPARATOR ),
+  stringify( NULLEDGE ),
+  stringify( LINESITE )
+};
+
+std::string EdgeProps::type_str() const {
+    std::ostringstream o;
+    o << edgeTypeNames[type];
+    return o.str();
+}
+
 /*
 * bisector formulas
 * x = x1 - x2 - x3*t +/- x4 * sqrt( square(x5+x6*t) - square(x7+x8*t) )

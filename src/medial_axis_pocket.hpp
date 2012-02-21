@@ -103,8 +103,9 @@ protected:
     bool has_next_radius(HEEdge e); 
     double find_next_radius();
     void output_next_mic(double next_radius, bool branch);
-    //std::vector<Point> bitangent_points(Point c1, double r1, Point c2, double r2);
+
     std::vector<Point> bitangent_points2(Point c1, double r1, Point c2, double r2);
+    std::pair<Point,double> edge_point(double u);
 //DATA
     bool debug;
     std::vector<HEEdge> ma_edges; // the edges of the medial-axis
@@ -114,6 +115,7 @@ protected:
 
     HEEdge current_edge;
     double current_radius;
+    double current_u;
     Point current_center;
     
     // flag for indicating new branch

@@ -72,6 +72,7 @@ void medial_axis_pocket::find_initial_mic() {
     mic.r2 = max_mic_radius;
     mic.c1 = mic.c2;
     mic.r1 = mic.r1;
+    current_u = 0;
     current_radius = max_mic_radius;
     current_center = max_mic_pos;
     previous_branch_center = max_mic_pos;
@@ -111,11 +112,20 @@ bool medial_axis_pocket::find_next_mic() {
     //  w_max = | c2 - c1 | + r2 - r1
     
     // we allways move from source to target.
-    double target_radius = g[ g.target(current_edge) ].dist();
-    Point c1 = g[current_edge].point(current_radius); 
-    double r1 = current_radius;
-    Point c2 = g[current_edge].point(target_radius);
-    double r2 = target_radius;
+    //double target_radius = g[ g.target(current_edge) ].dist();
+    
+    //Point c1 = g[current_edge].point(current_radius);
+    Point c1;
+    double r1;
+    boost::tie(c1,r1) = edge_point(current_u);
+    //g[current_edge].point(current_radius); 
+    //double r1 = current_radius;
+    Point c2;
+    double r2;
+    boost::tie(c2,r2) = edge_point( 1.0 );
+    //g[current_edge].point(target_radius);
+    //double r2 = g[ g.target(current_edge) ].dist();
+    
     double w_target = ( c2-c1 ).norm() + r2 - r1;
     if (debug) std::cout << "find_next_mic() target width " << w_target << "\n";
 
@@ -376,6 +386,54 @@ std::vector<Point> medial_axis_pocket::bitangent_points2(Point c1, double r1, Po
     return out;
 }
 
+// find a point on current_edge at u [0,1]
+std::pair<Point,double> medial_axis_pocket::edge_point(double u) {
+    Point p;
+    double r;
+    // on line-type edges return
+    // p = p1 + u ( p2 - p1 )
+    /*
+    enum VoronoiEdgeType {
+    LINE,          // PontSite PointSite
+    LINELINE,      // LineSite LineSite
+    PARA_LINELINE, // LineSite LineSite
+    OUTEDGE, 
+    PARABOLA,      // LineSite PointSite
+    ELLIPSE, 
+    HYPERBOLA, 
+    SEPARATOR,     // LineSite PointSite(endpoint) 
+    NULLEDGE, 
+    LINESITE
+    };
+    */
+    if ( g[current_edge].type == LINE ||
+        g[current_edge].type == LINELINE ||
+        g[current_edge].type == PARA_LINELINE ) // note SEPARATOR shouldn't occur in the medial-axis
+        {
+        Point src = g[ g.source(current_edge) ].position;
+        Point trg = g[ g.target(current_edge) ].position;
+        p = src + u * (trg-src);
+        HEFace f = g[current_edge].face;
+        Site* s = g[f].site;
+        Point pa = s->apex_point(p);
+        r = (p-pa).norm();
+    } else if ( g[current_edge].type == PARABOLA ) {
+        // use the existing t-parametrisation ?
+        HEVertex src_v = g.source(current_edge);
+        HEVertex trg_v = g.target(current_edge);
+        double src_t = g[src_v].dist();
+        double trg_t = g[trg_v].dist();
+        double u_t = src_t + u*(trg_t-src_t);
+        p = g[current_edge].point(u_t);
+        r=u_t;
+    } else {
+        std::cout << "ERROR medial_axis_pocket::edge_point() unsuppoerted edge type.\n";
+        std::cout << " type= " << g[current_edge].type_str() << "\n";
+        exit(-1);
+    }
+    
+    return std::make_pair(p,r);
+}
 
 } // end namespace
 

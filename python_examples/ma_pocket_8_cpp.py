@@ -5,11 +5,11 @@ import time
 import vtk
 import datetime
 import math
-import random
+#import random
 import os
 import sys
-import pickle
-import gzip
+#import pickle
+#import gzip
 import ngc_writer
 
 def drawCircle(myscreen, c, r, circlecolor):
@@ -470,7 +470,7 @@ if __name__ == "__main__":
 
     scale=1
     myscreen.render()
-    random.seed(42)
+    #random.seed(42)
     far = 1
     camPos = far
     zmult = 1.8

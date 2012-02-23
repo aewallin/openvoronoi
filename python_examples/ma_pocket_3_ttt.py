@@ -201,15 +201,15 @@ if __name__ == "__main__":
     vod.offsetEdges = 0
     vd.setEdgeOffset(0.05)
     
-    [segs, extents, scale] = get_scaled_segs( "L", 0.3)
+    [segs, extents, scale] = get_scaled_segs( "M", 0.3)
     dx = -0.3
     dy = 0
     segs = translate(segs, dx, dy )
     
     times = insert_many_polygons(vd,segs)
     vd.check()
-    #vod.setVDText2(times)
-    #vod.setAll()
+    vod.setVDText2(times)
+    vod.setAll()
     
     pi = ovd.PolygonInterior(True)
     vd.filter_graph(pi)
@@ -227,7 +227,7 @@ if __name__ == "__main__":
     mapocket = ovd.MedialAxisPocket(vd.getGraph())
     mapocket.debug(True)
     mapocket.setWidth(0.005)
-    4
+    
     #maxmic = mapocket.maxMic()
     mapocket.run()
     mic_list = mapocket.get_mic_list()

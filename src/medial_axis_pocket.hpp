@@ -65,28 +65,6 @@ struct MIC {
 
 typedef std::list<MIC> MICList;
 
-// error functor for numerically finding the next MIC
-class CutWidthError  {
-public:
-    CutWidthError(HEGraph& gi, double wmax, HEEdge search_edge, Point cen1, double rad1) 
-    : g(gi), w_max(wmax), e(search_edge), c1(cen1), r1(rad1) {}
-    double operator()(const double x) {
-        // w_max = | c2 - c1 | + r2 - r1
-        Point c2 = g[e].point(x); // current MIC center
-        double r2 = x; // current MIC radius
-        double w = (c2-c1).norm() + r2 - r1; // this is the cut-width
-        return w-w_max; // error compared to desired cut-width
-    }
-private:
-    HEGraph& g;
-    double w_max; // desired cut-width
-    HEEdge e;
-    Point c1; // previous MIC center
-    double r1; // previous MIC radius
-};
-
-
-
 /// experimental medial-axis pocketing
 class medial_axis_pocket {
 public:

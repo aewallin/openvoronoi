@@ -298,33 +298,6 @@ bool medial_axis_pocket::has_next_radius(HEEdge e) {
     else
         return false;
 }
-    
-// on the current edge, move from current_radius towards target_radius
-// and find a radius-value that satisfies the cut-width constraint.
-/*
-double medial_axis_pocket::find_next_radius() {
-    CutWidthError t(g, max_width, current_edge, current_center, current_radius);
-    typedef std::pair<double, double> Result;
-    boost::uintmax_t max_iter=500;
-    boost::math::tools::eps_tolerance<double> tol(30);
-    double target_radius = g[ g.target(current_edge) ].dist();
-
-    double trg_err = t(target_radius);
-    double cur_err = t(current_radius);
-    if ( debug ||  ( !(trg_err*cur_err < 0) ) ) {
-        std::cout << "find_next_radius():\n";
-        std::cout << " current edge: "; g.print_edge(current_edge);// << current_radius << "\n";
-        std::cout << "    edge type: " << g[current_edge].type_str() << "\n";
-        std::cout << " current rad = " << current_radius << "\n";
-        std::cout << " target rad = " << target_radius << "\n";
-        std::cout << " error at current = " << t(current_radius) << "\n";
-        std::cout << " error at target = " << t(target_radius) << "\n";
-    }
-    double min_r = std::min(current_radius, target_radius);
-    double max_r = std::max(current_radius, target_radius);
-    Result r1 = boost::math::tools::toms748_solve(t, min_r, max_r, tol, max_iter);
-    return r1.first;
-}*/
 
 //use u-param
 std::pair<double,double> medial_axis_pocket::find_next_u() {
@@ -407,8 +380,8 @@ std::vector<Point> medial_axis_pocket::bitangent_points2(Point c1, double r1, Po
     if ( r1 == r2 ) {
         Point c1c2 = c2-c1;
         c1c2.normalize();
-        bd1 = c1c2.xy_perp();
-        bd2 = -1*c1c2.xy_perp();
+        bd1 = -1*c1c2.xy_perp();
+        bd2 = c1c2.xy_perp();
     } else {
         double c1c2_dist = (c1-c2).norm();
         double dr = fabs(r1-r2);

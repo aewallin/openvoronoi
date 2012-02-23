@@ -85,6 +85,8 @@ private:
     double r1; // previous MIC radius
 };
 
+
+
 /// experimental medial-axis pocketing
 class medial_axis_pocket {
 public:
@@ -93,6 +95,7 @@ public:
     void run();
     void set_debug(bool b);
     MICList get_mic_list();
+    std::pair<Point,double> edge_point(HEEdge e, double u);
 protected:
     void find_initial_mic();
     bool find_next_mic();
@@ -101,11 +104,12 @@ protected:
     std::pair<HEEdge,bool> find_next_edge();
     void mark_done(HEEdge e);
     bool has_next_radius(HEEdge e); 
-    double find_next_radius();
-    void output_next_mic(double next_radius, bool branch);
+    //double find_next_radius();
+    std::pair<double,double> find_next_u();
+    void output_next_mic(double next_u, double next_radius, bool branch);
 
     std::vector<Point> bitangent_points2(Point c1, double r1, Point c2, double r2);
-    std::pair<Point,double> edge_point(double u);
+    
 //DATA
     bool debug;
     std::vector<HEEdge> ma_edges; // the edges of the medial-axis
@@ -127,6 +131,26 @@ protected:
     double max_width;
     // the result of the operation is alist of MICs 
     MICList mic_list;
+};
+
+class CutWidthError2  {
+public:
+    CutWidthError2(medial_axis_pocket* ma, HEEdge ed, double wmax, Point cen1, double rad1) 
+    : m(ma), e(ed), w_max(wmax),  c1(cen1), r1(rad1) {}
+    double operator()(const double x) {
+        // w_max = | c2 - c1 | + r2 - r1
+        Point c2; // = m->edge_point(x); //g[e].point(x); // current MIC center
+        double r2; // = x; // current MIC radius
+        boost::tie(c2,r2) = m->edge_point(e,x);
+        double w = (c2-c1).norm() + r2 - r1; // this is the cut-width
+        return w-w_max; // error compared to desired cut-width
+    }
+private:
+    medial_axis_pocket* m;
+    HEEdge e;
+    double w_max; // desired cut-width
+    Point c1; // previous MIC center
+    double r1; // previous MIC radius
 };
 
 } // end namespace

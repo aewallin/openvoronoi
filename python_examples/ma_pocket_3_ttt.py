@@ -227,7 +227,7 @@ if __name__ == "__main__":
     mapocket = ovd.MedialAxisPocket(vd.getGraph())
     mapocket.debug(True)
     mapocket.setWidth(0.005)
-    
+    4
     #maxmic = mapocket.maxMic()
     mapocket.run()
     mic_list = mapocket.get_mic_list()

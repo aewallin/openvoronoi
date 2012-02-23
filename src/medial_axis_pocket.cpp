@@ -39,9 +39,10 @@ medial_axis_pocket::medial_axis_pocket(HEGraph& gi): g(gi) {
     debug = false;
 }
 
-
 /// set the maximum cut width
 void medial_axis_pocket::set_width(double w) {max_width=w;}
+void medial_axis_pocket::set_debug(bool b) {debug=b;}
+MICList medial_axis_pocket::get_mic_list() {return mic_list;}
 
 /// run the algorithm
 void medial_axis_pocket::run() {
@@ -49,9 +50,6 @@ void medial_axis_pocket::run() {
     while (find_next_mic()) {}
     if (debug) std::cout << "medial_axis_pocket::run() done. generated " << mic_list.size() << " MICs \n";
 }
-
-void medial_axis_pocket::set_debug(bool b) {debug=b;}
-MICList medial_axis_pocket::get_mic_list() {return mic_list;}
     
 /// find the largest MIC and add it to the output
 void medial_axis_pocket::find_initial_mic() {
@@ -68,6 +66,8 @@ void medial_axis_pocket::find_initial_mic() {
             max_mic_vertex = src;
         }
     }
+    if (debug) { std::cout << "find_initial_mic() max mic is c="<< max_mic_pos << " r=" << max_mic_radius << "\n"; }
+
     mic.c2 = max_mic_pos;
     mic.r2 = max_mic_radius;
     mic.c1 = mic.c2;
@@ -93,12 +93,11 @@ void medial_axis_pocket::find_initial_mic() {
             unvisited.push( branch_point(current_center, current_radius, e ) );
         }
     }
-    if (debug) { std::cout << " start edge is: "; g.print_edge(current_edge); }
+    if (debug) { std::cout << "find_initial_mic() start edge is: "; g.print_edge(current_edge); }
     new_branch=false;
     mic.new_branch = new_branch;
     mic_list.push_back(mic);
 }
-
 
 // return true if next mic was found and added to list
 // false means end-of-operation
@@ -115,28 +114,30 @@ bool medial_axis_pocket::find_next_mic() {
     //double target_radius = g[ g.target(current_edge) ].dist();
     
     //Point c1 = g[current_edge].point(current_radius);
-    Point c1;
-    double r1;
-    boost::tie(c1,r1) = edge_point(current_u);
+    Point c1 = current_center;
+    double r1 = current_radius;
+    //boost::tie(c1,r1) = edge_point(current_edge,current_u);
     //g[current_edge].point(current_radius); 
     //double r1 = current_radius;
     Point c2;
     double r2;
-    boost::tie(c2,r2) = edge_point( 1.0 );
+    boost::tie(c2,r2) = edge_point(current_edge, 1.0 );
     //g[current_edge].point(target_radius);
     //double r2 = g[ g.target(current_edge) ].dist();
     
     double w_target = ( c2-c1 ).norm() + r2 - r1;
-    if (debug) std::cout << "find_next_mic() target width " << w_target << "\n";
+    //if (debug) std::cout << "find_next_mic() target width " << w_target << "\n";
 
     if ( w_target > max_width ) {
         // since moving to the target vertex would give too large cut-width
         // we search on the current edge for the next MIC
         if (debug) {  std::cout << " searching on the current edge "; g.print_edge(current_edge); }
         // find a point on the current edge
-        double next_radius = find_next_radius();
+        double next_u;
+        double next_radius; // = find_next_radius();
+        boost::tie(next_u,next_radius) = find_next_u();
         if (debug) {  std::cout << " next_radius = " << next_radius << "\n"; }
-        output_next_mic(next_radius, new_branch);
+        output_next_mic(next_u, next_radius, new_branch);
         return true;
     } else {
         // moving to the target edge does not give a cut-width that is large enough
@@ -144,7 +145,7 @@ bool medial_axis_pocket::find_next_mic() {
         
         // mark edge DONE. this means we have machined all MICs on this edge.
         mark_done(current_edge);
-        if (debug) std::cout << "Finding new edge !\n";
+        if (debug) std::cout << "find_next_mic() Finding new edge !\n";
         
         bool end_branch_mic;
         boost::tie( current_edge, end_branch_mic) = find_next_edge(); // move to the next edge
@@ -160,13 +161,15 @@ bool medial_axis_pocket::find_next_mic() {
             return true;
         }
         
-        double next_radius = find_next_radius();
+        double next_u;
+        double next_radius;
+        boost::tie(next_u,next_radius) = find_next_u();
         if (new_branch) {
             new_branch=false;
-            output_next_mic(next_radius, true);
+            output_next_mic(next_u, next_radius, true);
             return true;
         } else {
-            output_next_mic(next_radius, false);
+            output_next_mic(next_u, next_radius, false);
             return true;
         }
     }
@@ -221,6 +224,7 @@ std::pair<HEEdge,bool> medial_axis_pocket::find_next_edge() {
             
         if (has_next_radius(e)) {
             if (debug) { std::cout << "find_next_edge(): next-branch is: "; g.print_edge(e); }
+            current_u = 0;
             return std::make_pair(e,false);
         } else {
             if (debug) { std::cout << "find_next_edge(): next-branch, but not valid\n"; }
@@ -232,6 +236,7 @@ std::pair<HEEdge,bool> medial_axis_pocket::find_next_edge() {
         // only one choice for the next edge
         if (has_next_radius(out_edges[0])) {
             if (debug) { std::cout << "find_next_edge(): only one out-edge: "; g.print_edge(out_edges[0]); }
+            current_u = 0;
             return std::make_pair(out_edges[0],false);
         } else {
             if (debug) std::cout << "find_next_edge(): one out-edge, but not valid\n"; 
@@ -246,6 +251,7 @@ std::pair<HEEdge,bool> medial_axis_pocket::find_next_edge() {
         
         if (has_next_radius(out_edges[0])) {
             if (debug) { std::cout << "find_next_edge(): two out-edges, returning first: "; g.print_edge(out_edges[0]); }
+            current_u=0;
             return std::make_pair(out_edges[0],false);
         } else {
             mark_done( out_edges[0] ); 
@@ -268,14 +274,21 @@ void medial_axis_pocket::mark_done(HEEdge e) {
 bool medial_axis_pocket::has_next_radius(HEEdge e) {
     // check if the edge e is one where we continue
     double r1 = current_radius;
-    Point  c1 = g[current_edge].point(r1); 
-    double r2 = g[ g.target(e) ].dist();
-    Point  c2 = g[e].point(r2);
+    Point  c1 = current_center; 
+    //boost::tie(c1,r1) = edge_point(current_u);
+    double r2; // = g[ g.target(e) ].dist();
+    Point  c2; // = g[e].point(r2);
+    boost::tie(c2,r2) = edge_point(e,1.0);
 
     double w_target = ( c2-c1 ).norm() + r2 - r1;
     if (debug) {
-        std::cout << "has_next_radius() "; g.print_edge(e);
-        std::cout << " taget width = " << w_target << "\n";
+        CutWidthError2 t(this, e,max_width, current_center, current_radius);
+        std::cout << "has_next_radius() ?"<< ( w_target > max_width ) <<" "; g.print_edge(e);
+        std::cout << "has_next_radius() err src "<< t(0) <<"\n";
+        std::cout << "has_next_radius() err trg "<< t(1) <<"\n";
+
+
+        //std::cout << " taget width = " << w_target << "\n";
     }
     if (w_target<=0)
         return false;
@@ -288,6 +301,7 @@ bool medial_axis_pocket::has_next_radius(HEEdge e) {
     
 // on the current edge, move from current_radius towards target_radius
 // and find a radius-value that satisfies the cut-width constraint.
+/*
 double medial_axis_pocket::find_next_radius() {
     CutWidthError t(g, max_width, current_edge, current_center, current_radius);
     typedef std::pair<double, double> Result;
@@ -310,18 +324,58 @@ double medial_axis_pocket::find_next_radius() {
     double max_r = std::max(current_radius, target_radius);
     Result r1 = boost::math::tools::toms748_solve(t, min_r, max_r, tol, max_iter);
     return r1.first;
+}*/
+
+//use u-param
+std::pair<double,double> medial_axis_pocket::find_next_u() {
+    CutWidthError2 t(this, current_edge, max_width, current_center, current_radius);
+    typedef std::pair<double, double> Result;
+    boost::uintmax_t max_iter=500;
+    boost::math::tools::eps_tolerance<double> tol(30);
+    //Point target p;
+    //double target_radius;
+    //boost::tie(target_p,target_radius) = g[ g.target(current_edge) ].dist();
+
+    double trg_err = t(1.0);
+    double cur_err = t(current_u);
+    if ( debug ||  ( !(trg_err*cur_err < 0) ) ) {
+        std::cout << "find_next_u():\n";
+        std::cout << " current edge: "; g.print_edge(current_edge);// << current_radius << "\n";
+        std::cout << "    edge type: " << g[current_edge].type_str() << "\n";
+        std::cout << " source c= "<< g[ g.source(current_edge) ].position << " r= " << g[ g.source(current_edge) ].dist() << " err= " <<  t(0.0) <<"\n";
+        std::cout << " target c= "<< g[ g.target(current_edge) ].position << " r= " << g[ g.target(current_edge) ].dist() << " err= " <<  t(1.0) <<"\n";
+        std::cout << " current c1=" << current_center << " r1=" << current_radius << "\n";
+        std::cout << " current u = " << current_u << "\n";
+        std::cout << " error at current = " << t(current_u) << "\n";
+        std::cout << " error at target = " << t(1.0) << "\n";
+    }
+    //double min_r = std::min(current_radius, target_radius);
+    //double max_r = std::max(current_radius, target_radius);
+    Result r1 = boost::math::tools::toms748_solve(t, current_u, 1.0, tol, max_iter);
+    double rnext;
+    Point pnext;
+    boost::tie( pnext, rnext ) = edge_point( current_edge, r1.first );
+    return std::make_pair( r1.first, rnext );
 }
     
 // output the next MIC, for processing by a downstream algorithm
 // that lays out the pattern: lead-out, rapid, lead-in, bi-tangent, cut-arc, bi-tangent
-void medial_axis_pocket::output_next_mic(double next_radius, bool branch) {
+void medial_axis_pocket::output_next_mic(double next_u, double next_radius, bool branch) {
     MIC mic;
-    if (debug) std::cout << "output_next_mic() next_radius = " << next_radius << "\n";
+    
 
     Point c1 = current_center;
-    Point c2 = g[current_edge].point(next_radius);
     double r1 = current_radius;
-    double r2 = next_radius;
+    Point c2;
+    double r2;
+    boost::tie(c2,r2) = edge_point(current_edge, next_u); //g[current_edge].point(next_radius);
+    //double r2 = next_radius;
+    if (debug) {
+        std::cout << "output_next_mic(): \n";
+        std::cout << " next_u = " << next_u << "\n";
+        std::cout << " next_radius = " << next_radius << "\n";
+        std::cout << " c= " << c2 << " r= " << r2 << "\n";
+    }
     
     mic.c1 = c1;
     mic.r1 = r1;
@@ -339,8 +393,9 @@ void medial_axis_pocket::output_next_mic(double next_radius, bool branch) {
     mic.c_prev = previous_branch_center;
     mic.r_prev = previous_branch_radius;
     mic_list.push_back(mic);
-    current_radius = next_radius;
-    current_center = g[current_edge].point(next_radius);
+    current_radius = r2; //next_radius;
+    current_center = c2; //g[current_edge].point(next_radius);
+    current_u = next_u;
 }
 
 
@@ -387,7 +442,7 @@ std::vector<Point> medial_axis_pocket::bitangent_points2(Point c1, double r1, Po
 }
 
 // find a point on current_edge at u [0,1]
-std::pair<Point,double> medial_axis_pocket::edge_point(double u) {
+std::pair<Point,double> medial_axis_pocket::edge_point(HEEdge e, double u) {
     Point p;
     double r;
     // on line-type edges return
@@ -406,29 +461,29 @@ std::pair<Point,double> medial_axis_pocket::edge_point(double u) {
     LINESITE
     };
     */
-    if ( g[current_edge].type == LINE ||
-        g[current_edge].type == LINELINE ||
-        g[current_edge].type == PARA_LINELINE ) // note SEPARATOR shouldn't occur in the medial-axis
+    if ( g[e].type == LINE ||
+        g[e].type == LINELINE ||
+        g[e].type == PARA_LINELINE ) // note SEPARATOR shouldn't occur in the medial-axis
         {
-        Point src = g[ g.source(current_edge) ].position;
-        Point trg = g[ g.target(current_edge) ].position;
+        Point src = g[ g.source(e) ].position;
+        Point trg = g[ g.target(e) ].position;
         p = src + u * (trg-src);
-        HEFace f = g[current_edge].face;
+        HEFace f = g[e].face;
         Site* s = g[f].site;
         Point pa = s->apex_point(p);
         r = (p-pa).norm();
-    } else if ( g[current_edge].type == PARABOLA ) {
+    } else if ( g[e].type == PARABOLA ) {
         // use the existing t-parametrisation ?
-        HEVertex src_v = g.source(current_edge);
-        HEVertex trg_v = g.target(current_edge);
+        HEVertex src_v = g.source(e);
+        HEVertex trg_v = g.target(e);
         double src_t = g[src_v].dist();
         double trg_t = g[trg_v].dist();
         double u_t = src_t + u*(trg_t-src_t);
-        p = g[current_edge].point(u_t);
+        p = g[e].point(u_t);
         r=u_t;
     } else {
         std::cout << "ERROR medial_axis_pocket::edge_point() unsuppoerted edge type.\n";
-        std::cout << " type= " << g[current_edge].type_str() << "\n";
+        std::cout << " type= " << g[e].type_str() << "\n";
         exit(-1);
     }
     

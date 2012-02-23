@@ -111,22 +111,12 @@ bool medial_axis_pocket::find_next_mic() {
     //  w_max = | c2 - c1 | + r2 - r1
     
     // we allways move from source to target.
-    //double target_radius = g[ g.target(current_edge) ].dist();
-    
-    //Point c1 = g[current_edge].point(current_radius);
     Point c1 = current_center;
     double r1 = current_radius;
-    //boost::tie(c1,r1) = edge_point(current_edge,current_u);
-    //g[current_edge].point(current_radius); 
-    //double r1 = current_radius;
     Point c2;
     double r2;
     boost::tie(c2,r2) = edge_point(current_edge, 1.0 );
-    //g[current_edge].point(target_radius);
-    //double r2 = g[ g.target(current_edge) ].dist();
-    
     double w_target = ( c2-c1 ).norm() + r2 - r1;
-    //if (debug) std::cout << "find_next_mic() target width " << w_target << "\n";
 
     if ( w_target > max_width ) {
         // since moving to the target vertex would give too large cut-width
@@ -264,20 +254,19 @@ std::pair<HEEdge,bool> medial_axis_pocket::find_next_edge() {
         return std::make_pair(HEEdge(),false);
     }
 }
-    
+
 void medial_axis_pocket::mark_done(HEEdge e) {
     edge_data[ e ].done = true;
     edge_data[ g[e].twin ].done = true;
 }
-    
+
 // does HEEdge e have the next MIC we want ?
 bool medial_axis_pocket::has_next_radius(HEEdge e) {
     // check if the edge e is one where we continue
     double r1 = current_radius;
     Point  c1 = current_center; 
-    //boost::tie(c1,r1) = edge_point(current_u);
-    double r2; // = g[ g.target(e) ].dist();
-    Point  c2; // = g[e].point(r2);
+    double r2;
+    Point  c2;
     boost::tie(c2,r2) = edge_point(e,1.0);
 
     double w_target = ( c2-c1 ).norm() + r2 - r1;
@@ -286,9 +275,6 @@ bool medial_axis_pocket::has_next_radius(HEEdge e) {
         std::cout << "has_next_radius() ?"<< ( w_target > max_width ) <<" "; g.print_edge(e);
         std::cout << "has_next_radius() err src "<< t(0) <<"\n";
         std::cout << "has_next_radius() err trg "<< t(1) <<"\n";
-
-
-        //std::cout << " taget width = " << w_target << "\n";
     }
     if (w_target<=0)
         return false;
@@ -305,10 +291,6 @@ std::pair<double,double> medial_axis_pocket::find_next_u() {
     typedef std::pair<double, double> Result;
     boost::uintmax_t max_iter=500;
     boost::math::tools::eps_tolerance<double> tol(30);
-    //Point target p;
-    //double target_radius;
-    //boost::tie(target_p,target_radius) = g[ g.target(current_edge) ].dist();
-
     double trg_err = t(1.0);
     double cur_err = t(current_u);
     if ( debug ||  ( !(trg_err*cur_err < 0) ) ) {
@@ -335,8 +317,6 @@ std::pair<double,double> medial_axis_pocket::find_next_u() {
 // that lays out the pattern: lead-out, rapid, lead-in, bi-tangent, cut-arc, bi-tangent
 void medial_axis_pocket::output_next_mic(double next_u, double next_radius, bool branch) {
     MIC mic;
-    
-
     Point c1 = current_center;
     double r1 = current_radius;
     Point c2;
@@ -356,7 +336,7 @@ void medial_axis_pocket::output_next_mic(double next_u, double next_radius, bool
     mic.r2 = r2;
 
     if (c1 != c2) {
-        std::vector<Point> tangents = bitangent_points2(c1,r1,c2,r2);
+        std::vector<Point> tangents = bitangent_points(c1,r1,c2,r2);
         mic.t1 = tangents[0]; //tang1; //2
         mic.t2 = tangents[1]; //3
         mic.t3 = tangents[2]; //4
@@ -372,9 +352,8 @@ void medial_axis_pocket::output_next_mic(double next_u, double next_radius, bool
 }
 
 
-// try a more robust solution approach
-
-std::vector<Point> medial_axis_pocket::bitangent_points2(Point c1, double r1, Point c2, double r2) {
+// bi-tangent points to c1-c2
+std::vector<Point> medial_axis_pocket::bitangent_points(Point c1, double r1, Point c2, double r2) {
     std::vector<Point> out;
     Point bd1,bd2;
     if ( r1 == r2 ) {
@@ -446,7 +425,7 @@ std::pair<Point,double> medial_axis_pocket::edge_point(HEEdge e, double u) {
         Point pa = s->apex_point(p);
         r = (p-pa).norm();
     } else if ( g[e].type == PARABOLA ) {
-        // use the existing t-parametrisation ?
+        // use the existing t-parametrisation (?)
         HEVertex src_v = g.source(e);
         HEVertex trg_v = g.target(e);
         double src_t = g[src_v].dist();

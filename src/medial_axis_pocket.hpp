@@ -73,7 +73,7 @@ public:
     void run();
     void set_debug(bool b);
     MICList get_mic_list();
-    std::pair<Point,double> edge_point(HEEdge e, double u);
+    std::pair<Point,double> edge_point(HEEdge e, double u); // used by the error-functor also. move somewhere else?
 protected:
     void find_initial_mic();
     bool find_next_mic();
@@ -82,11 +82,9 @@ protected:
     std::pair<HEEdge,bool> find_next_edge();
     void mark_done(HEEdge e);
     bool has_next_radius(HEEdge e); 
-    //double find_next_radius();
     std::pair<double,double> find_next_u();
     void output_next_mic(double next_u, double next_radius, bool branch);
-
-    std::vector<Point> bitangent_points2(Point c1, double r1, Point c2, double r2);
+    std::vector<Point> bitangent_points(Point c1, double r1, Point c2, double r2);
     
 //DATA
     bool debug;

@@ -625,7 +625,7 @@ if __name__ == "__main__":
 
     #pts = [p1,p2,p3,p4,p5]
     
-    [segs, extents, scale] = get_scaled_segs( "M", 0.3)
+    [segs, extents, scale] = get_scaled_segs( "C", 0.3)
     dx = -0.3
     dy = 0
     segs = translate(segs, dx, dy )

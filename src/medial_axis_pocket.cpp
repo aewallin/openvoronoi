@@ -44,6 +44,7 @@ medial_axis_pocket::medial_axis_pocket(HEGraph& gi): g(gi) {
 void medial_axis_pocket::set_width(double w) {max_width=w;}
 void medial_axis_pocket::set_debug(bool b) {debug=b;}
 MICList medial_axis_pocket::get_mic_list() {return mic_list;}
+std::vector<MICList> medial_axis_pocket::get_mic_components() {return ma_components;}
 
 /// run the algorithm
 void medial_axis_pocket::run() {
@@ -51,22 +52,45 @@ void medial_axis_pocket::run() {
     while (find_next_mic()) {}
     if (debug) std::cout << "medial_axis_pocket::run() done. generated " << mic_list.size() << " MICs \n";
 }
+
+// many component run
+void medial_axis_pocket::run2() {
+    mic_list.clear();
+    while ( find_initial_mic() ) {
+        while (find_next_mic()) {}
+        if (debug) std::cout << "medial_axis_pocket::run() component done. generated " << mic_list.size() << " MICs \n";
+        ma_components.push_back(mic_list);
+        mic_list.clear();
+    }
+    //if (debug) std::cout << "medial_axis_pocket::run() component done. generated " << mic_list.size() << " MICs \n";
+    
+    
+    
+    if (debug) std::cout << "medial_axis_pocket::run() all done. generated " << ma_components.size() << " components \n";
+
+}
+
     
 /// find the largest MIC and add it to the output
-void medial_axis_pocket::find_initial_mic() {
+bool medial_axis_pocket::find_initial_mic() {
     MIC mic;
     // find the vertex with the maximum radius mic
     double max_mic_radius(-1);
     Point max_mic_pos(0,0);
     HEVertex max_mic_vertex = HEVertex();
+    bool found(false);
     BOOST_FOREACH( HEEdge e, ma_edges ) {
         HEVertex src = g.source(e);
-        if ( g[src].dist() > max_mic_radius ) {
+        if ( !edge_data[e].done && g[src].dist() > max_mic_radius ) {
             max_mic_radius = g[src].dist();
             max_mic_pos = g[src].position; 
             max_mic_vertex = src;
+            found = true;
         }
     }
+    if (!found)
+        return false;
+        
     if (debug) { std::cout << "find_initial_mic() max mic is c="<< max_mic_pos << " r=" << max_mic_radius << "\n"; }
 
     mic.c2 = max_mic_pos;
@@ -98,6 +122,7 @@ void medial_axis_pocket::find_initial_mic() {
     new_branch=false;
     mic.new_branch = new_branch;
     mic_list.push_back(mic);
+    return true;
 }
 
 // return true if next mic was found and added to list
@@ -115,13 +140,10 @@ bool medial_axis_pocket::find_next_mic() {
     // cut-width
     //  w_max = | c2 - c1 | + r2 - r1
     
-    // we allways move from source to target.
-    Point c1 = current_center;
-    double r1 = current_radius;
     Point c2;
     double r2;
     boost::tie(c2,r2) = edge_point(current_edge, 1.0 );
-    double w_target = ( c2-c1 ).norm() + r2 - r1;
+    double w_target = cut_width(current_center, current_radius, c2, r2); //( c2-c1 ).norm() + r2 - r1;
 
     if ( w_target > max_width ) {
         // since moving to the target vertex would give too large cut-width
@@ -274,15 +296,13 @@ void medial_axis_pocket::mark_done(HEEdge e) {
 // does HEEdge e have the next MIC we want ?
 bool medial_axis_pocket::has_next_radius(HEEdge e) {
     // check if the edge e is one where we continue
-    double r1 = current_radius;
-    Point  c1 = current_center; 
     double r2;
     Point  c2;
     boost::tie(c2,r2) = edge_point(e,1.0);
 
-    double w_target = ( c2-c1 ).norm() + r2 - r1;
+    double w_target = cut_width(current_center, current_radius, c2, r2);
     if (debug) {
-        CutWidthError2 t(this, e,max_width, current_center, current_radius);
+        CutWidthError t(this, e,max_width, current_center, current_radius);
         std::cout << "has_next_radius() ?"<< ( w_target > max_width ) <<" "; g.print_edge(e);
         std::cout << "has_next_radius() err src "<< t(0) <<"\n";
         std::cout << "has_next_radius() err trg "<< t(1) <<"\n";
@@ -298,7 +318,7 @@ bool medial_axis_pocket::has_next_radius(HEEdge e) {
 
 //use u-param
 std::pair<double,double> medial_axis_pocket::find_next_u() {
-    CutWidthError2 t(this, current_edge, max_width, current_center, current_radius);
+    CutWidthError t(this, current_edge, max_width, current_center, current_radius);
     typedef std::pair<double, double> Result;
     boost::uintmax_t max_iter=500;
     boost::math::tools::eps_tolerance<double> tol(30);
@@ -402,6 +422,15 @@ std::vector<Point> medial_axis_pocket::bitangent_points(Point c1, double r1, Poi
     out.push_back( c2 + r2*bd1 );
     out.push_back( c2 + r2*bd2 );
     return out;
+}
+
+
+// (c1,r1) is the previously machined MIC
+// (c2,r2) is the new MIC
+// the maximum cut-width when cutting c2 is
+//  w_max = | c2 - c1 | + r2 - r1
+double medial_axis_pocket::cut_width(Point c1, double r1, Point c2, double r2) {
+    return ( c2-c1 ).norm() + r2 - r1;
 }
 
 // find a point on current_edge at u [0,1]

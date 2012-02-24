@@ -49,6 +49,32 @@ public:
         }
         return out;
     }
+    
+    boost::python::list py_get_mic_components() {
+        boost::python::list out;
+        BOOST_FOREACH(MICList miclist, ma_components) {
+            boost::python::list mic_out;
+            BOOST_FOREACH(MIC mic, miclist) {
+                boost::python::list m;
+                m.append( mic.c2 );          //0
+                m.append( mic.r2 );          //1
+                m.append( mic.t1 );         //2
+                m.append( mic.t2 );         //3
+                m.append( mic.t3 );         //4
+                m.append( mic.t4 );         //5
+                m.append( mic.c1 );          //6
+                m.append( mic.r1 );          //7
+                m.append( mic.new_branch ); //8
+                m.append( mic.c_prev );     //9
+                m.append( mic.r_prev );     //10
+                mic_out.append(m);
+            }
+            out.append(mic_out);
+            //return out;
+            
+        }
+        return out;
+    }
 };
 
 } // end namespace

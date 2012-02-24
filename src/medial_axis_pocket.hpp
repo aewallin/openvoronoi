@@ -54,6 +54,10 @@ struct branch_point {
     HEEdge next_edge;
 };
 
+// it is the responsibility of a downstream algorithm to lay down a toolpath
+// that machines the area between c2 and c1
+// c1 is the circle that is assumed already cut
+// c2 is the new circle
 struct MIC {
     Point c1,c2;  // center
     double r1,r2; // radius
@@ -63,7 +67,8 @@ struct MIC {
     double r_prev;
 };
 
-typedef std::list<MIC> MICList;
+// the list of MICs from one connected component of the MA
+typedef std::vector<MIC> MICList;
 
 /// experimental medial-axis pocketing
 class medial_axis_pocket {
@@ -71,11 +76,13 @@ public:
     medial_axis_pocket(HEGraph& gi);
     void set_width(double w);
     void run();
+    void run2();
     void set_debug(bool b);
     MICList get_mic_list();
+    std::vector<MICList> get_mic_components(); // {return ma_components;}
     std::pair<Point,double> edge_point(HEEdge e, double u); // used by the error-functor also. move somewhere else?
 protected:
-    void find_initial_mic();
+    bool find_initial_mic();
     bool find_next_mic();
     HEEdge find_next_branch();
     EdgeVector find_out_edges();
@@ -85,7 +92,7 @@ protected:
     std::pair<double,double> find_next_u();
     void output_next_mic(double next_u, double next_radius, bool branch);
     std::vector<Point> bitangent_points(Point c1, double r1, Point c2, double r2);
-    
+    double cut_width(Point c1, double r1, Point c2, double r2);
 //DATA
     bool debug;
     std::vector<HEEdge> ma_edges; // the edges of the medial-axis
@@ -107,12 +114,13 @@ protected:
     double max_width;
     // the result of the operation is a list of MICs 
     MICList mic_list;
+    std::vector<MICList> ma_components;
     //int max_mic_count;
 };
 
-class CutWidthError2  {
+class CutWidthError  {
 public:
-    CutWidthError2(medial_axis_pocket* ma, HEEdge ed, double wmax, Point cen1, double rad1) 
+    CutWidthError(medial_axis_pocket* ma, HEEdge ed, double wmax, Point cen1, double rad1) 
     : m(ma), e(ed), w_max(wmax),  c1(cen1), r1(rad1) {}
     double operator()(const double x) {
         // w_max = | c2 - c1 | + r2 - r1

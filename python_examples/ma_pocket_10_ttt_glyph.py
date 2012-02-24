@@ -204,10 +204,10 @@ def spiral_clear(myscreen, out_tangent, in_tangent, c1, r1, c2, r2, out1, in1):
         ovdvtk.drawLine(myscreen, p,trg,ovdvtk.pink)
         ngc_writer.xy_line_to(trg.x,trg.y)
         
-        if n != Npts+1:
-            drawPoint(myscreen, trg, ovdvtk.orange)
-        else:
-            drawPoint(myscreen, trg, ovdvtk.orange,0.004)
+        #if n != Npts+1:
+        #    drawPoint(myscreen, trg, ovdvtk.orange)
+        #else:
+        #    drawPoint(myscreen, trg, ovdvtk.orange,0.004)
         p = trg
         #if n == Npts-2:
         #    break
@@ -625,7 +625,7 @@ if __name__ == "__main__":
 
     #pts = [p1,p2,p3,p4,p5]
     
-    [segs, extents, scale] = get_scaled_segs( "C", 0.3)
+    [segs, extents, scale] = get_scaled_segs( "P", 0.3)
     dx = -0.3
     dy = 0
     segs = translate(segs, dx, dy )
@@ -652,7 +652,7 @@ if __name__ == "__main__":
     
     drawOffsets2(myscreen, ofs)
     
-    #myscreen.render()   
+    myscreen.render()   
     #myscreen.iren.Start()
     
     
@@ -666,13 +666,13 @@ if __name__ == "__main__":
     vd2.filter_graph(pi)
     of = ovd.Offset( vd2.getGraph() ) # pass the created graph to the Offset class
     t_before = time.time()
-    ofs = of.offset(0.0015)
+    ofs2 = of.offset(0.0015)
     t_after = time.time()
     #print "( VD2 OFFSET in ", 1e3*(t_after-t_before)," milliseconds.  )"
     print "( VD2 OFFSET in %.3f s.  )" % (1e3*(t_after-t_before))
-    drawOffsets2(myscreen, ofs)
+    drawOffsets2(myscreen, ofs2)
     
-    #myscreen.render()   
+    myscreen.render()   
     #myscreen.iren.Start()
     
     # now create the VD for pocketing
@@ -691,7 +691,7 @@ if __name__ == "__main__":
     
     vod3.setVDText2(times)
     
-    pi = ovd.PolygonInterior(True)
+    pi = ovd.PolygonInterior(False)
     vd3.filter_graph(pi)
     ma = ovd.MedialAxis()
     vd3.filter_graph(ma)
@@ -702,7 +702,7 @@ if __name__ == "__main__":
     
     mapocket = ovd.MedialAxisPocket(vd3.getGraph())
     mapocket.setWidth(0.005)
-    mapocket.debug(False)
+    mapocket.debug(True)
     t_before = time.time()
     mapocket.run()
     mic_list = mapocket.get_mic_list()
@@ -775,7 +775,7 @@ if __name__ == "__main__":
                 rapid_to_next(myscreen, out_tangent, in_tangent, previous_center, previous_radius, cen2, r2, previous_out1, in1)
         else:
             # spiral-clear the start-MIC. The spiral should end at in1
-            spiral_clear(myscreen, out_tangent, in_tangent, previous_center, previous_radius, cen2, r2, previous_out1, in1)
+            #spiral_clear(myscreen, out_tangent, in_tangent, previous_center, previous_radius, cen2, r2, previous_out1, in1)
             #print "No rapid-move on first-iteration."
             first = False
 
@@ -797,7 +797,7 @@ if __name__ == "__main__":
             #print "Final lead-out arc"
 
         nframe = nframe+1
-        myscreen.render()
+        #myscreen.render()
         
     #print "mic-pocket done."
     

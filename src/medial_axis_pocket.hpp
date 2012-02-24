@@ -105,8 +105,9 @@ protected:
     
     // the max cutting-width
     double max_width;
-    // the result of the operation is alist of MICs 
+    // the result of the operation is a list of MICs 
     MICList mic_list;
+    //int max_mic_count;
 };
 
 class CutWidthError2  {

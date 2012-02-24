@@ -37,6 +37,7 @@ medial_axis_pocket::medial_axis_pocket(HEGraph& gi): g(gi) {
     current_edge = HEEdge();
     max_width = 0.05;
     debug = false;
+    //max_mic_count=300; // limit output size in debug mode
 }
 
 /// set the maximum cut width
@@ -106,6 +107,10 @@ bool medial_axis_pocket::find_next_mic() {
         if (debug) std::cout << "find_next_mic() end of operation. Nothing to do.\n";
         return false;
     }
+    //if ( debug && mic_list.size() > max_mic_count ) {
+    //    std::cout << " max_mic_count reached. stopping.\n";
+    //    return false;
+    //}
     // find a point on current-edge so that we get the desired 
     // cut-width
     //  w_max = | c2 - c1 | + r2 - r1
@@ -180,7 +185,10 @@ HEEdge medial_axis_pocket::find_next_branch() {
         current_center = out.current_center;
         current_radius = out.current_radius;
         new_branch = true;
-        return out.next_edge;
+        if ( !edge_data[ out.next_edge ].done )
+            return out.next_edge;
+        else
+            return find_next_branch();
     }
 }
 
@@ -188,7 +196,10 @@ EdgeVector medial_axis_pocket::find_out_edges() {
     HEVertex trg = g.target(current_edge);
     EdgeVector out_edges;
     BOOST_FOREACH(HEEdge e, g.out_edge_itr(trg) ) {
-        if ( e != g[current_edge].twin && g[e].valid && g[e].type != NULLEDGE && g[e].type != OUTEDGE ) {
+        if ( e != g[current_edge].twin && 
+             g[e].valid && !edge_data[e].done && 
+             g[e].type != NULLEDGE && 
+             g[e].type != OUTEDGE ) {
             out_edges.push_back(e);
         }
     }

@@ -658,7 +658,7 @@ if __name__ == "__main__":
     # camPos/float(1000)
     myscreen.camera.SetPosition(0, -camPos/float(1000), zmult*camPos) 
     myscreen.camera.SetClippingRange(-(zmult+1)*camPos,(zmult+1)*camPos)
-    myscreen.camera.SetFocalPoint(0.0, 0.22, 0)
+    myscreen.camera.SetFocalPoint(0.0, 0, 0)
     
     # redirect stdout to file
     # example with redirection of sys.stdout
@@ -671,17 +671,29 @@ if __name__ == "__main__":
     print "( COLOR,0,255,255 ) "
     print "( STOCK/BLOCK,300.0000,200.0000,10.0000,150.0000,100.0000,5.0000 ) "
     
-    [segs, extents, scale] = get_scaled_segs( "POC", 0.3)
+    # stock-box
+    left = -0.35
+    right = 0.08
+    top = 0.13
+    bot = -0.2
+    p1=(left,bot)
+    p2=(left,top)
+    p3=(right,top)
+    p4=(right,bot)
+    pts = [p1,p2,p3,p4]
+
+    [segs, extents, scale] = get_scaled_segs( "P O C", 0.3)
     dx = -0.3
     dy = 0
     segs = translate(segs, dx, dy )
     
-    [segs2, extents2, scale2] = get_scaled_segs( "KET", 0.3)
+    [segs2, extents2, scale2] = get_scaled_segs( "K E T", 0.3)
     dx = -0.3
     dy = -0.15
     segs2 = translate(segs2, dx, dy )
     
     segs.extend(segs2) # = segs+segs2
+    segs.extend([pts])
     
     vd = ovd.VoronoiDiagram(1,120)
     times = insert_many_polygons(vd,segs)
@@ -690,13 +702,13 @@ if __name__ == "__main__":
     print "( VD1 done in   %.3f s.  )" % (sum(times))
     #vod.setVDText2(times)
     
-    pi = ovd.PolygonInterior(True)
+    pi = ovd.PolygonInterior(False)
     vd.filter_graph(pi)
     
     of = ovd.Offset( vd.getGraph() ) # pass the created graph to the Offset class
     #ofs_list=[]
     t_before = time.time()
-    ofs = of.offset(0.0015)
+    ofs = of.offset(0.001)
     t_after = time.time()
     #print "( VD1 OFFSET in ", 1e3*(t_after-t_before)," milliseconds.  )"
     print "( VD1 OFFSET in %.3f s.  )" % (1e3*(t_after-t_before))

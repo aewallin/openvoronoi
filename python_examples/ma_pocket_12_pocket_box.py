@@ -48,7 +48,7 @@ def drawArc(myscreen, pt1, pt2, r, cen,cw,arcColor):
     
     dtheta = theta2-theta1
     arclength = r*dtheta
-    dlength = max(0.001, arclength/10)
+    dlength = 0.005
     steps = int( float(arclength) / float(dlength))
     if steps==0: steps=1
     rsteps = float(1)/float(steps)
@@ -777,8 +777,6 @@ if __name__ == "__main__":
     
     mic_components = mapocket.get_mic_components()
     
-    mic_list = mic_components[0] #mapocket.get_mic_list()
-    
     ngc_writer.scale = 10/0.03
     ngc_writer.preamble()
         
@@ -795,6 +793,6 @@ if __name__ == "__main__":
             print>>f, item
     f.close()
     
-    print "python done."
+    print "python done. g-code written to output.nc "
     myscreen.render()        
     myscreen.iren.Start()

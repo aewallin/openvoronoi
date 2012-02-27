@@ -1,5 +1,6 @@
 import openvoronoi as ovd
 import ovdvtk
+import ttt
 
 import time
 import vtk
@@ -47,8 +48,9 @@ def drawArc(myscreen, pt1, pt2, r, cen,cw,arcColor):
     
     dtheta = theta2-theta1
     arclength = r*dtheta
-    dlength = min(0.01, arclength/10)
+    dlength = max(0.001, arclength/10)
     steps = int( float(arclength) / float(dlength))
+    if steps==0: steps=1
     rsteps = float(1)/float(steps)
     dc = math.cos(-dtheta*rsteps) # delta-cos  
     ds = math.sin(-dtheta*rsteps) # delta-sin
@@ -68,7 +70,7 @@ def rapid_to_next(myscreen, prv_tang, nxt_tang, c1, r1, c2, r2, prv, nxt):
     # rapid from prev, to nxt
     # while staying inside c1(r1) and c2(r)
 
-    rad_default = 0.03
+    rad_default = 0.003
     rad = min( rad_default, 0.9*r1 , 0.9*r2)
     
     prv_tang.normalize()
@@ -97,7 +99,7 @@ def rapid_to_next(myscreen, prv_tang, nxt_tang, c1, r1, c2, r2, prv, nxt):
 def rapid_to_new_branch(myscreen, prv_tang, nxt_tang, c1, r1, c2, r2, prv, nxt):
     # rapid from prev, to nxt
     # while staying inside c1(r1) and c2(r)
-    rad_default = 0.03
+    rad_default = 0.003
     rad1 = min( rad_default, 0.9*r1 ) # wrong? we get the new-branch r1 here, while we would want the old-branch r1
     rad2 = min( rad_default, 0.9*r2 )    
     prv_tang.normalize()
@@ -124,7 +126,7 @@ def rapid_to_new_branch(myscreen, prv_tang, nxt_tang, c1, r1, c2, r2, prv, nxt):
     drawArc(myscreen, src2, nxt, rad2, cen2, True, ovdvtk.mag2) # lead-in arc
 
 def final_lead_out(myscreen, prv_tang, nxt_tang, c1, r1, c2, r2, prv, nxt):
-    rad_default = 0.03
+    rad_default = 0.003
     rad1 = min( rad_default, 0.9*r1 ) # wrong? we get the new-branch r1 here, while we would want the old-branch r1
     prv_tang.normalize()
     prv_normal = -1*prv_tang.xy_perp()
@@ -133,7 +135,7 @@ def final_lead_out(myscreen, prv_tang, nxt_tang, c1, r1, c2, r2, prv, nxt):
     drawArc(myscreen, prv, trg1, rad1, cen1, True, ovdvtk.red) # lead-out arc
 
 
-def spiral_clear(myscreen, out_tangent, in_tangent, c1, r1, c2, r2, out1, in1):
+def spiral_clear(myscreen, cutwidth, out_tangent, in_tangent, c1, r1, c2, r2, out1, in1):
     print "( spiral clear! )"
     ngc_writer.pen_up()
     
@@ -151,7 +153,7 @@ def spiral_clear(myscreen, out_tangent, in_tangent, c1, r1, c2, r2, out1, in1):
     #drawPoint( myscreen, in1, ovdvtk.blue, 0.006 )
     # width = 2*pi*b
     # => b = width/(2*pi)
-    b=0.01/(2*math.pi)
+    b=cutwidth/(2*math.pi)
     # r = a + b in1_theta = r_max
     # =>
     # a = r_max-b*in1_theta
@@ -202,10 +204,10 @@ def spiral_clear(myscreen, out_tangent, in_tangent, c1, r1, c2, r2, out1, in1):
         ovdvtk.drawLine(myscreen, p,trg,ovdvtk.pink)
         ngc_writer.xy_line_to(trg.x,trg.y)
         
-        if n != Npts+1:
-            drawPoint(myscreen, trg, ovdvtk.orange)
-        else:
-            drawPoint(myscreen, trg, ovdvtk.orange,0.004)
+        #if n != Npts+1:
+        #    drawPoint(myscreen, trg, ovdvtk.orange)
+        #else:
+        #    drawPoint(myscreen, trg, ovdvtk.orange,0.004)
         p = trg
         #if n == Npts-2:
         #    break
@@ -372,41 +374,58 @@ def drawOffsets2(myscreen, ofs):
     myscreen.addActor( edge_actor )
 
 
-def insert_polygon_points(vd, pts):
-    #pts=[]
-    #for p in polygon:
-    #    pts.append( ovd.Point( p[0], p[1] ) )
+def insert_polygon_points2(vd, polygon):
+    pts=[]
+    for p in polygon:
+        pts.append( ovd.Point( p[0], p[1] ) )
     id_list = []
-    
     #print "inserting ",len(pts)," point-sites:"
     m=0
     for p in pts:
-        
         id_list.append( vd.addVertexSite( p ) )
-        #print " ",m," added vertex ", id_list[ len(id_list) -1 ], " at ",p
+        #print " ",m," added vertex ", id_list[ len(id_list) -1 ]
         m=m+1   
-        
-    #print "id list is ", id_list
+    #print vd.numFaces()," faces after all points inserted"
     return id_list
 
-def insert_polygon_segments(vd,id_list):
-    j=0
+def insert_polygon_segments2(vd,id_list):
+    #j=0
+    #jmax=9999999 # for debugging, set jmax to the problematic case to stop algorithm in the middle
     #print "inserting ",len(id_list)," line-segments:"
     for n in range(len(id_list)):
         n_nxt = n+1
         if n==(len(id_list)-1):
             n_nxt=0
-        #print " ",j,"inserting segement ",id_list[n]," - ",id_list[n_nxt]
+
+        #if (j<jmax):
+            #vd.debug_on()
+        #    print " ",j,"inserting segement ",id_list[n]," - ",id_list[n_nxt]
+
+        #    if 0: # id_list[n] == 22871: #102187: # 102187/7 #115869: # 51456: 115869
+        #        vd.debug_on()
+        #        vd.addLineSite( id_list[n], id_list[n_nxt],7)
+        #        vod.setVDText2([1,1])
+        #        vod.setAll()
+        #        vod.drawErrorVertices()
+                #verts=[92555, 51680,92624,52559,51474,92620,52805]
+                #for v in verts:
+                    #print "drawing ",v
+                    #print vod
+                    #print dir(vod)
+                #    vod.drawVertexIdx(v)
+        #        print "PYTHON All DONE."
+        #        myscreen.render()   
+        #        myscreen.iren.Start()
+        #    else:
+                #pass
         vd.addLineSite( id_list[n], id_list[n_nxt])
-        j=j+1
+        #j=j+1
 
 # give ofsets ofs
 # insert points and line-segments in the vd
 def insert_offset_loop(vd,ofs):
     polygon_ids =[]
-    
     # create segs from ofs
-    
     segs = []
     previous = ovd.Point()
     for ofloop in ofs:
@@ -450,21 +469,183 @@ def insert_offset_loop(vd,ofs):
     
     return [pt_time, seg_time]
 
+def insert_polygon_points(vd, pts):
+    id_list = []
+    for p in pts:
+        id_list.append( vd.addVertexSite( p ) )
+    return id_list
+
+def insert_polygon_segments(vd,id_list):
+    for n in range(len(id_list)):
+        n_nxt = n+1
+        if n==(len(id_list)-1):
+            n_nxt=0
+        vd.addLineSite( id_list[n], id_list[n_nxt])
+
 # a simple class with a write method
 class WritableObject:
     def __init__(self):
         self.content = []
     def write(self, string):
         self.content.append(string)
- 
 
+def ttt_segments(text,scale):
+    wr = ttt.SEG_Writer()
+
+    # wr.scale = 3
+    wr.arc = False
+    wr.conic = False
+    wr.cubic = False
+    wr.scale = float(1)/float(scale)
+    # "L" has 36 points by default
+    wr.conic_biarc_subdivision = 10 # this has no effect?
+    wr.conic_line_subdivision = 200 # =10 increasesn nr of points to 366, = 5 gives 729 pts
+    wr.cubic_biarc_subdivision = 10 # no effect?
+    wr.cubic_line_subdivision = 10 # no effect?
+    s3 = ttt.ttt(text,wr) 
+    segs = wr.get_segments()
+    ext = wr.extents
+    return [ext, segs]
+    
+def get_scaled_segs( chars, length):
+    # generate segs with scale 1
+    ret = ttt_segments(  chars , 1)
+    extents = ret[0]
+    segs = ret[1]
+    # translate so lower left corner is at (0,0)
+    segs = translate(segs, -extents.minx, -extents.miny )
+    # scale to desired length
+    current_length = extents.maxx-extents.minx
+    current_height = extents.maxy-extents.miny
+    [segs,scale] = scale_segs(segs, current_length, length)
+    
+    # remove duplicate points
+    segs = modify_segments(segs)
+    return [segs, extents,scale]
+
+def translate(segs,x,y):
+    out = []
+    for seg in segs:
+        seg2 = []
+        for p in seg:
+            p2 = []
+            p2.append(p[0] + x)
+            p2.append(p[1] + y)
+            seg2.append(p2)
+            #seg2.append(seg[3] + y)
+        out.append(seg2)
+    return out
+
+def scale_segs(segs, current_length, desired_length):
+    out=[]
+    scale = float(desired_length) / float(current_length)
+    for seg in segs:
+        seg2 = []
+        for p in seg:
+            p2 = []
+            p2.append(p[0] * scale)
+            p2.append(p[1] * scale)
+            seg2.append(p2)
+            #seg2.append(seg[3] + y)
+        out.append(seg2)
+    return [out,scale]
+    
+def modify_segments(segs):
+    segs_mod =[]
+    for seg in segs:
+        first = seg[0]
+        last = seg[ len(seg)-1 ]
+        assert( first[0]==last[0] and first[1]==last[1] )
+        seg.pop()
+        seg.reverse()
+        segs_mod.append(seg)
+        #drawSegment(myscreen, seg)
+    return segs_mod
+
+def insert_many_polygons(vd,segs):
+    polygon_ids =[]
+    t_before = time.time()
+    for poly in segs:
+        poly_id = insert_polygon_points2(vd,poly)
+        polygon_ids.append(poly_id)
+    t_after = time.time()
+    pt_time = t_after-t_before
+    
+    t_before = time.time()
+    for ids in polygon_ids:
+        insert_polygon_segments2(vd,ids)
+    
+    t_after = time.time()
+    seg_time = t_after-t_before
+    
+    return [pt_time, seg_time]
+
+def drawToolPath(myscreen, mic_list, cut_width):
+    maxmic = mic_list[0]
+    previous_center = maxmic[0]
+    previous_radius = maxmic[1]
+    nframe=0
+    first = True
+    previous_out1 = ovd.Point()
+    out_tangent = ovd.Point()
+    in_tangent = ovd.Point()
+    for n in range(1,len(mic_list)):
+        mic = mic_list[n]
+        cen2 = mic[0]
+        r2 = mic[1]
+        previous_center = mic[6]
+        previous_radius = mic[7]
+        new_branch = mic[8] # true/false indicates if we are starting on new branch
+        prev_branch_center = mic[9]
+        prev_branch_radius = mic[10] # old branch MIC radius
+        in1 = mic[3]
+        in2 = mic[5]
+        out2 = mic[4]
+        out1 = mic[2]
+
+        in_tangent = in2-in1
+        # rapid traverse to in1
+        if not first:
+            if new_branch:
+                # new branch re-position move
+                rapid_to_new_branch(myscreen, out_tangent, in_tangent, prev_branch_center, prev_branch_radius , cen2, r2, previous_out1, in1)
+            else:
+                # normal arc-rapid-arc to next MIC
+                rapid_to_next(myscreen, out_tangent, in_tangent, previous_center, previous_radius, cen2, r2, previous_out1, in1)
+        else:
+            # spiral-clear the start-MIC. The spiral should end at in1
+            spiral_clear(myscreen, cut_width, out_tangent, in_tangent, previous_center, previous_radius, cen2, r2, previous_out1, in1)
+            #print "No rapid-move on first-iteration."
+            first = False
+
+        # in bi-tangent
+        ovdvtk.drawLine(myscreen, in1, in2, ovdvtk.green)
+        ngc_writer.xy_line_to(in2.x,in2.y)
+        # cut-arc
+        drawArc(myscreen, in2, out2, r2, cen2, True, ovdvtk.green)
+        # out bi-tangent
+        ovdvtk.drawLine(myscreen, out2, out1, ovdvtk.green)
+        ngc_writer.xy_line_to(out1.x,out1.y)
+        
+        previous_out1 = out1 # this is used as the start-point for the rapid on the next iteration
+        out_tangent = out1-out2
+        
+        if n == len(mic_list)-1:
+            # end of operation. do a final lead-out arc.
+            final_lead_out(myscreen, out_tangent, in_tangent, previous_center, previous_radius, cen2, r2, previous_out1, in1)
+
+        nframe = nframe+1
+        #myscreen.render()
+
+    
+    
 if __name__ == "__main__":  
     #w=2500
     #h=1500
-    #w=1920
-    #h=1080
-    w=1024
-    h=1024
+    w=1920
+    h=1080
+    #w=1024
+    #h=1024
     myscreen = ovdvtk.VTKScreen(width=w, height=h) 
     ovdvtk.drawOCLtext(myscreen, rev_text=ovd.version() )
 
@@ -484,53 +665,28 @@ if __name__ == "__main__":
     foo = WritableObject()                   # a writable object
     sys.stdout = foo                         # redirection
 
-    print "( Medial-Axis pocketing. Proof-of-principle. 2012-02-12 )"
+    print "( Medial-Axis pocketing. Proof-of-principle. 2012-02-25 )"
     print "( OpenVoronoi %s  )" % (ovd.version())
-    print "( TOOL/MILL,10,0,50 ) "
+    print "( TOOL/MILL,1,0,50 ) "
     print "( COLOR,0,255,255 ) "
-    print "( STOCK/BLOCK,700.0000,400.0000,10.0000,350.0000,160.0000,5.0000 ) "
+    print "( STOCK/BLOCK,300.0000,200.0000,10.0000,150.0000,100.0000,5.0000 ) "
     
-    linesegs = 1 # switch to turn on/off line-segments
+    [segs, extents, scale] = get_scaled_segs( "POC", 0.3)
+    dx = -0.3
+    dy = 0
+    segs = translate(segs, dx, dy )
     
-    segs = []
-    #ovd.Point(1,1)
-    eps=0.9
-    p1=ovd.Point(-0.1,-0.2)
-    p2=ovd.Point(0.2,0.1)
-    p3=ovd.Point(0.4,0.2)
-    p4=ovd.Point(0.6,0.6)
-    p5=ovd.Point(-0.6,0.3)
-
-    pts = [p1,p2,p3,p4,p5]
+    [segs2, extents2, scale2] = get_scaled_segs( "KET", 0.3)
+    dx = -0.3
+    dy = -0.15
+    segs2 = translate(segs2, dx, dy )
     
-    vd = ovd.VoronoiDiagram(far,120)
-    #t_after = time.time()
-    #print ".done in {0:.3f} s.".format( t_after-t_before )
-    times=[]
-    id_list = []
-    m=0
-    t_before = time.time()
-    for p in pts:
-        
-        id_list.append( vd.addVertexSite( p ) )
-        #print m," added vertex", seg_id[0]
-        m=m+1
-   
-    t_after = time.time()
-    times.append( t_after-t_before )
+    segs.extend(segs2) # = segs+segs2
     
-    #print "all point sites inserted. "
+    vd = ovd.VoronoiDiagram(1,120)
+    times = insert_many_polygons(vd,segs)
     vd.check()
     
-    t_before = time.time()
-    vd.addLineSite( id_list[0], id_list[1])
-    vd.addLineSite( id_list[1], id_list[2])
-    vd.addLineSite( id_list[2], id_list[3])
-    vd.addLineSite( id_list[3], id_list[4])
-    vd.addLineSite( id_list[4], id_list[0])
-    t_after = time.time()
-    times.append( t_after-t_before )
-    vd.check()
     print "( VD1 done in   %.3f s.  )" % (sum(times))
     #vod.setVDText2(times)
     
@@ -538,16 +694,23 @@ if __name__ == "__main__":
     vd.filter_graph(pi)
     
     of = ovd.Offset( vd.getGraph() ) # pass the created graph to the Offset class
-    ofs_list=[]
+    #ofs_list=[]
     t_before = time.time()
-    ofs = of.offset(0.03)
+    ofs = of.offset(0.0015)
     t_after = time.time()
     #print "( VD1 OFFSET in ", 1e3*(t_after-t_before)," milliseconds.  )"
     print "( VD1 OFFSET in %.3f s.  )" % (1e3*(t_after-t_before))
     #print " offset is len=",len(ofs)
     #print ofs
     
+    drawOffsets2(myscreen, ofs)
+    
+    myscreen.render()   
+    #myscreen.iren.Start()
+    
+    
     # now create a new VD from the offset
+    """
     vd2 = ovd.VoronoiDiagram(1,120)
     tim2 = insert_offset_loop(vd2,ofs)
     #print "( VD2 done in ", 1e3*(sum(tim2))," milliseconds.  )"
@@ -557,11 +720,14 @@ if __name__ == "__main__":
     vd2.filter_graph(pi)
     of = ovd.Offset( vd2.getGraph() ) # pass the created graph to the Offset class
     t_before = time.time()
-    ofs = of.offset(0.015)
+    ofs2 = of.offset(0.0015)
     t_after = time.time()
     #print "( VD2 OFFSET in ", 1e3*(t_after-t_before)," milliseconds.  )"
     print "( VD2 OFFSET in %.3f s.  )" % (1e3*(t_after-t_before))
-    drawOffsets2(myscreen, ofs)
+    drawOffsets2(myscreen, ofs2)
+    """
+    myscreen.render()   
+    #myscreen.iren.Start()
     
     # now create the VD for pocketing
     vd3 = ovd.VoronoiDiagram(1,120)
@@ -579,106 +745,34 @@ if __name__ == "__main__":
     
     vod3.setVDText2(times)
     
-    pi = ovd.PolygonInterior(True)
+    pi = ovd.PolygonInterior(False)
     vd3.filter_graph(pi)
     ma = ovd.MedialAxis()
     vd3.filter_graph(ma)
     
     vod3.setAll()
-    
-    mapocket = ovd.MedialAxisPocket(vd3.getGraph())
-    mapocket.setWidth(0.01)
-    mapocket.debug(False)
-    t_before = time.time()
-    mapocket.run()
-    mic_list = mapocket.get_mic_list()
-    t_after = time.time()
-    #print "( ma-pocket done in ", 1e3*(t_after-t_before)," milliseconds. got ",  len(mic_list)," MICs )"
-    print "( MA-pocket done in %.3f s. Got %d MICs )" % ((t_after-t_before),len(mic_list) )
-    
-    maxmic = mic_list[0] 
-    
-    #print maxmic
-    previous_center = maxmic[0]
-    previous_radius = maxmic[1]
-    cl = ovd.Point(0,0)
-    
-    # the initial largest MIC. to be cleared with a spiral-path
-    drawCircle( myscreen, maxmic[0], maxmic[1] , ovdvtk.red )
-    
-    #myscreen.render()   
+    myscreen.render()   
     #myscreen.iren.Start()
+    
+    cut_width = 0.002
+    mapocket = ovd.MedialAxisPocket(vd3.getGraph())
+    mapocket.setWidth( cut_width )
+    mapocket.debug(True)
+    t_before = time.time()
+    mapocket.run2()
+    t_after = time.time()
+    #print "( MA-pocket done in %.3f s. Got %d MICs )" % ((t_after-t_before),len(mic_list) )
+    
+    mic_components = mapocket.get_mic_components()
+    
+    mic_list = mic_components[0] #mapocket.get_mic_list()
+    
     ngc_writer.scale = 10/0.03
     ngc_writer.preamble()
-    
-    # the rest of the MICs are then cleared
-    nframe=0
-    first = True
-    previous_out1 = ovd.Point()
-    out_tangent = ovd.Point()
-    in_tangent = ovd.Point()
-    #while True:
-    #for mic in mic_list[1:]:
-    for n in range(1,len(mic_list)):
-        mic = mic_list[n] #apocket.nxtMic()
-        if 0: #nframe == 40:
-            break
-            
-        cen2 = mic[0]
-        r2 = mic[1]
-        #drawCircle( myscreen, mic[0], mic[1] , ovdvtk.green )
         
-        previous_center = mic[6]
-        previous_radius = mic[7]
-        
-        new_branch = mic[8] # true/false indicates if we are starting on new branch
-        prev_branch_center = mic[9]
-        prev_branch_radius = mic[10] # old branch MIC radius
+    for mic_list in mic_components:
+        drawToolPath(myscreen, mic_list, cut_width)
 
-        in1 = mic[3]
-        in2 = mic[5]
-        out2 = mic[4]
-        out1 = mic[2]
-
-        in_tangent = in2-in1
-        # rapid traverse to in1
-        if not first:
-            if new_branch:
-                # new branch re-position move
-                rapid_to_new_branch(myscreen, out_tangent, in_tangent, prev_branch_center, prev_branch_radius , cen2, r2, previous_out1, in1)
-            else:
-                # normal arc-rapid-arc to next MIC
-                rapid_to_next(myscreen, out_tangent, in_tangent, previous_center, previous_radius, cen2, r2, previous_out1, in1)
-        else:
-            # spiral-clear the start-MIC. The spiral should end at in1
-            spiral_clear(myscreen, out_tangent, in_tangent, previous_center, previous_radius, cen2, r2, previous_out1, in1)
-            #print "No rapid-move on first-iteration."
-            first = False
-
-        # in bi-tangent
-        ovdvtk.drawLine(myscreen, in1, in2, ovdvtk.green)
-        ngc_writer.xy_line_to(in2.x,in2.y)
-        # draw arc
-        drawArc(myscreen, in2, out2, r2, cen2, True, ovdvtk.green)
-        # out bi-tangent
-        ovdvtk.drawLine(myscreen, out2, out1, ovdvtk.green)
-        ngc_writer.xy_line_to(out1.x,out1.y)
-        
-        previous_out1 = out1 # this is used as the start-point for the rapid on the next iteration
-        out_tangent = out1-out2
-        
-        if n == len(mic_list)-1:
-            # end of operation. do a final lead-out arc.
-            final_lead_out(myscreen, out_tangent, in_tangent, previous_center, previous_radius, cen2, r2, previous_out1, in1)
-            #print "Final lead-out arc"
-
-        nframe = nframe+1
-        myscreen.render()
-        
-    #print "mic-pocket done."
-    
-    #print "PYTHON All DONE."
-    
     ngc_writer.postamble()
     
     sys.stdout = sys.__stdout__              # remember to reset sys.stdout!
@@ -690,8 +784,5 @@ if __name__ == "__main__":
     f.close()
     
     print "python done."
-    
-    myscreen.render()   
-
-     
+    myscreen.render()        
     myscreen.iren.Start()

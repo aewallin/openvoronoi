@@ -3,18 +3,18 @@
  *  
  *  This file is part of OpenVoronoi.
  *
- *  OpenCAMlib is free software: you can redistribute it and/or modify
+ *  OpenVoronoi is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  OpenCAMlib is distributed in the hope that it will be useful,
+ *  OpenVoronoi is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with OpenCAMlib.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with OpenVoronoi.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #ifndef VODI_VERTEX_HPP
@@ -22,8 +22,6 @@
 
 #include <map>
 #include <cmath>
-
-#include <boost/graph/adjacency_list.hpp>
 
 #include "common/point.hpp"
 #include "site.hpp"
@@ -45,8 +43,6 @@ enum VoronoiVertexStatus {OUT, IN, UNDECIDED, NEW };
 /// ENDPOINT vertices are end-points of line-segments or arc-segments
 /// APEX vertices split quadratic edges at their apex(closest point to site)
 enum VoronoiVertexType {OUTER, NORMAL, POINTSITE, ENDPOINT, SEPPOINT, APEX, SPLIT};
-
-//enum VoronoiVertexSolver {PPP, DESPERATE};
 
 /// a map of this type is used by topology-checker to check that all vertices
 /// have the expected (correct) degree (i.e. number of edges)
@@ -92,13 +88,12 @@ public:
     /// vertices are marked: undecided, in, out, or new
     VoronoiVertexStatus status;
     VoronoiVertexType type;
-    //VoronoiVertexSolver solver;
     double max_error;
     bool in_queue;
     /// the position of the vertex
     Point position;
     void set_alfa(const Point& dir);
-    //Site* site; // pointSite, if this is a point-site (required??)
+
     double k3; // the offset-direction {-1,+1} to the newly inserted site.
     double alfa; // angle for a null-vertex
     HEFace null_face;
@@ -109,15 +104,13 @@ protected:
     void init(Point p, VoronoiVertexStatus st, VoronoiVertexType t);
     void init(Point p, VoronoiVertexStatus st, VoronoiVertexType t, Point initDist);
     void init(Point p, VoronoiVertexStatus st, VoronoiVertexType t, Point initDist, double k3);
-
     /// global vertex count
-    static int count;
+    static int count; // hold this in hedigraph instead?
     /// map for checking topology correctness
     static VertexDegreeMap expected_degree;
     /// clearance-disk radius, i.e. the closest site is at this distance
     double r;
-    
 };
 
-} // end ocl namespace
+} // end namespace
 #endif

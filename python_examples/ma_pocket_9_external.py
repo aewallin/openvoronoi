@@ -5,11 +5,11 @@ import time
 import vtk
 import datetime
 import math
-#import random
+import random
 import os
 import sys
-#import pickle
-#import gzip
+import pickle
+import gzip
 import ngc_writer
 
 def drawCircle(myscreen, c, r, circlecolor):
@@ -295,10 +295,10 @@ def arc_pts2(  pt1, pt2, r, cen,cw): # (start, end, radius, center, cw )
     return pts
     
 # faster drawing of offsets using vtkPolyData
-def drawOffsets2(myscreen, ofs):
+def drawOffsets2(myscreen, ofs,offsetcolor=ovdvtk.lgreen):
     # draw loops
     nloop = 0
-    lineColor = ovdvtk.lgreen
+    lineColor = offsetcolor
     arcColor = ovdvtk.green #grass
     ofs_points=[]
     for lop in ofs:
@@ -368,7 +368,7 @@ def drawOffsets2(myscreen, ofs):
     mapper.SetInput(linePolyData)
     edge_actor = vtk.vtkActor()
     edge_actor.SetMapper(mapper)
-    edge_actor.GetProperty().SetColor( ovdvtk.lgreen)
+    edge_actor.GetProperty().SetColor( offsetcolor )
     myscreen.addActor( edge_actor )
 
 
@@ -461,16 +461,16 @@ class WritableObject:
 if __name__ == "__main__":  
     #w=2500
     #h=1500
-    #w=1920
-    #h=1080
-    w=1024
-    h=1024
+    w=1920
+    h=1080
+    #w=1024
+    #h=1024
     myscreen = ovdvtk.VTKScreen(width=w, height=h) 
     ovdvtk.drawOCLtext(myscreen, rev_text=ovd.version() )
 
     scale=1
     myscreen.render()
-    #random.seed(42)
+    random.seed(42)
     far = 1
     camPos = far
     zmult = 1.8
@@ -534,18 +534,18 @@ if __name__ == "__main__":
     print "( VD1 done in   %.3f s.  )" % (sum(times))
     #vod.setVDText2(times)
     
-    pi = ovd.PolygonInterior(True)
+    pi = ovd.PolygonInterior(False)
     vd.filter_graph(pi)
-    
+
     of = ovd.Offset( vd.getGraph() ) # pass the created graph to the Offset class
     ofs_list=[]
     t_before = time.time()
-    ofs = of.offset(0.03)
+    ofs = of.offset(0.015)
     t_after = time.time()
     #print "( VD1 OFFSET in ", 1e3*(t_after-t_before)," milliseconds.  )"
     print "( VD1 OFFSET in %.3f s.  )" % (1e3*(t_after-t_before))
     #print " offset is len=",len(ofs)
-    #print ofs
+    drawOffsets2(myscreen, ofs)
     
     # now create a new VD from the offset
     vd2 = ovd.VoronoiDiagram(1,120)
@@ -561,8 +561,18 @@ if __name__ == "__main__":
     t_after = time.time()
     #print "( VD2 OFFSET in ", 1e3*(t_after-t_before)," milliseconds.  )"
     print "( VD2 OFFSET in %.3f s.  )" % (1e3*(t_after-t_before))
-    drawOffsets2(myscreen, ofs)
-    
+    drawOffsets2(myscreen, ofs, ovdvtk.pink)
+    #myscreen.render()   
+    #myscreen.iren.Start()
+
+
+
+
+
+
+
+
+
     # now create the VD for pocketing
     vd3 = ovd.VoronoiDiagram(1,120)
     times = insert_offset_loop(vd3,ofs)
@@ -584,8 +594,11 @@ if __name__ == "__main__":
     ma = ovd.MedialAxis()
     vd3.filter_graph(ma)
     
+
     vod3.setAll()
-    
+    myscreen.render()        
+    myscreen.iren.Start()
+ 
     mapocket = ovd.MedialAxisPocket(vd3.getGraph())
     mapocket.setWidth(0.01)
     mapocket.debug(False)
@@ -673,7 +686,6 @@ if __name__ == "__main__":
             #print "Final lead-out arc"
 
         nframe = nframe+1
-        myscreen.render()
         
     #print "mic-pocket done."
     

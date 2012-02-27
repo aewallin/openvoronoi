@@ -31,30 +31,25 @@ EdgeProps::EdgeProps() {
     valid=true;
 }
 
-/*
-* bisector formulas
-* x = x1 - x2 - x3*t +/- x4 * sqrt( square(x5+x6*t) - square(x7+x8*t) )
-* (same formula for y-coordinate)
-* line (line/line)
-* parabola (circle/line)
-* hyperbola (circle/circle)
-* ellipse (circle/circle)
-*/
-/*
-Point EdgeProps::point(double t, Solution& ) const {
-    return point(t);
-}*/
+#define stringify( name ) # name
+const char* edgeTypeNames[] = {
+  stringify( LINE ),
+  stringify( LINELINE ),
+  stringify( PARA_LINELINE ),
+  stringify( OUTEDGE ),
+  stringify( PARABOLA ),
+  stringify( ELLIPSE ),
+  stringify( HYPERBOLA ),
+  stringify( SEPARATOR ),
+  stringify( NULLEDGE ),
+  stringify( LINESITE )
+};
 
-/*
-double EdgeProps::error(Solution& sl) const {
-    Point p;
-    if (type==PARA_LINELINE) {
-        p = projection_point( sl );
-    } else {
-        p = point( sl.t );
-    }
-    return (p-sl.p).norm();
-}*/
+std::string EdgeProps::type_str() const {
+    std::ostringstream o;
+    o << edgeTypeNames[type];
+    return o.str();
+}
 
 // the edge is not parametrized by t-value as normal edges
 // so we need a projection of sl onto the edge instead
@@ -83,6 +78,8 @@ Point EdgeProps::projection_point(Solution& sl) const {
     return (p0+v*t);
 }*/
 
+// return point at given offset-distance t
+// x = x1 - x2 - x3*t +/- x4 * sqrt( square(x5+x6*t) - square(x7+x8*t) )
 Point EdgeProps::point(double t) const {
     double discr1 =  chop( sq(x[4]+x[5]*t) - sq(x[6]+x[7]*t), 1e-14 );
     double discr2 =  chop( sq(y[4]+y[5]*t) - sq(y[6]+y[7]*t), 1e-14 );
@@ -176,10 +173,8 @@ EdgeProps& EdgeProps::operator=(const EdgeProps &other) {
 
 // called for point(s1)-point(s2) edges
 void EdgeProps::set_pp_parameters(Site* s1, Site* s2) {
-    //std::cout << "set_pp_parameters()\n";
-    // x = x1 - x2 - x3*t +/- x4 * sqrt( square(x5+x6*t) - square(x7+x8*t) )
     assert( s1->isPoint() && s2->isPoint() );
-    double d = (s1->position() - s2->position()).norm(); //sqrt( sq(xc1-xc2) + sq(yc1-yc2) )
+    double d = (s1->position() - s2->position()).norm();
     double alfa1 = (s2->x() - s1->x()) / d;
     double alfa2 = (s2->y() - s1->y()) / d;
     double alfa3 = -d/2;
@@ -192,7 +187,7 @@ void EdgeProps::set_pp_parameters(Site* s1, Site* s2) {
     x[4]=0;             
     x[5]=+1;          
     x[6]=alfa3;       
-    x[7]=0;           // sqrt(  (0+t)^2 - (d/2 +0*t)^2 )
+    x[7]=0;
     y[0]=s1->y();     
     y[1]=alfa2*alfa3; 
     y[2]=0; 
@@ -335,8 +330,6 @@ void EdgeProps::set_ll_parameters(Site* s1, Site* s2) {  // Held thesis p96
     double alfa2 = ( s2->a()*s1->c()-s1->a()*s2->c() ) / delta;
     double alfa3 = -( s2->b()-s1->b() ) / delta;
     double alfa4 = -( s1->a()-s2->a() ) / delta;
-    //double alfa3 = -( s2->b()*s1->k()-s1->b()*s2->k() ) / delta;
-    //double alfa4 = -( s1->a()*s2->k()-s2->a()*s1->k() ) / delta;
     
     // point (alfa1,alfa2) is the intersection point between the line-segments
     // vector (-alfa3,-alfa4) is the direction/tangent of the bisector

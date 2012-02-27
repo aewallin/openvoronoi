@@ -668,6 +668,7 @@ def drawBitangents():
     
     myscreen.render()
     myscreen.iren.Start()
+    
 def root_to_line(root,m,n,p,q):
     C = root
     A = m*C+n
@@ -675,6 +676,94 @@ def root_to_line(root,m,n,p,q):
     print A, " ", B, " ", C ," ", A*A+B*B
     l = Line(A,B,C,1)
     return l
+
+def drawBitangents2():
+    myscreen = ovdvtk.VTKScreen()
+    myscreen.camera.SetPosition(0.01, 0,  100 ) 
+    myscreen.camera.SetFocalPoint(0, 0, 0)
+    myscreen.camera.SetClippingRange(-100,3000)
+    
+    c1 = ovd.Point(10,20)
+    r1=20
+    c2 = ovd.Point(6,13)
+    r2=23
+    # external ma-pocket fails with this input:
+    c1 = ovd.Point(0, -25)
+    r1 = 5 #16.7033
+    c2 = ovd.Point(0, 0.2167)
+    r2 = 15.9299
+    r2 = 2 #16 # 5
+    drawCircle(myscreen, c1, r1, ovdvtk.red)
+    drawCircle(myscreen, c2, r2, ovdvtk.green)
+    # when machining c2 the maximum cut-width is 
+    # w_max = | c2 - c1 | + r2 - r1
+    #print "dr = ",dr
+    print " cut-width = ", ((c2-c1).norm()+r2-r1)
+    [bd1,bd2] = bitanget_direction(c1,c2,r1,r2)
+    # from C, go a distance r along the normal to the line.
+    p1 = c1 + r1*bd1
+    p2 = c1 + r1*bd2
+    drawCircle(myscreen,p1,0.5,ovdvtk.pink)
+    drawCircle(myscreen,p2,0.5,ovdvtk.red)
+
+    p3 = c2 + r2*bd1
+    p4 = c2 + r2*bd2
+    drawCircle(myscreen,p3,0.5,ovdvtk.lgreen)
+    drawCircle(myscreen,p4,0.5,ovdvtk.green)
+    
+    myscreen.render()
+    myscreen.iren.Start()
+
+def bitanget_direction(c1,c2,r1,r2):
+    if r1==r2:
+        c1c2 = c2-c1
+        c1c2 = c1c2 * (1/c1c2.norm())
+        bd1 = c1c2.xy_perp()
+        bd2 = -1*c1c2.xy_perp()
+        return [bd1, bd2]
+    #r_small=0
+    #r_large=0
+    #c_small=c1
+    #c_large=c2
+    print " c1 ",c1
+    print " c2 ",c2
+    """
+    if r1>r2:
+        r_large = r1
+        c_large = c1
+        r_small = r2
+        c_small = c2
+    else:
+        r_large = r2
+        c_large = c2
+        r_small = r1
+        c_small = c1
+    """
+    dr = abs(r1-r2) #r_large-r_small
+    # bitangent direction
+    # is from c_small to a circle with radius r_large-r_small at c_large
+    c1c2_dist = (c1-c2).norm()
+    bitang_length = math.sqrt( c1c2_dist*c1c2_dist + dr*dr )
+    # now calculate the height of the triangle
+    area = dr*bitang_length
+    height = area / c1c2_dist
+    bitang_c1c2 = math.sqrt( bitang_length*bitang_length - height*height )
+    cdir =  c2-c1 #(c_large-c_small)
+    if r1>r2:
+        cdir = c1-c2
+    #print cdir
+    cdir = cdir* (1/ cdir.norm()) #(c_large-c_small).normalize()
+    #print cdir
+    bit1 = bitang_c1c2*cdir + height*cdir.xy_perp()
+    bit2 = bitang_c1c2*cdir - height*cdir.xy_perp()
+    bit1 = bit1 * (1/bit1.norm())
+    bit2 = bit2 * (1/bit2.norm())
+    if r1>r2:
+        return [bit1.xy_perp(), -1*bit2.xy_perp()]
+    else:
+        return [-1*bit2.xy_perp(), bit1.xy_perp()]
+    #    return [bit1.xy_perp(), bit2.xy_perp()]
+    #if r1>r2: 
     
 if __name__ == "__main__":  
     #drawPointPointTest()# point-point bisector is a LINE
@@ -685,4 +774,4 @@ if __name__ == "__main__":
     
     #drawSeparatorSolver1(4.3)
     #drawSeparatorSolver2(4.3)
-    drawBitangents()
+    drawBitangents2()

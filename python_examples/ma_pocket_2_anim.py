@@ -111,15 +111,6 @@ if __name__ == "__main__":
     
     vod.setAll()
     
-    """
-    t_after = time.time()
-    line_time = t_after-t_before
-    if line_time < 1e-3:
-        line_time = 1
-    times.append( line_time )
-    """
-
-    
     mapocket = ovd.MedialAxisPocket(vd.getGraph())
     mapocket.setWidth(0.005)
     
@@ -128,9 +119,6 @@ if __name__ == "__main__":
     mapocket.run()
     mic_list = mapocket.get_mic_list()
     
-    #print maxmic
-    
-    #drawCircle( myscreen, maxmic[0], maxmic[1] , ovdvtk.red )
     nframe=0
     
     for n in range( len(mic_list) ):
@@ -147,23 +135,6 @@ if __name__ == "__main__":
         myscreen.render()
     print "mic done."
     
-    """
-    while True:
-        mic = mapocket.nxtMic()
-        if len(mic) == 2:
-            drawCircle( myscreen, mic[0], mic[1] , ovdvtk.green )
-            w2if.Modified()
-            lwr.SetFileName("frames/%06d.png" % ( nframe ) )
-            #lwr.Write()
-        else:
-            break
-        nframe = nframe+1
-        
-    print "mic done."
-    """
-    
-
-        
     print "PYTHON All DONE."
 
     myscreen.render()   

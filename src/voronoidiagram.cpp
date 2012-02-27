@@ -21,7 +21,7 @@
 
 #include <boost/foreach.hpp>
 #include <boost/math/tools/roots.hpp> // for toms748
-#include <boost/current_function.hpp>
+//#include <boost/current_function.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/assign/list_of.hpp>
 

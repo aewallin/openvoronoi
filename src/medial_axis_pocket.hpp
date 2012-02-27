@@ -54,6 +54,10 @@ struct branch_point {
     HEEdge next_edge;
 };
 
+// it is the responsibility of a downstream algorithm to lay down a toolpath
+// that machines the area between c2 and c1
+// c1 is the circle that is assumed already cut
+// c2 is the new circle
 struct MIC {
     Point c1,c2;  // center
     double r1,r2; // radius
@@ -63,46 +67,8 @@ struct MIC {
     double r_prev;
 };
 
-typedef std::list<MIC> MICList;
-
-// error functor for numerically finding the next MIC
-class CutWidthError  {
-public:
-    CutWidthError(HEGraph& gi, double wmax, HEEdge search_edge, Point cen1, double rad1) 
-    : g(gi), w_max(wmax), e(search_edge), c1(cen1), r1(rad1) {
-    }
-    double operator()(const double x) {
-        // w_max = | c2 - c1 | + r2 - r1
-        Point c2 = g[e].point(x); // current MIC center
-        double r2 = x; // current MIC radius
-        double w = (c2-c1).norm() + r2 - r1; // this is the cut-width
-        return w-w_max; // error compared to desired cut-width
-    }
-private:
-    HEGraph& g;
-    double w_max; // desired cut-width
-    HEEdge e;
-    Point c1; // previous MIC center
-    double r1; // previous MIC radius
-};
-
-// error functor for bitangent points
-/*
-class BitangentError {
-public:
-    BitangentError( Point ci1, double ri1, Point ci2, double ri2):
-    c1(ci1), c2(ci2), r1(ri1),  r2(ri2) {}
-    double operator()(const double x) {
-        std::pair<double,double> dir = numeric::diangle_xy(x);
-        Point rad1 = r1*Point(dir.first,dir.second);
-        Point t1 = c1 + r1*Point(dir.first,dir.second);
-        Point t2 = c2 + r2*Point(dir.first,dir.second);
-        return rad1.dot(t2-t1);
-    }
-private:
-    Point c1,c2;
-    double r1,r2;
-};*/
+// the list of MICs from one connected component of the MA
+typedef std::vector<MIC> MICList;
 
 /// experimental medial-axis pocketing
 class medial_axis_pocket {
@@ -110,20 +76,23 @@ public:
     medial_axis_pocket(HEGraph& gi);
     void set_width(double w);
     void run();
+    void run2();
     void set_debug(bool b);
     MICList get_mic_list();
+    std::vector<MICList> get_mic_components(); // {return ma_components;}
+    std::pair<Point,double> edge_point(HEEdge e, double u); // used by the error-functor also. move somewhere else?
 protected:
-    void find_initial_mic();
+    bool find_initial_mic();
     bool find_next_mic();
     HEEdge find_next_branch();
     EdgeVector find_out_edges();
     std::pair<HEEdge,bool> find_next_edge();
     void mark_done(HEEdge e);
     bool has_next_radius(HEEdge e); 
-    double find_next_radius();
-    void output_next_mic(double next_radius, bool branch);
+    std::pair<double,double> find_next_u();
+    void output_next_mic(double next_u, double next_radius, bool branch);
     std::vector<Point> bitangent_points(Point c1, double r1, Point c2, double r2);
-    //std::vector<Point> bitangent_points2(Point c1, double r1, Point c2, double r2);
+    double cut_width(Point c1, double r1, Point c2, double r2);
 //DATA
     bool debug;
     std::vector<HEEdge> ma_edges; // the edges of the medial-axis
@@ -133,9 +102,8 @@ protected:
 
     HEEdge current_edge;
     double current_radius;
+    double current_u;
     Point current_center;
-    //double previous_radius;
-    //Point previous_center;
     
     // flag for indicating new branch
     bool new_branch;
@@ -144,8 +112,30 @@ protected:
     
     // the max cutting-width
     double max_width;
-    // the result of the operation is alist of MICs 
+    // the result of the operation is a list of MICs 
     MICList mic_list;
+    std::vector<MICList> ma_components;
+    //int max_mic_count;
+};
+
+class CutWidthError  {
+public:
+    CutWidthError(medial_axis_pocket* ma, HEEdge ed, double wmax, Point cen1, double rad1) 
+    : m(ma), e(ed), w_max(wmax),  c1(cen1), r1(rad1) {}
+    double operator()(const double x) {
+        // w_max = | c2 - c1 | + r2 - r1
+        Point c2; // = m->edge_point(x); //g[e].point(x); // current MIC center
+        double r2; // = x; // current MIC radius
+        boost::tie(c2,r2) = m->edge_point(e,x);
+        double w = (c2-c1).norm() + r2 - r1; // this is the cut-width
+        return w-w_max; // error compared to desired cut-width
+    }
+private:
+    medial_axis_pocket* m;
+    HEEdge e;
+    double w_max; // desired cut-width
+    Point c1; // previous MIC center
+    double r1; // previous MIC radius
 };
 
 } // end namespace

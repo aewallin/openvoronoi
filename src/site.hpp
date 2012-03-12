@@ -114,12 +114,17 @@ typedef boost::adjacency_list_traits<OUT_EDGE_CONTAINER,
 /// point:  (1, -2x, -2y,    0, x*x+y*y    )    point at (x,y)
 template<class Scalar>
 struct Eq {
-    bool q; // true for quadratic, false for linear
+    /// true for quadratic, false for linear
+    bool q; 
+    /// a parameter of line-equation
     Scalar a;
+    /// b parameter of line equation
     Scalar b;
+    /// c parameter of line equation
     Scalar c;
+    /// offset direction parameter
     Scalar k;
-    
+    /// default ctor
     Eq<Scalar>() {
         a = Scalar(0);
         b = Scalar(0);
@@ -127,7 +132,7 @@ struct Eq {
         k = Scalar(0);
         q = false;
     }
-    
+    /// assignment
     template<class Scalar2>
     Eq<Scalar>& operator=(const Eq<Scalar2>& other) {
         q = other.q;
@@ -137,7 +142,7 @@ struct Eq {
         k = other.k;
         return *this;
     }
-    
+    /// subtract two equations from eachother
     Eq<Scalar>& operator-=(const Eq<Scalar>& other) {
         a-=other.a;
         b-=other.b;
@@ -145,16 +150,17 @@ struct Eq {
         k-=other.k;
         return *this;
     }
-        
+    /// subtraction
     const Eq<Scalar> operator-(const Eq<Scalar>& other) const {
         return Eq<Scalar>(*this) -= other;
     }
     
+    /// equality
     template <class TScalar>
     bool operator==(const Eq<TScalar>& other) {
         return ( a==other.a && b==other.b && c==other.c );
     }
-    
+    /// access parameters through operator[]
     Scalar operator[](int idx) const {
         switch (idx) {
             case 0:
@@ -176,15 +182,22 @@ struct Eq {
 /// preliminary offset-prerensentations. experiental...
 class Ofs {
 public:
+    /// string
     virtual std::string str() = 0;
+    /// radius, -1 if line
     virtual double radius() {return -1;}
+    /// center (for arc)
     virtual Point center() {return Point(0,0);}
+    /// start point
     virtual Point start() {return Point(0,0);}
+    /// end point
     virtual Point end() {return Point(0,0);}
 };
 /// \brief offset-element of LineSite
 class LineOfs : public Ofs {
 public:
+    /// \param p1 start point
+    /// \param p2 end point
     LineOfs(Point p1, Point p2) : _start(p1), _end(p2) {}
     virtual std::string str() {
         std::ostringstream o;
@@ -192,12 +205,18 @@ public:
         return o.str();        
     }
 protected:
+    /// start point
     Point _start;
+    /// end point
     Point _end;
 };
 /// \brief offset-element of PointSite or ArcSite
 class ArcOfs : public Ofs {
 public:
+    /// \param p1 start Point
+    /// \param p2 end Point
+    /// \param cen center Point
+    /// \param rad radius
     ArcOfs(Point p1, Point p2, Point cen, double rad) : _start(p1), _end(p2), c(cen), r(rad) {}
     virtual std::string str() {
         std::ostringstream o;
@@ -209,110 +228,139 @@ public:
     virtual Point start() {return _start;}
     virtual Point end() {return _end;}
 protected:
+    /// start
     Point _start;
+    /// end
     Point _end;
+    /// center
     Point c;
+    /// radius
     double r;
 };
 
 /// Base-class for a voronoi-diagram site, or generator.
 class Site {
 public:
+    /// ctor
     Site() {}
+    /// dtor
     virtual ~Site() {}
     /// return closest point on site to given point p
     virtual Point apex_point(const Point& p) = 0;
     /// return offset of site
     virtual Ofs* offset(Point, Point) = 0;
-    
+    /// position of site for PointSite
     inline virtual const Point position() const {assert(0); return Point(0,0);}
+    /// start point of site (for LineSite and ArcSite)
     virtual const Point start() const {assert(0); return Point(0,0);}
+    /// end point of site (for LineSite and ArcSite)
     virtual const Point end() const {assert(0); return Point(0,0);}
-
+    /// return equation parameters
     Eq<double> eqp() {return eq;} 
+    /// return equation parameters
     Eq<double> eqp(double kk) {
         Eq<double> eq2(eq);
         eq2.k *= kk;
         return eq2;
     } 
+    /// return equation parameters
     Eq<qd_real> eqp_qd(double kk) const {
         Eq<qd_real> eq2;
         eq2=eq;
         eq2.k *= kk;
         return eq2;
     }
-
+    /// true for LineSite
     bool is_linear() {return isLine(); }
+    /// true for PointSite and ArcSite
     bool is_quadratic() {return isPoint();}
-
+    /// x position
     virtual double x() const {
         std::cout << " WARNING: never call Site !\n";
         assert(0); 
         return 0;
     }
+    /// y position
     virtual double y() const {
         std::cout << " WARNING: never call Site !\n";
         assert(0); 
         return 0;
     }
+    /// radius (zero for PointSite)
     virtual double r() const {
         std::cout << " WARNING: never call Site !\n";
         assert(0); 
         return 0;
     }
+    /// offset direction
     virtual double k() const {
         std::cout << " WARNING: never call Site !\n";
         assert(0); 
         return 0;
     }
-
+    /// LineSite a parameter
     virtual double a() const {
         std::cout << " WARNING: never call Site !\n";
         assert(0); 
         return 0;
     }
+    /// LineSite b parameter
     virtual double b() const {
         std::cout << " WARNING: never call Site !\n";
         assert(0); 
         return 0;
     }
+    /// LineSite c parameter
     virtual double c() const {
         std::cout << " WARNING: never call Site !\n";
         assert(0); 
         return 0;
     }
-    virtual void set_c(const Point& ) {}
-    
+    // used??
+    //virtual void set_c(const Point& ) {}
+    /// string output
     virtual std::string str() const {assert(0); return "Site";}
+    /// alternative string output
     virtual std::string str2() const {assert(0); return "Site";}
+    /// true for PointSite
     inline virtual bool isPoint() const { return false;}
+    /// true for LineSite
     inline virtual bool isLine() const  { return false;}
+    /// is given Point in_region ?
     virtual bool in_region(const Point& ) const {
         std::cout << " WARNING: never call Site !\n";
         return false;
     }
+    /// is given Point in region?
     virtual double in_region_t(const Point& ) const {
         std::cout << " WARNING: never call Site !\n";
         return 0;
     } 
+    /// in-region t-valye
     virtual double in_region_t_raw(const Point&) const {
         return -99;
     }
+    /// return edge (if this is a LineSite or ArcSite
     virtual HEEdge edge() {return HEEdge();}
+    /// return vertex, if this is a PointSite
     virtual HEVertex vertex() {
         std::cout << " DON'T call Site::vertex() !! \n";
         exit(-1); 
         return HEVertex();
     }
-    typedef unsigned int HEFace;    
+    /// face descriptor type
+    typedef unsigned int HEFace;
+    /// the HEFace of this Site
     HEFace face;
 protected:
+    /// equation parameters
     Eq<double> eq;
 };
 
 /// vertex Site
 class PointSite : public Site {
 public:
+    /// ctor
     PointSite( const Point& p, HEFace f=0): _p(p)  {
         face = f;
         eq.q = true;
@@ -321,6 +369,7 @@ public:
         eq.k = 0;
         eq.c = p.x*p.x + p.y*p.y;
     }
+    /// ctor
     PointSite( const Point& p, HEFace f, HEVertex vert):  v(vert), _p(p) {
         face = f;
         eq.q = true;
@@ -350,9 +399,11 @@ public:
     virtual bool in_region(const Point& ) const {return true;}
     virtual double in_region_t(const Point& p) const {return -1;}
     virtual HEVertex vertex() {return v;}
+    /// vertex descriptor of this PointSite
     HEVertex v;
 private:
     PointSite() {} // don't use!
+    /// position
     Point _p;
 };
 
@@ -375,6 +426,7 @@ public:
         e = HEEdge();
         assert( fabs( eq.a*eq.a + eq.b*eq.b -1.0 ) < 1e-5);
     }
+    /// copy ctor
     LineSite( Site& s ) { // "downcast" like constructor? required??
         eq = s.eqp();
         face = s.face;
@@ -382,10 +434,6 @@ public:
         _end = s.end();
     }
     ~LineSite() {}
-    /*
-    virtual void set_c(const Point& p) {
-        eq.c = -( eq.a * p.x + eq.b * p.y );
-    }*/
     virtual Ofs* offset(Point p1,Point p2) {return new LineOfs(p1, p2); }
     
     /// closest point on start-end segment to given point.
@@ -443,10 +491,13 @@ public:
     virtual const Point start() const {return _start;}
     virtual const Point end() const {return _end;}
     virtual HEEdge edge() {return e;}
-    HEEdge e; // store an edge_descriptor to the LINESITE edge
+    /// store an edge_descriptor to the LINESITE edge
+    HEEdge e; 
 private:
     LineSite() {} // don't use!
+    /// start Point of LineSite
     Point _start;
+    /// end Point of LineSite
     Point _end;
     
 };
@@ -454,6 +505,7 @@ private:
 /// circular arc Site
 class ArcSite : public Site {
 public:
+    /// create arc-site
     ArcSite( const Point& s, const Point& e, const Point& center, bool dir): _start(s), _end(e), _center(center), _dir(dir) {
         _radius = (_center - _start).norm();
         eq.q = true;

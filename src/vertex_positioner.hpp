@@ -33,7 +33,9 @@ class Solver; // fwd decl
 
 /// predicate for filtering solutions based on t-value in [tmin,tmax] range
 struct t_filter {
+    /// create filter for [tmin,tmax]
     t_filter(double tmin, double tmax): tmin_(tmin),tmax_(tmax) {}
+    /// is the given Solution \a s in the offset-distance interval [tmin,tmax] ?
     bool operator()(solvers::Solution s) { 
         double eps=1e-9;
         double tround=s.t;
@@ -44,17 +46,22 @@ struct t_filter {
         return (tround<tmin_) || (tround>tmax_); // these points rejected!
     }
 private:
+    /// minimum offset-distance value
     double tmin_;
+    /// maximum offset-distance value
     double tmax_;
 };
 
 /// predicate for rejecting out-of-region solutions
 struct in_region_filter {
+    /// \param s Site for in_region check
     in_region_filter(Site* s): site_(s) {}
+    /// is Solution \a s in_region of Site \a site_ ?
     bool operator()(solvers::Solution s) { 
         return !site_->in_region(s.p); 
     }
 private:
+    /// the Site
     Site* site_;
 };
 
@@ -65,7 +72,7 @@ public:
     virtual ~VertexPositioner();
 
     solvers::Solution position( HEEdge e, Site* s);
-
+    /// return vector of errors
     std::vector<double> get_stat() {return errstat;}
     double dist_error(HEEdge e, const solvers::Solution& sl, Site* s3);
     void solver_debug(bool b);
@@ -89,17 +96,28 @@ private:
     solvers::Solution desperate_solution(Site* s3);
 
 // solvers, to which we dispatch, depending on the input sites
+    /// solver
     solvers::Solver* ppp_solver;
+    /// solver
     solvers::Solver* lll_solver;
+    /// solver
     solvers::Solver* lll_para_solver;
+    /// solver
     solvers::Solver* qll_solver;
+    /// separator solver
     solvers::Solver* sep_solver;
+    /// alternative separator solver
     solvers::Solver* alt_sep_solver;
 // DATA
-    HEGraph& g; // reference to the VD graph.
+    /// reference to the VD graph.
+    HEGraph& g; 
+    /// minimum offset-distance
     double t_min;
+    /// maximum offset-distance
     double t_max;
+    /// the edge on which we position a new vertex
     HEEdge edge;
+    /// error-statistics
     std::vector<double> errstat;
 };
 
@@ -108,15 +126,19 @@ private:
 /// minimize error by searching for a point on the solution-edge
 class VertexError {
 public:
+    /// \param gi vd-graph
+    /// \param sln_edge solution edge
+    /// \param si3 newly inserted Site
     VertexError(HEGraph& gi, HEEdge sln_edge, Site* si3) :
     g(gi),  edge(sln_edge), s3(si3)
     {}
-    
+    /// return the vertex-error,
     double operator()(const double t) {
         Point p = edge_point(t);
         double s3_dist = (p - s3->apex_point(p)).norm();
         return fabs(t-s3_dist);
     }
+    /// return a point on the edge at given offset-distance \a t
     Point edge_point(const double t) {
         Point p;
         if ( g[edge].type == LINELINE ) { // this is a workaround because the LINELINE edge-parameters are wrong? at least in some cases?
@@ -140,8 +162,11 @@ public:
         return p;
     }
 private:
+    /// vd-graph
     HEGraph& g;
+    /// existing edge on which we have positioned a new vertex
     HEEdge edge;
+    /// newly inserted Site
     Site* s3;
 };
 

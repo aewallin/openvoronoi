@@ -38,7 +38,7 @@ using namespace ovd::numeric; // sq() chop()
 
 namespace ovd {
 
-
+/// create positioner, set graph.
 VertexPositioner::VertexPositioner(HEGraph& gi): g(gi) {
     //ppp_solver = new PPPSolver<double>(); // faster, but inaccurate
     ppp_solver =      new solvers::PPPSolver<qd_real>();
@@ -50,6 +50,7 @@ VertexPositioner::VertexPositioner(HEGraph& gi): g(gi) {
     errstat.clear();
 }
 
+/// delete all solvers
 VertexPositioner::~VertexPositioner() {
     //std::cout << "~VertexPositioner()..";
     delete ppp_solver;
@@ -121,6 +122,7 @@ solvers::Solution VertexPositioner::position(HEEdge e, Site* s3) {
     return sl;
 }
 
+/// position new vertex
 // find vertex that is equidistant from s1, s2, s3
 // should lie on the k1 side of s1, k2 side of s2
 // we try both k3=-1 and k3=+1 for s3
@@ -239,7 +241,7 @@ solvers::Solution VertexPositioner::position(Site* s1, double k1, Site* s2, doub
     return desp;
 }
 
-// search numerically for a desperate solution along the solution-edge
+/// search numerically for a desperate solution along the solution-edge
 solvers::Solution VertexPositioner::desperate_solution(Site* s3) {
     VertexError err_functor(g, edge, s3);
     //HEFace face = g[edge].face;     
@@ -301,6 +303,7 @@ solvers::Solution VertexPositioner::desperate_solution(Site* s3) {
     return desp;
 }
 
+/// set debug output true/false
 void VertexPositioner::solver_debug(bool b) {
     ppp_solver->set_debug(b);
     lll_solver->set_debug(b);
@@ -310,6 +313,7 @@ void VertexPositioner::solver_debug(bool b) {
     lll_para_solver->set_debug(b);
 }
 
+/// dispatch to the correct solver based on the sites
 int VertexPositioner::solver_dispatch(Site* s1, double k1, Site* s2, double k2, Site* s3, double k3, 
                                         std::vector<solvers::Solution>& solns) {
 
@@ -379,6 +383,7 @@ int VertexPositioner::solver_dispatch(Site* s1, double k1, Site* s2, double k2, 
     
 }
 
+/// detect separator-case, so we can dispatch to the correct Solver
 bool VertexPositioner::detect_sep_case(Site* lsite, Site* psite) {
     HEEdge le = lsite->edge();
     HEVertex src = g.source(le);
@@ -454,6 +459,7 @@ bool VertexPositioner::detect_sep_case(Site* lsite, Site* psite) {
     return false;
 }
 
+/// error from solution to corresponding point on the edge
 double VertexPositioner::edge_error(solvers::Solution& sl) {
     Point p;
     if (g[edge].type==PARA_LINELINE) {
@@ -464,9 +470,8 @@ double VertexPositioner::edge_error(solvers::Solution& sl) {
     return (p-sl.p).norm();
 }
 
-// the edge is not parametrized by t-value as normal edges
-// so we need a projection of sl onto the edge instead
-
+/// when the edge is not parametrized by t-value as normal edges
+/// so we need a projection of sl onto the edge instead
 Point VertexPositioner::projection_point(solvers::Solution& sl) {
     assert( g[edge].type == PARA_LINELINE );
     // edge given by
@@ -487,6 +492,7 @@ Point VertexPositioner::projection_point(solvers::Solution& sl) {
     return (p0+v*t);
 }
 
+/// check that the new solution lies on the edge
 bool VertexPositioner::solution_on_edge(solvers::Solution& s) {
     double err = edge_error(s);
     double limit = 9E-4;
@@ -512,7 +518,7 @@ double VertexPositioner::edge_error(HEEdge e, Solution& s) {
     return (ep-s.p).norm();
 }*/
 
-// new vertices should lie within the far_radius
+/// new vertices should lie within the far_radius
 bool VertexPositioner::check_far_circle(solvers::Solution& s) {
     if (!(s.p.norm() < 18*1)) {
         std::cout << "WARNING check_far_circle() new vertex outside far_radius! \n";
@@ -522,6 +528,7 @@ bool VertexPositioner::check_far_circle(solvers::Solution& s) {
     return true;
 }
 
+/// distance sanity check
 // all vertices should be of degree three, i.e. three adjacent faces/sites
 // distance to the three adjacent sites should be equal
 bool VertexPositioner::check_dist(HEEdge e, const solvers::Solution& sl, Site* s3) {
@@ -555,6 +562,7 @@ bool VertexPositioner::check_dist(HEEdge e, const solvers::Solution& sl, Site* s
     return true;
 }
 
+/// distance-error
 // new vertices should be equidistant to the three adjacent sites that define the vertex
 // we here calculate the distances d1, d2, d3 from the Solution to the three sites s1, s2, s3
 // and return the max deviation from the solution t-value.
@@ -576,6 +584,7 @@ double VertexPositioner::dist_error(HEEdge e, const solvers::Solution& sl, Site*
 
 }
 
+/// are \a d1 and \a d2 roughly equal?
 bool VertexPositioner::equal(double d1, double d2) {
     bool tol = 1e-3;
     if ( fabs(d1-d2) < 1e-15 )

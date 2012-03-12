@@ -86,7 +86,9 @@ template <class TOutEdgeList,
           >
 class half_edge_diagram {
 public:
+    /// type of face descriptor
     typedef unsigned int Face; 
+    /// underlying boost graph type
     typedef typename boost::adjacency_list< TOutEdgeList,            
                                             TVertexList,            
                                             TDirected,   
@@ -116,17 +118,24 @@ public:
     typedef typename boost::graph_traits< BGLGraph >::degree_size_type       degree_size_type;
     typedef typename boost::graph_traits< BGLGraph >::adjacency_iterator     adjacency_iterator;
 
+    /// vector of vertices
     typedef std::vector<Vertex> VertexVector;
+    /// vector of faces
     typedef std::vector<Face>   FaceVector;
+    /// vector of edges
     typedef std::vector<Edge>   EdgeVector;  
-
-    inline TFaceProperties& operator[](Face f) { return faces[f]; }
-    inline const TFaceProperties& operator[](Face f) const { return faces[f]; } 
-
-    inline TEdgeProperties& operator[](Edge e) { return g[e]; }
-    inline const TEdgeProperties& operator[](Edge e) const { return g[e]; }
     
+    /// access to Face properties
+    inline TFaceProperties& operator[](Face f) { return faces[f]; }
+    /// const access to Face properties
+    inline const TFaceProperties& operator[](Face f) const { return faces[f]; } 
+    /// access to Edge properties
+    inline TEdgeProperties& operator[](Edge e) { return g[e]; }
+    /// const access to Edge properties
+    inline const TEdgeProperties& operator[](Edge e) const { return g[e]; }
+    /// access to Vertex properties
     inline TVertexProperties& operator[](Vertex v)  { return g[v]; }
+    /// const access to Vertex properties
     inline const TVertexProperties& operator[](Vertex v) const  { return g[v]; }
 
 //DATA
@@ -174,6 +183,7 @@ unsigned int num_edges(Face f) { return face_edges(f).size(); }
 Edge add_edge(Vertex v1, Vertex v2) { return boost::add_edge( v1, v2, g).first; }
 /// add an edge with given properties between vertices v1-v2
 Edge add_edge( Vertex v1, Vertex  v2, const TEdgeProperties& prop ) { return boost::add_edge( v1, v2, prop, g).first; }
+/// return begin/edge iterators for out-edges of Vertex \a v
 std::pair<OutEdgeItr, OutEdgeItr> out_edge_itr( Vertex v ) { return boost::out_edges( v, g ); } // FIXME: change name to out_edges!!
 /// return true if v1-v2 edge exists
 bool has_edge( Vertex v1, Vertex v2) { return boost::edge( v1, v2, g ).second; }
@@ -188,6 +198,7 @@ void remove_edge( Edge e ) { boost::remove_edge( e , g ); }
 /// delete a vertex. clear and remove.
 void delete_vertex(Vertex v) { clear_vertex(v); remove_vertex(v); }
 
+/// insert Vertex \a v into the middle of Edge \a e
 void add_vertex_in_edge( Vertex v, Edge e) {
     // the vertex v is inserted into the middle of edge e
     // edge e and its twin are replaced by four new edges: e1,e2 and their twins te2,te1
@@ -233,7 +244,7 @@ void add_vertex_in_edge( Vertex v, Edge e) {
     // finally, remove the old edge
     remove_twin_edges(esource, etarget);
 }
-
+/// ad two edges, one from \a v1 to \a v2 and one from \a v2 to \a v1
 std::pair<Edge,Edge> add_twin_edges(Vertex v1, Vertex v2) {
     Edge e1,e2;
     bool b;
@@ -470,7 +481,7 @@ void remove_twin_edges( Vertex v1, Vertex v2) {
     boost::remove_edge( result2.first , g );
 }
 
-// remove a degree-two vertex from the middle of an edge.
+/// remove a degree-two Vertex from the middle of an Edge
 // preserve edge-properties (next, face, k)
 void remove_deg2_vertex( Vertex v ) {
     //                    face1 e[1]
@@ -511,7 +522,7 @@ void remove_deg2_vertex( Vertex v ) {
     remove_twin_edges(v,v2);
     remove_vertex(v);
 }
-
+/// set next-pointer of e1 to e2
 void set_next(Edge e1, Edge e2) {
     if (target(e1) != source(e2) ){
         std::cout << " ERROR target(e1) = " << g[target(e1)].index << " source(e2)= " << g[source(e2)].index << "\n"; 
@@ -520,9 +531,9 @@ void set_next(Edge e1, Edge e2) {
     g[e1].next = e2;
 }
 
-// form a face from the edge-list:
-// e1->e2->...->e1
-// for all edges, set edge.face=f, and edge.k=k
+/// form a face from the edge-list:
+/// e1->e2->...->e1
+/// for all edges, set edge.face=f, and edge.k=k
 void set_next_cycle( std::list<Edge> list, Face f, double k) {
     typename std::list<Edge>::iterator begin,it,nxt,end;
     it= list.begin();
@@ -542,7 +553,7 @@ void set_next_cycle( std::list<Edge> list, Face f, double k) {
     }
 }
 
-// set next-pointers for the given list (but don't close to form a cycle)
+/// set next-pointers for the given list (but don't close to form a cycle)
 // also set face and k properties for edge
 void set_next_chain( std::list<Edge> list, Face f, double k) {
     typename std::list<Edge>::iterator it,nxt,end;
@@ -562,7 +573,7 @@ void set_next_chain( std::list<Edge> list, Face f, double k) {
     }
 }
 
-// set next-pointers for the list
+/// set next-pointers for the list
 void set_next_chain( std::list<Edge> list ) {
     typename std::list<Edge>::iterator it,nxt,end;
     it= list.begin();
@@ -576,7 +587,7 @@ void set_next_chain( std::list<Edge> list ) {
     }
 }
 
-// on a face, search and return the left/right edge from endp
+/// on a face, search and return the left/right edge from endp
 std::pair<Edge,Edge> find_next_prev(Face f, Vertex endp) {
     Edge current = faces[f].edge;
     Edge start_edge = current;
@@ -600,13 +611,14 @@ std::pair<Edge,Edge> find_next_prev(Face f, Vertex endp) {
     return std::make_pair(next_edge, prev_edge);
 }
 
-
+/// print all faces of graph
 void print_faces() {
     for( Face f=0;f<g.num_faces();f++) {
         print_face(f);
     }
 }
 
+/// print out vertices on given Face
 void print_face(Face f) {
     std::cout << " Face " << f << ": ";
     Edge current = faces[f].edge;
@@ -622,6 +634,7 @@ void print_face(Face f) {
     std::cout << "\n";
 }
 
+/// print given edges
 void print_edges(EdgeVector& q) {
     BOOST_FOREACH( Edge e, q ) {
         Vertex src = source(e);
@@ -630,12 +643,14 @@ void print_edges(EdgeVector& q) {
     }
 }
 
+/// print edge
 void print_edge(Edge e) {
     Vertex src = source(e);
     Vertex trg = target(e);
     std::cout << g[src].index << "-f" << g[e].face << "-" << g[trg].index << "\n";
 }
 
+/// print given vertices
 void print_vertices(VertexVector& q) {
     BOOST_FOREACH( Vertex v, q) {
         std::cout << g[v].index << "["<< g[v].type << "]" << " ";

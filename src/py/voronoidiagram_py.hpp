@@ -16,8 +16,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with OpenVoronoi.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef VODI_PY_H
-#define VODI_PY_H
+
+#pragma once
 
 // from where is boost::python included?
 #include "voronoidiagram.hpp"
@@ -30,8 +30,9 @@ using namespace ovd::numeric;
 namespace ovd
 {
 
-// to allow reading/writing Point objects using pickle
+/// python wrapping to allow reading/writing Point objects using pickle
 struct point_pickle_suite : boost::python::pickle_suite {
+    /// arguments of Point to store in pickle
     static boost::python::tuple getinitargs(Point const& p) {
         return boost::python::make_tuple( p.x, p.y );
     }
@@ -46,24 +47,27 @@ public:
         _edge_points=40;
         null_edge_offset=0.01;
     }
-    
+    /// 1-parameter point-inesrt
     int insert_point_site1(const Point& p) {
         return insert_point_site(p);
     }
+    /// 2-parameter point-insert
     int insert_point_site2(const Point& p, int step) {
         return insert_point_site(p,step);
     }
-    
+    /// 3-parameter line-insert
     bool insert_line_site2(int idx1, int idx2) {
         return insert_line_site( idx1, idx2);
     }
+    /// 3-parameter line-insert
     bool insert_line_site3(int idx1, int idx2, int step) {
         return insert_line_site( idx1, idx2, step);
     }
+    /// set amount to offset null-edges
     void set_null_edge_offset(double ofs) {
         null_edge_offset=ofs;
     }
-    /// return list of generators to python
+    /// return list of generators/sites to python
     boost::python::list getGenerators()  {
         boost::python::list plist;
         BOOST_FOREACH( HEVertex v, g.vertices() ) {
@@ -86,6 +90,7 @@ public:
         }
         return plist;
     }
+    /// return vertex error statistics
     boost::python::list getStat() {
         boost::python::list elist;
         BOOST_FOREACH( double  e, vpos->get_stat() ) {
@@ -176,6 +181,7 @@ public:
         return edge_list;
     }
     
+    /// return list of vertices on given face
     boost::python::list get_face_vertices(HEFace f)  {
         boost::python::list vertex_list;
         BOOST_FOREACH( HEEdge edge, g.edges() ) { // loop through each edge
@@ -190,7 +196,7 @@ public:
         return vertex_list;
     }
 
-    
+    /// get edges for drawing. with null-face offsets.
     // NOTE: no g[edge].valid check here!?
     boost::python::list getVoronoiEdgesOffset()  {
         boost::python::list edge_list;
@@ -289,7 +295,7 @@ public:
         return edge_list;
     }
 
-    // for animation/visualization only, not needed in main algorithm
+    /// return IN-IN edges. for animation/visualization only, not needed in main algorithm
     EdgeVector find_in_in_edges() { 
         assert( !v0.empty() );
         EdgeVector output; // new vertices generated on these edges
@@ -303,9 +309,10 @@ public:
         }
         return output;
     }
+    /// set number of edge points for parabolic edges
     void set_edge_points(int n) { _edge_points=n; }
 
-    // count edges, counting apex-split edges as one
+    /// count edges, counting apex-split edges as one
     unsigned int num_face_edges( HEFace f) {
         HEEdge start_edge = g[f].edge;
         HEEdge current_edge = start_edge;
@@ -322,7 +329,7 @@ public:
         } while( current_edge != start_edge );
         return out.size();
     }    
-
+    /// return list of face-statistics (e.g. for analysis of poisson voronoi diagrams)
     boost::python::list getFaceStats()  {
         boost::python::list stats;
         const double radius_limit = 0.7;
@@ -340,11 +347,12 @@ public:
         return stats;
     }
 private:
-    int _edge_points; // number of points to plot on quadratic edges
+    /// number of points to plot on quadratic edges
+    int _edge_points; 
+    /// amount to offset null-face edges
     double null_edge_offset;
 };
 
 
-} // end namespace
-#endif
+} // end ovd namespace
 // end voronoidiagram_py.h

@@ -16,19 +16,18 @@
  *  You should have received a copy of the GNU General Public License
  *  along with OpenVoronoi.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef OFFSET_PY_HPP
-#define OFFSET_PY_HPP
+#pragma once
 
-#ifndef PYTHON_DWA2002810_HPP
+//#ifndef PYTHON_DWA2002810_HPP
 #include <boost/python.hpp>
-#endif
+//#endif
 
-#ifndef OFFSET_HPP
+//#ifndef OFFSET_HPP
 #include "offset.hpp"
-#endif
-#ifndef VORONOI_DIAGRAM_HPP
+//#endif
+//#ifndef VORONOI_DIAGRAM_HPP
 #include "voronoidiagram.hpp"
-#endif
+//#endif
 
 namespace ovd
 {
@@ -36,8 +35,9 @@ namespace ovd
 /// \brief python wrapper for Offset
 class Offset_py : public Offset {
 public:
+    /// offset of graph \a gi
     Offset_py(HEGraph& gi): Offset(gi) { }
-
+    /// return list of offsets at given offset distance \a t
     boost::python::list offset_py(double t) {
         offset(t);
         boost::python::list py_offsets;
@@ -66,7 +66,5 @@ private:
     Offset_py(); // don't use.
 };
 
-
 } // end namespace
-#endif
 // end offset_py.hpp

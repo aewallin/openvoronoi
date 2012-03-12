@@ -86,7 +86,6 @@
 #include <sstream>
 
 #include "common/point.hpp"
-//#include "graph.hpp"
 
 namespace ovd {
 
@@ -172,7 +171,9 @@ struct Eq {
     
 };
 
-// preliminary offset-prerensentations. experiental...
+/// \brief base-class for offset-elements
+///
+/// preliminary offset-prerensentations. experiental...
 class Ofs {
 public:
     virtual std::string str() = 0;
@@ -181,7 +182,7 @@ public:
     virtual Point start() {return Point(0,0);}
     virtual Point end() {return Point(0,0);}
 };
-
+/// \brief offset-element of LineSite
 class LineOfs : public Ofs {
 public:
     LineOfs(Point p1, Point p2) : _start(p1), _end(p2) {}
@@ -194,7 +195,7 @@ protected:
     Point _start;
     Point _end;
 };
-
+/// \brief offset-element of PointSite or ArcSite
 class ArcOfs : public Ofs {
 public:
     ArcOfs(Point p1, Point p2, Point cen, double rad) : _start(p1), _end(p2), c(cen), r(rad) {}

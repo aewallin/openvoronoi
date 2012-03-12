@@ -106,7 +106,9 @@ private:
     std::vector<double> errstat;
 };
 
-// error function to minimize when solving by searching for a point on the solution-edge
+/// \brief error functor for edge-based desperate solver
+///
+/// minimize error by searching for a point on the solution-edge
 class VertexError {
 public:
     VertexError(HEGraph& gi, HEEdge sln_edge, Site* si3) :

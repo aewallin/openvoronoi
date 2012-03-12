@@ -29,12 +29,14 @@
 namespace ovd
 {
 
-// this filter sets the valid-property of edges
-// all interior edges are marked valid=true
-// all exterior edges are marked valid=false
-//
-// a polygon/pocket boundary shoud be specified in CW order
-// islands within the polygon should be specified in CCW order
+/// \brief filter for retaining voronoi-diagram inside a polygon
+///
+/// this filter sets the valid-property of edges
+/// all interior edges are marked valid=true
+/// all exterior edges are marked valid=false
+///
+/// a polygon/pocket boundary shoud be specified in CW order
+/// islands within the polygon should be specified in CCW order
 class polygon_interior_filter : public Filter {
 public:
     polygon_interior_filter( bool side=true) : _side(side) { }

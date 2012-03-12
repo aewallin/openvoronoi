@@ -51,7 +51,9 @@ struct FaceOffsetLoop {
 typedef std::vector<FaceOffsetLoop> FaceOffsetLoops;
 
 
-// experimental alternative offset approach.
+/// \brief experimental alternative offset approach.
+///
+/// \todo merge this with Offset
 class FaceOffset {
 public:
     FaceOffset(HEGraph& gi): g(gi) {

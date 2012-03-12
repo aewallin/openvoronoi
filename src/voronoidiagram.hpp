@@ -74,8 +74,10 @@ public:
 // sorted by decreasing fabs() of in_circle-predicate, so that the vertices whose IN/OUT status we are 'most certain' about are processed first
 typedef std::priority_queue< VertexDetPair , std::vector<VertexDetPair>, abs_comparison > VertexQueue;
 
-// this struct used in add_edge() for storing information related to
-// the new edge.
+/// \brief data required for adding a new edge
+///
+/// used in add_edge() for storing information related to
+/// the new edge.
 struct EdgeData {
     HEEdge v1_prv;
     HEVertex v1; // NEW edge source
@@ -214,8 +216,9 @@ private:
     VoronoiDiagram(); // don't use.
 };
 
-// class for passing to numerical boost::toms748 root-finding algorithm
-// to locate split-points
+/// \brief error-functor to locate split-points
+///
+/// for passing to numerical boost::toms748 root-finding algorithm
 class SplitPointError {
 public:
     SplitPointError(HEGraph& gi, HEEdge split_edge, Point pt1, Point pt2) :

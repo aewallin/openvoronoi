@@ -30,7 +30,9 @@
 
 namespace ovd
 {
-
+/// \brief retain only edges between distinct polygons
+///
+/// \todo FIXME: not done yet!
 struct island_filter : public Filter {
     island_filter() { }
     virtual bool operator()(const HEEdge& e) const {

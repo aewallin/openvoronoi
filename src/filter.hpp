@@ -29,12 +29,16 @@
 namespace ovd
 {
 
-// base-class for filters
+/// \brief base-class for voronoi-diagram filters
+///
+/// concrete sub-classes of Filter provide a predicate
+/// for determining if the edge belongs to the filtered graph. 
+///
 class Filter {
 public:
     Filter()   { }
     void set_graph(HEGraph* gi) {g=gi;}
-    // does this edge belong to the filtered graph?
+    /// does this edge belong to the filtered graph?
     virtual bool operator()(const HEEdge& e) const {exit(-1); return true;}
 protected:
     HEGraph* g;

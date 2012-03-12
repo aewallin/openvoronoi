@@ -66,7 +66,8 @@ enum VoronoiEdgeType {
 */
 
 
-/// properties of an edge in the voronoi diagram
+/// \brief properties of an edge in the VoronoiDiagram
+///
 /// each edge stores a pointer to the next HEEdge 
 /// and the HEFace to which this HEEdge belongs
 class EdgeProps {

@@ -52,6 +52,17 @@
 // may or may not store edge pointer
 
 
+
+
+
+namespace hedi  { 
+/*! 
+ * \namespace hedi
+ * \brief Half-edge diagram
+ */
+
+/// \brief half-edge diagram, based on the boost graph-library
+///
 /// half_edge_diagram is a half-edge diagram class.
 /// Templated on Vertex/Edge/Face property classes which allow
 /// attaching information to vertices/edges/faces that is 
@@ -65,14 +76,6 @@
 /// For a general description of the half-edge data structure see e.g.:
 ///  - http://www.holmes3d.net/graphics/dcel/
 ///  - http://openmesh.org/index.php?id=228
-
-
-namespace hedi  { 
-/*! 
- * \namespace hedi
- * \brief Half-edge diagram
- */
-
 template <class TOutEdgeList, 
           class TVertexList,
           class TDirected, 

@@ -55,8 +55,9 @@ typedef unsigned int HEFace;
 /// NONINCIDENT faces contain only OUT-vertices
 enum VoronoiFaceStatus {INCIDENT, NONINCIDENT};
 
-/// properties of a face in the voronoi diagram
-/// each face stores one edge on the boundary of the face
+/// \brief properties of a face in the voronoi diagram
+///
+/// 
 struct FaceProps {
     FaceProps() {
         site = 0;

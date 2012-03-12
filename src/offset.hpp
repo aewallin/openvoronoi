@@ -31,6 +31,8 @@ namespace ovd
 {
 
 /// \brief Line- or arc-vertex of an offset curve.
+///
+/// \todo this duplicates the idea of the Ofs class. Remove this or Ofs!
 struct OffsetVertex {
     Point p;
     // line-vertex is indicated by radius of -1, and c and cw are then ignored.

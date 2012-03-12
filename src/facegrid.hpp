@@ -37,7 +37,8 @@ typedef Grid::index                              GridIndex;
 
 typedef unsigned int HEFace;
 
-
+/// \brief Grid-search for nearest-neighbor search
+///
 /// this class is used to quickly find the nearest neighbor among the 
 /// existing generators when adding a new generator to a VoronoiDiagram
 /// the nearest-neighbor search algorithm is a grid-search

@@ -32,7 +32,7 @@
 namespace ovd
 {
 
-// keep track of data for each edge here
+/// keep track of bool done true/false flag for each edge
 struct edata {
     edata() {
         done = false;

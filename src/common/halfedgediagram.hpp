@@ -97,25 +97,42 @@ public:
                                             TGraphProperties,
                                             TEdgeList
                                             > BGLGraph;
+    /// edge descriptor
     typedef typename boost::graph_traits< BGLGraph >::edge_descriptor   Edge;
+    /// vertex descriptor
     typedef typename boost::graph_traits< BGLGraph >::vertex_descriptor Vertex;
+    /// vertex iterator type
     typedef typename boost::graph_traits< BGLGraph >::vertex_iterator   VertexItr;
+    /// out edge iterator type
     typedef typename boost::graph_traits< BGLGraph >::out_edge_iterator OutEdgeItr;
+    /// edge iterator type
     typedef typename boost::graph_traits< BGLGraph >::edge_iterator     EdgeItr; 
 
-    // BGL-types (do we need all of these?)
+    /// vertex descriptor
     typedef typename boost::graph_traits< BGLGraph >::vertex_descriptor      vertex_descriptor;
+    /// edge descriptor
     typedef typename boost::graph_traits< BGLGraph >::edge_descriptor        edge_descriptor;
+    /// edge iterator
     typedef typename boost::graph_traits< BGLGraph >::edge_iterator          edge_iterator;
+    /// out edge iterator
     typedef typename boost::graph_traits< BGLGraph >::out_edge_iterator      out_edge_iterator;
+    /// in edge iterator
     typedef typename boost::graph_traits< BGLGraph >::in_edge_iterator       in_edge_iterator;
+    /// vertex iterator
     typedef typename boost::graph_traits< BGLGraph >::vertex_iterator        vertex_iterator;
+    /// directed or underected graph
     typedef typename boost::graph_traits< BGLGraph >::directed_category      directed_category;
+    /// allow or disallow parallel edges
     typedef typename boost::graph_traits< BGLGraph >::edge_parallel_category edge_parallel_category;
+    /// ?
     typedef typename boost::graph_traits< BGLGraph >::traversal_category     traversal_category;
+    /// vertex size type
     typedef typename boost::graph_traits< BGLGraph >::vertices_size_type     vertices_size_type;
+    /// edge size type
     typedef typename boost::graph_traits< BGLGraph >::edges_size_type        edges_size_type;
+    /// degree size type
     typedef typename boost::graph_traits< BGLGraph >::degree_size_type       degree_size_type;
+    /// adjacency iterator
     typedef typename boost::graph_traits< BGLGraph >::adjacency_iterator     adjacency_iterator;
 
     /// vector of vertices
@@ -139,11 +156,14 @@ public:
     inline const TVertexProperties& operator[](Vertex v) const  { return g[v]; }
 
 //DATA
+    /// container for face properties
     std::vector< TFaceProperties > faces; // this could maybe be held as a GraphProperty of the BGL-graph?
+    /// underlying BGL graph
     BGLGraph g;
     
 // NOTE: there is no HEDIGraph constructor, we use the default one..
 
+/// dtor
 virtual ~half_edge_diagram(){
     // sites are associated with faces. go through all faces and delete the site
     //std::cout << "~half_edge_diagram()...";

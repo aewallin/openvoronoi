@@ -30,8 +30,10 @@ namespace ovd
 /// \brief python wrapper for MedialAxisWalk
 class MedialAxisWalk_py : public MedialAxisWalk {
 public:
+    /// create walk
     MedialAxisWalk_py(HEGraph& gi, int edge_pts = 20): MedialAxisWalk(gi, edge_pts) { }
 
+    /// return list of medial-axis edges
     boost::python::list walk_py() {
         do_walk();
         boost::python::list py_walk;

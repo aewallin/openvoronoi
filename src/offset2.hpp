@@ -33,21 +33,28 @@ namespace ovd
 /// From the face and corresponding edges we can later construct the
 /// corresponding OffsetVertex.
 struct FaceEdge {
+    /// face
     HEFace f;
+    /// edge
     HEEdge next_edge;
-
+    /// ctor
     FaceEdge(HEFace fi, const HEEdge &ei): f(fi), next_edge(ei) {}
 };
+/// vector of face-edges
 typedef std::vector<FaceEdge> FaceEdges;
 
 /// \brief FaceEdge list encountered in walk of offset by t.
 struct FaceOffsetLoop {
+    /// the face-edges encountered
     FaceEdges face_edges;
+    /// the start edge
     HEEdge start_edge;
+    /// offset distance
     double t;
-
+    /// ctor
     FaceOffsetLoop(const HEEdge &si, double ti): start_edge(si), t(ti) {}
 };
+/// vector of loops. the output type of the algorithm
 typedef std::vector<FaceOffsetLoop> FaceOffsetLoops;
 
 
@@ -56,10 +63,12 @@ typedef std::vector<FaceOffsetLoop> FaceOffsetLoops;
 /// \todo merge this with Offset
 class FaceOffset {
 public:
+    /// ctor
     FaceOffset(HEGraph& gi): g(gi) {
         face_done.clear();
         face_done.assign( g.num_faces(), 1 );
     }
+    /// create offsets at given offset distance
     void offset(double t) {
         offset_list = FaceOffsetLoops(); // clear the list
         set_flags(t); // mark faces as todo or done, based on the t-value, and validity of edges (after filtering).
@@ -69,9 +78,11 @@ public:
         }
         //return offset_list;
     }
+    /// return output
     FaceOffsetLoops get_offset_list() {
         return offset_list;
     }
+    /// find suitable start Face
     bool find_start_face(HEFace& start) {
         for(HEFace f=0; f<g.num_faces() ; f++) {
             if (face_done[f]==0 ) {
@@ -81,7 +92,7 @@ public:
         }
         return false;
     }
-
+    /// run algorithm
     void offset_walk(HEFace start,double t) {
         //std::cout << " offset_walk() starting on face " << start << "\n";
         bool out_in_mode= false; 
@@ -124,6 +135,7 @@ public:
         } while (current_edge != start_edge);
         offset_list.push_back(loop); // append the created loop to the output
     }
+    /// figure out mode
     bool edge_mode(HEEdge e, double t) {
         HEVertex src = g.source(e);
         HEVertex trg = g.target(e);
@@ -138,14 +150,14 @@ public:
             return false;
         }
     }
-    // figure out cw or ccw for an arc
+    /// figure out cw or ccw for an arc
     bool find_cw(Point start, Point center, Point end) {
         // arc from current to next edge
         // center at 
         return center.is_right(start,end); // this only works for arcs smaller than a half-circle !
     }
     
-    // starting at e, find the next edge on the face that brackets t
+    /// starting at e, find the next edge on the face that brackets t
     // we can be in one of two modes.
     // if mode=false then we are looking for an edge where src_t<t<trg_t
     // if mode=true we are looning for an edge where trg_t<t<src_t
@@ -171,11 +183,9 @@ public:
         //std::cout << "offset_edge = "; g.print_edge(ofs_edge);
         return ofs_edge;
     }
-    
-    
+
+    /// go through all faces and set flag=0 if the face requires an offset.
     void set_flags(double t) {
-        
-        // go through all faces and set flag=0 if the face requires an offset.
         for(HEFace f=0; f<g.num_faces() ; f++) {
             HEEdge start = g[f].edge;
             HEEdge current = start;
@@ -204,18 +214,14 @@ public:
                 current = g[current].next;
             } while ( current!=start );
         }
-        
-
-        
-        //print_status();
     }
-    // is t in (a,b) ?
+    /// is t in (a,b) ?
     bool t_bracket(double a, double b, double t) {
         double min_t = std::min(a,b);
         double max_t = std::max(a,b);
         return ( (min_t<t) && (t<max_t) );
     }
-    
+    /// string output
     void print() {
         std::cout << "Offset has " << offset_list.size() << " loops.\n";
         int n(0);
@@ -227,11 +233,13 @@ public:
         }
     }
 protected:
+    /// vd-graph
     HEGraph& g;
+    /// output offsets
     FaceOffsetLoops offset_list;
 private:
     FaceOffset(); // don't use.
-    // hold a 0/1 flag for each face, indicating if an offset for this face has been produced or not.
+    /// hold a 0/1 flag for each face, indicating if an offset for this face has been produced or not.
     std::vector<unsigned char> face_done;
     
 

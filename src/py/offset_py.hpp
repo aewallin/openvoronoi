@@ -18,16 +18,10 @@
 */
 #pragma once
 
-//#ifndef PYTHON_DWA2002810_HPP
 #include <boost/python.hpp>
-//#endif
 
-//#ifndef OFFSET_HPP
 #include "offset.hpp"
-//#endif
-//#ifndef VORONOI_DIAGRAM_HPP
-#include "voronoidiagram.hpp"
-//#endif
+//#include "voronoidiagram.hpp"
 
 namespace ovd
 {

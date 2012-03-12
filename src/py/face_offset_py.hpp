@@ -30,8 +30,9 @@ namespace ovd
 /// \brief python wrapper for FaceOffset
 class FaceOffset_py : public FaceOffset {
 public:
+    /// ctor
     FaceOffset_py(HEGraph& gi): FaceOffset(gi) { }
-
+    /// return list of offset elements
     boost::python::list offset_py(double t) {
         offset(t);
         boost::python::list py_offsets;

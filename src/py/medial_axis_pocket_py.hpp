@@ -29,7 +29,9 @@ namespace ovd
 /// python wrapper for medial_axis_pocket
 class medial_axis_pocket_py : public medial_axis_pocket {
 public:
+    /// create medial_axis_pocket object
     medial_axis_pocket_py(HEGraph& gi): medial_axis_pocket(gi) {}
+    /// return list of MICs \todo replaced by get_mic_components()
     boost::python::list py_get_mic_list() {
         boost::python::list out;
         BOOST_FOREACH(MIC mic, mic_list) {
@@ -50,6 +52,7 @@ public:
         return out;
     }
     
+    /// return list of MICs. one list per connected component in the graph
     boost::python::list py_get_mic_components() {
         boost::python::list out;
         BOOST_FOREACH(MICList miclist, ma_components) {

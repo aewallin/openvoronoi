@@ -43,7 +43,7 @@ public:
     /// \param side set true (false) for polygons inserted in CW (CCW) order and islands inserted in CCW (CW) order.
     polygon_interior_filter( bool side=true) : _side(side) { }
     
-    // determine if an edge is valid or not
+    /// determine if an edge is valid or not
     virtual bool operator()(const HEEdge& e) const {
         if ( (*g)[e].type == LINESITE || (*g)[e].type == NULLEDGE) 
             return true;
@@ -65,6 +65,7 @@ public:
         return false;
     }
 private:
+    /// on the face f, find the adjacent linesite
     HEEdge find_adjacent_linesite(  HEFace f ) const {
         HEEdge current = (*g)[f].edge;
         HEEdge start = current;
@@ -80,7 +81,7 @@ private:
         } while(current!=start);
         return HEEdge();
     }
-        
+    /// return true if linesite was inserted in the direction indicated by _side
     bool linesite_ccw(  HEFace f ) const {
         HEEdge current = (*g)[f].edge;
         HEEdge start = current;
@@ -93,7 +94,7 @@ private:
         } while(current!=start);
         return false;
     }
-    
+    /// CW / CCW flag
     bool _side;
 };
 

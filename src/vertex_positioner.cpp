@@ -40,13 +40,13 @@ namespace ovd {
 
 
 VertexPositioner::VertexPositioner(HEGraph& gi): g(gi) {
-    ppp_solver = new PPPSolver<qd_real>();
+    ppp_solver = new solvers::PPPSolver<qd_real>();
     //ppp_solver = new PPPSolver<double>(); // faster, but inaccurate
-    lll_solver = new LLLSolver();
-    qll_solver = new QLLSolver();
-    sep_solver = new SEPSolver();
-    alt_sep_solver = new ALTSEPSolver();
-    lll_para_solver = new LLLPARASolver();
+    lll_solver = new solvers::LLLSolver();
+    qll_solver = new solvers::QLLSolver();
+    sep_solver = new solvers::SEPSolver();
+    alt_sep_solver = new solvers::ALTSEPSolver();
+    lll_para_solver = new solvers::LLLPARASolver();
     errstat.clear();
 }
 
@@ -70,7 +70,7 @@ VertexPositioner::~VertexPositioner() {
 // - site to the left of HEEdge e
 // - site to the right of HEEdge e
 // - given new Site s
-Solution VertexPositioner::position(HEEdge e, Site* s3) {
+solvers::Solution VertexPositioner::position(HEEdge e, Site* s3) {
     edge = e;
     HEFace face = g[e].face;     
     HEEdge twin = g[e].twin;
@@ -86,7 +86,7 @@ Solution VertexPositioner::position(HEEdge e, Site* s3) {
     Site* s1 =  g[face].site;
     Site* s2 = g[twin_face].site;
 
-    Solution sl = position(  s1 , g[e].k, s2, g[twin].k, s3 );
+    solvers::Solution sl = position(  s1 , g[e].k, s2, g[twin].k, s3 );
 
     assert( solution_on_edge(sl) );
     assert( check_far_circle(sl) );
@@ -120,10 +120,10 @@ Solution VertexPositioner::position(HEEdge e, Site* s3) {
 // find vertex that is equidistant from s1, s2, s3
 // should lie on the k1 side of s1, k2 side of s2
 // we try both k3=-1 and k3=+1 for s3
-Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Site* s3) {
+solvers::Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Site* s3) {
     assert( (k1==1) || (k1 == -1) );
     assert( (k2==1) || (k2 == -1) );
-    std::vector<Solution> solutions;
+    std::vector<solvers::Solution> solutions;
         
     solver_dispatch(s1,k1,s2,k2,s3,+1, solutions); // a single k3=+1 call for s3->isPoint()
     
@@ -153,9 +153,9 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
         // two or more points remain so we must further filter here!
         // filter further using edge_error
         double min_error=100;
-        Solution min_solution(Point(0,0),0,0);
+        solvers::Solution min_solution(Point(0,0),0,0);
         //std::cout << " edge_error filter: \n";
-        BOOST_FOREACH(Solution s, solutions) {
+        BOOST_FOREACH(solvers::Solution s, solutions) {
             double err = edge_error(s); //g[edge].error(s);
             //std::cout << s.p << " k3=" << s.k3 << " t=" <<  s.t << " err=" << err << "\n";
             if ( err < min_error) {
@@ -196,7 +196,7 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     std::cout << "Running solvers again: \n";
     solver_debug(true);
     // run the solver(s) one more time in order to print out un-filtered solution points for debugging
-    std::vector<Solution> solutions2;
+    std::vector<solvers::Solution> solutions2;
     solver_dispatch(s1,k1,s2,k2,s3,+1, solutions2);
     if (!s3->isPoint()) // for points k3=+1 allways
         solver_dispatch(s1,k1,s2,k2,s3,-1, solutions2); // for lineSite or ArcSite we try k3=-1 also    
@@ -204,7 +204,7 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
     
     if ( !solutions2.empty() ) {
         std::cout << "The failing " << solutions2.size() << " solutions are: \n";
-        BOOST_FOREACH(Solution s, solutions2 ) {
+        BOOST_FOREACH(solvers::Solution s, solutions2 ) {
             std::cout << s.p << " t=" << s.t << " k3=" << s.k3  << " e_err=" << edge_error(s) <<"\n";
             std::cout << " min<t<max=" << ((s.t>=t_min) && (s.t<=t_max));
             std::cout << " s3.in_region=" << s3->in_region(s.p);
@@ -219,7 +219,7 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
 
     assert(0); // in Debug mode, stop here.
     
-    Solution desp = desperate_solution(s3);  // ( p_mid, t_mid, desp_k3 ); 
+    solvers::Solution desp = desperate_solution(s3);  // ( p_mid, t_mid, desp_k3 ); 
     
     VertexError s1_err_functor(g, edge, s1);
     VertexError s2_err_functor(g, edge, s2);
@@ -236,7 +236,7 @@ Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Si
 }
 
 // search numerically for a desperate solution along the solution-edge
-Solution VertexPositioner::desperate_solution(Site* s3) {
+solvers::Solution VertexPositioner::desperate_solution(Site* s3) {
     VertexError err_functor(g, edge, s3);
     //HEFace face = g[edge].face;     
     //HEEdge twin = g[edge].twin;
@@ -293,7 +293,7 @@ Solution VertexPositioner::desperate_solution(Site* s3) {
             desp_k3 = (s3->k()==1) ? 1 : -1;
         }
     }
-    Solution desp( p_sln, t_sln, desp_k3 ); 
+    solvers::Solution desp( p_sln, t_sln, desp_k3 ); 
     return desp;
 }
 
@@ -306,7 +306,8 @@ void VertexPositioner::solver_debug(bool b) {
     lll_para_solver->set_debug(b);
 }
 
-int VertexPositioner::solver_dispatch(Site* s1, double k1, Site* s2, double k2, Site* s3, double k3, std::vector<Solution>& solns) {
+int VertexPositioner::solver_dispatch(Site* s1, double k1, Site* s2, double k2, Site* s3, double k3, 
+                                        std::vector<solvers::Solution>& solns) {
 
 
     if ( g[edge].type == SEPARATOR ) {
@@ -449,7 +450,7 @@ bool VertexPositioner::detect_sep_case(Site* lsite, Site* psite) {
     return false;
 }
 
-double VertexPositioner::edge_error(Solution& sl) {
+double VertexPositioner::edge_error(solvers::Solution& sl) {
     Point p;
     if (g[edge].type==PARA_LINELINE) {
         p = projection_point( sl );
@@ -462,7 +463,7 @@ double VertexPositioner::edge_error(Solution& sl) {
 // the edge is not parametrized by t-value as normal edges
 // so we need a projection of sl onto the edge instead
 
-Point VertexPositioner::projection_point(Solution& sl) {
+Point VertexPositioner::projection_point(solvers::Solution& sl) {
     assert( g[edge].type == PARA_LINELINE );
     // edge given by
     // p = p0 + t * (p1-p0)   with t in [0,1]
@@ -482,7 +483,7 @@ Point VertexPositioner::projection_point(Solution& sl) {
     return (p0+v*t);
 }
 
-bool VertexPositioner::solution_on_edge(Solution& s) {
+bool VertexPositioner::solution_on_edge(solvers::Solution& s) {
     double err = edge_error(s);
     double limit = 9E-4;
     if ( err>=limit ) {
@@ -508,7 +509,7 @@ double VertexPositioner::edge_error(HEEdge e, Solution& s) {
 }*/
 
 // new vertices should lie within the far_radius
-bool VertexPositioner::check_far_circle(Solution& s) {
+bool VertexPositioner::check_far_circle(solvers::Solution& s) {
     if (!(s.p.norm() < 18*1)) {
         std::cout << "WARNING check_far_circle() new vertex outside far_radius! \n";
         std::cout << s.p << " norm=" << s.p.norm() << " far_radius=" << 1 << "\n"; 
@@ -519,7 +520,7 @@ bool VertexPositioner::check_far_circle(Solution& s) {
 
 // all vertices should be of degree three, i.e. three adjacent faces/sites
 // distance to the three adjacent sites should be equal
-bool VertexPositioner::check_dist(HEEdge e, const Solution& sl, Site* s3) {
+bool VertexPositioner::check_dist(HEEdge e, const solvers::Solution& sl, Site* s3) {
     HEFace face = g[e].face;     
     HEEdge tw_edge = g[e].twin;
     HEFace twin_face = g[tw_edge].face;      
@@ -555,7 +556,7 @@ bool VertexPositioner::check_dist(HEEdge e, const Solution& sl, Site* s3) {
 // and return the max deviation from the solution t-value.
 // this works as a sanity check for the solver.
 // a high error value here is also an indication of numerical instability in the solver
-double VertexPositioner::dist_error(HEEdge e, const Solution& sl, Site* s3) {
+double VertexPositioner::dist_error(HEEdge e, const solvers::Solution& sl, Site* s3) {
     HEFace face = g[e].face;     
     HEEdge tw_edge = g[e].twin;
     HEFace twin_face = g[tw_edge].face;      

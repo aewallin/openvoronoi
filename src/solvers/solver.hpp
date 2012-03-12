@@ -22,9 +22,16 @@
 namespace ovd {
 
 class Site;
+    
+namespace solvers {
+/*! 
+ * \namespace ovd::solvers
+ * \brief Voronoi vertex position solvers
+ */
 
-// abstract base-class for voronoi vertex-solvers
-// the input to the solver is three Sites (s1,s2,s3) and three offset-directions (k1,k2,k3) .
+/// \brief abstract base-class for voronoi vertex position solvers
+///
+/// the input to the solver is three Sites (s1,s2,s3) and three offset-directions (k1,k2,k3) .
 class Solver {
 public:
     virtual int solve(Site* s1, double k1, 
@@ -43,5 +50,5 @@ protected:
     bool debug;
 };
 
-
-} //end namespace
+} // solvers
+} //end ovd namespace

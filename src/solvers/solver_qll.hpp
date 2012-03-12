@@ -32,8 +32,10 @@
 using namespace ovd::numeric; // sq() chop() quadratic_roots()
 
 namespace ovd {
+namespace solvers {
 
-/// point-point-point vertex positioner based on Sugihara & Iri paper
+ 
+/// \brief quadratic-linear-linear solver
 class QLLSolver : public Solver {
 public:
 
@@ -172,6 +174,6 @@ int qll_solve( qd_real a0, qd_real b0, qd_real c0, qd_real d0,
 
 };
 
-
+} // solvers
 } // ovd
 #endif

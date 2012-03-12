@@ -29,8 +29,10 @@
 using namespace ovd::numeric; // sq() chop() determinant()
 
 namespace ovd {
-
-/// line-line-line vertex positioner.
+namespace solvers {
+    
+/// \brief line-line-line solver (parallel line-segment case)
+///
 /// solves 3x3 system.
 class LLLPARASolver : public Solver {
 public:
@@ -128,5 +130,5 @@ bool two_by_two_solver( double a,
 
 };
 
-
+} // solvers
 } // ovd

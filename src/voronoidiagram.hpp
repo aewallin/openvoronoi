@@ -28,19 +28,43 @@
 #include "vertex_positioner.hpp"
 #include "filter.hpp"
 
+/*! \mainpage OpenVoronoi
+ *
+ * \section intro_sec Introduction
+ *
+ * OpenVoronoi is a c++ library with python bindings for calculating 2D voronoi-diagrams of point, line-segment, and circular-arc(not implement yet!) sites.
+ * An incremental topology-oriented algorithm is used.
+ * 
+ * \section install_sec Installation
+ *
+ * \subsection step1 subsection
+ *
+ * etc...
+ */
+ 
+
 namespace ovd
 {
-
+/*! 
+ * \namespace ovd 
+ * \brief OpenVoronoi classes and functions
+ */
+ 
+ 
 class VoronoiDiagramChecker;
 class FaceGrid;
 
-// in augment_vertex_set() we grow the delete-tree by processing vertices
-// one-by-one from a priority_queue. This is the priority_queue sort predicate.
-// We handle vertices with a large fabs( in_circle() ) first, since we 
-// believe their predicate to be more reliable.
+
 typedef std::pair<HEVertex, double> VertexDetPair;
+/// \brief comparison-predicate for VertexQueue
+///
+/// in augment_vertex_set() we grow the delete-tree by processing vertices
+/// one-by-one from a priority_queue. This is the priority_queue sort predicate.
+/// We handle vertices with a large fabs( in_circle() ) first, since we 
+/// believe their predicate to be more reliable.
 class abs_comparison {
 public:
+  /// return true if absolute-value of lhs.second is smaller than rhs.second
   bool operator() (const VertexDetPair& lhs, const VertexDetPair&rhs) const {
     return ( fabs(lhs.second) < fabs(rhs.second) );
   }
@@ -72,10 +96,10 @@ struct EdgeData {
 ///  voronoi-edges are dual to delaunay-edges
 class VoronoiDiagram {
 public:
-    /// ctor
-    /// create diagram with given far-radius and number of bins
-    /// \param far radius of circle centered at (0,0) within which all sites must lie
-    /// \param n_bins number of bins used for nearest vd-vertex bucket-search
+    /// \brief create diagram with given far-radius and number of bins
+    ///
+    /// \param far radius of circle centered at (0,0) within which all sites must lie. (use 1.0)
+    /// \param n_bins number of bins used for nearest vd-vertex bucket-search. Use roughly sqrt(N) for a voronoi-diagram with N sites.
     VoronoiDiagram(double far, unsigned int n_bins);
     /// dtor
     virtual ~VoronoiDiagram();

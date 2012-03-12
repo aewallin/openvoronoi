@@ -105,7 +105,8 @@ typedef boost::adjacency_list_traits<OUT_EDGE_CONTAINER,
                                      boost::bidirectionalS, 
                                      EDGE_LIST_CONTAINER >::vertex_descriptor HEVertex;                                     
 
-/// equation-parameters
+/// \brief Offset equation parameters of a Site
+///
 /// the offset in direction k by a distance t of a general site (point,line,circle) can be expressed as
 /// q ( x*x + y*y - t*t ) + a x + b y + c + k t = 0
 /// the parameters (q,a,b,k,c) are set as:
@@ -308,7 +309,7 @@ protected:
     Eq<double> eq;
 };
 
-/// point, or vertex site.
+/// vertex Site
 class PointSite : public Site {
 public:
     PointSite( const Point& p, HEFace f=0): _p(p)  {
@@ -354,7 +355,7 @@ private:
     Point _p;
 };
 
-/// line-segment site
+/// line segment Site
 class LineSite : public Site {
 public:
     /// create line-site between start and end Point.
@@ -449,7 +450,7 @@ private:
     
 };
 
-/// arc or circle site
+/// circular arc Site
 class ArcSite : public Site {
 public:
     ArcSite( const Point& s, const Point& e, const Point& center, bool dir): _start(s), _end(e), _center(center), _dir(dir) {

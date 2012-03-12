@@ -68,7 +68,10 @@
 
 
 namespace hedi  { 
-
+/*! 
+ * \namespace hedi
+ * \brief Half-edge diagram
+ */
 
 template <class TOutEdgeList, 
           class TVertexList,

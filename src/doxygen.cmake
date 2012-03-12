@@ -38,31 +38,31 @@ IF (DOXYGEN_FOUND)
     )
 
 
-    IF (EXISTS ${PDFLATEX_COMPILER})
-        add_custom_command(
-            OUTPUT doc/latex/refman.pdf
-            DEPENDS doc/latex/index.tex
-            WORKING_DIRECTORY doc/latex
-            COMMAND make pdf
-            COMMENT building PDF docs
-            COMMAND mv refman.pdf ../openvoronoi-manual.pdf
-        )
+    #IF (EXISTS ${PDFLATEX_COMPILER})
+    #    add_custom_command(
+    #        OUTPUT doc/latex/refman.pdf
+    #        DEPENDS doc/latex/index.tex
+    #        WORKING_DIRECTORY doc/latex
+    #        COMMAND make pdf
+    #        COMMENT building PDF docs
+    #        COMMAND mv refman.pdf ../openvoronoi-manual.pdf
+    #    )
 
-        add_custom_target(
-            doc-pdf
-            DEPENDS doc/latex/refman.pdf
-        )
+    #    add_custom_target(
+    #        doc-pdf
+    #        DEPENDS doc/latex/refman.pdf
+    #    )
 
-        add_dependencies(doc doc-pdf)
-    ELSE (EXISTS ${PDFLATEX_COMPILER}) 
-       message(STATUS "pdflatex compiler not found, PDF docs will not be built")
-   ENDIF (EXISTS ${PDFLATEX_COMPILER})
+    #    add_dependencies(doc doc-pdf)
+    #ELSE (EXISTS ${PDFLATEX_COMPILER}) 
+    #   message(STATUS "pdflatex compiler not found, PDF docs will not be built")
+    #ENDIF (EXISTS ${PDFLATEX_COMPILER})
 
 
-    add_custom_target(
-        doc-latex
-        DEPENDS doc/latex/index.tex
-    )
+    #add_custom_target(
+    #    doc-latex
+    #    DEPENDS doc/latex/index.tex
+    #)
 
     #install(
     #    DIRECTORY doc/latex/

@@ -1172,7 +1172,7 @@ void VoronoiDiagram::add_vertices( Site* new_site ) {
             std::cout << " Position NEW vertex on " << g[src].index << " - " << g[trg].index << "\n";
             vpos->solver_debug(true);
         }
-        Solution sl = vpos->position( q_edges[m], new_site ); // vertex_positioner.cpp
+        solvers::Solution sl = vpos->position( q_edges[m], new_site ); // vertex_positioner.cpp
 
         if ( vpos->dist_error( q_edges[m], sl, new_site) > 1e-9 ) {
             HEVertex src = g.source(q_edges[m]);

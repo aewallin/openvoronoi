@@ -25,7 +25,8 @@
 using namespace ovd::numeric; // sq() chop() determinant()
 
 namespace ovd {
-
+namespace solvers {
+    
 // this solver is called when we want to position a vertex on a SEPARATOR edge
 // a SEPARATOR edge exists between a LineSite and one of its PointSite end-points
 // the input sites are thus s1=LineSite and s2=PointSite  (if arcs are supported in the future then s1=ArcSite is possible)
@@ -65,7 +66,7 @@ namespace ovd {
 //
 //  FIXME: what happens if we get a divide by zero situation ??
 //
-// Separator solver
+/// \brief alternative Separator solver
 class ALTSEPSolver : public Solver {
 public:
 virtual void set_type(int t) {type=t;}
@@ -140,5 +141,5 @@ private:
     int type;
 };
 
-
+} // solvers
 } // ovd

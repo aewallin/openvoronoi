@@ -21,8 +21,7 @@
  *  along with OpenVoronoi.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef LLL_SOLVER_HPP
-#define LLL_SOLVER_HPP
+#pragma once
 
 #include "common/point.hpp"
 #include "common/numeric.hpp"
@@ -30,8 +29,10 @@
 using namespace ovd::numeric; // sq() chop() determinant()
 
 namespace ovd {
-
-/// line-line-line vertex positioner.
+namespace solvers {
+    
+/// \brief line-line-line solver.
+///
 /// solves 3x3 system.
 class LLLSolver : public Solver {
 public:
@@ -103,6 +104,6 @@ int solve( Site* s1, double k1,
 
 };
 
-
+} // solvers
 } // ovd
-#endif
+

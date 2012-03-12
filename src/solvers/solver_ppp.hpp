@@ -28,13 +28,15 @@
 #include <cassert>
 
 #include "solver.hpp"
+#include "site.hpp"
 #include "common/numeric.hpp"
 
 using namespace ovd::numeric; // sq() chop()
 
 namespace ovd {
-
-// templated point-class, so we can use qd_real as the coordinate type.
+namespace solvers {
+    
+/// \brief templated point-class, so we can use qd_real as the coordinate type.
 template<class Scalar>
 struct scalar_pt {
     scalar_pt<Scalar>() : x(0), y(0) {}
@@ -57,7 +59,7 @@ struct scalar_pt {
 };
 
 // with the qd_real number-type we need to_double() to get the solution coordinates as double type.
-
+/// \brief template-specialization for qd_real
 template<>
 struct scalar_pt<qd_real> {
     scalar_pt<qd_real>() : x(qd_real(0)), y(qd_real(0)) {}
@@ -81,7 +83,7 @@ struct scalar_pt<qd_real> {
 
 /// point-point-point vertex positioner based on Sugihara & Iri paper
 template<class Scalar>
-class PPPSolver : public Solver {
+class PPPSolver : public solvers::Solver {
 public:
 
 int solve( Site* s1, Site* s2, Site* s3,  std::vector<Solution>& slns ) {
@@ -131,6 +133,6 @@ int solve( Site* s1, Site* s2, Site* s3,  std::vector<Solution>& slns ) {
 
 };
 
-
+} // solvers
 } // ovd
 #endif

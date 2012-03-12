@@ -50,7 +50,8 @@ typedef std::map<VoronoiVertexType, unsigned int> VertexDegreeMap;
 
 typedef unsigned int HEFace;
                                      
-/// A vertex in the voronoi diagram
+/// \brief A vertex in the voronoi diagram
+///
 /// an object of this type is held in the BGL-graph for each vertex.
 class VoronoiVertex {
 public:

@@ -42,7 +42,7 @@ struct edata {
 typedef std::pair<HEEdge , edata> Edata;
 
 
-// branch-data when we backtract to machine an un-machined branch
+/// branch-data when we backtrack to machine an un-machined branch
 struct branch_point {
     branch_point(Point p, double r, HEEdge e) {
         current_center = p;
@@ -54,10 +54,12 @@ struct branch_point {
     HEEdge next_edge;
 };
 
-// it is the responsibility of a downstream algorithm to lay down a toolpath
-// that machines the area between c2 and c1
-// c1 is the circle that is assumed already cut
-// c2 is the new circle
+/// \brief Maximal Inscribed Circle. A combination of a Point and a clearance-disk radius.
+///
+/// it is the responsibility of a downstream algorithm to lay down a toolpath
+/// that machines the area between c2 and c1
+/// c1 is the circle that is assumed already cut
+/// c2 is the new circle
 struct MIC {
     Point c1,c2;  // center
     double r1,r2; // radius
@@ -118,6 +120,7 @@ protected:
     //int max_mic_count;
 };
 
+/// \brief error-functor for medial_axis_pocket::find_next_u()
 class CutWidthError  {
 public:
     CutWidthError(medial_axis_pocket* ma, HEEdge ed, double wmax, Point cen1, double rad1) 

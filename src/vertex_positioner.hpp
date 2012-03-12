@@ -28,12 +28,14 @@
 
 namespace ovd {
 
-class Solver;
+namespace solvers {
+class Solver; // fwd decl
+}
 
-// predicate for filtering solutions based on t-value being in [tmin,tmax] range
+/// predicate for filtering solutions based on t-value in [tmin,tmax] range
 struct t_filter {
     t_filter(double tmin, double tmax): tmin_(tmin),tmax_(tmax) {}
-    bool operator()(Solution s) { 
+    bool operator()(solvers::Solution s) { 
         double eps=1e-9;
         double tround=s.t;
         if ( fabs(s.t-tmin_) < eps )
@@ -47,10 +49,10 @@ private:
     double tmax_;
 };
 
-// predicate for rejecting out-of-region solutions
+/// predicate for rejecting out-of-region solutions
 struct in_region_filter {
     in_region_filter(Site* s): site_(s) {}
-    bool operator()(Solution s) { 
+    bool operator()(solvers::Solution s) { 
         return !site_->in_region(s.p); 
     }
 private:
@@ -65,37 +67,37 @@ public:
     /// calculate the position of a new voronoi-vertex lying on the given edge.
     /// The new vertex is equidistant to the two sites that defined the edge
     /// and to the new site. 
-    Solution position( HEEdge e, Site* s);
+    solvers::Solution position( HEEdge e, Site* s);
 
     std::vector<double> get_stat() {return errstat;}
-    double dist_error(HEEdge e, const Solution& sl, Site* s3);
+    double dist_error(HEEdge e, const solvers::Solution& sl, Site* s3);
     void solver_debug(bool b);
 private:
-    Solution position(Site* s1, double k1, Site* s2, double k2, Site* s3);
+    solvers::Solution position(Site* s1, double k1, Site* s2, double k2, Site* s3);
     int solver_dispatch(Site* s1, double k1, 
                Site* s2, double k2, 
-               Site* s3, double k3, std::vector<Solution>& slns ); 
+               Site* s3, double k3, std::vector<solvers::Solution>& slns ); 
     bool detect_sep_case(Site* lsite, Site* psite);
 
 // solution-filtering
-    double edge_error(Solution& sl);
-    Point projection_point(Solution& sl);
+    double edge_error(solvers::Solution& sl);
+    Point projection_point(solvers::Solution& sl);
 // geometry-checks
     
-    bool solution_on_edge(Solution& s);
-    bool check_far_circle(Solution& s);
-    bool check_dist(HEEdge e, const Solution& s, Site* s3);
+    bool solution_on_edge(solvers::Solution& s);
+    bool check_far_circle(solvers::Solution& s);
+    bool check_dist(HEEdge e, const solvers::Solution& s, Site* s3);
     bool equal(double d1, double d2);
     
-    Solution desperate_solution(Site* s3);
+    solvers::Solution desperate_solution(Site* s3);
 
 // solvers, to which we dispatch, depending on the input sites
-    Solver* ppp_solver;
-    Solver* lll_solver;
-    Solver* lll_para_solver;
-    Solver* qll_solver;
-    Solver* sep_solver;
-    Solver* alt_sep_solver;
+    solvers::Solver* ppp_solver;
+    solvers::Solver* lll_solver;
+    solvers::Solver* lll_para_solver;
+    solvers::Solver* qll_solver;
+    solvers::Solver* sep_solver;
+    solvers::Solver* alt_sep_solver;
 // DATA
     HEGraph& g; // reference to the VD graph.
     double t_min;

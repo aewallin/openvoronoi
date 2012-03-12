@@ -16,15 +16,16 @@
  *  You should have received a copy of the GNU General Public License
  *  along with OpenVoronoi.  If not, see <http://www.gnu.org/licenses/>.
 */
-
 #pragma once
 
 #include "common/point.hpp"
 
 namespace ovd {
-
-// a new vd-vertex position solution
-// includes the offset-distamce t, and the offset direction k3
+namespace solvers {
+    
+/// \brief a new vertex position solution (position, offset-distance, side)
+///
+/// includes the offset-distamce t, and the offset direction k3
 struct Solution {
     Solution(Point pt, double tv, double k) : p(pt), t(tv), k3(k) {}
     Point p;
@@ -32,7 +33,5 @@ struct Solution {
     double k3;
 };
 
-
-
-
-} //end namespace
+} // solvers
+} //end ovd namespace

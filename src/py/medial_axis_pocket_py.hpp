@@ -26,7 +26,7 @@
 namespace ovd
 {
 
-// python wrapper for medial_axis_pocket
+/// python wrapper for medial_axis_pocket
 class medial_axis_pocket_py : public medial_axis_pocket {
 public:
     medial_axis_pocket_py(HEGraph& gi): medial_axis_pocket(gi) {}

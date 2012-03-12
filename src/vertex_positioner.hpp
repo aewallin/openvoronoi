@@ -63,9 +63,7 @@ class VertexPositioner {
 public:
     VertexPositioner(HEGraph& gi);
     virtual ~VertexPositioner();
-    /// calculate the position of a new voronoi-vertex lying on the given edge.
-    /// The new vertex is equidistant to the two sites that defined the edge
-    /// and to the new site. 
+
     solvers::Solution position( HEEdge e, Site* s);
 
     std::vector<double> get_stat() {return errstat;}

@@ -45,25 +45,25 @@ VoronoiVertex::VoronoiVertex() {
     init();
 }
 
-/// construct vertex at position p with type t
+/// construct vertex at position Point \a p with VoronoiVertexStatus \a st
 VoronoiVertex::VoronoiVertex( Point p, VoronoiVertexStatus st) {
     init(p,st);
 }
     
+/// ctor with given status and type
 VoronoiVertex::VoronoiVertex( Point p, VoronoiVertexStatus st, VoronoiVertexType t) {
     init(p,st,t);
 }
-VoronoiVertex::VoronoiVertex( Point p, VoronoiVertexStatus st, VoronoiVertexType t, Point initDist) 
-{
+/// ctor with initial apex Point
+VoronoiVertex::VoronoiVertex( Point p, VoronoiVertexStatus st, VoronoiVertexType t, Point initDist) {
     init(p,st,t,initDist);
 }
-
-VoronoiVertex::VoronoiVertex( Point p, VoronoiVertexStatus st, VoronoiVertexType t, Point initDist, double lk3) 
-{   
+/// ctor with initial k3-value
+VoronoiVertex::VoronoiVertex( Point p, VoronoiVertexStatus st, VoronoiVertexType t, Point initDist, double lk3) {   
     init(p,st,t,initDist,lk3);
 }
-VoronoiVertex::VoronoiVertex( Point p, VoronoiVertexStatus st, VoronoiVertexType t, double init_radius)
-{
+/// ctor with initial clearance-disk radius
+VoronoiVertex::VoronoiVertex( Point p, VoronoiVertexStatus st, VoronoiVertexType t, double init_radius) {
     init(p,st,t);
     r = init_radius;
 }
@@ -79,27 +79,27 @@ void VoronoiVertex::init() {
     max_error = 0;
 }
 
+/// set position and status
 void VoronoiVertex::init(Point p, VoronoiVertexStatus st) {
     init();
     position=p;
     status=st;
 }
-
+/// set position, status and type
 void VoronoiVertex::init(Point p, VoronoiVertexStatus st, VoronoiVertexType t) {
     init(p,st);
     type = t;
 }
-
+/// set position, status, type, and clearance-disk through givem apex-point
 void VoronoiVertex::init(Point p, VoronoiVertexStatus st, VoronoiVertexType t, Point initDist) {
     init(p,st,t);
     init_dist(initDist);
 }
-
+/// set position, status, type, clerance-disk radius, and k3-side
 void VoronoiVertex::init(Point p, VoronoiVertexStatus st, VoronoiVertexType t, Point initDist, double lk3) {
     init(p,st,t,initDist);
     k3 = lk3;
 }
-
 
 /// set in_queue false, and status to UNDECIDED
 void VoronoiVertex::reset() {

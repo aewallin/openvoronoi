@@ -63,7 +63,11 @@ VertexPositioner::~VertexPositioner() {
     //std::cout << "DONE.\n";
 }
 
-// calculate the position of a new vertex on the given edge e
+/// \brief position a new vertex on given HEEdge \a e when inserting the new Site \a s3
+///
+/// calculate the position of a new voronoi-vertex lying on the given edge.
+/// The new vertex is equidistant to the two sites that defined the edge
+/// and to the new site. 
 // the edge e holds information about which face it belongs to.
 // each face holds information about which site created it
 // so the three sites defining the position of the vertex are:

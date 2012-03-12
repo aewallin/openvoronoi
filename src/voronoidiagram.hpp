@@ -77,13 +77,20 @@ typedef std::priority_queue< VertexDetPair , std::vector<VertexDetPair>, abs_com
 /// used in add_edge() for storing information related to
 /// the new edge.
 struct EdgeData {
+    /// edge prior to v1
     HEEdge v1_prv;
-    HEVertex v1; // NEW edge source
+    /// NEW edge source 
+    HEVertex v1;
+    /// edge following v1 
     HEEdge v1_nxt;
+    /// edge propr to v2 
     HEEdge v2_prv;
-    HEVertex v2; // NEW edge target
+    /// NEW edge target 
+    HEVertex v2;
+    /// edge following v2 
     HEEdge v2_nxt;
-    HEFace f;
+    /// face of v1 and v2 
+    HEFace f; 
 };
 
 /// \brief Voronoi diagram.
@@ -103,9 +110,7 @@ public:
     VoronoiDiagram(double far, unsigned int n_bins);
     /// dtor
     virtual ~VoronoiDiagram();
-
     int insert_point_site(const Point& p, int step=0);
-
     bool insert_line_site(int idx1, int idx2, int step=99); // default step should make algorithm run until the end!
     /// return the far radius
     double get_far_radius() const {return far_radius;}
@@ -115,31 +120,19 @@ public:
     int num_line_sites() const {return num_lsites;}
     /// return number of voronoi-vertices
     int num_vertices() const { return g.num_vertices()-num_point_sites(); }
+    /// return number of faces in graph
     int num_faces() const { return g.num_faces(); }
     int num_split_vertices();
-    /// string repr
+    
     std::string print() const;
+    /// reset vertex index count \todo not very elegant...
     static void reset_vertex_count() { VoronoiVertex::reset_count(); }
-    void debug_on() {debug=true;}
-    bool check();
-    HEGraph& get_graph_reference() {return g;}
-    
-    void filter( Filter* flt) {
-        flt->set_graph(&g);
-        BOOST_FOREACH(HEEdge e, g.edges() ) {
-            if ( ! (*flt)(e) )
-                g[e].valid = false;
-        }
-    }
-    
-    void filter_reset() { // this sets valid=true for all edges 
-        BOOST_FOREACH(HEEdge e, g.edges() ) {
-            g[e].valid = true;
-        }
-    }
-
+    /// turn on debug output
+    void debug_on() {debug=true;} 
+    bool check(); 
+    void filter( Filter* flt);
+    void filter_reset();
 protected:
-    /// initialize the diagram with three generators
     void initialize();
     HEVertex   find_seed_vertex(HEFace f, Site* site);
     EdgeVector find_in_out_edges(); 
@@ -147,9 +140,7 @@ protected:
     EdgeVector find_split_edges(HEFace f, Point pt1, Point pt2);
     bool       find_split_vertex(HEFace f, HEVertex& v);
     std::pair<HEVertex,HEVertex> find_endpoints(int idx1, int idx2);
-
     bool null_vertex_target( HEVertex v , HEVertex& trg);
-    
     void augment_vertex_set( Site* site);        
     bool predicate_c4(HEVertex v);
     bool predicate_c5(HEVertex v);
@@ -158,20 +149,15 @@ protected:
     void mark_vertex(HEVertex& v,  Site* site); 
     void   add_vertices( Site* site );
     HEFace add_face(Site* site);
-    
     void   add_edges(HEFace new_f1, HEFace f);        
     void   add_edges(HEFace new_f1, HEFace f, HEFace new_f2, std::pair<HEVertex,HEVertex> seg);
     void   add_edge(EdgeData ed, HEFace new1, HEFace new2=0);
-    
     void   add_separator(HEFace f, HEFace nf, boost::tuple<HEEdge, HEVertex, HEEdge,bool> target, HEVertex endp, Site* s1, Site* s2);
     void   add_split_vertex(HEFace f, Site* s);
-    
     boost::tuple<HEVertex,HEFace,HEVertex,HEVertex,HEFace> find_null_face(HEVertex start, HEVertex other, Point l);
     boost::tuple<HEEdge,HEVertex,HEEdge,bool> find_separator_target(HEFace f, HEVertex endp);
-
     std::pair<HEVertex,HEFace> process_null_edge(Point dir, HEEdge next_edge , bool k3, bool next_prev);
     HEVertex add_separator_vertex(HEVertex endp, HEEdge edge, Point sep_dir);
-    
     void repair_face( HEFace f );
     void repair_face( HEFace f , std::pair<HEVertex,HEVertex> segs,
                                  std::pair<HEFace,HEFace> nulled_faces,
@@ -190,8 +176,11 @@ protected:
 // DATA
     /// turn debug output on/off
     bool debug;
+    /// type for vertex-index to vertex-descriptor map
     typedef std::map<int,HEVertex> VertexMap;
+    /// associate vertex index with vertex descriptor
     typedef std::pair<int,HEVertex> VertexMapPair;
+    /// map from int handles to vertex-descriptors, used in insert_line_site()
     VertexMap vertex_map;
     /// queue of vertices to be processed
     VertexQueue vertexQueue;
@@ -219,12 +208,15 @@ private:
 /// for passing to numerical boost::toms748 root-finding algorithm
 class SplitPointError {
 public:
+    /// \param gi graph
+    /// \param split_edge the edge on which we want to position a SPLIT vertex
+    /// \param pt1 first point of split-line
+    /// \param pt2 second point of split-line
     SplitPointError(HEGraph& gi, HEEdge split_edge, Point pt1, Point pt2) :
     g(gi),  edge(split_edge), p1(pt1), p2(pt2)
     {}
     
-    // find point on edge at t-value
-    // compute a signed distance to the pt1-pt2 line
+    /// \return signed distance to the pt1-pt2 line from edge-point at given offset \a t
     double operator()(const double t) {
         Point p = g[edge].point(t);
         // line: pt1 + u*(pt2-pt1) = p
@@ -242,9 +234,13 @@ public:
         return sign*dist;
     }
 private:
+    /// reference to vd-graph
     HEGraph& g;
+    /// the HEEdge on which we position the new SPLIT vertex
     HEEdge edge;
+    /// first point of the split-line
     Point p1;
+    /// second point of the split-line
     Point p2;
 };
 

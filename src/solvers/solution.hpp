@@ -27,9 +27,15 @@ namespace solvers {
 ///
 /// includes the offset-distamce t, and the offset direction k3
 struct Solution {
+    /// \param pt vertex position
+    /// \param tv clearance-disk radius
+    /// \param k offset direction
     Solution(Point pt, double tv, double k) : p(pt), t(tv), k3(k) {}
+    /// position
     Point p;
+    /// clearance-disk radius
     double t;
+    /// offfset direction to third adjacent Site
     double k3;
 };
 

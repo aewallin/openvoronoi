@@ -39,17 +39,19 @@ namespace solvers {
 template<class Scalar>
 struct scalar_pt {
     scalar_pt<Scalar>() : x(0), y(0) {}
+    /// \param xi x coordinate
+    /// \param yi y coordinate
     scalar_pt<Scalar>(Scalar xi, Scalar yi) : x(xi), y(yi) {}
     
+    /// x coordinate
     Scalar x;
+    /// y coordinate
     Scalar y;
-    double getx() {
-        return x;
-    }
-    double gety() {
-        return y;
-    }
-    
+    /// return x coordinate
+    double getx() { return x; }
+    /// return y coordinate
+    double gety() { return y; }
+    /// assignment operator
     scalar_pt<Scalar> &operator=(const Point& p) {
         x = p.x;
         y = p.y;
@@ -62,16 +64,19 @@ struct scalar_pt {
 template<>
 struct scalar_pt<qd_real> {
     scalar_pt<qd_real>() : x(qd_real(0)), y(qd_real(0)) {}
+    /// \param xi x coordinate
+    /// \param yi y coordinate
     scalar_pt<qd_real>(qd_real xi, qd_real yi) : x(xi), y(yi) {}
     
+    /// x coordinate
     qd_real x;
+    /// y coordinate
     qd_real y;
-    double getx() {
-        return to_double(x);
-    }
-    double gety() {
-        return to_double(y);
-    }
+    /// return x coordinate as double
+    double getx() { return to_double(x); }
+    /// return y coordinate as double
+    double gety() { return to_double(y); }
+    /// assignment
     scalar_pt<qd_real> &operator=(const Point& p) {
         x = p.x;
         y = p.y;

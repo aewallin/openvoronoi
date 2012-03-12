@@ -474,10 +474,15 @@ public:
     virtual std::string str() const {return "ArcSite";}
 private:
     ArcSite() {} // don't use!
+    /// start Point of arc
     Point _start;
+    /// end Point of arc
     Point _end;
+    /// center of arc
     Point _center;
+    /// CW or CCW direction flag
     bool _dir; // CW or CCW
+    /// radius of arc
     double _radius; // redundant?
 };
 

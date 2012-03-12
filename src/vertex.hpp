@@ -56,24 +56,23 @@ typedef unsigned int HEFace;
 class VoronoiVertex {
 public:
     VoronoiVertex();
-    /// construct vertex at position p with type t
     VoronoiVertex( Point p, VoronoiVertexStatus st);
-    /// vertex with given position, status, and type
     VoronoiVertex( Point p, VoronoiVertexStatus st, VoronoiVertexType t);
     VoronoiVertex( Point p, VoronoiVertexStatus st, VoronoiVertexType t, double init_radius);
     VoronoiVertex( Point pos, VoronoiVertexStatus st, VoronoiVertexType t, Point initDist);
     VoronoiVertex( Point pos, VoronoiVertexStatus st, VoronoiVertexType t, Point initDist, double k3);
     
     virtual ~VoronoiVertex() {}
-    /// reset status
+    /// reset vertex status
     void reset();
     friend class VoronoiDiagramChecker;
     /// initialize clerance-disk
     void init_dist(const Point& p) { r = dist(p); }
     /// return distance to a point from this vertex
     double dist(const Point& p) const { return (position-p).norm(); }
-    /// return clearance-disk radius
+    /// set clearance-disk to zero
     void zero_dist() {r=0;}
+    /// return clearance disk-radius
     double dist() const { return r; }
     /// in-circle predicate 
     double in_circle(const Point& p) const {
@@ -82,23 +81,34 @@ public:
         //else
             return dist(p) - r; 
     }
+    /// reset the index count
     static void reset_count() { count = 0; }
 // DATA
+    /// index of vertex
     int index;
     /// vertex status. when the incremental algorithm runs
     /// vertices are marked: undecided, in, out, or new
     VoronoiVertexStatus status;
+    /// The type of the vertex
     VoronoiVertexType type;
+    
+    /// \todo what is this? remove?
     double max_error;
+    
+    /// flag for indicating wether vertex is in the vertexQueue
     bool in_queue;
     /// the position of the vertex
     Point position;
+    /// set alfa
     void set_alfa(const Point& dir);
-
-    double k3; // the offset-direction {-1,+1} to the newly inserted site.
-    double alfa; // angle for a null-vertex
+    /// the offset-direction {-1,+1} to the newly inserted site.
+    double k3; 
+    /// angle for a null-vertex
+    double alfa;
+    /// if this is a null-face, a handle to the null-face 
     HEFace null_face;
-    HEFace face; // the face of this vertex, if the vertex is a point-site
+    /// the face of this vertex, if the vertex is a point-site
+    HEFace face; 
 protected:
     void init();
     void init(Point p, VoronoiVertexStatus st);

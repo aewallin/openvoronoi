@@ -29,7 +29,7 @@
 namespace ovd
 {
 
-/// \brief filter for retaining voronoi-diagram inside a polygon
+/// \brief Filter for retaining voronoi-diagram inside a polygon
 ///
 /// this filter sets the valid-property of edges
 /// all interior edges are marked valid=true
@@ -39,6 +39,8 @@ namespace ovd
 /// islands within the polygon should be specified in CCW order
 class polygon_interior_filter : public Filter {
 public:
+    /// \brief create a polygon interior Filter with given \a side
+    /// \param side set true (false) for polygons inserted in CW (CCW) order and islands inserted in CCW (CW) order.
     polygon_interior_filter( bool side=true) : _side(side) { }
     
     // determine if an edge is valid or not

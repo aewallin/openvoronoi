@@ -40,7 +40,7 @@ public:
 
 int solve( Site* s1, double k1, 
                 Site* s2, double k2, 
-                Site* s3, double k3, std::vector<Solution>& solns ) {
+                Site* s3, double k3, std::vector<Solution>& slns ) {
     if (debug) 
         std::cout << "QLLSolver.\n";
     
@@ -71,15 +71,16 @@ int solve( Site* s1, double k1,
     // x and y in terms of t
     // y and t in terms of x
     // t and x in terms of y
-    qll_solver( lins, 0, 1, 2, quads[0], k3, solns);
-    qll_solver( lins, 2, 0, 1, quads[0], k3, solns);
-    qll_solver( lins, 1, 2, 0, quads[0], k3, solns);
+    qll_solver( lins, 0, 1, 2, quads[0], k3, slns);
+    qll_solver( lins, 2, 0, 1, quads[0], k3, slns);
+    qll_solver( lins, 1, 2, 0, quads[0], k3, slns);
     
     return solns.size();
 }
 
 
 private:
+/// \brief qll solver
 // l0 first linear eqn
 // l1 second linear eqn
 // xi,yi,ti  indexes to shuffle around

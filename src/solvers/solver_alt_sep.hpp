@@ -138,6 +138,9 @@ int solve( Site* s1, double k1,
 }
 
 private:
+    /// separator case type.
+    /// - type = 0 means l3 / p1 form a separator
+    /// - type = 1 means l3 / p2 form a separator
     int type;
 };
 

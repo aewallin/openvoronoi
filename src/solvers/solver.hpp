@@ -31,22 +31,40 @@ namespace solvers {
 
 /// \brief abstract base-class for voronoi vertex position solvers
 ///
-/// the input to the solver is three Sites (s1,s2,s3) and three offset-directions (k1,k2,k3) .
+/// The input to the solver is three Sites (s1,s2,s3) and three offset-directions (k1,k2,k3).
+/// The optput is a vector with one or more Solution.
 class Solver {
 public:
+    /// \brief solve for position of VoronoiVertex with given adjacent sites and directions
+    ///
+    /// \param s1 first adjacent Site
+    /// \param k1 direction from \a s1 to new VoronoiVertex
+    /// \param s2 second adjacent Site
+    /// \param k2 direction from \a s2 to new VoronoiVertex
+    /// \param s3 third adjacent Site
+    /// \param k3 direction from \a s3 to new VoronoiVertex
+    /// \param slns Solution vector, will be updated by Solver
     virtual int solve(Site* s1, double k1, 
                            Site* s2, double k2, 
                            Site* s3, double k3, std::vector<Solution>& slns ) {return 0;}
     
     // this is used by PPPSolver, when no k-values are needed
+    /// \brief solve for position of VoronoiVertex with given adjacent sites. This is used by PPPSolver, when no k-values are needed.
+    ///
+    /// \param s1 first adjacent Site
+    /// \param s2 second adjacent Site
+    /// \param s3 third adjacent Site
+    /// \param slns Solution vector, will be updated by Solver
     virtual int solve(Site* s1, 
                            Site* s2,  
                            Site* s3,  std::vector<Solution>& slns ) {return 0;}
     
-    // used by alt_sep_solver
+    /// used by alt_sep_solver
     virtual void set_type(int) {}
+    /// set the debug mode to \a b
     void set_debug(bool b) {debug=b;}
 protected:
+    /// flag for debug output
     bool debug;
 };
 

@@ -1102,7 +1102,7 @@ void VoronoiDiagram::add_split_vertex(HEFace f, Site* s) {
                 std::cout << " trg=" << g[split_trg].index << "("<< g[split_trg].dist() << ") \n";
                 std::cout << "is_right src=" << g[split_src].position.is_right(pt1,pt2) << "  trg="<< g[split_trg].position.is_right(pt1,pt2) << "\n";
             }
-            SplitPointError errFunctr( get_graph_reference(), split_edge, pt1, pt2); // error functor
+            SplitPointError errFunctr( g, split_edge, pt1, pt2); // error functor
             typedef std::pair<double, double> Result;
             boost::uintmax_t max_iter=500;
             boost::math::tools::eps_tolerance<double> tol(64); // bits of tolerance?

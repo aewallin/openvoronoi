@@ -75,7 +75,7 @@ int solve( Site* s1, double k1,
     qll_solver( lins, 2, 0, 1, quads[0], k3, slns);
     qll_solver( lins, 1, 2, 0, quads[0], k3, slns);
     
-    return solns.size();
+    return slns.size();
 }
 
 

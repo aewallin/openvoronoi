@@ -84,7 +84,7 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         .def("filterReset", &VoronoiDiagram_py::filter_reset)
         .def("filter_graph", &VoronoiDiagram_py::filter) // "filter" is a built-in function in Python!
         .def("getFaceStats", &VoronoiDiagram_py::getFaceStats)
-        .def("getGraph", &VoronoiDiagram_py::get_graph_reference, bp::return_value_policy<bp::reference_existing_object>())
+        //.def("getGraph", &VoronoiDiagram_py::get_graph_reference, bp::return_value_policy<bp::reference_existing_object>())
     ;
     
     bp::enum_<VoronoiVertexStatus>("VoronoiVertexStatus")

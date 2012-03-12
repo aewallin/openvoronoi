@@ -123,6 +123,8 @@ public:
     /// return number of faces in graph
     int num_faces() const { return g.num_faces(); }
     int num_split_vertices();
+    /// return reference to graph \todo not elegant. only used by vd2svg ?
+    HEGraph& get_graph_reference() {return g;}
     
     std::string print() const;
     /// reset vertex index count \todo not very elegant...

@@ -66,6 +66,9 @@ if (CMAKE_BUILD_TYPE MATCHES "Debug")
     MESSAGE(STATUS " CMAKE_CXX_FLAGS_DEBUG = " ${CMAKE_CXX_FLAGS_DEBUG})
 endif (CMAKE_BUILD_TYPE MATCHES "Debug")
 
+option(BUILD_DOC
+  "Build doxygen documentation? " ON)
+  
 #
 # this figures out the Python include directories and adds them to the
 # header file search path
@@ -263,6 +266,9 @@ MESSAGE(STATUS "Python libraries will be installed to: " ${Python_site_packages}
 
 # tests
 include(${CMAKE_SOURCE_DIR}/test/ovd_tests.cmake)
+
+# doxygen documentation
+include(doxygen.cmake)
 
 # "make package" stuff
 execute_process(

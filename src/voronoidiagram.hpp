@@ -16,8 +16,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with OpenVoronoi.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef VORONOI_DIAGRAM_HPP
-#define VORONOI_DIAGRAM_HPP
+#pragma once
 
 #include <queue>
 #include <set>
@@ -32,14 +31,13 @@
  *
  * \section intro_sec Introduction
  *
- * OpenVoronoi is a c++ library with python bindings for calculating 2D voronoi-diagrams of point, line-segment, and circular-arc(not implement yet!) sites.
+ * OpenVoronoi is a c++ library with python bindings for calculating 2D voronoi-diagrams of point, 
+ * line-segment, and circular-arc(not implement yet!) sites.
  * An incremental topology-oriented algorithm is used.
  * 
- * \section install_sec Installation
+ * See github for build/install instructions https://github.com/aewallin/openvoronoi
  *
- * \subsection step1 subsection
  *
- * etc...
  */
  
 
@@ -250,6 +248,6 @@ private:
     Point p2;
 };
 
-} // end namespace
-#endif
-// end voronoidiagram.h
+} // end ovd namespace
+
+// end voronoidiagram.hpp

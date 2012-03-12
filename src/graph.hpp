@@ -17,8 +17,7 @@
  *  along with OpenVoronoi.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef VODI_G_HPP
-#define VODI_G_HPP
+#pragma once
 
 #include <vector>
 
@@ -106,7 +105,4 @@ typedef std::vector<HEVertex> VertexVector;
 typedef std::vector<HEFace>   FaceVector;
 typedef std::vector<HEEdge>   EdgeVector;  
 
-} // end namespace
-#endif
-
-
+} // end ovd namespace

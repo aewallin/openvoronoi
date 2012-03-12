@@ -16,8 +16,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with OpenVoronoi.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef HEDI_H
-#define HEDI_H
+#pragma once
 
 #include <vector>
 #include <list>
@@ -648,6 +647,4 @@ void print_vertices(VertexVector& q) {
 
 
 } // end hedi namespace
-
-#endif
 // end halfedgediagram.hpp

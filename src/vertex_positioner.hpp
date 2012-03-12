@@ -17,8 +17,7 @@
  *  along with OpenVoronoi.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef VERTEX_POSITIONER_HPP
-#define VERTEX_POSITIONER_HPP
+#pragma once
 
 #include <qd/qd_real.h> // http://crd.lbl.gov/~dhbailey/mpdist/
 
@@ -149,4 +148,4 @@ private:
 };
 
 }
-#endif
+

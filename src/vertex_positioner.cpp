@@ -40,12 +40,12 @@ namespace ovd {
 
 
 VertexPositioner::VertexPositioner(HEGraph& gi): g(gi) {
-    ppp_solver = new solvers::PPPSolver<qd_real>();
     //ppp_solver = new PPPSolver<double>(); // faster, but inaccurate
-    lll_solver = new solvers::LLLSolver();
-    qll_solver = new solvers::QLLSolver();
-    sep_solver = new solvers::SEPSolver();
-    alt_sep_solver = new solvers::ALTSEPSolver();
+    ppp_solver =      new solvers::PPPSolver<qd_real>();
+    lll_solver =      new solvers::LLLSolver();
+    qll_solver =      new solvers::QLLSolver();
+    sep_solver =      new solvers::SEPSolver();
+    alt_sep_solver =  new solvers::ALTSEPSolver();
     lll_para_solver = new solvers::LLLPARASolver();
     errstat.clear();
 }

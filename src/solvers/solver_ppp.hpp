@@ -21,8 +21,7 @@
  *  along with OpenVoronoi.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PPP_SOLVER_HPP
-#define PPP_SOLVER_HPP
+#pragma once
 
 #include <vector>
 #include <cassert>
@@ -135,4 +134,3 @@ int solve( Site* s1, Site* s2, Site* s3,  std::vector<Solution>& slns ) {
 
 } // solvers
 } // ovd
-#endif

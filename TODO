@@ -87,7 +87,7 @@ Tests
 -- http://www.cs.uiuc.edu/~jeffe/open/randompoly.html
 
 Documentation
-- improve doxygen documentation (can we put Asymptote/SVG drawings in the doxygen-generated html?)
+- can we put Asymptote/SVG drawings in the doxygen-generated html?
 - set up github homepage with gallery of output, doxygen documentation, download counters, etc.
 
 Packaging/Building etc 
@@ -100,6 +100,7 @@ Packaging/Building etc
   so that the size of the "openvoronoi" package is as small as possible (for non developers who do not need to run tests)
 
 DONE:
+- 2012-03-12 doxygen documentation now works.
 - 2012-02-10 hilbert curve demo-script
 - 2012-02-01 chain_5_collinear2.py exposes a case where a desperate solution is returned, because we fail to detect this
   as a case for the sep_solver.

@@ -21,8 +21,7 @@
  *  along with OpenVoronoi.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef QLL_SOLVER_HPP
-#define QLL_SOLVER_HPP
+#pragma once
 
 #include <qd/qd_real.h> // http://crd.lbl.gov/~dhbailey/mpdist/
 
@@ -176,4 +175,3 @@ int qll_solve( qd_real a0, qd_real b0, qd_real c0, qd_real d0,
 
 } // solvers
 } // ovd
-#endif

@@ -16,9 +16,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with OpenVoronoi.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef OFFSET_HPP
-#define OFFSET_HPP
-
 #pragma once
 
 #include <string>
@@ -229,6 +226,5 @@ private:
 };
 
 
-} // end namespace
-#endif
+} // end ovd namespace
 // end file offset.hpp

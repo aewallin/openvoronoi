@@ -17,8 +17,7 @@
  *  along with OpenCAMlib.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FACEGRID_H
-#define FACEGRID_H
+#pragma once
 
 #include <set>
 #include <vector>
@@ -82,6 +81,5 @@ class FaceGrid {
         FaceSetContainer face_set;
 };
 
-}
-#endif
+} // ovd
 // end facegrid.h

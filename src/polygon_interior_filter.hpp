@@ -95,6 +95,5 @@ private:
     bool _side;
 };
 
-} // end namespace
-
+} // end ovd namespace
 // end file polygon_interior.hpp

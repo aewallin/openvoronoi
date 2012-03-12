@@ -19,27 +19,22 @@ https://groups.google.com/forum/?hl=en#!forum/opencamlib
 There is a gallery of voronoi diagrams produced with OpenVoronoi at
 https://picasaweb.google.com/106188605401091280402/OpenVoronoiExamples
 
-Dependencies
-python
-git (required only for the version-string)
+Required Dependencies
 cmake
-Boost graph library
-Boost python (if python bindings are built)
-libQD (a quad-precision arithmetic library). Available as package 
-"liqd-dev" on ubuntu. See "http://crd.lbl.gov/~dhbailey/mpdist/
+libqd-dev             http://crd.lbl.gov/~dhbailey/mpdist/
+Boost graph library   
 
-most python-examples use VTK and the VTK python bindings to visualize
-the input geometry and the voronoi diagram. On ubuntu these are available 
-in the packages
-- libvtk (Ubuntu 11.10 has libvtk5.6)
-- python-vtk
-
-many examples use truetype-tracer (python module "ttt") for generating input data.
-https://github.com/aewallin/truetype-tracer
-
-some examples and tests use the 2-opt random polygon generator from CGAL.
-There is a boost-python module "rpg" which is used by these scripts.
-https://github.com/aewallin/CGAL_RPG
+Optional Dependencies
+git            (required only for the version-string)
+python         (if python bindings are built/used)
+Boost python   (if python bindings are built)
+doxygen        (for building documentation)
+asymptote      (white-paper figures)
+lyx            (white-paper)
+libvtk         (many python-scripts use VTK for visualization)
+python-vtk     (VTK python bindings)
+ttt            https://github.com/aewallin/truetype-tracer
+rpg            https://github.com/aewallin/CGAL_RPG
 
 Build/Install instructions
 
@@ -56,6 +51,10 @@ $ cd bld
 $ cmake ../src
 $ make
 $ sudo make install
+
+Documentation
+Doxygen documentation can be built with "make doc"
+A white-paper on the algorithm/solvers in Lyx format is located in /doc
 
 Tests
 There are a few python-scrits in src/test/ that can be run with CTest.
@@ -79,7 +78,7 @@ Contributing
 See the TODO file. Fork the github repo, create a feature branch, commit yor 
 changes, test. Make a short description of your changes and create a pull request.
 Follow the coding-style of the existing code. One fix/feature per pull request.
-Contributed code must comply with the GPL.
+Contributed code must comply with the GPL. Provide short doxygen-formatted documentation in the code.
 
 Other voronoi-diagram codes
 

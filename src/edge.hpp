@@ -44,8 +44,8 @@ typedef boost::adjacency_list_traits<OUT_EDGE_CONTAINER,
 typedef unsigned int HEFace;
 
 /// edge type 
-enum VoronoiEdgeType {
-    LINE,          /*!< Line edge between PontSite and PointSite */ 
+enum EdgeType {
+    LINE,          /*!< Line edge between PointSite and PointSite */ 
     LINELINE,      /*!< Line edge between LineSite and LineSite */ 
     PARA_LINELINE, /*!< Line edge between LineSite and LineSite (parallel case) */ 
     OUTEDGE,       /*!< special outer edge set by initialize() */ 
@@ -87,7 +87,7 @@ public:
     bool has_null_face;
     
     double k; // offset-direction from the adjacent site, either +1 or -1
-    VoronoiEdgeType type;
+    EdgeType type;
     
     // the edge-parametrization. see point(t) for how these are used to produce (x,y) points on an edge
     boost::array<double,8> x;

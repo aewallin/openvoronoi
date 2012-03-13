@@ -37,7 +37,7 @@ enum VertexStatus {
 };
 
 /// This is the permanent type of a vertex in the diagram. 
-enum VoronoiVertexType {
+enum VertexType {
     OUTER,      /*!< OUTER vertices are special vertices added in init(), should have degree==4 */
     NORMAL,     /*!< NORMAL are normal voronoi-vertices, should have degree==6  (degree 3 graph with double-edges) */
     POINTSITE,  /*!< POINTSITE are point sites, should have degree==0 */
@@ -49,7 +49,7 @@ enum VoronoiVertexType {
 
 /// A map of this type is used by VoronoiDiagramChecker to check that all vertices
 /// have the expected (correct) degree (i.e. number of edges)
-typedef std::map<VoronoiVertexType, unsigned int> VertexDegreeMap;
+typedef std::map<VertexType, unsigned int> VertexDegreeMap;
 /// face-descriptor
 typedef unsigned int HEFace;
                                      
@@ -60,10 +60,10 @@ class VoronoiVertex {
 public:
     VoronoiVertex();
     VoronoiVertex( Point p, VertexStatus st);
-    VoronoiVertex( Point p, VertexStatus st, VoronoiVertexType t);
-    VoronoiVertex( Point p, VertexStatus st, VoronoiVertexType t, double init_radius);
-    VoronoiVertex( Point pos, VertexStatus st, VoronoiVertexType t, Point initDist);
-    VoronoiVertex( Point pos, VertexStatus st, VoronoiVertexType t, Point initDist, double k3);
+    VoronoiVertex( Point p, VertexStatus st, VertexType t);
+    VoronoiVertex( Point p, VertexStatus st, VertexType t, double init_radius);
+    VoronoiVertex( Point pos, VertexStatus st, VertexType t, Point initDist);
+    VoronoiVertex( Point pos, VertexStatus st, VertexType t, Point initDist, double k3);
     
     virtual ~VoronoiVertex() {}
     /// reset vertex status
@@ -93,7 +93,7 @@ public:
     /// vertices are marked: undecided, in, out, or new
     VertexStatus status;
     /// The type of the vertex
-    VoronoiVertexType type;
+    VertexType type;
     
     /// \todo what is this? remove?
     double max_error;
@@ -115,9 +115,9 @@ public:
 protected:
     void init();
     void init(Point p, VertexStatus st);
-    void init(Point p, VertexStatus st, VoronoiVertexType t);
-    void init(Point p, VertexStatus st, VoronoiVertexType t, Point initDist);
-    void init(Point p, VertexStatus st, VoronoiVertexType t, Point initDist, double k3);
+    void init(Point p, VertexStatus st, VertexType t);
+    void init(Point p, VertexStatus st, VertexType t, Point initDist);
+    void init(Point p, VertexStatus st, VertexType t, Point initDist, double k3);
     /// global vertex count
     static int count; // hold this in hedigraph instead?
     /// map for checking topology correctness

@@ -98,7 +98,7 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         .value("UNDECIDED", UNDECIDED)
         .value("NEW", NEW)
     ;
-    bp::enum_<VoronoiVertexType>("VoronoiVertexType")
+    bp::enum_<VertexType>("VertexType")
         .value("OUTER", OUTER)   
         .value("NORMAL", NORMAL)
         .value("POINTSITE", POINTSITE)
@@ -111,7 +111,7 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         .value("INCIDENT", INCIDENT)
         .value("NONINCIDENT", NONINCIDENT)
     ;
-    bp::enum_<VoronoiEdgeType>("VoronoiEdgeType")
+    bp::enum_<EdgeType>("EdgeType")
         .value("LINE", LINE)
         .value("LINELINE", LINELINE)
         .value("PARA_LINELINE", PARA_LINELINE)

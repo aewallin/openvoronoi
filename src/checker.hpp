@@ -16,9 +16,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with OpenVoronoi.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef VODI_CHECK_H
-#define VODI_CHECK_H
-
+#pragma once
 #include "graph.hpp"
 
 namespace ovd {
@@ -28,6 +26,7 @@ class VoronoiDiagram;
 /// this class provides sanity-checks for the VoronoiDiagram class
 class VoronoiDiagramChecker {
 public:
+    /// \param gi input graph
     VoronoiDiagramChecker(HEGraph& gi) : g(gi) {}
     ~VoronoiDiagramChecker() {}
     /// sanity-check for the diagram, calls other sanity-check functions
@@ -51,10 +50,9 @@ public:
     bool check_edge(HEEdge e) const ;
     
 private:
-    HEGraph& g;
-    //VoronoiDiagram* vd;
+    HEGraph& g; ///< vd-graph
 };
 
-} // end namespace
-#endif
+} // end ovd namespace
+
 // end voronoidiagram_checker.h

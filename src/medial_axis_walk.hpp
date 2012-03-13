@@ -31,31 +31,34 @@ namespace ovd
 
 /// \brief Medial-axis point and associated clearance-disc radius.
 struct MedialPoint {
-    Point p;
-    double clearance_radius;
+    Point p; ///< position
+    double clearance_radius; ///< clearance-disk radius
+    /// \param pi position
+    /// \param r radius
     MedialPoint(Point pi, double r): p(pi), clearance_radius(r) {}
 };
-typedef std::list<MedialPoint> MedialPointList;
-typedef std::list<MedialPointList> MedialChain;
-typedef std::list<MedialChain> MedialChainList;
+typedef std::list<MedialPoint> MedialPointList; ///< list of points on the medial-axis
+typedef std::list<MedialPointList> MedialChain; ///< a list of several lists
+typedef std::list<MedialChain> MedialChainList; ///< a list of lists
 
 // FIXME: MedialAxisWalk could probably be optimized to minimize rapid-traverses
 
 /// \brief Walk along the medial-axis edges of a voronoi-diagram.
+///
 /// When we want a toolpath along the medial axis we use this class
 /// to walk along the "valid" edges which are left in the diagram.
 ///
-/// argument edge_pts: number of points to subdivide parabolas.
-///
 /// Algorithm:
-/// first find one valid edge that has a degree-1 vertex (i.e. a suitable start point for the path)
+/// - first find one valid edge that has a degree-1 vertex (i.e. a suitable start point for the path)
 /// - if there's only one choice for the next edge, go there
 /// - if there are two choices, take one of the choices
-/// when done, find another valid start-edge.
+/// - when done, find another valid start-edge.
 class MedialAxisWalk {
 public:
+    /// \param gi vd-graph
+    /// \param edge_pts subdivision for non-line edges
     MedialAxisWalk(HEGraph& gi, int edge_pts = 20): g(gi), _edge_points(edge_pts) {}
-
+    /// find start-edgem then walk
     void do_walk() {
         out = MedialChainList();
         HEEdge start;
@@ -63,13 +66,13 @@ public:
             medial_axis_walk(start); // from the start-edge, walk as far as possible
         }
     }
-
+    /// run algorithm
     MedialChainList walk() {
         do_walk();
         return out;
     }
 
-    // start at source of Edge start, and walk as far as possible
+    /// start at source of Edge start, and walk as far as possible
     void medial_axis_walk(HEEdge start) {
         // begin chain with start.
         HEEdge next = start; // why does = HEEdge() cause Wuninitialized ?
@@ -86,9 +89,10 @@ public:
         out.push_back( chain );
     }
 
-    // add the given edge to the current list of edges.
-    // for line-edges we add only two endpoints
-    // for parabolic edges we add many points
+    /// \brief add the given edge to the current list of edges.
+    ///
+    /// for line-edges we add only two endpoints
+    /// for parabolic edges we add many points
     void append_edge(MedialChain& chain, HEEdge edge)  {
         MedialPointList point_list; // the endpoints of each edge
         HEVertex v1 = g.source( edge );
@@ -121,8 +125,8 @@ public:
         }
         chain.push_back( point_list );
     }
-    // we are at target(e). find the next suitable edge.
-    // return true if a next-edge was found, false otherwise.
+    /// we are at target(e). find the next suitable edge.
+    /// \return true if a next-edge was found, false otherwise.
     bool next_edge(HEEdge e, HEEdge& next) {
         HEVertex trg = g.target(e);
         EdgeVector out_edges = g.out_edges(trg);
@@ -138,15 +142,15 @@ public:
         }
         return false; 
     }
-
+    /// set edge and its twin invalid
     void set_invalid(HEEdge e) {
         g[e].valid = false;
         if (g[e].twin != HEEdge()) {
             g[ g[e].twin ].valid = false;
         }
     }
-    // loop through all edges and find an edge where we can start
-    // valid edges have a source-vertex with exactly one valid out-edge.
+    /// loop through all edges and find an edge where we can start
+    /// valid edges have a source-vertex with exactly one valid out-edge.
     bool find_start_edge(HEEdge& start) {
         BOOST_FOREACH(HEEdge e, g.edges() ) { 
             if ( valid_next_edge(e) ) {
@@ -158,11 +162,11 @@ public:
         }
         return false;
     }
-    // we can follow an edge if it is valid, and not a LINESITE or NULLEDGE
+    /// we can follow an edge if it is valid, and not a ::LINESITE or ::NULLEDGE
     bool valid_next_edge(HEEdge e) {
         return ( (g[e].type != LINESITE) && (g[e].type !=NULLEDGE) && (g[e].valid) );
     }
-    // check if the source of the edge is a valid starting-point for a path
+    /// check if the source of the edge is a valid starting-point for a path
     bool degree_one_source(HEEdge e) {
         HEVertex src = g.source(e);
         EdgeVector out_edges = g.out_edges(src);
@@ -175,11 +179,11 @@ public:
         return (count==1);
     }
 protected:
-    MedialChainList out;
+    MedialChainList out; ///< output of algorithm
 private:
     MedialAxisWalk(); // don't use.
-    HEGraph& g; // original graph
-    int _edge_points; // number of points to subdivide parabolas.
+    HEGraph& g; ///< original graph
+    int _edge_points; ///< number of points to subdivide parabolas.
 
 };
 

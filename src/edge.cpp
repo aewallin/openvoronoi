@@ -24,6 +24,7 @@ using namespace ovd::numeric;
 
 namespace ovd {
 
+/// create edge with zero edge-parameters
 EdgeProps::EdgeProps() {
     x[0]=0;x[1]=0;x[2]=0;x[3]=0;x[4]=0;x[5]=0;x[6]=0;x[7]=0;
     y[0]=0;y[1]=0;y[2]=0;y[3]=0;y[4]=0;y[5]=0;y[6]=0;y[7]=0;
@@ -32,6 +33,7 @@ EdgeProps::EdgeProps() {
 }
 
 #define stringify( name ) # name
+/// table for type_str()
 const char* edgeTypeNames[] = {
   stringify( LINE ),
   stringify( LINELINE ),
@@ -45,6 +47,7 @@ const char* edgeTypeNames[] = {
   stringify( LINESITE )
 };
 
+/// return type of edge as string
 std::string EdgeProps::type_str() const {
     std::ostringstream o;
     o << edgeTypeNames[type];
@@ -78,8 +81,10 @@ Point EdgeProps::projection_point(Solution& sl) const {
     return (p0+v*t);
 }*/
 
-// return point at given offset-distance t
-// x = x1 - x2 - x3*t +/- x4 * sqrt( square(x5+x6*t) - square(x7+x8*t) )
+/// \brief return point on edge at given offset-distance t
+///
+/// the eight-parameter formula for a point on the edge is:
+/// x = x1 - x2 - x3*t +/- x4 * sqrt( square(x5+x6*t) - square(x7+x8*t) )
 Point EdgeProps::point(double t) const {
     double discr1 =  chop( sq(x[4]+x[5]*t) - sq(x[6]+x[7]*t), 1e-14 );
     double discr2 =  chop( sq(y[4]+y[5]*t) - sq(y[6]+y[7]*t), 1e-14 );
@@ -103,6 +108,7 @@ Point EdgeProps::point(double t) const {
     }
 }
 
+/// dispatch to setter functions based on type of \a s1 and \a s2
 void EdgeProps::set_parameters(Site* s1, Site* s2, bool sig) {
     sign = sig;
     if (s1->isPoint() && s2->isPoint())        // PP
@@ -121,6 +127,7 @@ void EdgeProps::set_parameters(Site* s1, Site* s2, bool sig) {
         // AL & LA
 }
 
+/// copy edge-parameters
 void EdgeProps::copy_parameters(EdgeProps& other) {
     sign = other.sign;
     x[0] = other.x[0];
@@ -141,6 +148,7 @@ void EdgeProps::copy_parameters(EdgeProps& other) {
     y[7] = other.y[7];
 }   
 
+/// assignment of edge-parameters
 EdgeProps& EdgeProps::operator=(const EdgeProps &other) {
     if (this == &other)
         return *this;
@@ -171,7 +179,7 @@ EdgeProps& EdgeProps::operator=(const EdgeProps &other) {
     return *this;
 }
 
-// called for point(s1)-point(s2) edges
+/// set edge parameters for PointSite-PointSite edge
 void EdgeProps::set_pp_parameters(Site* s1, Site* s2) {
     assert( s1->isPoint() && s2->isPoint() );
     double d = (s1->position() - s2->position()).norm();
@@ -198,7 +206,7 @@ void EdgeProps::set_pp_parameters(Site* s1, Site* s2) {
     y[7]=0;
 }
 
-// called for point(s1)-line(s2) edges
+/// set ::PARABOLA edge parameters (between PointSite and LineSite).
 void EdgeProps::set_pl_parameters(Site* s1, Site* s2) {
     assert( s1->isPoint() && s2->isLine() );
     
@@ -231,7 +239,7 @@ void EdgeProps::set_pl_parameters(Site* s1, Site* s2) {
     y[7]=kk;            // -1 = k2 side of line??
 }
 
-// set separator edge-parameters
+/// set ::SEPARATOR edge parameters
 void EdgeProps::set_sep_parameters(Point& endp, Point& p) {
     type = SEPARATOR;
     double dx = p.x - endp.x;
@@ -247,6 +255,7 @@ void EdgeProps::set_sep_parameters(Point& endp, Point& p) {
     y[1]=0;y[3]=0;y[4]=0;y[5]=0;y[6]=0;y[7]=0;
 }
 
+/// set edge parametrization for LineSite-LineSite edge (parallel case)
 void EdgeProps::set_ll_para_parameters(Site* s1, Site* s2) {
     assert( s1->isLine() && s2->isLine() );
     type = PARA_LINELINE;
@@ -316,7 +325,7 @@ void EdgeProps::set_ll_para_parameters(Site* s1, Site* s2) {
     y[2]=0;y[3]=0;y[4]=0;y[5]=0;y[6]=0;y[7]=0;
 }
 
-// line(s1)-line(s2) edge
+/// set edge parametrization for LineSite-LineSite edge
 void EdgeProps::set_ll_parameters(Site* s1, Site* s2) {  // Held thesis p96
     assert( s1->isLine() && s2->isLine() );
     type = LINELINE;
@@ -395,7 +404,8 @@ void EdgeProps::set_la_parameters(Site* s1, Site* s2) {
     y[7] = -1
 }
 */
-
+/// \return minumum t-value for this edge
+/// this function dispatches to a helper-function based on the Site:s \a s1 and \a s2
 double EdgeProps::minimum_t( Site* s1, Site* s2) {
     if (s1->isPoint() && s2->isPoint())        // PP
         return minimum_pp_t(s1,s2);
@@ -410,21 +420,21 @@ double EdgeProps::minimum_t( Site* s1, Site* s2) {
     // todo:  AP, AL, AA
     return -1;
 }
-
+/// minimum t-value for LINE edge between PointSite and PointSite
 double EdgeProps::minimum_pp_t(Site* s1, Site* s2) {
     assert( s1->isPoint() && s2->isPoint() );
     double p1p2 = (s1->position() - s2->position()).norm() ;
     assert( p1p2 >=0 );
     return p1p2/2; // this splits point-point edges at APEX
 }
-
+/// minimum t-value for ::PARABOLA edge 
 double EdgeProps::minimum_pl_t(Site* , Site* ) {
     double mint = - x[6]/(2.0*x[7]);
     assert( mint >=0 );
     return mint;
 }
 
-
+/// print out edge parametrization
 void EdgeProps::print_params() const {
     std::cout << "x-params: ";
     for (int m=0;m<8;m++)

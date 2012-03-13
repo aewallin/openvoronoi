@@ -56,7 +56,6 @@ enum VoronoiFaceStatus {
     };
 
 /// \brief properties of a face in the voronoi diagram
-///
 /// 
 struct FaceProps {
     FaceProps() {
@@ -68,19 +67,15 @@ struct FaceProps {
     FaceProps( HEEdge e , Site* s, VoronoiFaceStatus st) : edge(e), site(s), status(st), null(false) {}
     /// operator for sorting faces
     bool operator<(const FaceProps& f) const {return (this->idx<f.idx);}
-    /// face index
-    HEFace idx;
-    /// one edge that bounds this face
-    HEEdge edge;
-    /// the site/generator for this face (either PointSite, LineSite, or ArcSite)
-    Site* site;
-    /// face status (either incident or nonincident)
-    VoronoiFaceStatus status;
-    /// flag to indicate null-face
-    bool null;
+    HEFace idx;     ///< face index
+    HEEdge edge;     ///< one edge that bounds this face
+    Site* site;     ///< the Site for this face 
+    VoronoiFaceStatus status;     ///< face status (either ::INCIDENT or ::NONINCIDENT)
+    bool null;     ///< flag to indicate null-face
+
 };
 
-// the type of graph with which we construct the voronoi-diagram
+/// the type of graph with which we construct the voronoi-diagram
 typedef hedi::half_edge_diagram< OUT_EDGE_CONTAINER,     // out-edges storage
                        VERTEX_CONTAINER,         // vertex set stored here
                        boost::bidirectionalS,    // bidirectional graph.
@@ -93,19 +88,18 @@ typedef hedi::half_edge_diagram< OUT_EDGE_CONTAINER,     // out-edges storage
 // NOTE: if these listS etc. arguments ever change, they must also be updated
 // above where we do: adjacency_list_traits
 
-/// vertex descriptor
-typedef boost::graph_traits< HEGraph::BGLGraph >::vertex_descriptor  HEVertex;
-typedef boost::graph_traits< HEGraph::BGLGraph >::vertex_iterator    HEVertexItr;
-typedef boost::graph_traits< HEGraph::BGLGraph >::edge_iterator      HEEdgeItr;
-typedef boost::graph_traits< HEGraph::BGLGraph >::out_edge_iterator  HEOutEdgeItr;
-typedef boost::graph_traits< HEGraph::BGLGraph >::adjacency_iterator HEAdjacencyItr;
-typedef boost::graph_traits< HEGraph::BGLGraph >::vertices_size_type HEVertexSize;
+typedef boost::graph_traits< HEGraph::BGLGraph >::vertex_descriptor  HEVertex;       ///< vertex descriptor
+typedef boost::graph_traits< HEGraph::BGLGraph >::vertex_iterator    HEVertexItr;    ///< vertex iterator
+typedef boost::graph_traits< HEGraph::BGLGraph >::edge_iterator      HEEdgeItr;      ///< edge iterator
+typedef boost::graph_traits< HEGraph::BGLGraph >::out_edge_iterator  HEOutEdgeItr;   ///< out edge iterator
+typedef boost::graph_traits< HEGraph::BGLGraph >::adjacency_iterator HEAdjacencyItr; ///< adj iterator
+typedef boost::graph_traits< HEGraph::BGLGraph >::vertices_size_type HEVertexSize;   ///< vertex size
 
 // these containers are used, for simplicity, instead of iterators (like in BGL) when accessing
 // adjacent vertices, edges, faces.
 // FIXME: it may be faster to rewrite the code so it uses iterators, as does the BGL.
-typedef std::vector<HEVertex> VertexVector;
-typedef std::vector<HEFace>   FaceVector;
-typedef std::vector<HEEdge>   EdgeVector;  
+typedef std::vector<HEVertex> VertexVector; ///< vector of vertices 
+typedef std::vector<HEFace>   FaceVector;  ///< vector of faces
+typedef std::vector<HEEdge>   EdgeVector;  ///< vector of edges
 
 } // end ovd namespace

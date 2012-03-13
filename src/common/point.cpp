@@ -141,7 +141,7 @@ const Point Point::operator*(const double &a) const {
     return Point(*this) *= a;
 }
 
-// scalar*Point
+/// scalar*Point
 const Point operator*(const double &a, const Point &p) {
     return Point(p) *= a;
 }
@@ -160,6 +160,7 @@ std::string Point::str() const {
     return o.str();
 }
 
+/// string output for Point
 std::ostream& operator<<(std::ostream &stream, const Point& p) {
   stream << "(" << p.x << ", " << p.y << ")"; 
   return stream;

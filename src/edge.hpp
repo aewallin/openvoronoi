@@ -35,12 +35,12 @@ namespace ovd {
 #define VERTEX_CONTAINER boost::listS
 #define EDGE_LIST_CONTAINER boost::listS
 
-// type of edge-descriptors in the graph
+/// edge-descriptors
 typedef boost::adjacency_list_traits<OUT_EDGE_CONTAINER, 
                                      VERTEX_CONTAINER, 
                                      boost::bidirectionalS, 
                                      EDGE_LIST_CONTAINER >::edge_descriptor HEEdge;
-                                     
+/// face descriptor                                     
 typedef unsigned int HEFace;
 
 /// edge type 
@@ -74,38 +74,34 @@ enum EdgeType {
 class EdgeProps {
 public:
     EdgeProps();
+    /// create edge with given next and face
     EdgeProps(HEEdge n, HEFace f): next(n), face(f), has_null_face(false), valid(true) {}
     /// create edge with given next, twin, and face
     EdgeProps(HEEdge n, HEEdge t, HEFace f): next(n), twin(t), face(f), has_null_face(false), valid(true) {}
-    /// the next edge, counterclockwise, from this edge
-    HEEdge next; 
-    /// the twin edge
-    HEEdge twin;
-    /// the face to which this edge belongs
-    HEFace face; // each face corresponds to an input Site/generator
-    HEFace null_face;
-    bool has_null_face;
     
-    double k; // offset-direction from the adjacent site, either +1 or -1
-    EdgeType type;
+    HEEdge next;     ///< the next edge, counterclockwise on the face, from this edge
+    HEEdge twin; ///< the twin edge
+    HEFace face; ///< the face to which this edge belongs
+    HEFace null_face; ///< face descriptor of null-face (parallel SEPARATOR case ?)
+    bool has_null_face; ///< flag for indicating null-face (this means null_face is set?)
     
-    // the edge-parametrization. see point(t) for how these are used to produce (x,y) points on an edge
-    boost::array<double,8> x;
-    boost::array<double,8> y;
-    bool sign; // choose either +/- in front of sqrt()
+    double k; ///< offset-direction from the adjacent site, either +1 or -1
+    EdgeType type; ///< the type of this edge
+    
+    boost::array<double,8> x; ///< 8-parameter parametrization
+    boost::array<double,8> y; ///< 8-parameter parametrization
+    bool sign; ///< flag to choose either +/- in front of sqrt()
 
     Point point(double t) const; 
-
     double minimum_t( Site* s1, Site* s2);
     void copy_parameters(EdgeProps& other);   
     void set_parameters(Site* s1, Site* s2, bool sig);
     void set_sep_parameters(Point& endp, Point& p);
     EdgeProps &operator=(const EdgeProps &p);
-    bool valid; // for filtering graph
-    bool inserted_direction; // true if linesite-edge inserted in this direction
+    bool valid; ///< flag set by Filter, for use by downstream algorithms
+    bool inserted_direction; ///< true if ::LINESITE-edge inserted in this direction
     std::string type_str() const;
 private:
-    //Point projection_point(Solution& sl) const;
     double minimum_pp_t(Site* s1, Site* s2);
     double minimum_pl_t(Site* s1, Site* s2);
 
@@ -116,4 +112,4 @@ private:
     void print_params() const;
 };
 
-} // end namespace
+} // end ovd namespace

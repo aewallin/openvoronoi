@@ -33,21 +33,16 @@ namespace ovd
 ///
 /// concrete sub-classes of Filter provide a predicate
 /// for determining if the edge belongs to the filtered graph. 
-///
 class Filter {
 public:
-    Filter()   { }
+    Filter() {}
+    /// set graph
     void set_graph(HEGraph* gi) {g=gi;}
     /// does this edge belong to the filtered graph?
     virtual bool operator()(const HEEdge& e) const {exit(-1); return true;}
 protected:
-    HEGraph* g;
+    HEGraph* g; ///< vd-graph
 };
 
-
-
-
-
-} // end namespace
-
+} // end ovd namespace
 // end file 

@@ -39,15 +39,20 @@ namespace ovd {
 /// c1 is the circle that is assumed already cut
 /// c2 is the new circle
 struct MIC {
-    Point c1,c2;  // center
-    double r1,r2; // radius
-    Point t1,t2,t3,t4; // bi-tangent points
-    bool new_branch;
-    Point c_prev;
-    double r_prev;
+    Point c1;       ///< center
+    Point c2;       ///< center
+    double r1;      ///< radius
+    double r2;      ///< radius
+    Point t1;       ///< bi-tangent point
+    Point t2;       ///< bi-tangent point
+    Point t3;       ///< bi-tangent point
+    Point t4;       ///< bi-tangent point
+    bool new_branch;   ///< is this a new branch?
+    Point c_prev;      ///< for a new branch, the previous center
+    double r_prev;     ///< for a new branch, the previous radius
 };
 
-// the list of MICs from one connected component of the MA
+/// the list of MIC.s from one connected component of the medial-axis
 typedef std::vector<MIC> MICList;
 
 /// experimental medial-axis pocketing
@@ -66,8 +71,14 @@ protected:
     /// \sa medial_axis_pocket
     class CutWidthError  {
     public:
+        /// \param ma calling medial_axis_pocket object
+        /// \param ed edge on which to position MIC
+        /// \param wmax maximum cut width
+        /// \param cen1 previous MIC center
+        /// \param rad1 previous MIC radius
         CutWidthError(medial_axis_pocket* ma, HEEdge ed, double wmax, Point cen1, double rad1) 
         : m(ma), e(ed), w_max(wmax),  c1(cen1), r1(rad1) {}
+        /// cut-width if next MIC positioned at \a x
         double operator()(const double x) {
             // w_max = | c2 - c1 | + r2 - r1
             Point c2; // = m->edge_point(x); //g[e].point(x); // current MIC center
@@ -77,11 +88,11 @@ protected:
             return w-w_max; // error compared to desired cut-width
         }
     private:
-        medial_axis_pocket* m;
-        HEEdge e;
-        double w_max; // desired cut-width
-        Point c1; // previous MIC center
-        double r1; // previous MIC radius
+        medial_axis_pocket* m; ///< calling class
+        HEEdge e;     ///< current edge
+        double w_max; ///< desired cut-width
+        Point c1;     ///< previous MIC center
+        double r1;    ///< previous MIC radius
     };
 
     /// keep track of bool done true/false flag for each edge
@@ -89,19 +100,22 @@ protected:
         edata() {
             done = false;
         }
-        bool done;
+        bool done; ///< is edge done?
     };
 
     /// branch-data when we backtrack to machine an un-machined branch
     struct branch_point {
+        /// \param p position of degree-3 branch
+        /// \param r clearance-disk radius
+        /// \param e edge on which to start machining
         branch_point(Point p, double r, HEEdge e) {
             current_center = p;
             current_radius = r;
             next_edge = e;
         }
-        Point current_center;
-        double current_radius;
-        HEEdge next_edge;
+        Point current_center;  ///< current center
+        double current_radius; ///< current radius
+        HEEdge next_edge;      ///< edge on which to start machining when we switch to the new branch
     };
 
     bool find_initial_mic();
@@ -116,30 +130,22 @@ protected:
     std::vector<Point> bitangent_points(Point c1, double r1, Point c2, double r2);
     double cut_width(Point c1, double r1, Point c2, double r2);
 //DATA
-    bool debug;
-    std::vector<HEEdge> ma_edges; // the edges of the medial-axis
-    std::map<HEEdge, edata> edge_data;
-    HEGraph& g; // VD graph
-    std::stack<branch_point> unvisited;
-
-    HEEdge current_edge;
-    double current_radius;
-    double current_u;
-    Point current_center;
-    
-    // flag for indicating new branch
-    bool new_branch;
-    Point previous_branch_center;
-    double previous_branch_radius;
-    
-    // the max cutting-width
-    double max_width;
-    // the result of the operation is a list of MICs 
-    MICList mic_list;
-    std::vector<MICList> ma_components;
-    //int max_mic_count;
+    bool debug; ///< debug output flag
+    std::vector<HEEdge> ma_edges; ///< the edges of the medial-axis
+    std::map<HEEdge, edata> edge_data; ///< map from edge-descriptor to bool-flag
+    HEGraph& g; ///< VD graph
+    std::stack<branch_point> unvisited; ///< stack of unvisited branch_point:s
+    HEEdge current_edge; ///< the current edge
+    double current_radius; ///< current clearance-disk radius
+    double current_u; ///< current position along edge. u is in [0,1]
+    Point current_center; ///< current position
+    bool new_branch;     ///< flag for indicating new branch
+    Point previous_branch_center; ///< prev branch position
+    double previous_branch_radius; ///< prev branch radius
+    double max_width; ///< the max cutting-width
+    MICList mic_list; ///< the result of the operation is a list of MICs 
+    std::vector<MICList> ma_components; ///< algorithm output
 };
 
-} // end namespace
-
+} // end ovd namespace
 // end file 

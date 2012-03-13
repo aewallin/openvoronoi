@@ -57,13 +57,13 @@ struct medial_axis_filter : public Filter {
         return true; // otherwise we keep the edge
     }
 private:
-    // return true if this is an internal edge, i.e. both endpoints have a nonzero clearance-disk radius 
+    /// return true if this is an internal edge, i.e. both endpoints have a nonzero clearance-disk radius 
     bool both_endpoints_positive(HEEdge e) const {
         HEVertex src = g->source(e);
         HEVertex trg = g->target(e);
         return ((*g)[src].dist()>0) && ((*g)[trg].dist()>0);
     }
-    // return true if the segments that connect to the given Edge are nearly parallel
+    /// return true if the segments that connect to the given Edge are nearly parallel
     bool segments_parallel( HEEdge e ) const {
         HEVertex endp1 = find_endpoint(e);
         HEVertex endp2 = find_endpoint( (*g)[e].twin );
@@ -75,9 +75,10 @@ private:
         return fabs(dotprod)>_dot_product_threshold;
     }
     
-    // calculate the dot-product between unit vectors aligned along edges e1->e2
-    // since e1 and e2 are both line-sites the direction is easy to find
-    // FIXME: more code needed here for tangent calculation if we have arc-sites
+    /// \brief calculate the dot-product between unit vectors aligned along edges e1->e2
+    ///
+    /// since e1 and e2 are both line-sites the direction is easy to find
+    /// FIXME: more code needed here for tangent calculation if we have arc-sites
     double edge_dotprod(HEEdge e1, HEEdge e2) const {
         HEVertex src1 = g->source(e1);
         HEVertex trg1 = g->target(e1);
@@ -95,7 +96,7 @@ private:
         return dir1.dot(dir2);
     }
     
-    // find the linesite edge that connects to v.
+    /// find the LineSite edge that connects to \a v
     HEEdge find_segment(HEVertex v) const {
         BOOST_FOREACH(HEEdge e, g->out_edges(v)) {
             if ( (*g)[e].type == LINESITE )
@@ -106,7 +107,7 @@ private:
         return HEEdge();
     }
     
-    // find an ENDPOINT vertex that connects to Edge e through a NULLEDGE at either the source or target of e.
+    /// find an ::ENDPOINT vertex that connects to Edge e through a ::NULLEDGE at either the source or target of e.
     HEVertex find_endpoint(HEEdge e) const {
         HEEdge next = (*g)[e].next;
         HEEdge prev = g->previous_edge(e);
@@ -125,7 +126,7 @@ private:
         return endp;
     }
 
-    double _dot_product_threshold;
+    double _dot_product_threshold; ///< a dot-product threshold in [0,1] for filtering out edges between nearly parallel LineSite segments
 };
 
 

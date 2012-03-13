@@ -43,7 +43,7 @@ struct island_filter : public Filter {
         return false; // otherwise we keep the edge
     }
 private:
-    // return true if this is an internal edge, i.e. both endpoints have a nonzero clearance-disk radius 
+    /// return true if this is an internal edge, i.e. both endpoints have a nonzero clearance-disk radius 
     bool both_endpoints_positive(HEEdge e) const {
         HEVertex src = g->source(e);
         HEVertex trg = g->target(e);

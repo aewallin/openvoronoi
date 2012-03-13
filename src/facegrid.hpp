@@ -30,11 +30,11 @@
 namespace ovd
 {
 
-typedef std::vector<FaceProps>                   FacePropVector;
-typedef boost::multi_array< FacePropVector* , 2> Grid;
-typedef Grid::index                              GridIndex;
+typedef std::vector<FaceProps>                   FacePropVector; ///< vector of faces
+typedef boost::multi_array< FacePropVector* , 2> Grid; ///< grid for storing faces
+typedef Grid::index                              GridIndex; ///< index type of grid
 
-typedef unsigned int HEFace;
+typedef unsigned int HEFace; ///< face descriptor
 
 /// \brief Grid-search for nearest-neighbor search
 ///
@@ -68,17 +68,14 @@ class FaceGrid {
         /// add faces from (row,col) to the set
         void insert_faces_from_bucket(  GridIndex row, GridIndex col );
     // DATA
-        /// all generators should fit within this radius from the origin
-        double far_radius;
-        /// the width of a bin (grid cell)
-        double binwidth;
-        /// the number of bins in the X and Y direction
-        GridIndex nbins;
+        double far_radius; ///< all generators should fit within this radius from the origin
+        double binwidth;   ///< the width of a bin (grid cell)
+        GridIndex nbins; ///< the number of bins in the X and Y direction
         /// a 2D grid where each cell contains a 
         /// pointer to a vector of FaceProps, corresponding to the faces in the cell
         Grid* grid;
-        typedef std::vector<FaceProps> FaceSetContainer;
-        FaceSetContainer face_set;
+        typedef std::vector<FaceProps> FaceSetContainer; ///< container for faces
+        FaceSetContainer face_set; ///< set of faces to search
 };
 
 } // ovd

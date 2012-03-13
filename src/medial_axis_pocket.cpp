@@ -42,18 +42,21 @@ medial_axis_pocket::medial_axis_pocket(HEGraph& gi): g(gi) {
 
 /// set the maximum cut width
 void medial_axis_pocket::set_width(double w) {max_width=w;}
+/// set debug mode
 void medial_axis_pocket::set_debug(bool b) {debug=b;}
+/// return output
 MICList medial_axis_pocket::get_mic_list() {return mic_list;}
+/// return the algorithm output
 std::vector<MICList> medial_axis_pocket::get_mic_components() {return ma_components;}
 
-/// run the algorithm
+/// run the algorithm (single connected component)
 void medial_axis_pocket::run() {
     find_initial_mic();
     while (find_next_mic()) {}
     if (debug) std::cout << "medial_axis_pocket::run() done. generated " << mic_list.size() << " MICs \n";
 }
 
-// many component run
+/// many component run
 void medial_axis_pocket::run2() {
     mic_list.clear();
     while ( find_initial_mic() ) {
@@ -125,8 +128,8 @@ bool medial_axis_pocket::find_initial_mic() {
     return true;
 }
 
-// return true if next mic was found and added to list
-// false means end-of-operation
+/// return true if next mic was found and added to list.
+/// false means end-of-operation
 bool medial_axis_pocket::find_next_mic() {
     if ( current_edge == HEEdge() ) {
         if (debug) std::cout << "find_next_mic() end of operation. Nothing to do.\n";
@@ -192,8 +195,8 @@ bool medial_axis_pocket::find_next_mic() {
     }
 }
 
-// pop an unvisited edge from the stack
-// or end-of-operation if the stack is empty
+/// pop an unvisited edge from the stack
+/// or end-of-operation if the stack is empty
 HEEdge medial_axis_pocket::find_next_branch() {
     if (unvisited.empty() ) {
         if (debug) std::cout << "find_next_branch(): no un-machined branches. end operation.\n";
@@ -213,7 +216,7 @@ HEEdge medial_axis_pocket::find_next_branch() {
             return find_next_branch();
     }
 }
-
+/// find out-edges of current_edge
 EdgeVector medial_axis_pocket::find_out_edges() {
     HEVertex trg = g.target(current_edge);
     EdgeVector out_edges;
@@ -228,7 +231,7 @@ EdgeVector medial_axis_pocket::find_out_edges() {
     return out_edges;
 }
 
-// output the next edge
+/// find the next edge
 // return true if we need a final MIC at the end of a branch
 std::pair<HEEdge,bool> medial_axis_pocket::find_next_edge() {
     EdgeVector out_edges = find_out_edges();
@@ -288,12 +291,13 @@ std::pair<HEEdge,bool> medial_axis_pocket::find_next_edge() {
     }
 }
 
+/// mark edge and its twin done
 void medial_axis_pocket::mark_done(HEEdge e) {
     edge_data[ e ].done = true;
     edge_data[ g[e].twin ].done = true;
 }
 
-// does HEEdge e have the next MIC we want ?
+/// does HEEdge e have the next MIC we want ?
 bool medial_axis_pocket::has_next_radius(HEEdge e) {
     // check if the edge e is one where we continue
     double r2;
@@ -316,7 +320,7 @@ bool medial_axis_pocket::has_next_radius(HEEdge e) {
         return false;
 }
 
-//use u-param
+/// find the next u-value that produces the desired cut-width
 std::pair<double,double> medial_axis_pocket::find_next_u() {
     CutWidthError t(this, current_edge, max_width, current_center, current_radius);
     typedef std::pair<double, double> Result;
@@ -344,8 +348,10 @@ std::pair<double,double> medial_axis_pocket::find_next_u() {
     return std::make_pair( r1.first, rnext );
 }
     
-// output the next MIC, for processing by a downstream algorithm
-// that lays out the pattern: lead-out, rapid, lead-in, bi-tangent, cut-arc, bi-tangent
+/// \brief output the next MIC
+///
+/// based on the output here a downstream algorithm
+/// will lay out the pattern: lead-out, rapid, lead-in, bi-tangent, cut-arc, bi-tangent
 void medial_axis_pocket::output_next_mic(double next_u, double next_radius, bool branch) {
     MIC mic;
     Point c1 = current_center;
@@ -382,8 +388,7 @@ void medial_axis_pocket::output_next_mic(double next_u, double next_radius, bool
     current_u = next_u;
 }
 
-
-// bi-tangent points to c1-c2
+/// bi-tangent points to c1-c2
 std::vector<Point> medial_axis_pocket::bitangent_points(Point c1, double r1, Point c2, double r2) {
     std::vector<Point> out;
     Point bd1,bd2;
@@ -425,15 +430,17 @@ std::vector<Point> medial_axis_pocket::bitangent_points(Point c1, double r1, Poi
 }
 
 
-// (c1,r1) is the previously machined MIC
-// (c2,r2) is the new MIC
-// the maximum cut-width when cutting c2 is
-//  w_max = | c2 - c1 | + r2 - r1
+/// \return cut-width from c1/r1 to c2/r2
+///
+/// - (c1,r1) is the previously machined MIC
+/// - (c2,r2) is the new MIC
+/// the maximum cut-width when cutting c2 is
+///  w_max = | c2 - c1 | + r2 - r1
 double medial_axis_pocket::cut_width(Point c1, double r1, Point c2, double r2) {
     return ( c2-c1 ).norm() + r2 - r1;
 }
 
-// find a point on current_edge at u [0,1]
+/// find a point on current_edge at u [0,1]
 std::pair<Point,double> medial_axis_pocket::edge_point(HEEdge e, double u) {
     Point p;
     double r;

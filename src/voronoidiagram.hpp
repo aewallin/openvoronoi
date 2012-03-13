@@ -52,47 +52,6 @@ namespace ovd
 class VoronoiDiagramChecker;
 class FaceGrid;
 
-
-typedef std::pair<HEVertex, double> VertexDetPair;
-/// \brief comparison-predicate for VertexQueue
-///
-/// in augment_vertex_set() we grow the delete-tree by processing vertices
-/// one-by-one from a priority_queue. This is the priority_queue sort predicate.
-/// We handle vertices with a large fabs( in_circle() ) first, since we 
-/// believe their predicate to be more reliable.
-class abs_comparison {
-public:
-  /// return true if absolute-value of lhs.second is smaller than rhs.second
-  bool operator() (const VertexDetPair& lhs, const VertexDetPair&rhs) const {
-    return ( fabs(lhs.second) < fabs(rhs.second) );
-  }
-};
-
-/// priority_queue for vertex for processing 
-// sorted by decreasing fabs() of in_circle-predicate, so that the vertices whose IN/OUT status we are 'most certain' about are processed first
-typedef std::priority_queue< VertexDetPair , std::vector<VertexDetPair>, abs_comparison > VertexQueue;
-
-/// \brief data required for adding a new edge
-///
-/// used in add_edge() for storing information related to
-/// the new edge.
-struct EdgeData {
-    /// edge prior to v1
-    HEEdge v1_prv;
-    /// NEW edge source 
-    HEVertex v1;
-    /// edge following v1 
-    HEEdge v1_nxt;
-    /// edge propr to v2 
-    HEEdge v2_prv;
-    /// NEW edge target 
-    HEVertex v2;
-    /// edge following v2 
-    HEEdge v2_nxt;
-    /// face of v1 and v2 
-    HEFace f; 
-};
-
 /// \brief Voronoi diagram.
 ///
 /// see http://en.wikipedia.org/wiki/Voronoi_diagram
@@ -135,6 +94,47 @@ public:
     void filter( Filter* flt);
     void filter_reset();
 protected:
+    /// type for item in VertexQueue. pair of vertex-desxriptor and in_circle predicate
+    typedef std::pair<HEVertex, double> VertexDetPair;
+    /// \brief comparison-predicate for VertexQueue
+    ///
+    /// in augment_vertex_set() we grow the delete-tree by processing vertices
+    /// one-by-one from a priority_queue. This is the priority_queue sort predicate.
+    /// We handle vertices with a large fabs( in_circle() ) first, since we 
+    /// believe their predicate to be more reliable.
+    class abs_comparison {
+    public:
+      /// return true if absolute-value of lhs.second is smaller than rhs.second
+      bool operator() (const VertexDetPair& lhs, const VertexDetPair&rhs) const {
+        return ( fabs(lhs.second) < fabs(rhs.second) );
+      }
+    };
+
+    /// priority_queue for vertex for processing 
+    // sorted by decreasing fabs() of in_circle-predicate, so that the vertices whose IN/OUT status we are 'most certain' about are processed first
+    typedef std::priority_queue< VertexDetPair , std::vector<VertexDetPair>, abs_comparison > VertexQueue;
+    
+    /// \brief data required for adding a new edge
+    ///
+    /// used in add_edge() for storing information related to
+    /// the new edge.
+    struct EdgeData {
+        HEEdge v1_prv; ///< edge prior to v1
+        /// NEW edge source 
+        HEVertex v1;
+        /// edge following v1 
+        HEEdge v1_nxt;
+        /// edge propr to v2 
+        HEEdge v2_prv;
+        /// NEW edge target 
+        HEVertex v2;
+        /// edge following v2 
+        HEEdge v2_nxt;
+        /// face of v1 and v2 
+        HEFace f; 
+    };
+
+    
     void initialize();
     HEVertex   find_seed_vertex(HEFace f, Site* site);
     EdgeVector find_in_out_edges(); 
@@ -201,6 +201,7 @@ protected:
     std::set<HEVertex> modified_vertices;
     /// IN-vertices, i.e. to-be-deleted
     VertexVector v0;
+
 private:
     VoronoiDiagram(); // don't use.
 };

@@ -31,6 +31,7 @@ bool VoronoiDiagramChecker::is_valid() {
 }
 
 /// check that number of faces equals the number of generators
+/// \todo not implemented!
 bool VoronoiDiagramChecker::face_count_equals_generator_count() {
     // Euler formula for planar graphs
     // v - e + f = 2
@@ -55,8 +56,8 @@ bool VoronoiDiagramChecker::face_count_equals_generator_count() {
     return true;
 }
 
-/// the diagram should be of degree three.
-/// however SPLIT and APEX vertices are of degree 2.
+/// check that the diagram is of degree three.
+/// however ::SPLIT and ::APEX vertices are of degree 2.
 bool VoronoiDiagramChecker::vertex_degree_ok() {
     BOOST_FOREACH(HEVertex v, g.vertices() ) {
         if ( g.degree(v) != VoronoiVertex::expected_degree[ g[v].type ] ) {
@@ -70,7 +71,7 @@ bool VoronoiDiagramChecker::vertex_degree_ok() {
     return true;
 }
 
-/// traverse the incident faces and check next-pointers
+// traverse the incident faces and check next-pointers
 /*
 bool VoronoiDiagramChecker::allIncidentFacesOK() { // have this take incident_faces as a parameter?
     // all incident faces should pass the sanity-check
@@ -104,7 +105,7 @@ bool  VoronoiDiagramChecker::noUndecidedInFace( HEFace f ) { // is this true??
     return true;
 }
 
-// check that for HEFace f the vertices TYPE are connected
+/// check that for HEFace f the vertices TYPE are connected
 bool VoronoiDiagramChecker::faceVerticesConnected(  HEFace f, VertexStatus Vtype ) {
     VertexVector face_verts = g.face_vertices(f);
     VertexVector type_verts;
@@ -156,7 +157,7 @@ bool VoronoiDiagramChecker::incidentFaceVerticesConnected( VoronoiVertexStatus  
     }
     return true;
 }*/
-
+/// check that Point \a has a negative in_circle predicate
 bool VoronoiDiagramChecker::in_circle_is_negative(  const Point& p, HEVertex minimalVertex ) {
     double minimumH = g[minimalVertex].in_circle(p);
     if (!(minimumH <= 0) ) {
@@ -168,7 +169,7 @@ bool VoronoiDiagramChecker::in_circle_is_negative(  const Point& p, HEVertex min
     return (minimumH <= 0 );
 }
 
-// check that all faces are ok
+/// check that all faces are ok. calls face_ok()
 bool VoronoiDiagramChecker::all_faces_ok() {
     for(HEFace f=0;f< g.num_faces() ; f++ ) {
         if (!face_ok(f)) {
@@ -180,6 +181,7 @@ bool VoronoiDiagramChecker::all_faces_ok() {
     return true;
 }
 
+/// check that the face is ok
 bool VoronoiDiagramChecker::face_ok(HEFace f, bool debug) {
     HEEdge current_edge = g[f].edge;
     //std::cout << " face_ok( " << f << " )\n";
@@ -247,6 +249,7 @@ bool VoronoiDiagramChecker::face_ok(HEFace f, bool debug) {
     return true;
 }
 
+/// check that current edge and next-edge are on the same face
 bool VoronoiDiagramChecker::current_face_equals_next_face( HEEdge e) {
     if ( g[e].face !=  g[ g[e].next ].face) {
         std::cout << " current_face_equals_next_face() ERROR.\n";
@@ -272,6 +275,7 @@ bool VoronoiDiagramChecker::current_face_equals_next_face( HEEdge e) {
     return true;
 }
 
+/// sanity-check for edge
 bool VoronoiDiagramChecker::check_edge(HEEdge e) const {
     HEVertex src = g.source(e);
     HEVertex trg = g.target(e);

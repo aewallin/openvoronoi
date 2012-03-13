@@ -1540,7 +1540,7 @@ boost::tuple<HEEdge,HEVertex,HEEdge,bool> VoronoiDiagram::find_separator_target(
 /// \param segment contains ENDPOINT vertices, when we are inserting a line-segment
 /// (these vertices are needed to ensure finding correct points around sites/null-edges)
 
-EdgeData VoronoiDiagram::find_edge_data(HEFace f, VertexVector startverts, std::pair<HEVertex,HEVertex> segment)  {
+VoronoiDiagram::EdgeData VoronoiDiagram::find_edge_data(HEFace f, VertexVector startverts, std::pair<HEVertex,HEVertex> segment)  {
     EdgeData ed;
     ed.f = f;
     if (debug) {

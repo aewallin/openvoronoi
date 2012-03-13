@@ -31,39 +31,10 @@ namespace solvers {
 class Solver; // fwd decl
 }
 
-/// predicate for filtering solutions based on t-value in [tmin,tmax] range
-struct t_filter {
-    /// create filter for [tmin,tmax]
-    t_filter(double tmin, double tmax): tmin_(tmin),tmax_(tmax) {}
-    /// is the given Solution \a s in the offset-distance interval [tmin,tmax] ?
-    bool operator()(solvers::Solution s) { 
-        double eps=1e-9;
-        double tround=s.t;
-        if ( fabs(s.t-tmin_) < eps )
-            tround=tmin_;
-        else if (fabs(s.t-tmax_)<eps)
-            tround=tmax_;
-        return (tround<tmin_) || (tround>tmax_); // these points rejected!
-    }
-private:
-    /// minimum offset-distance value
-    double tmin_;
-    /// maximum offset-distance value
-    double tmax_;
-};
 
-/// predicate for rejecting out-of-region solutions
-struct in_region_filter {
-    /// \param s Site for in_region check
-    in_region_filter(Site* s): site_(s) {}
-    /// is Solution \a s in_region of Site \a site_ ?
-    bool operator()(solvers::Solution s) { 
-        return !site_->in_region(s.p); 
-    }
-private:
-    /// the Site
-    Site* site_;
-};
+
+
+
 
 /// Calculates the (x,y) position of vertices in a voronoi diagram
 class VertexPositioner {
@@ -77,6 +48,40 @@ public:
     double dist_error(HEEdge e, const solvers::Solution& sl, Site* s3);
     void solver_debug(bool b);
 private:
+
+    /// predicate for rejecting out-of-region solutions
+    struct in_region_filter {
+        /// \param s Site for in_region check
+        in_region_filter(Site* s): site_(s) {}
+        /// is Solution \a s in_region of Site \a site_ ?
+        bool operator()(solvers::Solution s) { 
+            return !site_->in_region(s.p); 
+        }
+    private:
+        /// the Site
+        Site* site_;
+    };
+    /// predicate for filtering solutions based on t-value in [tmin,tmax] range
+    struct t_filter {
+        /// create filter for [tmin,tmax]
+        t_filter(double tmin, double tmax): tmin_(tmin),tmax_(tmax) {}
+        /// is the given Solution \a s in the offset-distance interval [tmin,tmax] ?
+        bool operator()(solvers::Solution s) { 
+            double eps=1e-9;
+            double tround=s.t;
+            if ( fabs(s.t-tmin_) < eps )
+                tround=tmin_;
+            else if (fabs(s.t-tmax_)<eps)
+                tround=tmax_;
+            return (tround<tmin_) || (tround>tmax_); // these points rejected!
+        }
+    private:
+        /// minimum offset-distance value
+        double tmin_;
+        /// maximum offset-distance value
+        double tmax_;
+    };
+
     solvers::Solution position(Site* s1, double k1, Site* s2, double k2, Site* s3);
     int solver_dispatch(Site* s1, double k1, 
                Site* s2, double k2, 

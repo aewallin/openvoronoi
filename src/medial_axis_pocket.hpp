@@ -29,30 +29,8 @@
 #include "common/numeric.hpp"
 #include "site.hpp"
 
-namespace ovd
-{
+namespace ovd {
 
-/// keep track of bool done true/false flag for each edge
-struct edata {
-    edata() {
-        done = false;
-    }
-    bool done;
-};
-typedef std::pair<HEEdge , edata> Edata;
-
-
-/// branch-data when we backtrack to machine an un-machined branch
-struct branch_point {
-    branch_point(Point p, double r, HEEdge e) {
-        current_center = p;
-        current_radius = r;
-        next_edge = e;
-    }
-    Point current_center;
-    double current_radius;
-    HEEdge next_edge;
-};
 
 /// \brief Maximal Inscribed Circle. A combination of a Point and a clearance-disk radius.
 ///
@@ -84,6 +62,48 @@ public:
     std::vector<MICList> get_mic_components(); // {return ma_components;}
     std::pair<Point,double> edge_point(HEEdge e, double u); // used by the error-functor also. move somewhere else?
 protected:
+    /// \brief error-functor for find_next_u()
+    /// \sa medial_axis_pocket
+    class CutWidthError  {
+    public:
+        CutWidthError(medial_axis_pocket* ma, HEEdge ed, double wmax, Point cen1, double rad1) 
+        : m(ma), e(ed), w_max(wmax),  c1(cen1), r1(rad1) {}
+        double operator()(const double x) {
+            // w_max = | c2 - c1 | + r2 - r1
+            Point c2; // = m->edge_point(x); //g[e].point(x); // current MIC center
+            double r2; // = x; // current MIC radius
+            boost::tie(c2,r2) = m->edge_point(e,x);
+            double w = (c2-c1).norm() + r2 - r1; // this is the cut-width
+            return w-w_max; // error compared to desired cut-width
+        }
+    private:
+        medial_axis_pocket* m;
+        HEEdge e;
+        double w_max; // desired cut-width
+        Point c1; // previous MIC center
+        double r1; // previous MIC radius
+    };
+
+    /// keep track of bool done true/false flag for each edge
+    struct edata {
+        edata() {
+            done = false;
+        }
+        bool done;
+    };
+
+    /// branch-data when we backtrack to machine an un-machined branch
+    struct branch_point {
+        branch_point(Point p, double r, HEEdge e) {
+            current_center = p;
+            current_radius = r;
+            next_edge = e;
+        }
+        Point current_center;
+        double current_radius;
+        HEEdge next_edge;
+    };
+
     bool find_initial_mic();
     bool find_next_mic();
     HEEdge find_next_branch();
@@ -118,28 +138,6 @@ protected:
     MICList mic_list;
     std::vector<MICList> ma_components;
     //int max_mic_count;
-};
-
-/// \brief error-functor for find_next_u()
-/// \sa medial_axis_pocket
-class CutWidthError  {
-public:
-    CutWidthError(medial_axis_pocket* ma, HEEdge ed, double wmax, Point cen1, double rad1) 
-    : m(ma), e(ed), w_max(wmax),  c1(cen1), r1(rad1) {}
-    double operator()(const double x) {
-        // w_max = | c2 - c1 | + r2 - r1
-        Point c2; // = m->edge_point(x); //g[e].point(x); // current MIC center
-        double r2; // = x; // current MIC radius
-        boost::tie(c2,r2) = m->edge_point(e,x);
-        double w = (c2-c1).norm() + r2 - r1; // this is the cut-width
-        return w-w_max; // error compared to desired cut-width
-    }
-private:
-    medial_axis_pocket* m;
-    HEEdge e;
-    double w_max; // desired cut-width
-    Point c1; // previous MIC center
-    double r1; // previous MIC radius
 };
 
 } // end namespace

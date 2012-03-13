@@ -31,7 +31,7 @@ medial_axis_pocket::medial_axis_pocket(HEGraph& gi): g(gi) {
              g[e].type != OUTEDGE   ) {
             ma_edges.push_back(e);
             edata ed;
-            edge_data.insert( Edata(e, ed ) );
+            edge_data.insert( std::make_pair(e, ed ) );
         }
     }
     current_edge = HEEdge();

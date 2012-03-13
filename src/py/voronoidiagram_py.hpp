@@ -47,7 +47,7 @@ public:
         _edge_points=40;
         null_edge_offset=0.01;
     }
-    /// 1-parameter point-inesrt
+    /// 1-parameter point-insert
     int insert_point_site1(const Point& p) {
         return insert_point_site(p);
     }

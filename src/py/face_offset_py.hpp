@@ -24,9 +24,9 @@
 #include "offset2.hpp"
 #include "voronoidiagram.hpp"
 
-namespace ovd
-{
-
+namespace ovd {
+namespace pyovd {
+    
 /// \brief python wrapper for FaceOffset
 class FaceOffset_py : public FaceOffset {
 public:
@@ -67,8 +67,8 @@ private:
     FaceOffset_py(); // don't use.
 };
 
-
-} // end namespace
+} // pyovd
+} // end ovd namespace
 
 // end face_offset_py.hpp
 

@@ -23,9 +23,9 @@
 
 #include "medial_axis_pocket.hpp"
 
-namespace ovd
-{
-
+namespace ovd {
+namespace pyovd {
+    
 /// python wrapper for medial_axis_pocket
 class medial_axis_pocket_py : public medial_axis_pocket {
 public:
@@ -80,6 +80,6 @@ public:
     }
 };
 
-} // end namespace
-
+} // pyovd
+} // end ovd namespace
 // end file 

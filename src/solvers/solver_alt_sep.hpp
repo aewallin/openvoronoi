@@ -66,7 +66,7 @@ namespace solvers {
 //
 //  FIXME: what happens if we get a divide by zero situation ??
 //
-/// \brief alternative Separator solver
+/// \brief alternative SEPARATOR Solver
 class ALTSEPSolver : public Solver {
 public:
 virtual void set_type(int t) {type=t;}

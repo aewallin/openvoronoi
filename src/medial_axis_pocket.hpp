@@ -120,7 +120,8 @@ protected:
     //int max_mic_count;
 };
 
-/// \brief error-functor for medial_axis_pocket::find_next_u()
+/// \brief error-functor for find_next_u()
+/// \sa medial_axis_pocket
 class CutWidthError  {
 public:
     CutWidthError(medial_axis_pocket* ma, HEEdge ed, double wmax, Point cen1, double rad1) 

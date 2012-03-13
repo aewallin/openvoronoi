@@ -30,7 +30,7 @@
 
 namespace ovd
 {
-/// \brief retain only edges between distinct polygons
+/// \brief Filter that retains only edges between distinct polygons
 ///
 /// \todo FIXME: not done yet!
 struct island_filter : public Filter {

@@ -24,8 +24,8 @@
 #include "medial_axis_walk.hpp"
 #include "voronoidiagram.hpp"
 
-namespace ovd
-{
+namespace ovd {
+namespace pyovd {
 
 /// \brief python wrapper for MedialAxisWalk
 class MedialAxisWalk_py : public MedialAxisWalk {
@@ -58,6 +58,7 @@ private:
 };
 
 
-} // end namespace
+} // pyovd
+} // end ovd namespace
 
 // end medial_axis_walk_py.hpp

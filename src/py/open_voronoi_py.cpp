@@ -41,10 +41,15 @@
  *  Boost::Python wrapping of voronoi diagram and related classes.
  */
 
-using namespace ovd;
-
+namespace ovd {
+namespace pyovd {
+/*! 
+ * \namespace ovd::pyovd
+ * \brief Python wrappers for OpenVoronoi
+ */
+ 
 namespace bp = boost::python;
-
+/// create openvoronoi python module
 BOOST_PYTHON_MODULE(openvoronoi) {
     bp::def("version", version);
     bp::def("build_type", build_type);
@@ -93,7 +98,7 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         .value("UNDECIDED", UNDECIDED)
         .value("NEW", NEW)
     ;
-    bp::enum_<VoronoiVertexType>("VoronoiVertexType") // OUTER, NORMAL, POINTSITE, ENDPOINT, SEPPOINT, APEX, SPLIT};
+    bp::enum_<VoronoiVertexType>("VoronoiVertexType")
         .value("OUTER", OUTER)   
         .value("NORMAL", NORMAL)
         .value("POINTSITE", POINTSITE)
@@ -148,7 +153,7 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         .def("offset", &FaceOffset_py::offset_py )
         .def("str", &FaceOffset_py::print )
     ; 
-    
+// Filters
     bp::class_< Filter >(" Filter_base", bp::no_init)
     ;
     bp::class_<polygon_interior_filter, bp::bases<Filter> >("PolygonInterior")
@@ -178,3 +183,7 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         .def("debug", &medial_axis_pocket_py::set_debug)
     ;
 }
+
+} // pyovd namespace
+} // ovd namespace
+

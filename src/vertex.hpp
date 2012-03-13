@@ -29,25 +29,28 @@
 namespace ovd {
 
 /// As we incrementally construct the diagram voronoi-vertices can have one of these four different states. 
-/// The status is updated as follows:
-/// OUT-vertices will not be deleted
-/// IN-vertices will be deleted
-/// UNDECIDED-vertices have not been examied yet
-/// NEW-vertices are constructed on OUT-IN edges
-enum VoronoiVertexStatus {OUT, IN, UNDECIDED, NEW };
+enum VoronoiVertexStatus {
+    OUT,          /*!< OUT-vertices will not be deleted */
+    IN,           /*!< IN-vertices will be deleted */
+    UNDECIDED,    /*!< UNDECIDED-vertices have not been examied yet */
+    NEW           /*!< NEW-vertices are constructed on OUT-IN edges */
+};
 
 /// This is the permanent type of a vertex in the diagram. 
-/// OUTER vertices are special vertices added in init(), should have degree==4
-/// POINTSITE are point sites, should have degree==0
-/// NORMAL are normal voronoi-vertices, should have degree==6  (degree 3 graph with double-edges)
-/// ENDPOINT vertices are end-points of line-segments or arc-segments
-/// APEX vertices split quadratic edges at their apex(closest point to site)
-enum VoronoiVertexType {OUTER, NORMAL, POINTSITE, ENDPOINT, SEPPOINT, APEX, SPLIT};
+enum VoronoiVertexType {
+    OUTER,      /*!< OUTER vertices are special vertices added in init(), should have degree==4 */
+    NORMAL,     /*!< NORMAL are normal voronoi-vertices, should have degree==6  (degree 3 graph with double-edges) */
+    POINTSITE,  /*!< POINTSITE are point sites, should have degree==0 */
+    ENDPOINT,   /*!< ENDPOINT vertices are end-points of line-segments or arc-segments */
+    SEPPOINT,   /*!< separator start-vertices on a null-face */
+    APEX,       /*!< APEX vertices split quadratic edges at their apex(closest point to site) */
+    SPLIT       /*!< split-vertices of degree==2 to avoid loops in the delete-tree */
+};
 
-/// a map of this type is used by topology-checker to check that all vertices
+/// A map of this type is used by VoronoiDiagramChecker to check that all vertices
 /// have the expected (correct) degree (i.e. number of edges)
 typedef std::map<VoronoiVertexType, unsigned int> VertexDegreeMap;
-
+/// face-descriptor
 typedef unsigned int HEFace;
                                      
 /// \brief A vertex in the voronoi diagram

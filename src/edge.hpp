@@ -43,15 +43,16 @@ typedef boost::adjacency_list_traits<OUT_EDGE_CONTAINER,
                                      
 typedef unsigned int HEFace;
 
+/// edge type 
 enum VoronoiEdgeType {
-    LINE,          // PontSite PointSite
-    LINELINE,      // LineSite LineSite
-    PARA_LINELINE, // LineSite LineSite
-    OUTEDGE, 
-    PARABOLA,      // LineSite PointSite
+    LINE,          /*!< Line edge between PontSite and PointSite */ 
+    LINELINE,      /*!< Line edge between LineSite and LineSite */ 
+    PARA_LINELINE, /*!< Line edge between LineSite and LineSite (parallel case) */ 
+    OUTEDGE,       /*!< special outer edge set by initialize() */ 
+    PARABOLA,      /*!< Parabolic edge between PointSite and LineSite */ 
     ELLIPSE, 
     HYPERBOLA, 
-    SEPARATOR,     // LineSite PointSite(endpoint) 
+    SEPARATOR,     /*!< Separator edge between PointSite (endpoint) and LineSite */ 
     NULLEDGE, 
     LINESITE
     };

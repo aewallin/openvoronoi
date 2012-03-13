@@ -21,11 +21,10 @@
 #include <boost/python.hpp>
 
 #include "offset.hpp"
-//#include "voronoidiagram.hpp"
 
-namespace ovd
-{
-
+namespace ovd {
+namespace pyovd {
+    
 /// \brief python wrapper for Offset
 class Offset_py : public Offset {
 public:
@@ -60,5 +59,6 @@ private:
     Offset_py(); // don't use.
 };
 
-} // end namespace
+} // pyovd
+} // end ovd namespace
 // end offset_py.hpp

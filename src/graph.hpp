@@ -39,20 +39,21 @@ namespace ovd {
 #define VERTEX_CONTAINER boost::listS
 #define EDGE_LIST_CONTAINER boost::listS
 
-// type of edge-descriptors in the graph
+/// edge-descriptors in the graph
 typedef boost::adjacency_list_traits<OUT_EDGE_CONTAINER, 
                                      VERTEX_CONTAINER, 
                                      boost::bidirectionalS, 
                                      EDGE_LIST_CONTAINER >::edge_descriptor HEEdge;
                                      
-// type of face-descriptors in the graph 
+///face-descriptors in the graph 
 // (if there were a traits-class for HEDIGraph we could use it here, instead of "hard coding" the type)
 typedef unsigned int HEFace;    
 
 /// Status of faces in the voronoi diagram
-/// INCIDENT faces contain one or more IN-vertex
-/// NONINCIDENT faces contain only OUT-vertices
-enum VoronoiFaceStatus {INCIDENT, NONINCIDENT};
+enum VoronoiFaceStatus {
+    INCIDENT,    /*!< INCIDENT faces contain one or more IN-vertex */
+    NONINCIDENT  /*!< NONINCIDENT faces contain only OUT/UNDECIDED-vertices */
+    };
 
 /// \brief properties of a face in the voronoi diagram
 ///
@@ -75,6 +76,7 @@ struct FaceProps {
     Site* site;
     /// face status (either incident or nonincident)
     VoronoiFaceStatus status;
+    /// flag to indicate null-face
     bool null;
 };
 
@@ -91,6 +93,7 @@ typedef hedi::half_edge_diagram< OUT_EDGE_CONTAINER,     // out-edges storage
 // NOTE: if these listS etc. arguments ever change, they must also be updated
 // above where we do: adjacency_list_traits
 
+/// vertex descriptor
 typedef boost::graph_traits< HEGraph::BGLGraph >::vertex_descriptor  HEVertex;
 typedef boost::graph_traits< HEGraph::BGLGraph >::vertex_iterator    HEVertexItr;
 typedef boost::graph_traits< HEGraph::BGLGraph >::edge_iterator      HEEdgeItr;

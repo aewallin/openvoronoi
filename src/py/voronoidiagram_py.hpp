@@ -27,10 +27,10 @@
 
 using namespace ovd::numeric;
 
-namespace ovd
-{
-
-/// python wrapping to allow reading/writing Point objects using pickle
+namespace ovd {
+namespace pyovd {
+    
+/// python wrapper for Point (to allow reading/writing objects using pickle)
 struct point_pickle_suite : boost::python::pickle_suite {
     /// arguments of Point to store in pickle
     static boost::python::tuple getinitargs(Point const& p) {
@@ -353,6 +353,6 @@ private:
     double null_edge_offset;
 };
 
-
+} // pyovd
 } // end ovd namespace
 // end voronoidiagram_py.h

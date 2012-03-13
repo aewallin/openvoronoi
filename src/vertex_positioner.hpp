@@ -31,17 +31,11 @@ namespace solvers {
 class Solver; // fwd decl
 }
 
-
-
-
-
-
-/// Calculates the (x,y) position of vertices in a voronoi diagram
+/// Calculates the (x,y) position of a VoronoiVertex in the VoronoiDiagram
 class VertexPositioner {
 public:
     VertexPositioner(HEGraph& gi);
     virtual ~VertexPositioner();
-
     solvers::Solution position( HEEdge e, Site* s);
     /// return vector of errors
     std::vector<double> get_stat() {return errstat;}
@@ -57,7 +51,6 @@ private:
         bool operator()(solvers::Solution s) { 
             return !site_->in_region(s.p); 
         }
-    private:
         /// the Site
         Site* site_;
     };
@@ -75,7 +68,6 @@ private:
                 tround=tmax_;
             return (tround<tmin_) || (tround>tmax_); // these points rejected!
         }
-    private:
         /// minimum offset-distance value
         double tmin_;
         /// maximum offset-distance value

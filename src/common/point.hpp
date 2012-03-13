@@ -35,50 +35,40 @@ class Point {
         /// create a point at p
         Point(const Point &p): x(p.x), y(p.y) {}
         virtual ~Point() {}        
-        /// dot product
+        
         double dot(const Point &p) const;
-        /// 2D cross-product
+        
         double cross(const Point& p) const;
 
-        /// norm of vector, or distance from (0,0,0) to *this
+        
         double norm() const; 
-        /// squared norm (avoiding sqrt() might be faster in some cases)
+        
         double norm_sq() const; 
-        /// scales vector so that norm()==1.0
+        
         void normalize();
-        /// return perpendicular in the xy plane, rotated 90 degree to the left
+        
         Point xy_perp() const;
-        /// distance from this to p1-p2 line
+        
         double distance_to_line(const Point &p1, const Point &p2) const;
         bool is_right(const Point &p1, const Point &p2) const;
-        /// retrun true if Point within line segment p1-p2
-        bool isInside(const Point& p1, const Point& p2) const;
-        /// assignment
-        Point &operator=(const Point &p);
-        /// addition
-        Point &operator+=(const Point &p);
-        /// subtraction
-        Point &operator-=(const Point &p);
-        /// addition
-        const Point operator+(const Point &p)const;
-        /// subtraction
-        const Point operator-(const Point &p) const;
-        /// scalar multiplication
-        Point &operator*=(const double &a);  // scalar multiplication with Point *= scalar
-        /// Point * scalar
-        const Point operator*(const double &a)const;     // Point*scalar 
-        /// equality
-        bool operator==(const Point &p) const;
-        /// inequality
-        bool operator!=(const Point &p) const;
+        
+        //bool isInside(const Point& p1, const Point& p2) const;
+        
+        Point &operator=(const Point &p);           ///< assignment
+        Point &operator+=(const Point &p);          ///< addition
+        Point &operator-=(const Point &p);          ///< subtraction
+        const Point operator+(const Point &p)const; ///< addition
+        const Point operator-(const Point &p) const;///< subtraction
+        Point &operator*=(const double &a);         ///< scalar multiplication with Point *= scalar
+        const Point operator*(const double &a)const;///< Point*scalar 
+        bool operator==(const Point &p) const;      ///< equality
+        bool operator!=(const Point &p) const;      ///< inequality
         /// string repr
         friend std::ostream& operator<<(std::ostream &stream, const Point &p);
-        /// string repr
-        std::string str() const;
-        /// X coordinate
-        double x;
-        /// Y coordinate
-        double y;
+        
+        std::string str() const; ///< string repr
+        double x;   ///< X coordinate
+        double y;   ///< Y coordinate
 };
 
 /// scalar multiplication   scalar*Point

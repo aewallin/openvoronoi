@@ -24,29 +24,29 @@
 #include "point.hpp"
 
 namespace ovd {
-
+/// norm of vector, or distance from (0,0,0) to *this
 double Point::norm() const {
     return sqrt( x*x + y*y  );
 }
-
+/// squared norm (avoiding sqrt() might be faster in some cases)
 double Point::norm_sq() const {
     return x*x + y*y;
 }
 
-
+/// dot product
 double Point::dot(const Point &p) const {
     return x * p.x + y * p.y ; 
 }
-
+/// 2D cross-product
 double Point::cross(const Point &p) const {
     return x * p.y - y * p.x ; 
 }
-
+/// scales vector so that norm()==1.0
 void Point::normalize() {
     if (this->norm() != 0.0)
         *this *=(1/this->norm());
 }
-
+/// return perpendicular in the xy plane, rotated 90 degree to the left
 Point Point::xy_perp() const {
     return Point(-y, x);
     // 2D rotation matrix:
@@ -57,7 +57,7 @@ Point Point::xy_perp() const {
     //   1    0   ( y )  = ( -y  x )
     
 }
-
+/// distance from this to p1-p2 line
 double Point::distance_to_line(const Point &p1, const Point &p2) const {
     // see for example
     // http://mathworld.wolfram.com/Point-LineDistance2-Dimensional.html
@@ -77,9 +77,8 @@ double Point::distance_to_line(const Point &p1, const Point &p2) const {
     }
 }
 
-
+/// is this Point right of line through points \a p1 and \a p2 ?
 bool Point::is_right(const Point &p1, const Point &p2) const {
-    // is Point right of line through points p1 and p2 ?, in the XY plane.
     // this is an ugly way of doing a determinant
     // should be prettyfied sometime...
     /// \todo FIXME: what if p1==p2 ? (in the XY plane)

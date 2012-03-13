@@ -21,7 +21,6 @@
 
 #include <boost/foreach.hpp>
 #include <boost/math/tools/roots.hpp> // for toms748
-//#include <boost/current_function.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/assign/list_of.hpp>
 
@@ -152,21 +151,24 @@ void VoronoiDiagram::initialize() {
     assert( vd_checker->is_valid() );
 }
 
-// comments relate to Sugihara-Iri 1994 paper
-// this is roughly "algorithm A" from the paper, page 15/50
-//
-// 1) find the face that is closest to the new site
-// 2) among the vertices on the closest face, find the seed vertex
-// 3) grow the tree of IN-vertices
-// 4) add new voronoi-vertices on all IN-OUT edges so they becone IN-NEW-OUT
-// 5) add new face by splitting each INCIDENT face into two parts by inserting a NEW-NEW edge. 
-// 6) remove IN-IN edges and IN-NEW edges
-// 7) reset vertex/face status to be ready for next incremental operation
-/// \brief insert a PointSite site into the diagram 
+
+/// \brief insert a PointSite into the diagram 
 ///
 /// \param p position of site
 /// \param step (optional, for debugging) stop at this step
 /// \return integer handle to the inserted point. use this integer when inserting lines/arcs with insert_line_site
+///
+/// \details
+/// comments relate to Sugihara-Iri 1994 paper
+/// this is roughly "algorithm A" from the paper, page 15/50
+///
+/// -# find the face that is closest to the new site
+/// -# among the vertices on the closest face, find the seed vertex
+/// -# grow the tree of IN-vertices augment_vertex_set()
+/// -# add new voronoi-vertices on all IN-OUT edges so they becone IN-NEW-OUT
+/// -# add new face by splitting each INCIDENT face into two parts by inserting a NEW-NEW edge. 
+/// -# remove IN-IN edges and IN-NEW edges
+/// -# reset vertex/face status to be ready for next incremental operation
 int VoronoiDiagram::insert_point_site(const Point& p, int step) {
     num_psites++;
     int current_step=1;
@@ -200,11 +202,14 @@ if (step==current_step) return -1; current_step++;
     return g[new_vert].index;
 }
 
-/// \brief insert a line-segment site into the diagram
+/// \brief insert a LineSite into the diagram
 ///
 /// \param idx1 int handle to startpoint of line-segment
 /// \param idx2 int handle to endpoint of line-segment
 /// \param step (optional, fod debug) stop at step
+///
+/// \details
+/// \todo detailed description of line-segment insertion here..
 bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
     num_lsites++;
     int current_step=1;
@@ -1428,13 +1433,18 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
 }
 
 
-/// \brief find the target of a new SEPARATOR edge
+/// \brief find the target of a new ::SEPARATOR edge
+/// \param f the HEFace on which we search for the target vertex
+/// \param endp the end-point of the null-face with the ::SEPARATOR source
 ///
-/// we want to insert a SEPARATOR edge (endp, target) , on the give face f.
-/// find and return the target vertex to which the new SEPARATOR-edge should connect
+/// we want to insert a ::SEPARATOR edge (endp, target) , on the give face f.
+/// find and return the target vertex to which the new ::SEPARATOR edge should connect
 /// also return the adjacent next/prev edges
-/// flag==true when an OUT-NEW-IN vertex was found
-/// flag==false when an IN-NEW-OUT vertex was found
+///
+/// flag==true when an ::OUT-::NEW-::IN vertex was found
+///
+/// flag==false when an ::IN-::NEW-::OUT vertex was found
+///
 boost::tuple<HEEdge,HEVertex,HEEdge,bool> VoronoiDiagram::find_separator_target(HEFace f, HEVertex endp) {
     if (endp==HEVertex()) // no separator
         return boost::make_tuple( HEEdge(), HEVertex(), HEEdge(), false) ;
@@ -1712,10 +1722,10 @@ void VoronoiDiagram::reset_status() {
     v0.clear();
 }
 
-/// \brief find and return IN-OUT edges
+/// \brief find and return ::IN - ::OUT edges
 /// 
-/// given the set v0 of "IN" vertices, find and return the adjacent IN-OUT edges 
-/// later NEW-vertices are inserted into each of the found IN-OUT edges
+/// given the set v0 of ::IN vertices, find and return the adjacent ::IN - ::OUT edges.
+/// Later ::NEW vertices are inserted into each of the found ::IN - ::OUT edges
 EdgeVector VoronoiDiagram::find_in_out_edges() { 
     assert( !v0.empty() );
     EdgeVector output; // new vertices generated on these edges

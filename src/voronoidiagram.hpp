@@ -68,7 +68,7 @@ public:
   }
 };
 
-// vertices for processing held in this queue
+/// priority_queue for vertex for processing 
 // sorted by decreasing fabs() of in_circle-predicate, so that the vertices whose IN/OUT status we are 'most certain' about are processed first
 typedef std::priority_queue< VertexDetPair , std::vector<VertexDetPair>, abs_comparison > VertexQueue;
 
@@ -205,7 +205,7 @@ private:
     VoronoiDiagram(); // don't use.
 };
 
-/// \brief error-functor to locate split-points
+/// \brief error-functor to locate ::SPLIT vertices
 ///
 /// for passing to numerical boost::toms748 root-finding algorithm
 class SplitPointError {

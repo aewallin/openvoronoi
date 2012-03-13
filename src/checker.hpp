@@ -42,7 +42,7 @@ public:
     bool all_in( const VertexVector& q);
     /// check that no undecided vertices remain in the face
     bool noUndecidedInFace( HEFace f );
-    bool faceVerticesConnected( HEFace f, VoronoiVertexStatus Vtype );
+    bool faceVerticesConnected( HEFace f, VertexStatus Vtype );
     //bool incidentFaceVerticesConnected(  VoronoiVertexStatus Vtype );
     bool in_circle_is_negative( const Point& p, HEVertex minimalVertex );
     bool current_face_equals_next_face( HEEdge e); 

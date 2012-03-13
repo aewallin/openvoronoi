@@ -67,7 +67,7 @@ namespace solvers {
 //  FIXME: what happens if we get a divide by zero situation ??
 //
 
-/// \brief Separator solver
+/// \brief ::SEPARATOR Solver
 class SEPSolver : public Solver {
 public:
 

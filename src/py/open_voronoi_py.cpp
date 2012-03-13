@@ -92,7 +92,7 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         //.def("getGraph", &VoronoiDiagram_py::get_graph_reference, bp::return_value_policy<bp::reference_existing_object>())
     ;
     
-    bp::enum_<VoronoiVertexStatus>("VoronoiVertexStatus")
+    bp::enum_<VertexStatus>("VertexStatus")
         .value("OUT", OUT)   
         .value("IN", IN)
         .value("UNDECIDED", UNDECIDED)

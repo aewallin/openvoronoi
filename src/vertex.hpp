@@ -29,7 +29,7 @@
 namespace ovd {
 
 /// As we incrementally construct the diagram voronoi-vertices can have one of these four different states. 
-enum VoronoiVertexStatus {
+enum VertexStatus {
     OUT,          /*!< OUT-vertices will not be deleted */
     IN,           /*!< IN-vertices will be deleted */
     UNDECIDED,    /*!< UNDECIDED-vertices have not been examied yet */
@@ -59,11 +59,11 @@ typedef unsigned int HEFace;
 class VoronoiVertex {
 public:
     VoronoiVertex();
-    VoronoiVertex( Point p, VoronoiVertexStatus st);
-    VoronoiVertex( Point p, VoronoiVertexStatus st, VoronoiVertexType t);
-    VoronoiVertex( Point p, VoronoiVertexStatus st, VoronoiVertexType t, double init_radius);
-    VoronoiVertex( Point pos, VoronoiVertexStatus st, VoronoiVertexType t, Point initDist);
-    VoronoiVertex( Point pos, VoronoiVertexStatus st, VoronoiVertexType t, Point initDist, double k3);
+    VoronoiVertex( Point p, VertexStatus st);
+    VoronoiVertex( Point p, VertexStatus st, VoronoiVertexType t);
+    VoronoiVertex( Point p, VertexStatus st, VoronoiVertexType t, double init_radius);
+    VoronoiVertex( Point pos, VertexStatus st, VoronoiVertexType t, Point initDist);
+    VoronoiVertex( Point pos, VertexStatus st, VoronoiVertexType t, Point initDist, double k3);
     
     virtual ~VoronoiVertex() {}
     /// reset vertex status
@@ -91,7 +91,7 @@ public:
     int index;
     /// vertex status. when the incremental algorithm runs
     /// vertices are marked: undecided, in, out, or new
-    VoronoiVertexStatus status;
+    VertexStatus status;
     /// The type of the vertex
     VoronoiVertexType type;
     
@@ -114,10 +114,10 @@ public:
     HEFace face; 
 protected:
     void init();
-    void init(Point p, VoronoiVertexStatus st);
-    void init(Point p, VoronoiVertexStatus st, VoronoiVertexType t);
-    void init(Point p, VoronoiVertexStatus st, VoronoiVertexType t, Point initDist);
-    void init(Point p, VoronoiVertexStatus st, VoronoiVertexType t, Point initDist, double k3);
+    void init(Point p, VertexStatus st);
+    void init(Point p, VertexStatus st, VoronoiVertexType t);
+    void init(Point p, VertexStatus st, VoronoiVertexType t, Point initDist);
+    void init(Point p, VertexStatus st, VoronoiVertexType t, Point initDist, double k3);
     /// global vertex count
     static int count; // hold this in hedigraph instead?
     /// map for checking topology correctness

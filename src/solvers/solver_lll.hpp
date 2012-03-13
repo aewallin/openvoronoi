@@ -31,7 +31,7 @@ using namespace ovd::numeric; // sq() chop() determinant()
 namespace ovd {
 namespace solvers {
     
-/// \brief line-line-line solver.
+/// \brief line-line-line Solver
 ///
 /// solves 3x3 system.
 class LLLSolver : public Solver {

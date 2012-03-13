@@ -105,7 +105,7 @@ bool  VoronoiDiagramChecker::noUndecidedInFace( HEFace f ) { // is this true??
 }
 
 // check that for HEFace f the vertices TYPE are connected
-bool VoronoiDiagramChecker::faceVerticesConnected(  HEFace f, VoronoiVertexStatus Vtype ) {
+bool VoronoiDiagramChecker::faceVerticesConnected(  HEFace f, VertexStatus Vtype ) {
     VertexVector face_verts = g.face_vertices(f);
     VertexVector type_verts;
     BOOST_FOREACH( HEVertex v, face_verts ) {

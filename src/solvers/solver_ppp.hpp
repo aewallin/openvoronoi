@@ -85,7 +85,7 @@ struct scalar_pt<qd_real> {
 };
 
 
-/// point-point-point vertex positioner based on Sugihara & Iri paper
+/// point-point-point Solver (based on Sugihara & Iri paper)
 template<class Scalar>
 class PPPSolver : public solvers::Solver {
 public:

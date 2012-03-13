@@ -34,7 +34,7 @@ namespace ovd {
 namespace solvers {
 
  
-/// \brief quadratic-linear-linear solver
+/// \brief quadratic-linear-linear Solver
 class QLLSolver : public Solver {
 public:
 

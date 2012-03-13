@@ -45,25 +45,25 @@ VoronoiVertex::VoronoiVertex() {
     init();
 }
 
-/// construct vertex at position Point \a p with VoronoiVertexStatus \a st
-VoronoiVertex::VoronoiVertex( Point p, VoronoiVertexStatus st) {
+/// construct vertex at position Point \a p with VertexStatus \a st
+VoronoiVertex::VoronoiVertex( Point p, VertexStatus st) {
     init(p,st);
 }
     
 /// ctor with given status and type
-VoronoiVertex::VoronoiVertex( Point p, VoronoiVertexStatus st, VoronoiVertexType t) {
+VoronoiVertex::VoronoiVertex( Point p, VertexStatus st, VoronoiVertexType t) {
     init(p,st,t);
 }
 /// ctor with initial apex Point
-VoronoiVertex::VoronoiVertex( Point p, VoronoiVertexStatus st, VoronoiVertexType t, Point initDist) {
+VoronoiVertex::VoronoiVertex( Point p, VertexStatus st, VoronoiVertexType t, Point initDist) {
     init(p,st,t,initDist);
 }
 /// ctor with initial k3-value
-VoronoiVertex::VoronoiVertex( Point p, VoronoiVertexStatus st, VoronoiVertexType t, Point initDist, double lk3) {   
+VoronoiVertex::VoronoiVertex( Point p, VertexStatus st, VoronoiVertexType t, Point initDist, double lk3) {   
     init(p,st,t,initDist,lk3);
 }
 /// ctor with initial clearance-disk radius
-VoronoiVertex::VoronoiVertex( Point p, VoronoiVertexStatus st, VoronoiVertexType t, double init_radius) {
+VoronoiVertex::VoronoiVertex( Point p, VertexStatus st, VoronoiVertexType t, double init_radius) {
     init(p,st,t);
     r = init_radius;
 }
@@ -80,23 +80,23 @@ void VoronoiVertex::init() {
 }
 
 /// set position and status
-void VoronoiVertex::init(Point p, VoronoiVertexStatus st) {
+void VoronoiVertex::init(Point p, VertexStatus st) {
     init();
     position=p;
     status=st;
 }
 /// set position, status and type
-void VoronoiVertex::init(Point p, VoronoiVertexStatus st, VoronoiVertexType t) {
+void VoronoiVertex::init(Point p, VertexStatus st, VoronoiVertexType t) {
     init(p,st);
     type = t;
 }
 /// set position, status, type, and clearance-disk through givem apex-point
-void VoronoiVertex::init(Point p, VoronoiVertexStatus st, VoronoiVertexType t, Point initDist) {
+void VoronoiVertex::init(Point p, VertexStatus st, VoronoiVertexType t, Point initDist) {
     init(p,st,t);
     init_dist(initDist);
 }
 /// set position, status, type, clerance-disk radius, and k3-side
-void VoronoiVertex::init(Point p, VoronoiVertexStatus st, VoronoiVertexType t, Point initDist, double lk3) {
+void VoronoiVertex::init(Point p, VertexStatus st, VoronoiVertexType t, Point initDist, double lk3) {
     init(p,st,t,initDist);
     k3 = lk3;
 }

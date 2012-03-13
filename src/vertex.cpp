@@ -27,8 +27,6 @@
 
 namespace ovd {
 
-inline double sq(double x) {return x*x;}
-
 int VoronoiVertex::count = 0;
 
 // the expected degree of a vertex. checked by topology-checker
@@ -110,4 +108,4 @@ void VoronoiVertex::set_alfa(const Point& dir) {
     alfa = numeric::diangle(dir.x,dir.y);
 }
 
-} // end ocl namespace
+} // end ovd namespace

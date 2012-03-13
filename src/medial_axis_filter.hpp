@@ -30,13 +30,14 @@
 namespace ovd
 {
 
-/// \brief From a voronoi-diagram, generate offset curve(s).
-/// argument dp_thr: dot-product threshold used to decide whether the segments
-/// that connect to a given Edge are nearly parallel
-// (approximate) medial-axis filter
-// marks the valid-property true for edges belonging to the medial axis
-// and false for other edges.
+/// \brief Filter for retaining the medial-axis of a voronoi diagram
+///
+/// (approximate) medial-axis Filter.
+/// marks the valid-property true for edges belonging to the medial axis
+/// and false for other edges.
 struct medial_axis_filter : public Filter {
+    /// \param thr dot-product threshold used to decide whether the segments
+    /// that connect to a given Edge are nearly parallel
     medial_axis_filter( double thr=0.8) :  _dot_product_threshold(thr) { }
     bool operator()(const HEEdge& e) const {
         if ( (*g)[e].type == LINESITE || (*g)[e].type == NULLEDGE) 

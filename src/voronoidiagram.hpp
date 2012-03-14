@@ -39,10 +39,11 @@
  * 
  * \section Notes on Test Coverage
  * - compile with "-fprofile-arcs -ftest-coverage"
+ * - run tests with "ctest -D Experimental -R cpptest_minimal"
  * - run "make ExperimentalCoverage"
  * - reset counters "lcov --directory ./ --zerocounters"
- * - in the build-directory generate an info-file with "lcov --directory ./ --capture --output-file app.info"
- * - generate html output with "genhtml app.info"
+ * - generate an info-file with "lcov --directory ./ --capture --output-file app.info"
+ * - generate html output with "genhtml --output-directory coverage --title OpenVoronoi Test Coverage app.info"
  */
  
 

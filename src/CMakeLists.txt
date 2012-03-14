@@ -3,7 +3,6 @@ project(OpenVoronoi)
 cmake_minimum_required(VERSION 2.4)
 
 # figure out the gcc version
-
 INCLUDE(gcc_version.cmake)
 
 
@@ -68,15 +67,11 @@ if (CMAKE_BUILD_TYPE MATCHES "Debug")
 endif (CMAKE_BUILD_TYPE MATCHES "Debug")
 
 if (CMAKE_BUILD_TYPE MATCHES "Coverage")
-    #set(CMAKE_CXX_FLAGS_COVERAGE "-fprofile-arcs" ; "-ftest-coverage" ${CMAKE_CXX_FLAGS_DEBUG} )
-    set(CMAKE_CXX_FLAGS "-O0 -fprofile-arcs -ftest-coverage ${CMAKE_CXX_FLAGS_DEBUG}")
-    #MESSAGE(STATUS " CMAKE_CXX_FLAGS_COVERAGE = " ${CMAKE_CXX_FLAGS_COVERAGE})
+    set(CMAKE_CXX_FLAGS "-O0 -fprofile-arcs -ftest-coverage -fno-inline ${CMAKE_CXX_FLAGS_DEBUG}")
     MESSAGE(STATUS " CMAKE_CXX_FLAGS = " ${CMAKE_CXX_FLAGS})
-    
 endif (CMAKE_BUILD_TYPE MATCHES "Coverage")
 
-option(BUILD_DOC
-  "Build doxygen documentation? " ON)
+option(BUILD_DOC "Build doxygen documentation? " ON)
   
 #
 # this figures out the Python include directories and adds them to the
@@ -90,7 +85,7 @@ execute_process(
 )
 include_directories(${Python_Includes})
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+#include_directories(${CMAKE_CURRENT_BINARY_DIR}) # duplicate!
 
 # find BOOST and boost-python
 find_package( Boost COMPONENTS python REQUIRED)
@@ -111,14 +106,10 @@ include_directories(${QD_INCLUDE_DIR})
 message( STATUS "build type = " ${CMAKE_BUILD_TYPE})
 
 ################ create version_string.hpp, http://stackoverflow.com/questions/3780667
-# include the output directory, where the version_string.hpp file is generated
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
 INCLUDE(version_string.cmake)
-STRING(REGEX REPLACE "([0-9][0-9]).*" "\\1" GIT_MAJOR_VERSION "${GIT_COMMIT_ID}" )
-STRING(REGEX REPLACE "[0-9][0-9].([0-9][0-9])-.*" "\\1" GIT_MINOR_VERSION "${GIT_COMMIT_ID}" )
-STRING(REGEX REPLACE "[0-9][0-9].[0-9][0-9]-(.*)-.*" "\\1" GIT_PATCH_VERSION "${GIT_COMMIT_ID}" )
 set(MY_VERSION "${GIT_MAJOR_VERSION}.${GIT_MINOR_VERSION}.${GIT_PATCH_VERSION}" CACHE STRING "version")
-
+# include the output directory, where version_string.hpp is generated
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 # this defines the source-files
 set(OVD_SRC
@@ -278,6 +269,17 @@ include(${CMAKE_SOURCE_DIR}/test/ovd_tests.cmake)
 
 # doxygen documentation
 include(doxygen.cmake)
+
+# coverage-report target
+add_custom_target(coverage-report
+    COMMAND lcov --directory ./ --zerocounters
+    # COMMAND make ExperimentalCoverage
+    COMMAND ctest -R cpptest
+    COMMAND lcov --directory ./ --capture --output-file testcoverage.info
+    COMMAND genhtml --output-directory coverage-report --title OpenVoronoi testcoverage.info
+    #DEPENDS ExperimentalCoverage
+)
+
 
 # "make package" stuff
 execute_process(

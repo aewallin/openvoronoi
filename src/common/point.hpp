@@ -28,13 +28,12 @@ namespace ovd
 /// \brief a point or vector in 2D with coordinates (x, y)
 class Point {
     public:
-        /// create a point at (0,0)
-        Point(): x(0.0), y(0.0) {}
+        Point();
         /// create a point at (x,y)
-        Point(double xi, double yi): x(xi), y(yi) {}
+        Point(double xi, double yi); //: x(xi), y(yi) {}
         /// create a point at p
-        Point(const Point &p): x(p.x), y(p.y) {}
-        virtual ~Point() {}        
+        Point(const Point &p); //: x(p.x), y(p.y) {}
+        virtual ~Point();// {}        
         
         double dot(const Point &p) const;
         

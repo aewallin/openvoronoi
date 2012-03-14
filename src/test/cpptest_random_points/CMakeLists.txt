@@ -20,11 +20,22 @@ find_library(OVD2_LIBRARY
 find_package( qd REQUIRED )
 include_directories(${QD_INCLUDE_DIR})
 
+unset(Boost_LIBRARIES) # required because this contains boost-python when we come here
+#MESSAGE(STATUS "linking ${test_name} with:  ${Boost_LIBRARIES}")
 find_package( Boost COMPONENTS program_options REQUIRED)
-
+#MESSAGE(STATUS "linking ${test_name} with:  ${Boost_LIBRARIES}")
 target_link_libraries(${test_name} ${OVD2_LIBRARY} ${QD_LIBRARY} ${Boost_LIBRARIES})
 
 
 ADD_TEST(${test_name} ${test_name})
+ADD_TEST(${test_name}_help ${test_name} --help)
+set_property(
+    TEST ${test_name}_help
+    PROPERTY WILL_FAIL TRUE
+)
+
+ADD_TEST(${test_name}_b ${test_name} --b 2)
 ADD_TEST(${test_name}_1000 ${test_name} --n 1000)
-ADD_TEST(${test_name}_10000 ${test_name} --n 10000)
+
+# for coverage-testing this takes too long..
+#ADD_TEST(${test_name}_10000 ${test_name} --n 10000)

@@ -24,6 +24,16 @@
 #include "point.hpp"
 
 namespace ovd {
+    
+/// create a point at (0,0)
+Point::Point(): x(0.0), y(0.0) {}
+/// create a point at (x,y)
+Point::Point(double xi, double yi) : x(xi), y(yi) {}
+/// create a point at p
+Point::Point(const Point &p): x(p.x), y(p.y) {}
+/// dtor
+Point::~Point() {}
+
 /// norm of vector, or distance from (0,0,0) to *this
 double Point::norm() const {
     return sqrt( x*x + y*y  );

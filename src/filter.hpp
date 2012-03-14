@@ -39,7 +39,7 @@ public:
     /// set graph
     void set_graph(HEGraph* gi) {g=gi;}
     /// does this edge belong to the filtered graph?
-    virtual bool operator()(const HEEdge& e) const {exit(-1); return true;}
+    virtual bool operator()(const HEEdge& e) const =0; //{exit(-1); return true;}
 protected:
     HEGraph* g; ///< vd-graph
 };

@@ -154,7 +154,7 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         .def("str", &FaceOffset_py::print )
     ; 
 // Filters
-    bp::class_< Filter >(" Filter_base", bp::no_init)
+    bp::class_< Filter, boost::noncopyable >(" Filter_base", bp::no_init) // pure virtual base class!
     ;
     bp::class_<polygon_interior_filter, bp::bases<Filter> >("PolygonInterior")
         .def(bp::init<bool>())

@@ -49,8 +49,6 @@ set_source_files_properties(
     HEADER_FILE_ONLY TRUE
 )
 
-# copy the file to the final header only if the version changes
-# reduces needless rebuilds
-#execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different
-#                        version_string.hpp.txt /version_string.hpp)
-
+STRING(REGEX REPLACE "([0-9][0-9]).*" "\\1" GIT_MAJOR_VERSION "${GIT_COMMIT_ID}" )
+STRING(REGEX REPLACE "[0-9][0-9].([0-9][0-9])-.*" "\\1" GIT_MINOR_VERSION "${GIT_COMMIT_ID}" )
+STRING(REGEX REPLACE "[0-9][0-9].[0-9][0-9]-(.*)-.*" "\\1" GIT_PATCH_VERSION "${GIT_COMMIT_ID}" )

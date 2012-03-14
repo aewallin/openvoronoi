@@ -1,4 +1,4 @@
-
+// OpenVoronoi random points example
 #include <string>
 #include <iostream>
 #include <vector>
@@ -15,7 +15,7 @@
 
 namespace po = boost::program_options;
 
-// random points
+
 int main(int argc,char *argv[]) {
     // Declare the supported options.
     po::options_description desc("This program calculates a poisson voronoi diagram\n Allowed options");

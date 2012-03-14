@@ -15,7 +15,7 @@
 
 namespace po = boost::program_options;
 
-
+/// \test random PointSite test
 int main(int argc,char *argv[]) {
     // Declare the supported options.
     po::options_description desc("This program calculates a poisson voronoi diagram\n Allowed options");

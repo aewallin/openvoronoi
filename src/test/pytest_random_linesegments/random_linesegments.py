@@ -10,15 +10,17 @@ import os
 def test(Nmax):
     vd = ovd.VoronoiDiagram(1,120)
     print "random_linesegments.py:  ",Nmax," random segments."
+    print "in directory: ", os.getcwd()
     sys.stdout.flush()
-    f1 = "../src/test/data/randomsegments_{0}.pickle.gz".format(Nmax)
-    f2 = "data/randomsegments_{0}.pickle.gz".format(Nmax)
+    f1 = "../../src/test/data/randomsegments_{0}.pickle.gz".format(Nmax)
+    f2 = "../data/randomsegments_{0}.pickle.gz".format(Nmax)
     filename = ""
     if os.path.exists( f1 ):
         filename = f1 # "../src/test/data/randomsegments_{0}.pickle.gz".format(Nmax) #  load pre-computed segments 
     elif os.path.exists( f2 ):
         filename = f2
     # (produced with lineseg_dataset_generator.py)
+    print "trying to open data file ",filename
     f = gzip.open(filename, 'rb')
     pstring = f.read()
     segs = pickle.loads( pstring )

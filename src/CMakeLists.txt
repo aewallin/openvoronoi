@@ -72,7 +72,9 @@ if (CMAKE_BUILD_TYPE MATCHES "Coverage")
 endif (CMAKE_BUILD_TYPE MATCHES "Coverage")
 
 option(BUILD_DOC "Build doxygen documentation? " ON)
-  
+
+set(BUILD_TESTS 1)
+
 #
 # this figures out the Python include directories and adds them to the
 # header file search path
@@ -265,7 +267,9 @@ MESSAGE(STATUS "Python libraries will be installed to: " ${Python_site_packages}
 
 
 # tests
+if( ${BUILD_TESTS} )
 include(${CMAKE_SOURCE_DIR}/test/ovd_tests.cmake)
+endif( ${BUILD_TESTS} )
 
 # doxygen documentation
 include(doxygen.cmake)

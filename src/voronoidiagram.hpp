@@ -37,6 +37,12 @@
  * 
  * See github for build/install instructions https://github.com/aewallin/openvoronoi
  * 
+ * \section Notes on Test Coverage
+ * - compile with "-fprofile-arcs -ftest-coverage"
+ * - run "make ExperimentalCoverage"
+ * - reset counters "lcov --directory ./ --zerocounters"
+ * - in the build-directory generate an info-file with "lcov --directory ./ --capture --output-file app.info"
+ * - generate html output with "genhtml app.info"
  */
  
 

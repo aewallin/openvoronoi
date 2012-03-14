@@ -1,7 +1,7 @@
 
 
 
-SET(test_name "test_random_points" )
+SET(test_name "cpptest_random_points" )
 
 MESSAGE(STATUS "configuring c++ test: " ${test_name})
 set(SOURCE_FILES random_points.cpp)
@@ -14,7 +14,7 @@ find_library(OVD2_LIBRARY
             REQUIRED
 )
 #MESSAGE(STATUS "OVD_LIBRARY for c++ tests is now: " ${OVD2_LIBRARY})
-include_directories( /usr/local/include/openvoronoi )
+#include_directories( /usr/local/include/openvoronoi )
     
 # find the qd library
 find_package( qd REQUIRED )

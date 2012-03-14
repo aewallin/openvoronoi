@@ -20,7 +20,7 @@ if (CMAKE_BUILD_TOOL MATCHES "make")
         add_definitions(-Werror -Wall -Wundef -Wno-error=uninitialized -Wshadow  -Wno-long-long -Wno-deprecated -pedantic -pedantic-errors)
     else(GCC_4_6)
         MESSAGE(STATUS "setting less strict gcc options.. (you have an old gcc version!)")
-        add_definitions(-Wall  -Wno-deprecated -pedantic-errors)
+        add_definitions(-Wall -Wno-deprecated -pedantic-errors)
     endif(GCC_4_6)
     
     # some reasons why we don't enable certain errors:
@@ -49,6 +49,7 @@ endif (CMAKE_BUILD_TOOL MATCHES "make")
  set(CMAKE_BUILD_TYPE Release)
 # set(CMAKE_BUILD_TYPE Debug)
 # set(CMAKE_BUILD_TYPE Profile)
+# set(CMAKE_BUILD_TYPE Coverage)
 
 MESSAGE(STATUS " CMAKE_BUILD_TYPE  = " ${CMAKE_BUILD_TYPE})
 
@@ -65,6 +66,14 @@ endif (CMAKE_BUILD_TYPE MATCHES "Release")
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
     MESSAGE(STATUS " CMAKE_CXX_FLAGS_DEBUG = " ${CMAKE_CXX_FLAGS_DEBUG})
 endif (CMAKE_BUILD_TYPE MATCHES "Debug")
+
+if (CMAKE_BUILD_TYPE MATCHES "Coverage")
+    #set(CMAKE_CXX_FLAGS_COVERAGE "-fprofile-arcs" ; "-ftest-coverage" ${CMAKE_CXX_FLAGS_DEBUG} )
+    set(CMAKE_CXX_FLAGS "-O0 -fprofile-arcs -ftest-coverage ${CMAKE_CXX_FLAGS_DEBUG}")
+    #MESSAGE(STATUS " CMAKE_CXX_FLAGS_COVERAGE = " ${CMAKE_CXX_FLAGS_COVERAGE})
+    MESSAGE(STATUS " CMAKE_CXX_FLAGS = " ${CMAKE_CXX_FLAGS})
+    
+endif (CMAKE_BUILD_TYPE MATCHES "Coverage")
 
 option(BUILD_DOC
   "Build doxygen documentation? " ON)

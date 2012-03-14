@@ -12,6 +12,7 @@ if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
     MESSAGE(STATUS "found Boost: " ${Boost_LIB_VERSION})
     MESSAGE(STATUS "boost-incude dirs are: " ${Boost_INCLUDE_DIRS})
+    MESSAGE(STATUS "boost-libraries: " ${Boost_LIBRARIES})
 endif()
 
 

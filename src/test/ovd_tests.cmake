@@ -1,6 +1,11 @@
 
 ENABLE_TESTING()
 
+
+# Python tests
+#
+#
+
 set( RAND_PT_CASES 128 256 512 1024 2048 4096 10000 20000)
 foreach( CASE ${RAND_PT_CASES} )
     ADD_TEST(random_points_${CASE} python ../src/test/random_points.py 0 ${CASE})
@@ -41,3 +46,11 @@ endforeach()
 foreach( CASE RANGE 25) # seeds 1..25. These take about 4s each to run.
     ADD_TEST(ttt_random_chars_${CASE} python ../src/test/ttt_random_chars.py ${CASE})
 endforeach()
+
+
+#
+# C++ tests. Each test subdirectory has its own CMakeLists.txt file with
+# build and test commands. 
+#include_directories(${CMAKE_SOURCE_DIR})
+file(GLOB TEST_SUBDIRS test/test_*)
+subdirs(${TEST_SUBDIRS}) # calls the cmakelists.txt in each test_ subdirectory (?)

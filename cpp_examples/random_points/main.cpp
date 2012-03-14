@@ -70,6 +70,7 @@ int main(int argc,char *argv[]) {
     std::cout << 1e6*t/norm << " us * n*log2(n)\n";
     std::cout << vd->print();
     vd2svg("random_points.svg", vd);
+    delete vd;
     return 0;
 }
 

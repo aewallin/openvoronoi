@@ -16,6 +16,6 @@ int main() {
     vd->insert_point_site(p); // this returns an int-handle to the point-site, but we do not use it here.
     
     std::cout << vd->print();
-
+    delete vd;
     return 0;
 }

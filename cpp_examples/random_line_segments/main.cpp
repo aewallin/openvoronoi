@@ -149,6 +149,7 @@ int main(int argc,char *argv[]) {
     std::cout << "Lines: " << 1e6*t_lines/norm << " us * n*log2(n)\n";
     std::cout << vd->print();
     vd2svg("random_segments.svg", vd);
+    delete vd;
     return 0;
 }
 

@@ -20,6 +20,6 @@ int main(int argc, char **argv) {
 
         std::cout << "argv[" << i << "]: " << argv[i] << std::endl;
     }
-
+    delete vd;
     return 0;
 }

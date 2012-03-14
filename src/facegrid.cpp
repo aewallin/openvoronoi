@@ -23,9 +23,9 @@
 
 namespace ovd {
 
-FaceGrid::FaceGrid() {
-    assert(0); // DO NOT use. There are problems because operator= is not defined...
-}
+//FaceGrid::FaceGrid() {
+//    assert(0); // DO NOT use. There are problems because operator= is not defined...
+//}
 
 FaceGrid::~FaceGrid() {
     for ( GridIndex m=0 ; m<nbins ; ++m ) {
@@ -64,7 +64,9 @@ GridIndex FaceGrid::get_grid_index( double x ) {
     return idx;
 }
 
-/// simple implementation to find the closest face to the new generator p
+// simple implementation to find the closest face to the new generator p
+// Naive! very slow! don't use!
+/*
 HEFace FaceGrid::find_closest_face(const Point& p) {
     HEFace closest_face;
     face_set.clear(); // the set we are searching in
@@ -75,7 +77,7 @@ HEFace FaceGrid::find_closest_face(const Point& p) {
     }
     closest_face = find_closest_in_set(  p );
     return closest_face;
-}
+}*/
     
 // grid-based search for the closest face to generator p
 // grid search algorithm:

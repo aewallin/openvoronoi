@@ -47,18 +47,20 @@ typedef unsigned int HEFace; ///< face descriptor
 /// d) among the found cells, do a brute-force search for the nearest neighbor 
 class FaceGrid {
     public:
-        FaceGrid();
+        
         /// constructor with parameters: far-limit and number of bins
         FaceGrid(double far, unsigned int n_bins);
         virtual ~FaceGrid();
         /// add face with FaceProps
         void add_face(FaceProps props);
-        /// find and return the closest face to a given Point p. Naive algorithm.
-        HEFace find_closest_face(const Point& p);
+        // find and return the closest face to a given Point p. Naive algorithm.
+        //HEFace find_closest_face(const Point& p);
         /// find and return the closest face to a given Point p. Faster grid-search algorithm.
         HEFace grid_find_closest_face(const Point& p);
 
-    private:     
+    private:
+        FaceGrid();
+        
         /// convert an x-coordinate into the corresponding grid index
         GridIndex get_grid_index( double x );
         /// go through all faces in the set and find the closest one to Point p

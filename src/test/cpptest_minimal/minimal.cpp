@@ -11,6 +11,7 @@ int main(int argc, char **argv) {
     // int bins: bins for face-grid search. roughly sqrt(n), where n is the number of sites is good according to Held.
      
     std::cout << ovd::version() << "\n"; // the git revision-string
+    std::cout << ovd::build_type() << "\n"; // the build tybe (Release, Debug, Profile, etc)
     ovd::Point p(0,0);
     vd->insert_point_site(p); // this returns an int-handle to the point-site, but we do not use it here.
     

@@ -46,26 +46,19 @@ public:
     /// \param slns Solution vector, will be updated by Solver
     virtual int solve(Site* s1, double k1, 
                            Site* s2, double k2, 
-                           Site* s3, double k3, std::vector<Solution>& slns ) {return 0;}
-    
-    // this is used by PPPSolver, when no k-values are needed
-    /// \brief solve for position of VoronoiVertex with given adjacent sites. This is used by PPPSolver, when no k-values are needed.
-    ///
-    /// \param s1 first adjacent Site
-    /// \param s2 second adjacent Site
-    /// \param s3 third adjacent Site
-    /// \param slns Solution vector, will be updated by Solver
-    virtual int solve(Site* s1, 
-                           Site* s2,  
-                           Site* s3,  std::vector<Solution>& slns ) {return 0;}
-    
+                           Site* s3, double k3, std::vector<Solution>& slns ) =0;
+
     /// used by alt_sep_solver
-    virtual void set_type(int) {}
+    virtual void set_type(int t) {type=t;}
     /// set the debug mode to \a b
     void set_debug(bool b) {debug=b;}
 protected:
     /// flag for debug output
     bool debug;
+    /// separator case type.
+    /// - type = 0 means l3 / p1 form a separator
+    /// - type = 1 means l3 / p2 form a separator
+    int  type;
 };
 
 } // solvers

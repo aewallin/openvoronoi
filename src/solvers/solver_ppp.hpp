@@ -90,7 +90,7 @@ template<class Scalar>
 class PPPSolver : public solvers::Solver {
 public:
 
-int solve( Site* s1, Site* s2, Site* s3,  std::vector<Solution>& slns ) {
+int solve( Site* s1, double, Site* s2, double, Site* s3, double, std::vector<Solution>& slns ) {
     assert( s1->isPoint() && s2->isPoint() && s3->isPoint() );
     Point pi = s1->position();
     Point pj = s2->position();

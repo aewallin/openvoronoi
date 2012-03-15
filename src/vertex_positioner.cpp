@@ -354,11 +354,11 @@ int VertexPositioner::solver_dispatch(Site* s1, double k1, Site* s2, double k2, 
     } else if ( s1->isLine() && s2->isLine() && s3->isLine() ) 
         return lll_solver->solve( s1,k1,s2,k2,s3,k3, solns ); // all lines.
     else if ( s1->isPoint() && s2->isPoint() && s3->isPoint() )
-        return ppp_solver->solve( s1,s2,s3, solns ); // all points, no need to specify k1,k2,k3, they are all +1
+        return ppp_solver->solve( s1,1,s2,1,s3,1, solns ); // all points, no need to specify k1,k2,k3, they are all +1
     else if ( (s3->isLine() && s1->isPoint() ) || 
               (s1->isLine() && s3->isPoint() ) ||
               (s3->isLine() && s2->isPoint() ) ||
-              (s2->isLine() && s3->isPoint() )
+              (s2->isLine() && s3->isPoint() ) // bad coverage for this line?
             ) {
         // if s1/s2 form a SEPARATOR-edge, this is dispatched automatically to sep-solver
         // here we detect for a separator case between

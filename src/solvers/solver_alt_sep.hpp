@@ -69,7 +69,7 @@ namespace solvers {
 /// \brief alternative ::SEPARATOR Solver
 class ALTSEPSolver : public Solver {
 public:
-virtual void set_type(int t) {type=t;}
+//virtual void set_type(int t) {type=t;}
 int solve( Site* s1, double k1, 
            Site* s2, double k2, 
            Site* s3, double k3, std::vector<Solution>& slns ) {
@@ -137,11 +137,6 @@ int solve( Site* s1, double k1,
     return 1;
 }
 
-private:
-    /// separator case type.
-    /// - type = 0 means l3 / p1 form a separator
-    /// - type = 1 means l3 / p2 form a separator
-    int type;
 };
 
 } // solvers

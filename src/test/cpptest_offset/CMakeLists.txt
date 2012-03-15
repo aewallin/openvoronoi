@@ -1,14 +1,11 @@
 
 # The next line tells CMake and CTest about "test_minimal".
-SET(test_name "cpptest_minimal" )
+SET(test_name "cpptest_offset" )
 
 MESSAGE(STATUS "configuring c++ test: " ${test_name})
 
-set(SOURCE_FILES minimal.cpp)
-add_executable(
-    ${test_name}
-    ${SOURCE_FILES}
-    )
+set(SOURCE_FILES offset.cpp)
+add_executable(${test_name} ${SOURCE_FILES})
 
 find_library(OVD2_LIBRARY 
             NAMES openvoronoi

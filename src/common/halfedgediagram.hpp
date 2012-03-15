@@ -306,7 +306,7 @@ Face add_face(const TFaceProperties& prop) {
 }
 
 /// return all vertices in a vector of vertex descriptors
-VertexVector vertices()  {
+VertexVector vertices()  const {
     VertexVector vv;
     VertexItr it_begin, it_end, itr;
     boost::tie( it_begin, it_end ) = boost::vertices( g );

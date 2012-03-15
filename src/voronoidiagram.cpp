@@ -1823,9 +1823,9 @@ bool VoronoiDiagram::predicate_c5(HEVertex v) {
 }
 
 /// return number of ::SPLIT vertices
-int VoronoiDiagram::num_split_vertices()  { 
+int VoronoiDiagram::num_split_vertices() const { 
     int count = 0;
-    BOOST_FOREACH( HEVertex v, g.vertices() ) {
+    BOOST_FOREACH( const HEVertex v, g.vertices() ) {
         if (g[v].type == SPLIT)
             count++;
     }
@@ -1884,6 +1884,7 @@ std::string VoronoiDiagram::print() const {
     o << " num_edges       = "<< g.num_edges() <<"\n";
     o << " num_point_sites = "<< num_point_sites() <<"\n";
     o << " num_line_sites  = "<< num_line_sites() <<"\n";
+    o << " num_split_vertices  = "<< num_split_vertices() <<"\n";
     return o.str();
 }
 

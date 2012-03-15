@@ -74,37 +74,17 @@ public:
 int solve( Site* s1, double k1, 
            Site* s2, double k2, 
            Site* s3, double k3, std::vector<Solution>& slns ) {
-    // swap sites if necessary ?
+    assert( s1->isLine() && s2->isPoint() );
+    assert(s3->isLine());
     if (debug) 
         std::cout << "SEPSolver.\n";
     
-    assert( s1->isLine() && s2->isPoint() );
     // separator direction
-    Point sv(0,0);
-    /* code-coverage testing shows this never happens...
-    if (k2 == -1) { // was k2?? but k2 is allways +1??
-        sv.x = s1->a(); //l1.a
-        sv.y = s1->b(); //l1.b
-    } else */
-    {
-        sv.x = -s1->a();
-        sv.y = -s1->b();
-    }
+    Point sv(-s1->a(),-s1->b());
     if (debug) std::cout << " SEPSolver sv= "<< sv << "\n";
-    double tsln(0);
-    /* code-coverage testing shows this never happens...
-    if ( s3->isPoint() ) {
-        double dx = s2->x() - s3->x();
-        double dy = s2->y() - s3->y();
-        tsln = -(dx*dx+dy*dy) / (2*( dx*sv.x+dy*sv.y  )); // check for divide-by-zero?
+    
+    double tsln = -(s3->a()*s2->x()+s3->b()*s2->y()+s3->c()) / ( sv.x*s3->a() + sv.y*s3->b() + k3  );
 
-    } else */
-    if (s3->isLine()) {
-        tsln = -(s3->a()*s2->x()+s3->b()*s2->y()+s3->c()) / ( sv.x*s3->a() + sv.y*s3->b() + k3  );
-    } else {
-        assert(0);
-        exit(-1);
-    }
     Point psln = Point(s2->x(), s2->y() ) + tsln * sv;
     slns.push_back( Solution( psln, tsln, k3 ) );
     return 1;

@@ -127,6 +127,8 @@ void EdgeProps::set_parameters(Site* s1, Site* s2, bool sig) {
         // AL & LA
 }
 
+
+/*
 /// copy edge-parameters
 void EdgeProps::copy_parameters(EdgeProps& other) {
     sign = other.sign;
@@ -146,7 +148,7 @@ void EdgeProps::copy_parameters(EdgeProps& other) {
     y[5] = other.y[5];
     y[6] = other.y[6];        
     y[7] = other.y[7];
-}   
+} */  
 
 /// assignment of edge-parameters
 EdgeProps& EdgeProps::operator=(const EdgeProps &other) {

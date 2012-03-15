@@ -128,6 +128,12 @@ bool medial_axis_pocket::find_initial_mic() {
     return true;
 }
 
+medial_axis_pocket::branch_point::branch_point(Point p, double r, HEEdge e) {
+    current_center = p;
+    current_radius = r;
+    next_edge = e;
+}
+        
 /// return true if next mic was found and added to list.
 /// false means end-of-operation
 bool medial_axis_pocket::find_next_mic() {

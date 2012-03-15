@@ -108,11 +108,12 @@ protected:
         /// \param p position of degree-3 branch
         /// \param r clearance-disk radius
         /// \param e edge on which to start machining
-        branch_point(Point p, double r, HEEdge e) {
+        
+        branch_point(Point p, double r, HEEdge e); /* {
             current_center = p;
             current_radius = r;
             next_edge = e;
-        }
+        }*/
         Point current_center;  ///< current center
         double current_radius; ///< current radius
         HEEdge next_edge;      ///< edge on which to start machining when we switch to the new branch

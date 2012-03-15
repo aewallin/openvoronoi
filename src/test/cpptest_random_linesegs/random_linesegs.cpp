@@ -90,6 +90,7 @@ int main(int argc,char *argv[]) {
     desc.add_options()
         ("help", "produce help message")
         ("n", po::value<int>(), "set number of line-segments")
+        ("d",  "run in debug-mode")
     ;
 
     po::variables_map vm;
@@ -109,9 +110,17 @@ int main(int argc,char *argv[]) {
         std::cout << desc << "\n";
         return 1;
     }
+    
+    
+    
     std::cout << "Number of random line segments: " << nmax << "\n";
     int bins = (int)sqrt(nmax);
     ovd::VoronoiDiagram* vd = new ovd::VoronoiDiagram(1,10*bins);
+    
+    if (vm.count("d")) {
+        std::cout << "running in debug mode!\n";
+        vd->debug_on();
+    }
     
     std::cout << "OpenVoronoi version: " << ovd::version() << "\n";
     
@@ -121,7 +130,7 @@ int main(int argc,char *argv[]) {
     boost::timer tmr;
     std::vector<segment> segs = random_segments(1,nmax); // creante nmax random non-intersecting segments.
     std::cout << "done in " << tmr.elapsed() << " seconds\n" << std::flush;
-
+    std::cout << "number of segs: " << segs.size() << "\n" << std::flush;
     typedef std::pair<int,int> IdSeg; // the int-handles for a segment
     typedef std::vector< IdSeg > IdSegments; // all the segments stored in this vector
     IdSegments segment_ids;
@@ -134,13 +143,14 @@ int main(int argc,char *argv[]) {
         segment_ids.push_back(id); // store the int-handles returned by insert_point_site()
     }
     double t_points = tmr.elapsed();
-    
+    std::cout << "all point-sites inserted !\n"<< std::flush;
     // now we insert line-segments
     tmr.restart();
     BOOST_FOREACH(IdSeg id, segment_ids ) {
         vd->insert_line_site(id.first,id.second); // NOTE: arguments are the int-handles we got from VoronoiDiagram::insert_point_site() above!
     }
     double t_lines = tmr.elapsed();
+    std::cout << "all line-sites inserted !\n"<< std::flush;
     
     std::cout << "Points: " << t_points << " seconds \n";
     std::cout << "Lines: " << t_lines << " seconds \n";

@@ -1640,7 +1640,8 @@ void VoronoiDiagram::repair_face( HEFace f, std::pair<HEVertex,HEVertex> segment
                                             std::pair<HEFace,HEFace> null_face ) {
     if (debug) {
         std::cout << "repair_face ( " << f << " ) null1=" << null_face.first << " null2=" << null_face.second << "\n";
-        std::cout << " seg_start=" << g[segment.first].index << " seg_end=" << g[segment.second].index << "\n";
+        if ( (segment.first!=HEVertex()) && (segment.second!=HEVertex()) )
+            std::cout << " seg_start=" << g[segment.first].index << " seg_end=" << g[segment.second].index << "\n";
         std::cout << " nulled.first=" << nulled_faces.first << " nulled.second=" << nulled_faces.second << "\n";
     }
     HEEdge current_edge = g[f].edge;

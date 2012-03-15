@@ -38,6 +38,8 @@ set_property(
     PROPERTY WILL_FAIL TRUE
 )
 
+ADD_TEST(${test_name}_d ${test_name} --n 100 --d )
+
 #ADD_TEST(${test_name}_b ${test_name} --b 2)
 ADD_TEST(${test_name}_200 ${test_name} --n 200)
 

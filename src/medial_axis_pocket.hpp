@@ -97,23 +97,13 @@ protected:
 
     /// keep track of bool done true/false flag for each edge
     struct edata {
-        edata() {
-            done = false;
-        }
+        edata() { done = false; }
         bool done; ///< is edge done?
     };
 
     /// branch-data when we backtrack to machine an un-machined branch
     struct branch_point {
-        /// \param p position of degree-3 branch
-        /// \param r clearance-disk radius
-        /// \param e edge on which to start machining
-        
-        branch_point(Point p, double r, HEEdge e); /* {
-            current_center = p;
-            current_radius = r;
-            next_edge = e;
-        }*/
+        branch_point(Point p, double r, HEEdge e);
         Point current_center;  ///< current center
         double current_radius; ///< current radius
         HEEdge next_edge;      ///< edge on which to start machining when we switch to the new branch

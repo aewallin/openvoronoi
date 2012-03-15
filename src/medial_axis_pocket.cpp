@@ -128,6 +128,9 @@ bool medial_axis_pocket::find_initial_mic() {
     return true;
 }
 
+/// \param p position of degree-3 branch
+/// \param r clearance-disk radius
+/// \param e edge on which to start machining
 medial_axis_pocket::branch_point::branch_point(Point p, double r, HEEdge e) {
     current_center = p;
     current_radius = r;

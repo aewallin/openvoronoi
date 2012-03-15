@@ -27,8 +27,8 @@ class VoronoiDiagram;
 class VoronoiDiagramChecker {
 public:
     /// \param gi input graph
-    VoronoiDiagramChecker(HEGraph& gi) : g(gi) {}
-    ~VoronoiDiagramChecker() {}
+    VoronoiDiagramChecker(HEGraph& gi);// : g(gi) {}
+    ~VoronoiDiagramChecker();// {}
     /// sanity-check for the diagram, calls other sanity-check functions
     bool is_valid();
     /// check that number of faces equals the number of generators

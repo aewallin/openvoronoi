@@ -22,6 +22,10 @@
 
 namespace ovd {
 
+VoronoiDiagramChecker::VoronoiDiagramChecker(HEGraph& gi) : g(gi) {}
+
+VoronoiDiagramChecker::~VoronoiDiagramChecker() {}
+
 /// overall sanity-check for the diagram, calls other sanity-check functions
 bool VoronoiDiagramChecker::is_valid() {
     return  (   all_faces_ok() && 

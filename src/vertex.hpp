@@ -58,8 +58,8 @@ typedef unsigned int HEFace;
 /// an object of this type is held in the BGL-graph for each vertex.
 class VoronoiVertex {
 public:
-    VoronoiVertex();
-    VoronoiVertex( Point p, VertexStatus st);
+    
+    //VoronoiVertex( Point p, VertexStatus st);
     VoronoiVertex( Point p, VertexStatus st, VertexType t);
     VoronoiVertex( Point p, VertexStatus st, VertexType t, double init_radius);
     VoronoiVertex( Point pos, VertexStatus st, VertexType t, Point initDist);
@@ -124,6 +124,8 @@ protected:
     static VertexDegreeMap expected_degree;
     /// clearance-disk radius, i.e. the closest site is at this distance
     double r;
+private:
+    VoronoiVertex();
 };
 
 } // end namespace

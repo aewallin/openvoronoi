@@ -55,11 +55,11 @@ BOOST_PYTHON_MODULE(openvoronoi) {
     bp::def("build_type", build_type);
     bp::def("vd2svg", vd2svg);
     
-    bp::class_<VoronoiDiagram >("VoronoiDiagram_base", bp::no_init)
+    bp::class_<VoronoiDiagram , boost::noncopyable >("VoronoiDiagram_base", bp::no_init)
     ;
-    bp::class_<HEGraph>("Graph")
+    bp::class_<HEGraph , boost::noncopyable >("Graph")
     ;
-    bp::class_< VoronoiDiagram_py, bp::bases<VoronoiDiagram> >("VoronoiDiagram", bp::no_init)
+    bp::class_< VoronoiDiagram_py, boost::noncopyable, bp::bases<VoronoiDiagram> >("VoronoiDiagram", bp::no_init)
         .def(bp::init<double, unsigned int>())
         .def("addVertexSite",  &VoronoiDiagram_py::insert_point_site1 ) // (point)
         .def("addVertexSite",  &VoronoiDiagram_py::insert_point_site2 ) // (point, step)

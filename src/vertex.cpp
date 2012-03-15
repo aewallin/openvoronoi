@@ -39,14 +39,17 @@ VertexDegreeMap VoronoiVertex::expected_degree = boost::assign::map_list_of
     (SPLIT,4)     // split point, to avoid loops in delete-tree
     (APEX,4) ;    // apex point on quadratic bisector
 
+/*
 VoronoiVertex::VoronoiVertex() {
     init();
-}
+}*/
 
+/*
 /// construct vertex at position Point \a p with VertexStatus \a st
 VoronoiVertex::VoronoiVertex( Point p, VertexStatus st) {
     init(p,st);
 }
+  */
     
 /// ctor with given status and type
 VoronoiVertex::VoronoiVertex( Point p, VertexStatus st, VertexType t) {

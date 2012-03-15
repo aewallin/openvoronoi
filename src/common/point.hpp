@@ -16,8 +16,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with OpenVoronoi.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef POINT_HPP
-#define POINT_HPP
+#pragma once
 
 #include <string>
 #include <iostream>
@@ -29,26 +28,16 @@ namespace ovd
 class Point {
     public:
         Point();
-        /// create a point at (x,y)
-        Point(double xi, double yi); //: x(xi), y(yi) {}
-        /// create a point at p
-        Point(const Point &p); //: x(p.x), y(p.y) {}
-        virtual ~Point();// {}        
+        Point(double xi, double yi);
+        Point(const Point &p);
+        virtual ~Point();
         
         double dot(const Point &p) const;
-        
         double cross(const Point& p) const;
-
-        
         double norm() const; 
-        
         double norm_sq() const; 
-        
         void normalize();
-        
         Point xy_perp() const;
-        
-        double distance_to_line(const Point &p1, const Point &p2) const;
         bool is_right(const Point &p1, const Point &p2) const;
         
         //bool isInside(const Point& p1, const Point& p2) const;
@@ -62,10 +51,10 @@ class Point {
         const Point operator*(const double &a)const;///< Point*scalar 
         bool operator==(const Point &p) const;      ///< equality
         bool operator!=(const Point &p) const;      ///< inequality
-        /// string repr
-        friend std::ostream& operator<<(std::ostream &stream, const Point &p);
         
+        friend std::ostream& operator<<(std::ostream &stream, const Point &p); ///< string repr
         std::string str() const; ///< string repr
+        
         double x;   ///< X coordinate
         double y;   ///< Y coordinate
 };
@@ -73,6 +62,6 @@ class Point {
 /// scalar multiplication   scalar*Point
 const Point operator*(const double &a, const Point &p);
 
-} // end namespace
-#endif
+} // end ovd namespace
+
 // end file point.hpp

@@ -45,10 +45,10 @@ endif (CMAKE_BUILD_TOOL MATCHES "make")
 
 
 # uncomment one of these to change build-type
- set(CMAKE_BUILD_TYPE Release)
+# set(CMAKE_BUILD_TYPE Release)
 # set(CMAKE_BUILD_TYPE Debug)
 # set(CMAKE_BUILD_TYPE Profile)
-# set(CMAKE_BUILD_TYPE Coverage)
+ set(CMAKE_BUILD_TYPE Coverage)
 
 MESSAGE(STATUS " CMAKE_BUILD_TYPE  = " ${CMAKE_BUILD_TYPE})
 
@@ -73,7 +73,7 @@ endif (CMAKE_BUILD_TYPE MATCHES "Coverage")
 
 option(BUILD_DOC "Build doxygen documentation? " ON)
 
-set(BUILD_TESTS 0)
+set(BUILD_TESTS 1)
 
 #
 # this figures out the Python include directories and adds them to the
@@ -274,15 +274,21 @@ endif( ${BUILD_TESTS} )
 # doxygen documentation
 include(doxygen.cmake)
 
+#add_custom_target( 
+#    coverage-data
+#    COMMAND ctest -R cpptest
+#    )
 # coverage-report target
+message(STATUS "lcov cmake src dir ${CMAKE_SOURCE_DIR}")
 add_custom_target(coverage-report
     COMMAND lcov --directory ./ --zerocounters
     # COMMAND make ExperimentalCoverage
     COMMAND ctest -R cpptest
-    COMMAND lcov --directory ./ --capture --output-file testcoverage.info
-    COMMAND genhtml --output-directory coverage-report --title OpenVoronoi testcoverage.info
-    #DEPENDS ExperimentalCoverage
+    COMMAND lcov --directory ./ --capture  --output-file testcoverage.info # --base-directory ${CMAKE_SOURCE_DIR}
+    COMMAND lcov --directory ./ --extract testcoverage.info \"*/openvoronoi*\" --output-file testcoverage_ext.info
+    COMMAND genhtml --show-details --prefix \"${CMAKE_SOURCE_DIR}\" --output-directory coverage-report --title OpenVoronoi testcoverage_ext.info
 )
+
 
 
 # "make package" stuff

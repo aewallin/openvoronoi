@@ -38,18 +38,6 @@ VertexDegreeMap VoronoiVertex::expected_degree = boost::assign::map_list_of
     (SEPPOINT,6)  // end-point of separator
     (SPLIT,4)     // split point, to avoid loops in delete-tree
     (APEX,4) ;    // apex point on quadratic bisector
-
-/*
-VoronoiVertex::VoronoiVertex() {
-    init();
-}*/
-
-/*
-/// construct vertex at position Point \a p with VertexStatus \a st
-VoronoiVertex::VoronoiVertex( Point p, VertexStatus st) {
-    init(p,st);
-}
-  */
     
 /// ctor with given status and type
 VoronoiVertex::VoronoiVertex( Point p, VertexStatus st, VertexType t) {
@@ -68,6 +56,8 @@ VoronoiVertex::VoronoiVertex( Point p, VertexStatus st, VertexType t, double ini
     init(p,st,t);
     r = init_radius;
 }
+VoronoiVertex::~VoronoiVertex() {}
+
 /// set index, increase count, initialize in_queue to false.
 void VoronoiVertex::init() {
     index = count;
@@ -110,5 +100,23 @@ void VoronoiVertex::reset() {
 void VoronoiVertex::set_alfa(const Point& dir) {
     alfa = numeric::diangle(dir.x,dir.y);
 }
+/// initialize clerance-disk
+void VoronoiVertex::init_dist(const Point& p) { r = dist(p); }
+/// return distance to a point from this vertex
+double VoronoiVertex::dist(const Point& p) const { return (position-p).norm(); }
+/// set clearance-disk to zero
+void VoronoiVertex::zero_dist() {r=0;}
+/// return clearance disk-radius
+double VoronoiVertex::dist() const { return r; }
+/// in-circle predicate 
+double VoronoiVertex::in_circle(const Point& p) const {
+    //if ( r==0 && dist(p) == 0 ) 
+    //    return -1;
+    //else
+        return dist(p) - r; 
+}
+/// reset the index count
+void VoronoiVertex::reset_count() { count = 0; }
+
 
 } // end ovd namespace

@@ -94,7 +94,7 @@ public:
 
     Point point(double t) const; 
     double minimum_t( Site* s1, Site* s2);
-    //void copy_parameters(EdgeProps& other);   
+       
     void set_parameters(Site* s1, Site* s2, bool sig);
     void set_sep_parameters(Point& endp, Point& p);
     EdgeProps &operator=(const EdgeProps &p);

@@ -58,72 +58,43 @@ typedef unsigned int HEFace;
 /// an object of this type is held in the BGL-graph for each vertex.
 class VoronoiVertex {
 public:
-    
-    //VoronoiVertex( Point p, VertexStatus st);
     VoronoiVertex( Point p, VertexStatus st, VertexType t);
     VoronoiVertex( Point p, VertexStatus st, VertexType t, double init_radius);
     VoronoiVertex( Point pos, VertexStatus st, VertexType t, Point initDist);
     VoronoiVertex( Point pos, VertexStatus st, VertexType t, Point initDist, double k3);
     
-    virtual ~VoronoiVertex() {}
+    virtual ~VoronoiVertex();
     /// reset vertex status
     void reset();
     friend class VoronoiDiagramChecker;
-    /// initialize clerance-disk
-    void init_dist(const Point& p) { r = dist(p); }
-    /// return distance to a point from this vertex
-    double dist(const Point& p) const { return (position-p).norm(); }
-    /// set clearance-disk to zero
-    void zero_dist() {r=0;}
-    /// return clearance disk-radius
-    double dist() const { return r; }
-    /// in-circle predicate 
-    double in_circle(const Point& p) const {
-        //if ( r==0 && dist(p) == 0 ) 
-        //    return -1;
-        //else
-            return dist(p) - r; 
-    }
-    /// reset the index count
-    static void reset_count() { count = 0; }
+    void init_dist(const Point& p);
+    double dist(const Point& p) const;
+    void zero_dist();
+    double dist() const; 
+    double in_circle(const Point& p) const; 
+    static void reset_count(); 
+    void set_alfa(const Point& dir); ///< set alfa. This is only for debug-drawing of null-face vertices.
 // DATA
-    /// index of vertex
-    int index;
-    /// vertex status. when the incremental algorithm runs
-    /// vertices are marked: undecided, in, out, or new
-    VertexStatus status;
-    /// The type of the vertex
-    VertexType type;
     
-    /// \todo what is this? remove?
-    double max_error;
-    
-    /// flag for indicating wether vertex is in the vertexQueue
-    bool in_queue;
-    /// the position of the vertex
-    Point position;
-    /// set alfa
-    void set_alfa(const Point& dir);
-    /// the offset-direction {-1,+1} to the newly inserted site.
-    double k3; 
-    /// angle for a null-vertex
-    double alfa;
-    /// if this is a null-face, a handle to the null-face 
-    HEFace null_face;
-    /// the face of this vertex, if the vertex is a point-site
-    HEFace face; 
+    int index; ///< unique integer index of vertex
+    VertexStatus status; ///< vertex status. updated/changed during an incremental graph update
+    VertexType type; ///< The type of the vertex. Never(?) changes
+    double max_error; ///< \todo what is this? remove?
+    bool in_queue; ///< flag for indicating wether vertex is in the vertexQueue
+    Point position; ///< the position of the vertex.
+    double k3;  ///< the offset-direction {-1,+1} of this vertex to the newly inserted site.
+    double alfa; ///< diangle for a null-vertex. only for debug-drawing
+    HEFace null_face; ///< if this is a null-face, a handle to the null-face 
+    HEFace face; ///< the face of this vertex, if the vertex is a point-site
 protected:
     void init();
     void init(Point p, VertexStatus st);
     void init(Point p, VertexStatus st, VertexType t);
     void init(Point p, VertexStatus st, VertexType t, Point initDist);
     void init(Point p, VertexStatus st, VertexType t, Point initDist, double k3);
-    /// global vertex count
-    static int count; // hold this in hedigraph instead?
-    /// map for checking topology correctness
-    static VertexDegreeMap expected_degree;
-    /// clearance-disk radius, i.e. the closest site is at this distance
-    double r;
+    static int count; ///< global vertex count \todo hold this in hedigraph instead?
+    static VertexDegreeMap expected_degree; ///< map for checking topology correctness
+    double r; ///< clearance-disk radius, i.e. the closest Site is at this distance
 private:
     VoronoiVertex();
 };

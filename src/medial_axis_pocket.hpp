@@ -32,28 +32,9 @@
 namespace ovd {
 
 
-/// \brief Maximal Inscribed Circle. A combination of a Point and a clearance-disk radius.
-///
-/// it is the responsibility of a downstream algorithm to lay down a toolpath
-/// that machines the area between c2 and c1
-/// c1 is the circle that is assumed already cut
-/// c2 is the new circle
-struct MIC {
-    Point c1;       ///< center
-    Point c2;       ///< center
-    double r1;      ///< radius
-    double r2;      ///< radius
-    Point t1;       ///< bi-tangent point
-    Point t2;       ///< bi-tangent point
-    Point t3;       ///< bi-tangent point
-    Point t4;       ///< bi-tangent point
-    bool new_branch;   ///< is this a new branch?
-    Point c_prev;      ///< for a new branch, the previous center
-    double r_prev;     ///< for a new branch, the previous radius
-};
 
-/// the list of MIC.s from one connected component of the medial-axis
-typedef std::vector<MIC> MICList;
+
+
 
 /// experimental medial-axis pocketing
 class medial_axis_pocket {
@@ -61,32 +42,40 @@ public:
     medial_axis_pocket(HEGraph& gi);
     void set_width(double w);
     void run();
-    void run2();
+    //void run2();
     void set_debug(bool b);
-    MICList get_mic_list();
+    /// \brief Maximal Inscribed Circle. A combination of a Point and a clearance-disk radius.
+    ///
+    /// it is the responsibility of a downstream algorithm to lay down a toolpath
+    /// that machines the area between c2 and c1
+    /// c1 is the circle that is assumed already cut
+    /// c2 is the new circle
+    struct MIC {
+        Point c1;       ///< center
+        Point c2;       ///< center
+        double r1;      ///< radius
+        double r2;      ///< radius
+        Point t1;       ///< bi-tangent point
+        Point t2;       ///< bi-tangent point
+        Point t3;       ///< bi-tangent point
+        Point t4;       ///< bi-tangent point
+        bool new_branch;   ///< is this a new branch?
+        Point c_prev;      ///< for a new branch, the previous center
+        double r_prev;     ///< for a new branch, the previous radius
+    };
+    typedef std::vector<MIC> MICList; ///< the list of MIC.s from one connected component of the medial-axis
+    //MICList get_mic_list();
     std::vector<MICList> get_mic_components(); // {return ma_components;}
     std::pair<Point,double> edge_point(HEEdge e, double u); // used by the error-functor also. move somewhere else?
+    
+    
 protected:
     /// \brief error-functor for find_next_u()
     /// \sa medial_axis_pocket
     class CutWidthError  {
     public:
-        /// \param ma calling medial_axis_pocket object
-        /// \param ed edge on which to position MIC
-        /// \param wmax maximum cut width
-        /// \param cen1 previous MIC center
-        /// \param rad1 previous MIC radius
-        CutWidthError(medial_axis_pocket* ma, HEEdge ed, double wmax, Point cen1, double rad1) 
-        : m(ma), e(ed), w_max(wmax),  c1(cen1), r1(rad1) {}
-        /// cut-width if next MIC positioned at \a x
-        double operator()(const double x) {
-            // w_max = | c2 - c1 | + r2 - r1
-            Point c2; // = m->edge_point(x); //g[e].point(x); // current MIC center
-            double r2; // = x; // current MIC radius
-            boost::tie(c2,r2) = m->edge_point(e,x);
-            double w = (c2-c1).norm() + r2 - r1; // this is the cut-width
-            return w-w_max; // error compared to desired cut-width
-        }
+        CutWidthError(medial_axis_pocket* ma, HEEdge ed, double wmax, Point cen1, double rad1);
+        double operator()(const double x);
     private:
         medial_axis_pocket* m; ///< calling class
         HEEdge e;     ///< current edge
@@ -97,7 +86,7 @@ protected:
 
     /// keep track of bool done true/false flag for each edge
     struct edata {
-        edata() { done = false; }
+        edata();// { done = false; }
         bool done; ///< is edge done?
     };
 

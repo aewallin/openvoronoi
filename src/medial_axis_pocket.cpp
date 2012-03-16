@@ -45,19 +45,20 @@ void medial_axis_pocket::set_width(double w) {max_width=w;}
 /// set debug mode
 void medial_axis_pocket::set_debug(bool b) {debug=b;}
 /// return output
-MICList medial_axis_pocket::get_mic_list() {return mic_list;}
+//medial_axis_pocket::MICList medial_axis_pocket::get_mic_list() {return mic_list;}
 /// return the algorithm output
-std::vector<MICList> medial_axis_pocket::get_mic_components() {return ma_components;}
+std::vector<medial_axis_pocket::MICList> medial_axis_pocket::get_mic_components() {return ma_components;}
 
+/*
 /// run the algorithm (single connected component)
 void medial_axis_pocket::run() {
     find_initial_mic();
     while (find_next_mic()) {}
     if (debug) std::cout << "medial_axis_pocket::run() done. generated " << mic_list.size() << " MICs \n";
-}
+}*/
 
 /// many component run
-void medial_axis_pocket::run2() {
+void medial_axis_pocket::run() {
     mic_list.clear();
     while ( find_initial_mic() ) {
         while (find_next_mic()) {}
@@ -66,8 +67,6 @@ void medial_axis_pocket::run2() {
         mic_list.clear();
     }
     //if (debug) std::cout << "medial_axis_pocket::run() component done. generated " << mic_list.size() << " MICs \n";
-    
-    
     
     if (debug) std::cout << "medial_axis_pocket::run() all done. generated " << ma_components.size() << " components \n";
 
@@ -497,6 +496,27 @@ std::pair<Point,double> medial_axis_pocket::edge_point(HEEdge e, double u) {
     
     return std::make_pair(p,r);
 }
+
+/// \param ma calling medial_axis_pocket object
+/// \param ed edge on which to position MIC
+/// \param wmax maximum cut width
+/// \param cen1 previous MIC center
+/// \param rad1 previous MIC radius
+medial_axis_pocket::CutWidthError::CutWidthError(medial_axis_pocket* ma, 
+                            HEEdge ed, double wmax, Point cen1, double rad1) 
+: m(ma), e(ed), w_max(wmax),  c1(cen1), r1(rad1) {}
+
+/// cut-width if next MIC positioned at \a x
+double medial_axis_pocket::CutWidthError::operator()(const double x) {
+    // w_max = | c2 - c1 | + r2 - r1
+    Point c2; // = m->edge_point(x); //g[e].point(x); // current MIC center
+    double r2; // = x; // current MIC radius
+    boost::tie(c2,r2) = m->edge_point(e,x);
+    double w = (c2-c1).norm() + r2 - r1; // this is the cut-width
+    return w-w_max; // error compared to desired cut-width
+}
+
+medial_axis_pocket::edata::edata() { done = false; }
 
 } // end namespace
 

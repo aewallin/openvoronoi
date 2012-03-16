@@ -18,6 +18,17 @@ include_directories( /usr/local/include/openvoronoi )
 find_package( qd REQUIRED )
 include_directories(${QD_INCLUDE_DIR})
 
-target_link_libraries(${test_name} ${OVD2_LIBRARY} ${QD_LIBRARY} )
+unset(Boost_LIBRARIES) # required because this contains boost-python when we come here
+find_package( Boost COMPONENTS program_options REQUIRED)
+
+target_link_libraries(${test_name} ${OVD2_LIBRARY} ${QD_LIBRARY} ${Boost_LIBRARIES})
 
 ADD_TEST(${test_name} ${test_name})
+
+ADD_TEST(${test_name}_help ${test_name} --help)
+set_property(
+    TEST ${test_name}_help
+    PROPERTY WILL_FAIL TRUE
+)
+
+ADD_TEST(${test_name}_debug ${test_name} --d )

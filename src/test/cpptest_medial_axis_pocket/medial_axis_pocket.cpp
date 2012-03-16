@@ -9,10 +9,37 @@
 #include "utility/vd2svg.hpp"
 #include "version.hpp"
 
+#include <boost/program_options.hpp>
+
+namespace po = boost::program_options;
+
 // OpenVoronoi example program. Uses MedialAxis filter to filter the complete Voronoi diagram
 // down to the medial axis.
 // then uses MedialAxisWalk to walk along the medial axis and draw clearance-disks
-int main() {
+int main(int argc,char *argv[]) {
+    
+    // Declare the supported options.
+    po::options_description desc("medial axis pocket test");
+    desc.add_options()
+        ("help", "produce help message")
+        //("n", po::value<int>(), "set number of line-segments")
+        ("d",  "run in debug-mode")
+    ;
+
+    po::variables_map vm;
+    po::store(po::parse_command_line(argc, argv, desc), vm);
+    po::notify(vm);
+    
+    if (vm.count("help")) {
+        std::cout << desc << "\n";
+        return 1;
+    }
+    
+    bool debug_mode = false;
+    if (vm.count("d")) 
+        debug_mode = true;
+
+    
     ovd::VoronoiDiagram* vd = new ovd::VoronoiDiagram(1,100); // (r, bins)
     // double r: radius of circle within which all input geometry must fall. use 1 (unit-circle). Scale geometry if necessary.
     // int bins:  bins for face-grid search. roughly sqrt(n), where n is the number of sites is good according to Held.
@@ -47,9 +74,11 @@ int main() {
     
     // pocket
     ovd::medial_axis_pocket* map = new ovd::medial_axis_pocket( vd->get_graph_reference() );
-    
+    map->set_debug(debug_mode);
     map->set_width(0.032); // maximum cutting-width
-    map->run2();
+    map->run();
+    
+    std::vector< ovd::medial_axis_pocket::MICList > out = map->get_mic_components();
     
     delete map;
     

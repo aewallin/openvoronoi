@@ -1,6 +1,3 @@
-
-
-
 SET(test_name "cpptest_random_points" )
 
 MESSAGE(STATUS "configuring c++ test: " ${test_name})

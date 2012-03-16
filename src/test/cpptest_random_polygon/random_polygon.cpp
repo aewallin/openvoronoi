@@ -22,7 +22,6 @@ namespace po = boost::program_options;
 
 typedef std::pair<double,double> point;
 
-
 int main(int argc,char *argv[]) {
     // Declare the supported options.
     po::options_description desc("This program calculates the voronoi diagram for n random polygon\nAllowed options");
@@ -40,7 +39,7 @@ int main(int argc,char *argv[]) {
         std::cout << desc << "\n";
         return 1;
     }
-    
+
     unsigned int nmax = 100;
     unsigned int seed = 42;
     if (vm.count("n")) 
@@ -48,7 +47,7 @@ int main(int argc,char *argv[]) {
     
     if (vm.count("s")) 
         seed = vm["s"].as<int>();
-        
+
     std::cout << "Number of vertices in random polygon: " << nmax << "\n";
     int bins = (int)sqrt(nmax);
     ovd::VoronoiDiagram* vd = new ovd::VoronoiDiagram(1,10*bins);

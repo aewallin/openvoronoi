@@ -4,9 +4,6 @@
 #include <vector>
 #include <cmath>
 
-//#include <openvoronoi/voronoidiagram.hpp>
-//#include <openvoronoi/version.hpp>
-//#include <openvoronoi/utility/vd2svg.hpp>
 #include "voronoidiagram.hpp"
 #include "version.hpp"
 #include "utility/vd2svg.hpp"

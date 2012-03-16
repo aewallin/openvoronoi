@@ -38,12 +38,13 @@
  * See github for build/install instructions https://github.com/aewallin/openvoronoi
  * 
  * \section Notes on Test Coverage
- * - compile with "-fprofile-arcs -ftest-coverage"
- * - run tests with "ctest -D Experimental -R cpptest_minimal"
- * - run "make ExperimentalCoverage"
- * - reset counters "lcov --directory ./ --zerocounters"
- * - generate an info-file with "lcov --directory ./ --capture --output-file app.info"
- * - generate html output with "genhtml --output-directory coverage --title OpenVoronoi Test Coverage app.info"
+ * - compile using CMAKE_BUILD_TYPE=Coverage  (uses "-fprofile-arcs -ftest-coverage" )
+ * - There's a custom target "make coverage-report" that runs the following:
+ *  - reset counters "lcov --directory ./ --zerocounters"
+ *  - run tests with "ctest -D Experimental -R cpptest_minimal"
+ *  - generate an info-file with "lcov --directory ./ --capture --output-file app.info"
+ *  - generate html output with "genhtml --output-directory coverage --title OpenVoronoi Test Coverage app.info"
+ * - point your browser to build/doc/index.html to see the output
  */
  
 

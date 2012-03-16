@@ -13,5 +13,7 @@
  * \example polygon/main.cpp
  * \example offset/main.cpp
  * \example medial_axis/main.cpp
- */
+ * \example random_polygon/main.cpp 
+ * random polygon example using CGAL random polygon algorithm (2-opt) from https://github.com/aewallin/CGAL_RPG
+ * */
  

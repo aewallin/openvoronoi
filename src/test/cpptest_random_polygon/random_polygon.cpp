@@ -5,11 +5,11 @@
 #include <vector>
 #include <cmath>
 
-#include <openvoronoi/voronoidiagram.hpp>
-#include <openvoronoi/checker.hpp>
-#include <openvoronoi/version.hpp>
-#include <openvoronoi/common/point.hpp>
-#include <openvoronoi/utility/vd2svg.hpp>
+#include "voronoidiagram.hpp"
+#include "checker.hpp"
+#include "version.hpp"
+#include "common/point.hpp"
+#include "utility/vd2svg.hpp"
 
 #include <boost/random.hpp>
 #include <boost/timer.hpp>

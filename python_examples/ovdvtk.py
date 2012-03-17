@@ -267,11 +267,11 @@ class VD:
             status = pt[2]
             idx = pt[3]
             
-            if status == ovd.VoronoiVertexStatus.IN:
+            if status == ovd.VertexStatus.IN:
                 vcolor = red
-            elif status == ovd.VoronoiVertexStatus.NEW:
+            elif status == ovd.VertexStatus.NEW:
                 vcolor = green
-            elif status == ovd.VoronoiVertexStatus.OUT:
+            elif status == ovd.VertexStatus.OUT:
                 vcolor = blue
             
             if self.drawVertices:
@@ -416,24 +416,24 @@ class VD:
         
     def edgeStatusColor(self, src_status, trg_status, default_color):
         
-        if ( (src_status == ovd.VoronoiVertexStatus.IN) and (trg_status == ovd.VoronoiVertexStatus.IN)):
+        if ( (src_status == ovd.VertexStatus.IN) and (trg_status == ovd.VertexStatus.IN)):
             return red
-        elif ( ((src_status == ovd.VoronoiVertexStatus.OUT) and 
-             (trg_status == ovd.VoronoiVertexStatus.IN) ) or 
-             ((src_status == ovd.VoronoiVertexStatus.IN) and 
-             (trg_status == ovd.VoronoiVertexStatus.OUT) ) ):
+        elif ( ((src_status == ovd.VertexStatus.OUT) and 
+             (trg_status == ovd.VertexStatus.IN) ) or 
+             ((src_status == ovd.VertexStatus.IN) and 
+             (trg_status == ovd.VertexStatus.OUT) ) ):
             return purple
-        elif ( ((src_status == ovd.VoronoiVertexStatus.OUT) and 
-             (trg_status == ovd.VoronoiVertexStatus.NEW) ) or 
-             ((src_status == ovd.VoronoiVertexStatus.NEW) and 
-             (trg_status == ovd.VoronoiVertexStatus.OUT) ) ):
+        elif ( ((src_status == ovd.VertexStatus.OUT) and 
+             (trg_status == ovd.VertexStatus.NEW) ) or 
+             ((src_status == ovd.VertexStatus.NEW) and 
+             (trg_status == ovd.VertexStatus.OUT) ) ):
             return default_color
-        elif ( ((src_status == ovd.VoronoiVertexStatus.IN) and 
-             (trg_status == ovd.VoronoiVertexStatus.NEW) ) or 
-             ((src_status == ovd.VoronoiVertexStatus.NEW) and 
-             (trg_status == ovd.VoronoiVertexStatus.IN) ) ):
+        elif ( ((src_status == ovd.VertexStatus.IN) and 
+             (trg_status == ovd.VertexStatus.NEW) ) or 
+             ((src_status == ovd.VertexStatus.NEW) and 
+             (trg_status == ovd.VertexStatus.IN) ) ):
             return red    
-        elif ( (src_status == ovd.VoronoiVertexStatus.NEW) and (trg_status == ovd.VoronoiVertexStatus.NEW)):
+        elif ( (src_status == ovd.VertexStatus.NEW) and (trg_status == ovd.VertexStatus.NEW)):
             return green
         else:
             return default_color
@@ -441,19 +441,19 @@ class VD:
     
     def edgeTypeColor(self, edgeType, src_status, trg_status):
         #print " edgeStatusColor edgeType= ",edgeType
-        if (edgeType == ovd.VoronoiEdgeType.LINELINE):
+        if (edgeType == ovd.EdgeType.LINELINE):
             return self.edgeStatusColor(src_status,trg_status,lblue)
-        if (edgeType == ovd.VoronoiEdgeType.PARA_LINELINE):
+        if (edgeType == ovd.EdgeType.PARA_LINELINE):
             return self.edgeStatusColor(src_status,trg_status,blue)
-        if (edgeType == ovd.VoronoiEdgeType.LINE):
+        if (edgeType == ovd.EdgeType.LINE):
             return  self.edgeStatusColor(src_status,trg_status,cyan)
-        if (edgeType == ovd.VoronoiEdgeType.OUTEDGE):
+        if (edgeType == ovd.EdgeType.OUTEDGE):
             return pink
-        if (edgeType == ovd.VoronoiEdgeType.SEPARATOR):
+        if (edgeType == ovd.EdgeType.SEPARATOR):
             return self.edgeStatusColor(src_status,trg_status, mag2)
-        if (edgeType == ovd.VoronoiEdgeType.LINESITE):
+        if (edgeType == ovd.EdgeType.LINESITE):
             return yellow
-        if (edgeType == ovd.VoronoiEdgeType.PARABOLA):
+        if (edgeType == ovd.EdgeType.PARABOLA):
             return self.edgeStatusColor(src_status,trg_status, blue2)
         else:
             #print "UNKOWN edge type = ", edgeType

@@ -213,7 +213,8 @@ if (step==current_step) return -1; current_step++;
 /// \param step (optional, for debug) stop at step
 ///
 /// \details
-/// \attention All PointSite:s must be inserted before any LineSite:s are inserted. All LineSite:s should be inserted before any ArcSite:s are inserted.
+/// \attention All PointSite:s must be inserted before any LineSite:s are inserted. 
+///   All LineSite:s should be inserted before any ArcSite:s are inserted.
 /// \attention It is an error to insert a LineSite that intersects an existing LineSite in the diagram!
 ///
 /// The basic idea of the incremental diagram update is similar to that in insert_point_site().
@@ -1094,8 +1095,9 @@ EdgeVector VoronoiDiagram::find_split_edges(HEFace f, Point pt1, Point pt2) {
 ///
 /// SPLIT vertices are inserted to avoid deleting loops during augment_vertex_set()
 void VoronoiDiagram::add_split_vertex(HEFace f, Site* s) {
-    if (s->isPoint())
-        return; // no split-vertices when inserting point-sites
+    assert(!s->isPoint());
+    //if (s->isPoint())
+    //    return; // no split-vertices when inserting point-sites
         
     Site* fs = g[f].site;
     

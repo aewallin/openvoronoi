@@ -77,6 +77,7 @@ int main() {
 
     doc.save();
     std::cout << vd->print();
+    vd->filter_reset();
     delete vd;
 
     return 0;

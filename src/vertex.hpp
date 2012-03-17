@@ -47,11 +47,9 @@ enum VertexType {
     SPLIT       /*!< split-vertices of degree==2 to avoid loops in the delete-tree */
 };
 
-/// A map of this type is used by VoronoiDiagramChecker to check that all vertices
-/// have the expected (correct) degree (i.e. number of edges)
-typedef std::map<VertexType, unsigned int> VertexDegreeMap;
-/// face-descriptor
-typedef unsigned int HEFace;
+
+
+
                                      
 /// \brief A vertex in the voronoi diagram
 ///
@@ -62,10 +60,11 @@ public:
     VoronoiVertex( Point p, VertexStatus st, VertexType t, double init_radius);
     VoronoiVertex( Point pos, VertexStatus st, VertexType t, Point initDist);
     VoronoiVertex( Point pos, VertexStatus st, VertexType t, Point initDist, double k3);
-    
     virtual ~VoronoiVertex();
-    /// reset vertex status
-    void reset();
+
+    typedef unsigned int HEFace;
+
+    void reset_status();
     friend class VoronoiDiagramChecker;
     void init_dist(const Point& p);
     double dist(const Point& p) const;
@@ -93,6 +92,9 @@ protected:
     void init(Point p, VertexStatus st, VertexType t, Point initDist);
     void init(Point p, VertexStatus st, VertexType t, Point initDist, double k3);
     static int count; ///< global vertex count \todo hold this in hedigraph instead?
+    /// A map of this type is used by VoronoiDiagramChecker to check that all vertices
+    /// have the expected (correct) degree (i.e. number of edges)
+    typedef std::map<VertexType, unsigned int> VertexDegreeMap;
     static VertexDegreeMap expected_degree; ///< map for checking topology correctness
     double r; ///< clearance-disk radius, i.e. the closest Site is at this distance
 private:

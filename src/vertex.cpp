@@ -30,7 +30,7 @@ namespace ovd {
 int VoronoiVertex::count = 0;
 
 // the expected degree of a vertex. checked by topology-checker
-VertexDegreeMap VoronoiVertex::expected_degree = boost::assign::map_list_of 
+VoronoiVertex::VertexDegreeMap VoronoiVertex::expected_degree = boost::assign::map_list_of 
     (OUTER,4)     // special outer vertices
     (NORMAL,6)    // normal vertex in the graph
     (POINTSITE,0) // point site
@@ -92,8 +92,8 @@ void VoronoiVertex::init(Point p, VertexStatus st, VertexType t, Point initDist,
     k3 = lk3;
 }
 
-/// set in_queue false, and status to UNDECIDED
-void VoronoiVertex::reset() {
+/// set in_queue false, and status to ::UNDECIDED
+void VoronoiVertex::reset_status() {
     in_queue = false;
     status = UNDECIDED;
 }

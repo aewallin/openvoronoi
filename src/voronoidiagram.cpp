@@ -1741,7 +1741,7 @@ void VoronoiDiagram::remove_vertex_set() {
 /// so that we are ready for the next insertion.
 void VoronoiDiagram::reset_status() {
     BOOST_FOREACH( HEVertex v, modified_vertices ) {
-        g[v].reset();
+        g[v].reset_status();
     }
     modified_vertices.clear();
     BOOST_FOREACH(HEFace& f, incident_faces ) { 

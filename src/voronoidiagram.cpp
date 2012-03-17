@@ -981,6 +981,7 @@ void VoronoiDiagram::augment_vertex_set(  Site* site ) {
     }
     
     assert( vertexQueue.empty() );
+    assert( vd_checker->all_in(v0) );
     if (debug) std::cout << "augment_vertex_set() DONE\n";
 
     // sanity-check?: for all incident faces the IN/OUT-vertices should be connected

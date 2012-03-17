@@ -29,30 +29,21 @@ public:
     /// \param gi input graph
     VoronoiDiagramChecker(HEGraph& gi);// : g(gi) {}
     ~VoronoiDiagramChecker();// {}
-    /// sanity-check for the diagram, calls other sanity-check functions
+
     bool is_valid();
-    /// check that number of faces equals the number of generators
     bool face_count_equals_generator_count();
-    /// the diagram should be of degree three (at least with point generators)
     bool vertex_degree_ok();
-    /// traverse the incident faces and check next-pointers
-    //bool allIncidentFacesOK();
-    /// check that all vertices in the input vector are of type IN
     bool all_in( const VertexVector& q);
-    /// check that no undecided vertices remain in the face
     bool noUndecidedInFace( HEFace f );
     bool faceVerticesConnected( HEFace f, VertexStatus Vtype );
-    //bool incidentFaceVerticesConnected(  VoronoiVertexStatus Vtype );
-    bool in_circle_is_negative( const Point& p, HEVertex minimalVertex );
     bool current_face_equals_next_face( HEEdge e); 
     bool face_ok(HEFace f, bool debug=false);
     bool all_faces_ok();
-    bool check_edge(HEEdge e) const ;
-    
+    bool check_edge(HEEdge e) const;
 private:
     HEGraph& g; ///< vd-graph
 };
 
 } // end ovd namespace
 
-// end voronoidiagram_checker.h
+// end voronoidiagram_checker.hpp

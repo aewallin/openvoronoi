@@ -90,7 +90,7 @@ bool VoronoiDiagramChecker::allIncidentFacesOK() { // have this take incident_fa
     return true;
 }*/
 
-/// check that all vertices in the input vector are of type IN
+/// check that all vertices in the input vector have status ::IN
 bool VoronoiDiagramChecker::all_in( const VertexVector& q) {
     BOOST_FOREACH( HEVertex v, q) {
         if ( g[v].status != IN )
@@ -161,17 +161,7 @@ bool VoronoiDiagramChecker::incidentFaceVerticesConnected( VoronoiVertexStatus  
     }
     return true;
 }*/
-/// check that Point \a has a negative in_circle predicate
-bool VoronoiDiagramChecker::in_circle_is_negative(  const Point& p, HEVertex minimalVertex ) {
-    double minimumH = g[minimalVertex].in_circle(p);
-    if (!(minimumH <= 0) ) {
-        std::cout << " inCircle_is_negative() WARNING\n";
-        std::cout << " WARNING: searching for seed when inserting " << p << " \n";
-    //    std::cout << " WARNING: closest face is " << f << " with generator " << g[f].generator << " \n";
-        std::cout << " WARNING: minimal vd-vertex " << g[minimalVertex].index << " has inCircle= " << minimumH  << "\n";
-    }
-    return (minimumH <= 0 );
-}
+
 
 /// check that all faces are ok. calls face_ok()
 bool VoronoiDiagramChecker::all_faces_ok() {

@@ -69,13 +69,12 @@ Medial-Axis pocket
 
 Input/Output
 - Write a class that makes it simpler to insert a polygon (with islands), and/or many polygons
-- SVG, DXF output for vd and offsets
+- DXF output for vd and offsets (?, we have SVG now)
 - SVG, DXF input
 
 Tests
 - Write more tests! ( also in c++? )
 - Test for memory-leaks with valgrind
-- Code-coverage for tests (gcov, trucov?)
 - Benchmark against libarea/kbool and libarea/Clipper (are there other FOSS offsetting codes?)
 - Compare against other VD codes (CGAL, boost-sweepline, others?)
 - Write software that generates test-cases (ttt is a good example)
@@ -96,10 +95,13 @@ Packaging/Building etc
 - build(and install on github?) doxygen html documentation
 - Windows package/installer with cmake/NSIS?
 - automate source-package building from github and periodic upload to launchpad (?)
-- src/test/data now has 3Mb of data-files for tests. These could/should(?) be in a separate debian package "openvoronoi-test-data"
-  so that the size of the "openvoronoi" package is as small as possible (for non developers who do not need to run tests)
+- src/test/data now has 3Mb of data-files for tests. These could/should(?) 
+  be in a separate debian package "openvoronoi-test-data" so that the size of 
+  the "openvoronoi" package is as small as possible (for non developers who do not need to run tests)
 
 DONE:
+- 2012       SVG output for vd and offsets with 
+- 2012-03-16 Code-coverage for tests ( "make coverage-report" )
 - 2012-03-12 doxygen documentation now works.
 - 2012-02-10 hilbert curve demo-script
 - 2012-02-01 chain_5_collinear2.py exposes a case where a desperate solution is returned, because we fail to detect this

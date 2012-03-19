@@ -6,6 +6,7 @@
 
 #include <boost/foreach.hpp>
 #include <boost/timer.hpp>
+#include <boost/program_options.hpp>
 
 #include <openvoronoi/voronoidiagram.hpp>
 #include <openvoronoi/checker.hpp>
@@ -18,10 +19,16 @@
 
 #define TTFONT "/usr/share/fonts/truetype/freefont/FreeSerif.ttf"
 
-Loops get_ttt_loops() {
+Loops get_ttt_loops(int char_index=0) {
     SEG_Writer my_writer; // this Writer writes G-code
     my_writer.set_scale(  2.5095362377e-4 );
-    Ttt t( &my_writer, "P", false , TTFONT ); // ( Writer*, text, unicode?, path-to-font )
+    
+    std::string all_glyphs = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    char c = all_glyphs.at(char_index);
+    std::string glyph(&c,1); //all_glyphs.at(char_index);
+    std::cout << " ttt glyph is " << glyph << "\n";
+    
+    Ttt t( &my_writer, glyph, false , TTFONT ); // ( Writer*, text, unicode?, path-to-font )
     
     Loops all_loops = my_writer.get_loops();
     
@@ -40,10 +47,38 @@ Loops get_ttt_loops() {
     return mod_loops;
 }
 
+namespace po = boost::program_options;
+
 // ttt example program
-int main() {
+int main(int argc,char *argv[]) {
+    // Declare the supported options.
+    po::options_description desc("This program calculates the voronoi diagram for a glyph from truetype-tracer.\nAllowed options");
+    desc.add_options()
+        ("help", "produce help message")
+        ("c", po::value<int>(), "set character, an int in [0,51] ")
+    ;
+
+    po::variables_map vm;
+    po::store(po::parse_command_line(argc, argv, desc), vm);
+    po::notify(vm);
     
-    Loops all_loops = get_ttt_loops();
+    if (vm.count("help")) {
+        std::cout << desc << "\n";
+        return 1;
+    }
+    
+    int char_index = 0;
+
+    if (vm.count("c")) {
+        int c = vm["c"].as<int>();
+        if ( 0<=c && c<= 51 )
+            char_index = c;
+        else {
+            std::cout << "--c option out of range!\n";
+            return 1;
+        }
+    }
+    Loops all_loops = get_ttt_loops(char_index);
     
     // print out the points
     int nloop =0;
@@ -91,7 +126,7 @@ int main() {
     std::cout << n_linesites << " LineSites:s inserted in  " << tmr.elapsed() << " seconds\n" << std::flush;
     
     // write vd to svg file
-    std::string filename = "ttt_glypoh.svg";
+    std::string filename = "ttt_glyph.svg";
     vd2svg(filename, vd);
     std::cout << "Output written to SVG file: " << filename << "\n"; //tmr.elapsed() << " seconds\n" << std::flush;
     

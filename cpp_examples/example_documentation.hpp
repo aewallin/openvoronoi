@@ -15,5 +15,7 @@
  * \example medial_axis/main.cpp
  * \example random_polygon/main.cpp 
  * random polygon example using CGAL random polygon algorithm (2-opt) from https://github.com/aewallin/CGAL_RPG
+ * \example ttt_glyph/main.cpp
+ * VD of a glyph/character from true-type-tracer. (https://github.com/aewallin/truetype-tracer) 
  * */
  

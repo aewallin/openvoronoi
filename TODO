@@ -1,4 +1,3 @@
-
 Core algorithm
 - support "spikes", i.e. three or more line-segments connecting to the same vertex
 - add suport for arcs
@@ -19,6 +18,7 @@ Core algorithm
   line-segment. Try to fail more graciously, or warn the user. Probably same issue with identical point-sites.
 - calling vd.check() after a "debug-mode" insert_line_site(id1,id2, step) (where e.g. step=5) causes a segfault
   make this fail more gracefully.
+- Try an alternative graph implementation for halfedge_diagram, such as http://lemon.cs.elte.hu/trac/lemon
 
 
 Solvers

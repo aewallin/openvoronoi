@@ -40,8 +40,6 @@ class Point {
         Point xy_perp() const;
         bool is_right(const Point &p1, const Point &p2) const;
         
-        //bool isInside(const Point& p1, const Point& p2) const;
-        
         Point &operator=(const Point &p);           ///< assignment
         Point &operator+=(const Point &p);          ///< addition
         Point &operator-=(const Point &p);          ///< subtraction

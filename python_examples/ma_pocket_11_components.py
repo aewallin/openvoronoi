@@ -759,7 +759,7 @@ if __name__ == "__main__":
     mapocket.setWidth( cut_width )
     mapocket.debug(True)
     t_before = time.time()
-    mapocket.run2()
+    mapocket.run()
     t_after = time.time()
     #print "( MA-pocket done in %.3f s. Got %d MICs )" % ((t_after-t_before),len(mic_list) )
     

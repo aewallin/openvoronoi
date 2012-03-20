@@ -114,16 +114,13 @@ typedef boost::adjacency_list_traits<OUT_EDGE_CONTAINER,
 /// point:  (1, -2x, -2y,    0, x*x+y*y    )    point at (x,y)
 template<class Scalar>
 struct Eq {
-    /// true for quadratic, false for linear
-    bool q; 
-    /// a parameter of line-equation
-    Scalar a;
-    /// b parameter of line equation
-    Scalar b;
-    /// c parameter of line equation
-    Scalar c;
-    /// offset direction parameter
-    Scalar k;
+    
+    bool q; ///< true for quadratic, false for linear
+    Scalar a; ///< a parameter of line-equation
+    Scalar b; ///< b parameter of line equation
+    Scalar c; ///< c parameter of line equation
+    Scalar k; ///< offset direction parameter
+    
     /// default ctor
     Eq<Scalar>() {
         a = Scalar(0);
@@ -185,13 +182,13 @@ public:
     /// string
     virtual std::string str() = 0;
     /// radius, -1 if line
-    virtual double radius() {return -1;}
+    virtual double radius() = 0; // {return -1;}
     /// center (for arc)
-    virtual Point center() {return Point(0,0);}
+    virtual Point center() =0; //{return Point(0,0);}
     /// start point
-    virtual Point start() {return Point(0,0);}
+    virtual Point start() =0;//{return Point(0,0);}
     /// end point
-    virtual Point end() {return Point(0,0);}
+    virtual Point end() =0; //{return Point(0,0);}
 };
 /// \brief offset-element of LineSite
 class LineOfs : public Ofs {
@@ -204,11 +201,13 @@ public:
         o << "LineOfs from:"<<_start<<" to " << _end << "\n";
         return o.str();        
     }
+    virtual double radius()  {return -1;}
+    virtual Point center() {return Point(0,0);}
+    virtual Point start() {return _start;}
+    virtual Point end() {return _end;}
 protected:
-    /// start point
-    Point _start;
-    /// end point
-    Point _end;
+    Point _start; ///< start point
+    Point _end;  ///< end point
 };
 /// \brief offset-element of PointSite or ArcSite
 class ArcOfs : public Ofs {
@@ -228,14 +227,10 @@ public:
     virtual Point start() {return _start;}
     virtual Point end() {return _end;}
 protected:
-    /// start
-    Point _start;
-    /// end
-    Point _end;
-    /// center
-    Point c;
-    /// radius
-    double r;
+    Point _start; ///< start
+    Point _end;   ///< end
+    Point c;      ///< center
+    double r;     ///< radius
 };
 
 /// Base-class for a voronoi-diagram site, or generator.
@@ -316,21 +311,21 @@ public:
         assert(0); 
         return 0;
     }
-    // used??
-    //virtual void set_c(const Point& ) {}
+
     /// string output
-    virtual std::string str() const {assert(0); return "Site";}
+    virtual std::string str() const =0; //{assert(0); return "Site";}
     /// alternative string output
-    virtual std::string str2() const {assert(0); return "Site";}
+    virtual std::string str2() const =0; //{assert(0); return "Site";}
     /// true for PointSite
     inline virtual bool isPoint() const { return false;}
     /// true for LineSite
     inline virtual bool isLine() const  { return false;}
     /// is given Point in_region ?
-    virtual bool in_region(const Point& ) const {
+    virtual bool in_region(const Point& ) const =0; 
+    /*{
         std::cout << " WARNING: never call Site !\n";
         return false;
-    }
+    }*/
     /// is given Point in region?
     virtual double in_region_t(const Point& ) const {
         std::cout << " WARNING: never call Site !\n";
@@ -526,16 +521,11 @@ public:
     virtual std::string str() const {return "ArcSite";}
 private:
     ArcSite() {} // don't use!
-    /// start Point of arc
-    Point _start;
-    /// end Point of arc
-    Point _end;
-    /// center of arc
-    Point _center;
-    /// CW or CCW direction flag
-    bool _dir; // CW or CCW
-    /// radius of arc
-    double _radius; // redundant?
+    Point _start; ///< start Point of arc
+    Point _end; ///< end Point of arc
+    Point _center; ///< center of arc
+    bool _dir; ///< CW or CCW direction flag
+    double _radius; /// radius of arc
 };
 
 

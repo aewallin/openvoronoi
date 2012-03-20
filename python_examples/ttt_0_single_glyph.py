@@ -68,9 +68,10 @@ def insert_polygon_segments(vd,id_list):
         #if (j<jmax):
             #vd.debug_on()
         #print " ",j,"inserting segement ",id_list[n]," - ",id_list[n_nxt]
-        if 0: #id_list[n]==90: #j == 0:
+        if 0: #id_list[n]==304: #j == 0:
             print " ",j,"inserting segement ",id_list[n]," - ",id_list[n_nxt]
-            vd.addLineSite( id_list[n], id_list[n_nxt],7)
+            vd.debug_on()
+            vd.addLineSite( id_list[n], id_list[n_nxt])
             vod.setVDText2([1,1])
             #ovd.PolygonInterior( vd.getGraph() , True )
             #ovd.MedialAxis( vd.getGraph() )
@@ -123,22 +124,23 @@ def ttt_segments(text,scale):
     wr = ttt.SEG_Writer()
 
     # wr.scale = 3
-    wr.arc = False
-    wr.conic = False
-    wr.cubic = False
-    wr.scale = float(1)/float(scale)
+    #wr.arc = False
+    #wr.conic = False
+    #wr.cubic = False
+    wr.scale = 1e-4 #float(1)/float(scale)
     # "L" has 36 points by default
-    wr.conic_biarc_subdivision = 10 # this has no effect?
-    wr.conic_line_subdivision = 50 # =10 increasesn nr of points to 366, = 5 gives 729 pts
-    wr.cubic_biarc_subdivision = 10 # no effect?
-    wr.cubic_line_subdivision = 10 # no effect?
-    wr.setFont(1)
+    #wr.conic_biarc_subdivision = 10 # this has no effect?
+    #wr.conic_line_subdivision = 50 # =10 increasesn nr of points to 366, = 5 gives 729 pts
+    #wr.cubic_biarc_subdivision = 10 # no effect?
+    #wr.cubic_line_subdivision = 10 # no effect?
+    #wr.setFont(0)
     s3 = ttt.ttt(text,wr) 
     segs = wr.get_segments()
     return segs
     
 
 if __name__ == "__main__":  
+    print ovd.version() + " " + ovd.build_type()
     #w=2500
     #h=1500
     
@@ -159,20 +161,20 @@ if __name__ == "__main__":
     myscreen.camera.SetFocalPoint(0.0, 0, 0)
 
     tscale = 1 / 2.5095362377e-4
-    segs = ttt_segments(  "f j", tscale) # 25000
-    segs = translate(segs, -0.5, -0.5)
+    segs = ttt_segments(  "j", tscale) # 25000
+    #segs = translate(segs, -0.5, -0.5)
     segs = modify_segments(segs)
     vd = ovd.VoronoiDiagram(far,120)
-    print ovd.version()
+    
     
     vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
     vod.drawFarCircle()
     vod.textScale = 0.00002
     vod.vertexRadius = 0.0011
     vod.drawVertices=0
-    vod.drawVertexIndex=0
+    vod.drawVertexIndex=1
     vod.drawGenerators=0
-    vod.offsetEdges = 0
+    vod.offsetEdges = 1
     vod.drawNullEdges = 1
     vd.setEdgeOffset(0.0001)
     
@@ -186,9 +188,9 @@ if __name__ == "__main__":
     vod.setVDText2(times)
     
     pi = ovd.PolygonInterior(  True )
-    vd.filter_graph(pi)
+    #vd.filter_graph(pi)
     ma = ovd.MedialAxis()
-    vd.filter_graph(ma)
+    #vd.filter_graph(ma)
     
     vod.setAll()
     print "PYTHON All DONE."

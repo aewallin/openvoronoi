@@ -223,7 +223,7 @@ solvers::Solution VertexPositioner::position(Site* s1, double k1, Site* s2, doub
         std::cout << "No solutions found by solvers!\n";
     }
 
-    assert(0); // in Debug mode, stop here.
+    //assert(0); // in Debug mode, stop here.
     
     solvers::Solution desp = desperate_solution(s3);  // ( p_mid, t_mid, desp_k3 ); 
     

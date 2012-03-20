@@ -84,7 +84,6 @@ private:
     double edge_error(solvers::Solution& sl);
     Point projection_point(solvers::Solution& sl);
 // geometry-checks
-    
     bool solution_on_edge(solvers::Solution& s);
     bool check_far_circle(solvers::Solution& s);
     bool check_dist(HEEdge e, const solvers::Solution& s, Site* s3);
@@ -93,29 +92,19 @@ private:
     solvers::Solution desperate_solution(Site* s3);
 
 // solvers, to which we dispatch, depending on the input sites
-    /// solver
-    solvers::Solver* ppp_solver;
-    /// solver
-    solvers::Solver* lll_solver;
-    /// solver
-    solvers::Solver* lll_para_solver;
-    /// solver
-    solvers::Solver* qll_solver;
-    /// separator solver
-    solvers::Solver* sep_solver;
-    /// alternative separator solver
-    solvers::Solver* alt_sep_solver;
+    
+    solvers::Solver* ppp_solver; ///< point-point-point solver
+    solvers::Solver* lll_solver; ///< line-line-line solver
+    solvers::Solver* lll_para_solver; ///< solver
+    solvers::Solver* qll_solver; ///< solver
+    solvers::Solver* sep_solver; ///< separator solver
+    solvers::Solver* alt_sep_solver; ///< alternative separator solver
 // DATA
-    /// reference to the VD graph.
-    HEGraph& g; 
-    /// minimum offset-distance
-    double t_min;
-    /// maximum offset-distance
-    double t_max;
-    /// the edge on which we position a new vertex
-    HEEdge edge;
-    /// error-statistics
-    std::vector<double> errstat;
+    HEGraph& g;  ///< reference to the VD graph.
+    double t_min; ///< minimum offset-distance
+    double t_max; ///< maximum offset-distance
+    HEEdge edge;  ///< the edge on which we position a new vertex
+    std::vector<double> errstat; ///< error-statistics
 };
 
 /// \brief error functor for edge-based desperate solver
@@ -129,13 +118,16 @@ public:
     VertexError(HEGraph& gi, HEEdge sln_edge, Site* si3) :
     g(gi),  edge(sln_edge), s3(si3)
     {}
-    /// return the vertex-error,
+    /// return the vertex-error t-d3 where
+    /// t3 is the distance from edge-point(t) to s3, and
+    /// t is the offset-distance of the solution
     double operator()(const double t) {
         Point p = edge_point(t);
         double s3_dist = (p - s3->apex_point(p)).norm();
         return fabs(t-s3_dist);
     }
-    /// return a point on the edge at given offset-distance \a t
+    /// return a point on the edge at given offset-distance
+    /// \param t offset-distance ( >= 0 )
     Point edge_point(const double t) {
         Point p;
         if ( g[edge].type == LINELINE ) { // this is a workaround because the LINELINE edge-parameters are wrong? at least in some cases?
@@ -159,12 +151,9 @@ public:
         return p;
     }
 private:
-    /// vd-graph
-    HEGraph& g;
-    /// existing edge on which we have positioned a new vertex
-    HEEdge edge;
-    /// newly inserted Site
-    Site* s3;
+    HEGraph& g; ///< vd-graph
+    HEEdge edge; ///< existing edge on which we have positioned a new vertex
+    Site* s3; ///< newly inserted Site
 };
 
 }

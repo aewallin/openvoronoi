@@ -21,7 +21,7 @@
 
 Loops get_ttt_loops(int char_index=0) {
     SEG_Writer my_writer; // this Writer writes G-code
-    my_writer.set_scale(  2.5095362377e-4 );
+    my_writer.set_scale(  1e-4 );
     
     std::string all_glyphs = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     char c = all_glyphs.at(char_index);

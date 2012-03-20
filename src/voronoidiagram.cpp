@@ -314,15 +314,17 @@ if (step==current_step) return false; current_step++;
     HEFace pos_face, neg_face; 
     HEEdge pos_edge, neg_edge;
     {
-        if ( linesite_k_sign ) {
-            boost::tie(pos_edge, neg_edge) = g.add_twin_edges( seg_start,   seg_end );
-            g[pos_edge].inserted_direction = true;
-            g[neg_edge].inserted_direction = false;
-        } else {
+        // 2012-03-20: coverage-testing shows this never happens!
+        //if ( linesite_k_sign ) {
+        //    boost::tie(pos_edge, neg_edge) = g.add_twin_edges( seg_start,   seg_end );
+        //    g[pos_edge].inserted_direction = true;
+        //    g[neg_edge].inserted_direction = false;
+        //} else {
+        assert(!linesite_k_sign);
             boost::tie( pos_edge, neg_edge) = g.add_twin_edges( seg_end  ,seg_start );
             g[pos_edge].inserted_direction = false;
             g[neg_edge].inserted_direction = true;
-        }
+        //}
         g[pos_edge].type = LINESITE;
         g[neg_edge].type = LINESITE;
         g[pos_edge].k = +1;

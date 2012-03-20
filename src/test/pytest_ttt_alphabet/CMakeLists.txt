@@ -12,5 +12,8 @@ set( TTT_ALPHA_CASES 200 100 50 25 )  # 12 6 3
 #    6== takes ca 384 seconds
 #    3== takes ca ??  seconds
 foreach( CASE ${TTT_ALPHA_CASES}) # characters A..Z
-    ADD_TEST(${test_name}_${CASE} python ${CMAKE_SOURCE_DIR}/test/${test_name}/ttt_alphabet.py ${CASE})
+    ADD_TEST(
+        NAME ${test_name}_${CASE} 
+        CONFIGURATIONS Release
+        COMMAND python ${CMAKE_SOURCE_DIR}/test/${test_name}/ttt_alphabet.py ${CASE})
 endforeach()

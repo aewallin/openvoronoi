@@ -103,6 +103,8 @@ namespace svg
         double x;
         double y;
     };
+    // AW 2012-03-20: code-coverage shows no use for this. comment out.
+    /*
     optional<Point> getMinPoint(std::vector<Point> const & points)
     {
         if (points.empty())
@@ -116,7 +118,9 @@ namespace svg
                 min.y = points[i].y;
         }
         return optional<Point>(min);
-    }
+    }*/
+    // AW 2012-03-20: code-coverage shows no use for this. comment out.
+    /*
     optional<Point> getMaxPoint(std::vector<Point> const & points)
     {
         if (points.empty())
@@ -131,6 +135,7 @@ namespace svg
         }
         return optional<Point>(max);
     }
+    */
 
     // Defines the dimensions, scale, origin, and origin offset of the document.
     struct Layout
@@ -301,13 +306,15 @@ namespace svg
 
         return combination_str;
     }
-
+    
+    
     class Circle : public Shape
     {
     public:
         Circle(Point const & icenter, double idiameter, Fill const & ifill,
             Stroke const & istroke = Stroke())
             : Shape(ifill, istroke), center(icenter), radius(idiameter / 2) { }
+        
         std::string toString(Layout const & layout) const
         {
             std::stringstream ss;
@@ -326,7 +333,8 @@ namespace svg
         Point center;
         double radius;
     };
-
+    // AW 2012-03-20: code-coverage shows no use for this. comment out.
+    /*
     class Elipse : public Shape
     {
     public:
@@ -354,7 +362,10 @@ namespace svg
         double radius_width;
         double radius_height;
     };
-
+    */
+    
+    // AW 2012-03-20: code-coverage shows no use for this. comment out.
+    /*
     class Rectangle : public Shape
     {
     public:
@@ -382,7 +393,10 @@ namespace svg
         double width;
         double height;
     };
-
+    */
+    
+    // AW 2012-03-20: code-coverage shows no use for this. comment out.
+    /*
     class Line : public Shape
     {
     public:
@@ -412,7 +426,8 @@ namespace svg
         Point start_point;
         Point end_point;
     };
-
+    */
+    
     class EllipticalArc : public Shape
     {
     public:
@@ -451,6 +466,8 @@ namespace svg
         Point end_point;
     };
 
+    // AW 2012-03-20: code-coverage shows no use for this. comment out.
+    /*
     class Polygon : public Shape
     {
     public:
@@ -485,7 +502,8 @@ namespace svg
     private:
         std::vector<Point> points;
     };
-
+    */
+    
     class Polyline : public Shape
     {
     public:
@@ -522,7 +540,8 @@ namespace svg
         }
         std::vector<Point> points;
     };
-
+    // AW 2012-03-20: code-coverage shows no use for this. comment out.
+    /*
     class Text : public Shape
     {
     public:
@@ -548,8 +567,12 @@ namespace svg
         std::string content;
         Font font;
     };
-
+    */
+    
+    
     // Sample charting class.
+    // AW 2012-03-20: code-coverage shows no use for this. comment out.
+    /*
     class LineChart : public Shape
     {
     public:
@@ -635,6 +658,7 @@ namespace svg
             return shifted_polyline.toString(layout) + vectorToString(vertices, layout);
         }
     };
+    */
 
     class Document
     {

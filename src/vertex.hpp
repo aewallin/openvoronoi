@@ -62,7 +62,7 @@ public:
     VoronoiVertex( Point pos, VertexStatus st, VertexType t, Point initDist, double k3);
     virtual ~VoronoiVertex();
 
-    typedef unsigned int HEFace;
+    typedef unsigned int HEFace; ///< face-descriptor
 
     void reset_status();
     friend class VoronoiDiagramChecker;

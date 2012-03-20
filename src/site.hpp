@@ -394,12 +394,10 @@ public:
     virtual bool in_region(const Point& ) const {return true;}
     virtual double in_region_t(const Point& p) const {return -1;}
     virtual HEVertex vertex() {return v;}
-    /// vertex descriptor of this PointSite
-    HEVertex v;
+    HEVertex v; ///< vertex descriptor of this PointSite
 private:
     PointSite() {} // don't use!
-    /// position
-    Point _p;
+    Point _p; ///< position
 };
 
 /// line segment Site
@@ -525,7 +523,7 @@ private:
     Point _end; ///< end Point of arc
     Point _center; ///< center of arc
     bool _dir; ///< CW or CCW direction flag
-    double _radius; /// radius of arc
+    double _radius; ///< radius of arc
 };
 
 

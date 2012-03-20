@@ -333,15 +333,15 @@ class VD:
             status = pt[2]
             idx = pt[3]
             vtype = pt[4]
-            if status == ovd.VoronoiVertexStatus.IN:
+            if status == ovd.VertexStatus.IN:
                 vcolor = red
-            elif status == ovd.VoronoiVertexStatus.OUT:
+            elif status == ovd.VertexStatus.OUT:
                 vcolor = blue
-            elif status == ovd.VoronoiVertexStatus.NEW:
+            elif status == ovd.VertexStatus.NEW:
                 vcolor = green
                     
-            if status == ovd.VoronoiVertexStatus.IN or status == ovd.VoronoiVertexStatus.OUT or status == ovd.VoronoiVertexStatus.NEW:
-                if ( vtype != ovd.VoronoiVertexType.SEPPOINT and vtype != ovd.VoronoiVertexType.ENDPOINT and vtype != ovd.VoronoiVertexType.POINTSITE):
+            if status == ovd.VertexStatus.IN or status == ovd.VertexStatus.OUT or status == ovd.VertexStatus.NEW:
+                if ( vtype != ovd.VertexType.SEPPOINT and vtype != ovd.VertexType.ENDPOINT and vtype != ovd.VertexType.POINTSITE):
                     id_text = str(idx)
                     #print "drawVertexIdx text= ", id_text, " pos= ", p
                     factor = FollowerText( text=id_text,center=(p.x,p.y,0), scale = self.textScale, color=vcolor)

@@ -256,19 +256,23 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
     Point src_se = g[start].position;
     Point trg_se = g[end  ].position;
     Point left = 0.5*(src_se+trg_se) + (trg_se-src_se).xy_perp(); // this is used below and in find_null_face()
+    #ifndef NDEBUG
     bool linesite_k_sign = left.is_right(src_se,trg_se); 
+    #endif
     
 if (step==current_step) return false; current_step++;
 
     LineSite* pos_site;
     LineSite* neg_site;
-    if ( linesite_k_sign ) {
-        pos_site = new LineSite( g[start].position, g[end  ].position , +1);
-        neg_site = new LineSite( g[end  ].position, g[start].position , -1);
-    } else {
+    assert(!linesite_k_sign);
+    // 2012-03-20: coverage testing shows this never happens:
+    //if ( linesite_k_sign ) {
+    //    pos_site = new LineSite( g[start].position, g[end  ].position , +1);
+    //    neg_site = new LineSite( g[end  ].position, g[start].position , -1);
+    //} else {
         pos_site = new LineSite( g[end  ].position, g[start].position , +1);
         neg_site = new LineSite( g[start].position, g[end  ].position , -1);
-    }
+    //}
 
 if (step==current_step) return false; current_step++;
 
@@ -707,14 +711,16 @@ VoronoiDiagram::find_null_face(HEVertex start, HEVertex other, Point left) {
                         found = true;
                 }
                 current2 = g[current2].next;
-            } while (current2!=start_edge2 ); // FIXME end early with !found 
-            assert( insert_edge != HEEdge() && found );
+            } while (current2!=start_edge2 && !found ); // FIXME end early with !found 
+            assert( insert_edge != HEEdge() );
+            assert( found );
+            /*
             if (!found) {
                 std::cout << "find_null_face() FATAL ERROR. can't find edge to insert segment endpoint.\n";
                 std::cout << " null face for endpoint " << g[start].index <<" is "; g.print_face(start_null_face);
                 
                 exit(-1);
-            }
+            }*/
             if (debug) { std::cout << "find_null_face() endpoint edge is "; g.print_edge(insert_edge); }
         }
         g.add_vertex_in_edge(seg_start,insert_edge); // insert endpoint in null-edge
@@ -1095,11 +1101,9 @@ EdgeVector VoronoiDiagram::find_split_edges(HEFace f, Point pt1, Point pt2) {
 ///
 /// these are projections/mirrors of the site of f with the new Site s acting as the mirror
 ///
-/// SPLIT vertices are inserted to avoid deleting loops during augment_vertex_set()
+/// ::SPLIT vertices are inserted to avoid deleting loops during augment_vertex_set()
 void VoronoiDiagram::add_split_vertex(HEFace f, Site* s) {
-    assert(!s->isPoint());
-    //if (s->isPoint())
-    //    return; // no split-vertices when inserting point-sites
+    assert(!s->isPoint()); // no split-vertices when inserting point-sites
         
     Site* fs = g[f].site;
     
@@ -1289,10 +1293,10 @@ void VoronoiDiagram::add_edges(HEFace newface, HEFace f, HEFace newface2, std::p
     if (debug) std::cout << " add_edges() on f=" << f << " with " << new_count << " NEW verts.\n";
     assert( new_count > 0 );
     assert( (new_count % 2) == 0 );
-    if ((new_count % 2) != 0) {
-        std::cout << " add_edges() FATAL ERROR on f=" << f << " with " << new_count << " NEW verts.\n";
-        exit(-1);
-    }
+    //if ((new_count % 2) != 0) {
+    //    std::cout << " add_edges() FATAL ERROR on f=" << f << " with " << new_count << " NEW verts.\n";
+    //    exit(-1);
+    //}
     int new_pairs = new_count / 2; // we add one NEW-NEW edge for each pair found
     VertexVector startverts; // this holds ed.v1 vertices for edges already added
     for (int m=0;m<new_pairs;m++) {
@@ -1331,10 +1335,10 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
     }
         
     // both trg and src should be on same side of new site 
-    if (g[new_target].k3 != g[new_source].k3) {
-        std::cout << "WARNING: g[" << g[new_target].index << "].k3=" << g[new_target].k3 << " != ";
-        std::cout << "g[" << g[new_source].index << "].k3=" << g[new_source].k3<< "\n";
-    }
+    //if (g[new_target].k3 != g[new_source].k3) {
+    //    std::cout << "WARNING: g[" << g[new_target].index << "].k3=" << g[new_target].k3 << " != ";
+    //    std::cout << "g[" << g[new_source].index << "].k3=" << g[new_source].k3<< "\n";
+    //}
     assert( g[new_target].k3 == g[new_source].k3 );
 
     //                                           f
@@ -1524,14 +1528,14 @@ boost::tuple<HEEdge,HEVertex,HEEdge,bool> VoronoiDiagram::find_separator_target(
         //assert(count<10000); // some reasonable max number of edges in face, to avoid infinite loop
     } while (current_edge!=start_edge && !found);
     assert(found);
-    if (!found) {
-        std::cout << "find_separator_target() FATAL ERROR\n";
-        std::cout << " find_separator_target Unable to find target vertex on face f=" << f << " endp= " << g[endp].index << "\n";
-        std::cout << " looking for OUT-NEW-IN: " << OUT << " - " << NEW << " - " << IN << "\n";
-        std::cout << " looking for IN-NEW-OUT: " << IN << " - " << NEW << " - " << OUT << "\n";
-        g.print_face(f);
-        exit(-1);
-    }
+    //if (!found) {
+    //    std::cout << "find_separator_target() FATAL ERROR\n";
+    //    std::cout << " find_separator_target Unable to find target vertex on face f=" << f << " endp= " << g[endp].index << "\n";
+    //    std::cout << " looking for OUT-NEW-IN: " << OUT << " - " << NEW << " - " << IN << "\n";
+    //    std::cout << " looking for IN-NEW-OUT: " << IN << " - " << NEW << " - " << OUT << "\n";
+    //    g.print_face(f);
+    //    exit(-1);
+    //}
     return boost::make_tuple(v_previous, v_target, v_next, flag);
 }
 
@@ -1590,11 +1594,11 @@ VoronoiDiagram::EdgeData VoronoiDiagram::find_edge_data(HEFace f, VertexVector s
         //count++;
         //assert(count<10000); // some reasonable max number of edges in face, to avoid infinite loop
     } while (current_edge!=start_edge && !found);
-    if (!found) {
-        std::cout << "ERROR: unable to find OUT-NEW-IN vertex on face:\n";
-        g.print_face(f);
-        std::cout << " The excluded vertices are: (size=" << startverts.size()<<")"; g.print_vertices(startverts);
-    }
+    //if (!found) {
+    //    std::cout << "ERROR: unable to find OUT-NEW-IN vertex on face:\n";
+    //    g.print_face(f);
+    //    std::cout << " The excluded vertices are: (size=" << startverts.size()<<")"; g.print_vertices(startverts);
+    //}
     assert(found);
     if (debug) std::cout << " OUT-NEW-IN = " << g[ed.v1].index << "\n";
 
@@ -1656,7 +1660,9 @@ void VoronoiDiagram::repair_face( HEFace f, std::pair<HEVertex,HEVertex> segment
         assert( vd_checker->check_edge(current_edge) );
         HEVertex current_target = g.target( current_edge ); // an edge on the new face
         HEVertex current_source = g.source( current_edge );
+        #ifndef NDEBUG
         bool found_next_edge= false;
+        #endif
         if (debug) { 
             std::cout << " edge " << g[ g.source(current_edge) ].index << " - ";
             std::cout <<  g[ g.target(current_edge) ].index << "\n";
@@ -1704,7 +1710,9 @@ void VoronoiDiagram::repair_face( HEFace f, std::pair<HEVertex,HEVertex> segment
                 // and it should be on the same face.
                 if (  (g[e].face == f) ) {  
                     g[current_edge].next = e; // this is the edge we want to take
+                    #ifndef NDEBUG
                     found_next_edge = true;
+                    #endif
                     if(debug) {
                         std::cout << "         next: " << g[ g.source(e) ].index << " - ";
                         std::cout << g[ g.target(e) ].index << "\n";
@@ -1714,10 +1722,10 @@ void VoronoiDiagram::repair_face( HEFace f, std::pair<HEVertex,HEVertex> segment
                 }
             } 
         }
-        if (!found_next_edge) {
-            std::cout << " repair_face( " << f << " ) error. could not find next-edge!\n";
-            exit(-1);
-        }
+        //if (!found_next_edge) {
+        //    std::cout << " repair_face( " << f << " ) error. could not find next-edge!\n";
+        //    exit(-1);
+        //}
         assert(found_next_edge); // must find a next-edge!
         //count++;
         //if (count>30)

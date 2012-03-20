@@ -45,10 +45,10 @@ endif (CMAKE_BUILD_TOOL MATCHES "make")
 
 
 # uncomment one of these to change build-type
- set(CMAKE_BUILD_TYPE Release)
+# set(CMAKE_BUILD_TYPE Release)
 # set(CMAKE_BUILD_TYPE Debug)
 # set(CMAKE_BUILD_TYPE Profile)
-# set(CMAKE_BUILD_TYPE Coverage)
+ set(CMAKE_BUILD_TYPE Coverage)
 
 MESSAGE(STATUS " CMAKE_BUILD_TYPE  = " ${CMAKE_BUILD_TYPE})
 
@@ -190,6 +190,20 @@ add_library(
 )
 set_target_properties(libopenvoronoi PROPERTIES PREFIX "")
 set_target_properties(libopenvoronoi PROPERTIES VERSION ${MY_VERSION}) 
+
+# c++lib for coverage testing
+add_library(
+    libopenvoronoi-coverage
+    SHARED
+    EXCLUDE_FROM_ALL # not built by default
+    ${OVD_SRC}
+)
+set_target_properties(libopenvoronoi-coverage PROPERTIES PREFIX "")
+set_target_properties( libopenvoronoi-coverage
+    PROPERTIES
+    CMAKE_BUILD_TYPE Coverage
+    CMAKE_CXX_FLAGS "-O0 -fprofile-arcs -ftest-coverage -fno-inline ${CMAKE_CXX_FLAGS_DEBUG}"
+    )
 
 # static library, linked with the python module below
 add_library(

@@ -76,7 +76,7 @@ def rpg_vd(Npts, seed, debug):
     for p in poly:
         ocl_pt = ovd.Point( p[0], p[1] )
         pts.append(  ocl_pt )
-        print ocl_pt
+        #print ocl_pt
         
     times=[]
     id_list = []
@@ -85,6 +85,7 @@ def rpg_vd(Npts, seed, debug):
     for p in pts:
         #print " adding vertex ",m
         id_list.append( vd.addVertexSite( p ) )
+        print id_list[m]," : ",p
         m=m+1
     """
     print "polygon is: "
@@ -95,8 +96,8 @@ def rpg_vd(Npts, seed, debug):
     t_after = time.time()
     times.append( t_after-t_before )
     
-    #print " pts inserted in ", times[0], " s"
-    #print " vd-check: ",vd.check()
+    print " pts inserted in ", times[0], " s"
+    print " vd-check: ",vd.check()
     if (debug):
         vd.debug_on()
 
@@ -127,25 +128,25 @@ def loop_run(Npts, max_seed, debug=False, debug_seed=-1):
             print "debug seed!"
             debug2 = True
         result = rpg_vd(Npts,seed,debug2)
-        print "N=",Npts," s=",seed, " ok?=",result
+        print "N=",Npts," s=",seed, " ok?=",result[0]
         assert( result[0] == True )
 
 def single_run(Npts, seed, debug=False):
     result = rpg_vd(Npts,seed,debug)
-    print "N=",Npts," s=",seed, " ok?=",result
+    print "N=",Npts," s=",seed, " ok?=",result[0]
     assert( result[0] == True )
     return result
     
 
     
 if __name__ == "__main__":  
-    #loop_run(50,300)
+    #loop_run(5,100)
     
     
-    r = single_run(50,int(37))
+    r = single_run(5,int(44))
     vd = r[1]
     pi = ovd.PolygonInterior(True)
     vd.filter_graph(pi)
     
     draw_vd(vd,r[2])
-        
+    

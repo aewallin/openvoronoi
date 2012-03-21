@@ -57,8 +57,8 @@ if __name__ == "__main__":
     vd.setEdgeOffset(0.05)
     linesegs = 1 # switch to turn on/off line-segments
     
-    Npts = 500
-    poly = rpg.rpg(Npts, 0)
+    Npts = 5
+    poly = rpg.rpg(Npts, 1)
     # N=3 working seeds: 25-43 45
     
     

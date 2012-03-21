@@ -1052,8 +1052,8 @@ void VoronoiDiagram::mark_adjacent_faces( HEVertex v, Site* site) {
 
     BOOST_FOREACH( HEFace adj_face, new_adjacent_faces ) {
         if ( g[adj_face].status != INCIDENT ) {
-            if ( site->isLine() )
-                add_split_vertex(adj_face, site);
+            //if ( site->isLine() )
+            //    add_split_vertex(adj_face, site);
 
             g[adj_face].status = INCIDENT;
             incident_faces.push_back(adj_face);

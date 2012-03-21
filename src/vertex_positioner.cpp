@@ -209,15 +209,16 @@ solvers::Solution VertexPositioner::position(Site* s1, double k1, Site* s2, doub
     solver_debug(false);
     
     if ( !solutions2.empty() ) {
+        std::cout <<  " t in [ " << t_min << " , " << t_max << "\n";
         std::cout << "The failing " << solutions2.size() << " solutions are: \n";
         BOOST_FOREACH(solvers::Solution s, solutions2 ) {
             std::cout << s.p << " t=" << s.t << " k3=" << s.k3  << " e_err=" << edge_error(s) <<"\n";
-            std::cout << " min<t<max=" << ((s.t>=t_min) && (s.t<=t_max));
-            std::cout << " s3.in_region=" << s3->in_region(s.p);
-            std::cout <<  " region-t=" << s3->in_region_t(s.p) << "\n";
-            std::cout <<  " t - t_min= " << s.t - t_min << "\n";
-            std::cout <<  " t_max - t= " << t_max - s.t << "\n";
-            std::cout <<  " edge type : " << g[edge].type << "\n"; //std::scientific;
+            //std::cout << " min<t<max=" << ((s.t>=t_min) && (s.t<=t_max));
+            //std::cout << " s3.in_region=" << s3->in_region(s.p);
+            //std::cout <<  " region-t=" << s3->in_region_t(s.p) << "\n";
+            //std::cout <<  " t - t_min= " << s.t - t_min << "\n";
+            //std::cout <<  " t_max - t= " << t_max - s.t << "\n";
+            //std::cout <<  " edge type : " << g[edge].type << "\n"; //std::scientific;
         }   
     } else {
         std::cout << "No solutions found by solvers!\n";

@@ -1,5 +1,6 @@
 Core algorithm
 - support "spikes", i.e. three or more line-segments connecting to the same vertex
+  (this is illustrated in the failing test cpptest_spike)
 - add suport for arcs
 - better logging (logging levels, where we log, etc)
 - better error handling (exceptions?)
@@ -73,7 +74,7 @@ Input/Output
 - SVG, DXF input
 
 Tests
-- Write more tests! ( also in c++? )
+- Write more tests!
 - Test for memory-leaks with valgrind
 - Benchmark against libarea/kbool and libarea/Clipper (are there other FOSS offsetting codes?)
 - Compare against other VD codes (CGAL, boost-sweepline, others?)
@@ -100,6 +101,7 @@ Packaging/Building etc
   the "openvoronoi" package is as small as possible (for non developers who do not need to run tests)
 
 DONE:
+- 2012-03    we now have a set of c++ tests in addition to the python tests
 - 2012       SVG output for vd and offsets with 
 - 2012-03-16 Code-coverage for tests ( "make coverage-report" )
 - 2012-03-12 doxygen documentation now works.

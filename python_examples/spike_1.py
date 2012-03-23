@@ -62,11 +62,11 @@ if __name__ == "__main__":
     segs = []
     #ovd.Point(1,1)
     eps=0.9
-    p1=ovd.Point(-0.1,-0.2)
-    p2=ovd.Point(0.2,0.1)
-    p3=ovd.Point(0.4,0.2)
-    p4=ovd.Point(0.6,0.6)
-    p5=ovd.Point(-0.6,0.3)
+    p1=ovd.Point(-0.1,-0.2) # 0
+    p2=ovd.Point(0.2,0.1)   # 1
+    p3=ovd.Point(0.4,0.2)   # 2
+    p4=ovd.Point(0.6,0.6)   # 3
+    p5=ovd.Point(-0.6,0.3)  # 4
 
     pts = [p1,p2,p3,p4,p5]
     
@@ -90,20 +90,16 @@ if __name__ == "__main__":
     print "all point sites inserted. ",
     vd.check()
     
-    #nsegs = Nmax
-    #nsegs = 5 #Nmax
-    #n=1
+
     t_before = time.time()
     
     #vd.debug_on()
     vd.addLineSite( id_list[0], id_list[1])
-    
-    
-    #vd.check()
+    vd.check()
     
     #vd.debug_on()
     vd.addLineSite( id_list[1], id_list[2])
-    #vd.check()
+    vd.check()
     
     #vd.addLineSite( id_list[2], id_list[3])
     #vd.check()
@@ -149,15 +145,6 @@ if __name__ == "__main__":
     # 12 reset status
             
     vod.setVDText2(times)
-    
-    err = vd.getStat()
-    #print err 
-    print "got errorstats for ",len(err)," points"
-    if len(err)>1:
-        minerr = min(err)
-        maxerr = max(err)
-        print "min error= ",minerr
-        print "max error= ",maxerr
     
     print "num vertices: ",vd.numVertices() 
     print "num SPLIT vertices: ",vd.numSplitVertices() 

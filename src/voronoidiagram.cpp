@@ -700,24 +700,36 @@ VoronoiDiagram::find_null_face(HEVertex start, HEVertex other, Point left) {
         // find the edge on the null-face where we insert seg_start
         HEEdge insert_edge = HEEdge();
         {
-            HEEdge current2 = g[start_null_face].edge;
-            HEEdge start_edge2 = current2;
+            HEEdge current = g[start_null_face].edge;
+            HEEdge start_edge2 = current;
+            EdgeVector incident_edges;
             g[seg_start].set_alfa(dir);
             bool found = false;
             if (debug) std::cout << "Looking for endpoint edge:\n";
             do {
-                bool face_incident = ( g[ g[ g[current2].twin ].face ].status == INCIDENT);
+                bool face_incident = ( g[ g[ g[current].twin ].face ].status == INCIDENT);
                 if (debug) {
-                    std::cout << " incident= " << face_incident << "\n"; g.print_edge(current2);
+                    if (face_incident)
+                        std::cout << " " << g[g.source(current)].index << " - " << g[g.target(current)].index << " INCIDENT \n"; // g.print_edge(current);
+                    else
+                        std::cout << " " << g[g.source(current)].index << " - " << g[g.target(current)].index << " NONINCIDENT \n";
                 }
-                if ( face_incident ) { // pick any incident face!
-                        insert_edge = current2;
-                        found = true;
+                if ( face_incident ) { // pick any incident face!?
+                    insert_edge = current;
+                    found = true;
+                    incident_edges.push_back(current);
                 }
-                current2 = g[current2].next;
-            } while (current2!=start_edge2 && !found ); // FIXME end early with !found 
+                current = g[current].next;
+            } while (current!=start_edge2  ); // end early with !found  && !found
             assert( insert_edge != HEEdge() );
             assert( found );
+            assert( !incident_edges.empty() );
+            if (incident_edges.size()==1 || incident_edges.size()==2)
+                insert_edge = incident_edges[0];
+            else if (incident_edges.size()==3)
+                insert_edge = incident_edges[1];
+            else
+                assert(0);
             /*
             if (!found) {
                 std::cout << "find_null_face() FATAL ERROR. can't find edge to insert segment endpoint.\n";

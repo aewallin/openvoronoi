@@ -87,7 +87,7 @@ if __name__ == "__main__":
     #exit()
     
     #print "   ",2*Nmax," point-sites sites took {0:.3f}".format(times[0])," seconds, {0:.2f}".format( 1e6*float( times[0] )/(float(2*Nmax)*float(math.log10(2*Nmax))) ) ,"us/n*log(n)"
-    print "all point sites inserted. ",
+    print "all point sites inserted. "
     vd.check()
     
 
@@ -109,7 +109,7 @@ if __name__ == "__main__":
     #vd.addLineSite( id_list[3], id_list[4])
     #vd.check()
     vd.debug_on()
-    vd.addLineSite( id_list[4], id_list[1],9)
+    vd.addLineSite( id_list[4], id_list[1])
     #vd.check()
     
     t_after = time.time()

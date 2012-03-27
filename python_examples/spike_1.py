@@ -48,13 +48,13 @@ if __name__ == "__main__":
     vod.drawFarCircle()
 
     
-    vod.textScale = 0.02
+    vod.textScale = 0.002
     vod.vertexRadius = 0.0031
     vod.drawVertices=0
     vod.drawVertexIndex=1
     vod.drawGenerators=0
     vod.offsetEdges = 1
-    vd.setEdgeOffset(0.05)
+    vd.setEdgeOffset(0.005)
     
     
     linesegs = 1 # switch to turn on/off line-segments
@@ -101,15 +101,20 @@ if __name__ == "__main__":
     vd.addLineSite( id_list[1], id_list[2])
     vd.check()
     
-    #vd.addLineSite( id_list[2], id_list[3])
-    #vd.check()
+    vd.addLineSite( id_list[4], id_list[1])
+    vd.check()
     
-    #vd.debug_on()
+    
+    vd.debug_on()
+    vd.addLineSite( id_list[3], id_list[1], 11)
+    #
+    
+    #
     
     #vd.addLineSite( id_list[3], id_list[4])
     #vd.check()
-    vd.debug_on()
-    vd.addLineSite( id_list[4], id_list[1])
+    #vd.debug_on()
+    
     #vd.check()
     
     t_after = time.time()
@@ -133,7 +138,8 @@ if __name__ == "__main__":
     # 8 add positive/start separator edge
     # 9 add negative/start separator edge
     # 10 add positive/end separator edge
-    
+    # 11 add neg/end separator
+    # 12 add normal edges
     
     # 5 create new vertices
     # 6 add startpoint pos separator

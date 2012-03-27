@@ -720,8 +720,10 @@ VoronoiDiagram::find_null_face(HEVertex start, HEVertex other, Point left) {
             assert( insert_edge != HEEdge() );
             assert( found );
             assert( !incident_edges.empty() );
-            if (incident_edges.size()==1 || incident_edges.size()==2)
+            if (incident_edges.size()==1)
                 insert_edge = incident_edges[0];
+            else if (incident_edges.size()==2)
+                insert_edge = incident_edges[1];
             else if (incident_edges.size()==3)
                 insert_edge = incident_edges[1];
             else

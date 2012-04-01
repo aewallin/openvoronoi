@@ -7,18 +7,7 @@ import vtk
 import random
 import string
 
-def translate(segs,x,y):
-    out = []
-    for seg in segs:
-        seg2 = []
-        for p in seg:
-            p2 = []
-            p2.append(p[0] + x)
-            p2.append(p[1] + y)
-            seg2.append(p2)
-            #seg2.append(seg[3] + y)
-        out.append(seg2)
-    return out
+
 
 def insert_polygon_points(vd, polygon):
     pts=[]
@@ -67,17 +56,7 @@ def insert_polygon_segments(vd,id_list):
                 vd.addLineSite( id_list[n], id_list[n_nxt])
         j=j+1
 
-def modify_segments(segs):
-    segs_mod =[]
-    for seg in segs:
-        first = seg[0]
-        last = seg[ len(seg)-1 ]
-        assert( first[0]==last[0] and first[1]==last[1] )
-        seg.pop()
-        seg.reverse()
-        segs_mod.append(seg)
-        #drawSegment(myscreen, seg)
-    return segs_mod
+
 
 def insert_many_polygons(vd,segs):
     polygon_ids =[]
@@ -107,7 +86,7 @@ def ttt_segments(text,scale):
     wr.scale = float(1)/float(scale)
     # "L" has 36 points by default
     wr.conic_biarc_subdivision = 10 # this has no effect?
-    wr.conic_line_subdivision = 200 # =10 increasesn nr of points to 366, = 5 gives 729 pts
+    wr.conic_line_subdivision = 200 # =10 increasesn nr of points to 366, =5 gives 729 pts
     wr.cubic_biarc_subdivision = 10 # no effect?
     wr.cubic_line_subdivision = 10 # no effect?
     s3 = ttt.ttt(text,wr) 
@@ -115,6 +94,31 @@ def ttt_segments(text,scale):
     ext = wr.extents
     return [ext, segs]
 
+def modify_segments(segs):
+    segs_mod =[]
+    for seg in segs:
+        first = seg[0]
+        last = seg[ len(seg)-1 ]
+        assert( first[0]==last[0] and first[1]==last[1] )
+        seg.pop()
+        seg.reverse()
+        segs_mod.append(seg)
+    return segs_mod
+
+# translate all segments by (x,y)
+def translate(segs,x,y):
+    out = []
+    for seg in segs:
+        seg2 = []
+        for p in seg:
+            p2 = []
+            p2.append(p[0] + x)
+            p2.append(p[1] + y)
+            seg2.append(p2)
+        out.append(seg2)
+    return out
+    
+# scale all segs so that the overall length becomes desired_length
 def scale_segs(segs, current_length, desired_length):
     out=[]
     scale = float(desired_length) / float(current_length)
@@ -125,7 +129,6 @@ def scale_segs(segs, current_length, desired_length):
             p2.append(p[0] * scale)
             p2.append(p[1] * scale)
             seg2.append(p2)
-            #seg2.append(seg[3] + y)
         out.append(seg2)
     return [out,scale]
     
@@ -140,16 +143,13 @@ def get_random_row(row_length):
 
 def get_scaled_segs( chars, length):
     # generate segs with scale 1
-    ret = ttt_segments(  chars , 1)
-    extents = ret[0]
-    segs = ret[1]
+    [extents, segs] = ttt_segments( chars , 1)
     # translate so lower left corner is at (0,0)
     segs = translate(segs, -extents.minx, -extents.miny )
     # scale to desired length
     current_length = extents.maxx-extents.minx
     current_height = extents.maxy-extents.miny
     [segs,scale] = scale_segs(segs, current_length, length)
-    
     # remove duplicate points
     segs = modify_segments(segs)
     return [segs, extents,scale]

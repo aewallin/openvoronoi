@@ -19,8 +19,7 @@ Core algorithm
   line-segment. Try to fail more graciously, or warn the user. Probably same issue with identical point-sites.
 - calling vd.check() after a "debug-mode" insert_line_site(id1,id2, step) (where e.g. step=5) causes a segfault
   make this fail more gracefully.
-- Try an alternative graph implementation for halfedge_diagram, such as http://lemon.cs.elte.hu/trac/lemon
-
+- Try an alternative (faster?) graph implementation for halfedge_diagram, such as http://lemon.cs.elte.hu/trac/lemon
 
 Solvers
 - geometric-filtering. try solver<double>, evaulate quality of solution, 
@@ -38,6 +37,10 @@ LLLSolver
   -- t = a * (n2 / (n1+n2) )
   -- this gives the bisector point (xb, yb) and the offset distance t as a function of u1 along l1
   -- insert this into the equation of the third site to find a solution u1
+- write a better DesperateSolver.
+  -- "simplex" algorithm?
+  -- PointSites have two parameters: diangle [0,4], offset-distance
+  -- LineSites have two parameters: u [0,1], offset-distance, (k-direction ?)
   
 Offset
 - figure out how to nest offset-loops to generate a machining-graph
@@ -58,14 +61,13 @@ Offset
 
 Medial-Axis
 - is the current medial-axis-walk a sound machining strategy? can it be improved.
-- fix medial-axis-walk case where we don't find a start-edge if the medial axis is e.g. O-shaped
 - optimize the order of toolpath so that "pen_up, rapid_traverse, pen_down" jumps are minimized
+- better selection of start-edge when the ma is o-shaped (select start-point with minimum clearance-disk)
 
 Medial-Axis pocket
 - better G-code output
 - micro-lift and clearance-height lifts for rapids
 - end-of-branch MICs are now left unmachined if they result in a cut-width less than max-cut-width.
-- deal with loops in the MA.
 - exterior ma-pocketing
 
 Input/Output
@@ -92,7 +94,6 @@ Documentation
 
 Packaging/Building etc 
 - the libboost-python dependency now has to be specified with many alternative version numbers. why?
-- have separate targets for pure c++ library and python module.
 - build(and install on github?) doxygen html documentation
 - Windows package/installer with cmake/NSIS?
 - automate source-package building from github and periodic upload to launchpad (?)
@@ -101,6 +102,9 @@ Packaging/Building etc
   the "openvoronoi" package is as small as possible (for non developers who do not need to run tests)
 
 DONE:
+- 2012-03    medial-Axis pocket: deal with loops in the MA (initial simple algorithm)
+- 2012-04-02 fix medial-axis-walk case where we don't find a start-edge if the medial axis is e.g. O-shaped
+- 2012-03    build: have separate targets for pure c++ library and python module.
 - 2012-03    we now have a set of c++ tests in addition to the python tests
 - 2012       SVG output for vd and offsets with 
 - 2012-03-16 Code-coverage for tests ( "make coverage-report" )

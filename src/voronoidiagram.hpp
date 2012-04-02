@@ -181,39 +181,24 @@ protected:
     void reset_status();
     int num_new_vertices(HEFace f);
 // HELPER-CLASSES
-    /// sanity-checks on the diagram are done by this helper class
-    VoronoiDiagramChecker* vd_checker;
-    /// a grid-search algorithm which allows fast nearest-neighbor search
-    FaceGrid* fgrid;
-    /// an algorithm for positioning vertices
-    VertexPositioner* vpos;
+    VoronoiDiagramChecker* vd_checker; ///< sanity-checks on the diagram are done by this helper class
+    FaceGrid* fgrid; ///< a grid-search algorithm which allows fast nearest-neighbor search
+    VertexPositioner* vpos; ///< an algorithm for positioning vertices
 // DATA
-    /// turn debug output on/off
-    bool debug;
-    /// type for vertex-index to vertex-descriptor map
-    typedef std::map<int,HEVertex> VertexMap;
-    /// associate vertex index with vertex descriptor
-    typedef std::pair<int,HEVertex> VertexMapPair;
-    /// map from int handles to vertex-descriptors, used in insert_line_site()
-    VertexMap vertex_map;
-    /// queue of vertices to be processed
-    VertexQueue vertexQueue;
-    /// the half-edge diagram of the vd
-    HEGraph g;
-    /// the voronoi diagram is constructed for sites within a circle with radius far_radius
-    double far_radius;
-    /// the number of point sites
-    int num_psites;
-    /// the number of line-segment sites
-    int num_lsites;
-    /// temporary variable for incident faces, will be reset to NONINCIDENT after a site has been inserted
-    FaceVector incident_faces;
-    /// temporary variable for in-vertices, out-vertices that need to be reset
-    /// after a site has been inserted
-    std::set<HEVertex> modified_vertices;
-    /// IN-vertices, i.e. to-be-deleted
-    VertexVector v0;
-    bool silent;
+    typedef std::map<int,HEVertex> VertexMap; ///< type for vertex-index to vertex-descriptor map
+    typedef std::pair<int,HEVertex> VertexMapPair; ///< associate vertex index with vertex descriptor
+    
+    VertexMap vertex_map; ///< map from int handles to vertex-descriptors, used in insert_line_site()
+    VertexQueue vertexQueue; ///< queue of vertices to be processed
+    HEGraph g; ///< the half-edge diagram of the vd
+    double far_radius; ///< sites must fall within a circle with radius far_radius
+    int num_psites; ///< the number of point sites
+    int num_lsites; ///< the number of line-segment sites
+    FaceVector incident_faces; ///< temporary variable for ::INCIDENT faces, will be reset to ::NONINCIDENT after a site has been inserted
+    std::set<HEVertex> modified_vertices; ///< temporary variable for in-vertices, out-vertices that need to be reset after a site has been inserted
+    VertexVector v0; ///< IN-vertices, i.e. to-be-deleted
+    bool debug; ///< turn debug output on/off
+    bool silent; ///< no warnings emitted when silent==true
 private:
     VoronoiDiagram(); // don't use.
 };

@@ -41,16 +41,7 @@ public:
     std::vector<double> get_stat() {return errstat;}
     double dist_error(HEEdge e, const solvers::Solution& sl, Site* s3);
     void solver_debug(bool b);
-    void set_silent(bool b);
-    /* {
-        silent=b;
-        ppp_solver->set_silent(b);
-        lll_solver->set_silent(b);
-        lll_para_solver->set_silent(b);
-        qll_solver->set_silent(b);
-        sep_solver->set_silent(b);
-        alt_sep_solver->set_silent(b);
-    }*/
+    void set_silent(bool b); ///< no warning messages when silent==true
 private:
 
     /// predicate for rejecting out-of-region solutions

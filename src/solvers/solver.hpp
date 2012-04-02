@@ -52,6 +52,7 @@ public:
     virtual void set_type(int t) {type=t;}
     /// set the debug mode to \a b
     void set_debug(bool b) {debug=b;}
+    /// no warnings/messages to stdout will be written, if silent is set true.
     void set_silent(bool b) {silent=b;}
 protected:
     /// flag for debug output

@@ -52,6 +52,7 @@ public:
     virtual void set_type(int t) {type=t;}
     /// set the debug mode to \a b
     void set_debug(bool b) {debug=b;}
+    void set_silent(bool b) {silent=b;}
 protected:
     /// flag for debug output
     bool debug;
@@ -59,6 +60,7 @@ protected:
     /// - type = 0 means l3 / p1 form a separator
     /// - type = 1 means l3 / p2 form a separator
     int  type;
+    bool silent; ///< suppress all warnings or other stdout output
 };
 
 } // solvers

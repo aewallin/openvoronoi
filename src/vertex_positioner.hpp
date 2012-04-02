@@ -41,6 +41,16 @@ public:
     std::vector<double> get_stat() {return errstat;}
     double dist_error(HEEdge e, const solvers::Solution& sl, Site* s3);
     void solver_debug(bool b);
+    void set_silent(bool b);
+    /* {
+        silent=b;
+        ppp_solver->set_silent(b);
+        lll_solver->set_silent(b);
+        lll_para_solver->set_silent(b);
+        qll_solver->set_silent(b);
+        sep_solver->set_silent(b);
+        alt_sep_solver->set_silent(b);
+    }*/
 private:
 
     /// predicate for rejecting out-of-region solutions
@@ -105,6 +115,7 @@ private:
     double t_max; ///< maximum offset-distance
     HEEdge edge;  ///< the edge on which we position a new vertex
     std::vector<double> errstat; ///< error-statistics
+    bool silent; ///< silent mode (outputs no warnings to stdout)
 };
 
 /// \brief error functor for edge-based desperate solver

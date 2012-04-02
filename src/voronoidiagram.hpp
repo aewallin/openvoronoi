@@ -97,6 +97,11 @@ public:
     static void reset_vertex_count() { VoronoiVertex::reset_count(); }
     /// turn on debug output
     void debug_on() {debug=true;} 
+    /// set silent mode on/off
+    void set_silent(bool b) {
+        silent=b;
+        vpos->set_silent(silent);
+    } 
     bool check(); 
     void filter( Filter* flt);
     void filter_reset();
@@ -208,7 +213,7 @@ protected:
     std::set<HEVertex> modified_vertices;
     /// IN-vertices, i.e. to-be-deleted
     VertexVector v0;
-
+    bool silent;
 private:
     VoronoiDiagram(); // don't use.
 };

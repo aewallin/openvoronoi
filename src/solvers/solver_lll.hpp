@@ -53,7 +53,7 @@ public:
 int solve( Site* s1, double k1, 
            Site* s2, double k2, 
            Site* s3, double k3, std::vector<Solution>& slns ) {
-    if (debug)
+    if (debug && !silent)
         std::cout << "LLLSolver.\n";
     
     assert( s1->isLine() && s2->isLine() && s3->isLine() );
@@ -80,14 +80,14 @@ int solve( Site* s1, double k1,
             qd_real sol_y = determinant(  eq[i].a, -eq[i].c, eq[i].k, 
                                           eq[j].a, -eq[j].c, eq[j].k, 
                                           eq[k].a, -eq[k].c, eq[k].k ) / d ; 
-            if (debug) 
+            if (debug && !silent ) 
                 std::cout << " solution: " << Point( to_double(sol_x), to_double(sol_y) ) << " t=" << to_double(t) << " k3=" << k3 << " det=" << to_double(d) << "\n";
             
             slns.push_back( Solution( Point( to_double(sol_x), to_double(sol_y) ), to_double(t), k3 ) ); // kk3 just passes through without any effect!?
             return 1;
         }
     } else {
-        if (debug) {
+        if (debug && !silent) {
             std::cout << "WARNING: LLLSolver small determinant! no solutions. d= " << d <<"\n";
             std::cout << " s1 : " << eq[0].a << " " << eq[0].b << " " << eq[0].c << " " << eq[0].k << "\n";
             std::cout << " s2 : " << eq[1].a << " " << eq[1].b << " " << eq[1].c << " " << eq[1].k << "\n";

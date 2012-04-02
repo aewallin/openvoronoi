@@ -73,8 +73,8 @@ endif (CMAKE_BUILD_TYPE MATCHES "Coverage")
 
 option(BUILD_DOC "Build doxygen documentation? " ON)
 
-set(BUILD_TESTS 1)
-#set(BUILD_TESTS 0) # don't build tests
+#set(BUILD_TESTS 1)
+set(BUILD_TESTS 0) # don't build tests
 
 #
 # this figures out the Python include directories and adds them to the
@@ -125,6 +125,7 @@ set(OVD_SRC
     ${OpenVoronoi_SOURCE_DIR}/vertex_positioner.cpp
     ${OpenVoronoi_SOURCE_DIR}/common/numeric.cpp
     ${OpenVoronoi_SOURCE_DIR}/medial_axis_pocket.cpp
+    ${OpenVoronoi_SOURCE_DIR}/medial_axis_walk.cpp
 )
 
 set( OVD_INCLUDE_FILES

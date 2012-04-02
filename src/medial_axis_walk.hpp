@@ -61,7 +61,7 @@ public:
     /// find start-edgem then walk
     void do_walk() {
         out = MedialChainList();
-        HEEdge start;
+        HEEdge start = HEEdge();
         while( find_start_edge(start) ) { // find a suitable start-edge
             medial_axis_walk(start); // from the start-edge, walk as far as possible
         }
@@ -93,12 +93,14 @@ public:
     ///
     /// for line-edges we add only two endpoints
     /// for parabolic edges we add many points
-    void append_edge(MedialChain& chain, HEEdge edge)  {
+    void append_edge(MedialChain& chain, HEEdge edge);
+    /*
+     {
         MedialPointList point_list; // the endpoints of each edge
         HEVertex v1 = g.source( edge );
         HEVertex v2 = g.target( edge );
         // these edge-types are drawn as a single line from source to target.
-        if (   (g[edge].type == LINELINE)  || (g[edge].type == PARA_LINELINE)) {
+        if ( (g[edge].type == LINELINE)  || (g[edge].type == PARA_LINELINE) ) {
             MedialPoint pt1( g[v1].position, g[v1].dist() );
             MedialPoint pt2( g[v2].position, g[v2].dist() );
             point_list.push_back(pt1);
@@ -108,13 +110,12 @@ public:
             double t_trg = g[v2].dist();
             double t_min = std::min(t_src,t_trg);
             double t_max = std::max(t_src,t_trg);
-            //_edge_points: number of points to subdivide parabolas.
             
             for (int n=0;n< _edge_points;n++) {
                 double t(0);
                 if (t_src<=t_trg) // increasing t-value
                     t = t_min + ((t_max-t_min)/numeric::sq(_edge_points-1))*numeric::sq(n); // NOTE: quadratic t-dependece. More points at smaller t.
-                else if (t_trg<t_src) { // decreasing t-value
+                else if (t_src>t_trg) { // decreasing t-value
                     int m = _edge_points-1-n; // m goes from (N-1)...0   as n goes from 0...(N-1)
                     t = t_min + ((t_max-t_min)/numeric::sq(_edge_points-1))*numeric::sq(m);
                 }
@@ -124,13 +125,15 @@ public:
             }
         }
         chain.push_back( point_list );
-    }
+    }*/
+    
     /// we are at target(e). find the next suitable edge.
     /// \return true if a next-edge was found, false otherwise.
     bool next_edge(HEEdge e, HEEdge& next) {
         HEVertex trg = g.target(e);
         EdgeVector out_edges = g.out_edges(trg);
-        std::vector<HEEdge> valid_edges;
+        
+        std::vector<HEEdge> valid_edges; // find all valid edges
         BOOST_FOREACH( HEEdge oe, out_edges) {
             if ( valid_next_edge(oe) ) {
                 valid_edges.push_back(oe);
@@ -152,14 +155,31 @@ public:
     /// loop through all edges and find an edge where we can start
     /// valid edges have a source-vertex with exactly one valid out-edge.
     bool find_start_edge(HEEdge& start) {
+        start = HEEdge();
         BOOST_FOREACH(HEEdge e, g.edges() ) { 
             if ( valid_next_edge(e) ) {
-                if (degree_one_source(e)) {
+                if (degree_one_source(e)) { // for an o-shaped medial axis, this doesn't find a start-edge!
                     start = e;
                     return true;
                 }
             }
         }
+        
+        // if we get here, there are no "dangling" edges where we can start.
+        // but there might be an o-shaped feature which is un-machined.
+        EdgeVector valid_edges;
+        BOOST_FOREACH(HEEdge e, g.edges() ) { 
+            if ( valid_next_edge(e) ) {
+                valid_edges.push_back(e);
+            }
+        }
+        // just return the first valid edge. (FIXME: better to start with a shallow cut, i.e. return the edge with the smallest clearance-disk?
+        if (!valid_edges.empty()) { // for an o-shaped medial axis, this doesn't find a start-edge!
+            start = valid_edges[0];
+            return true;
+        }
+        
+        
         return false;
     }
     /// we can follow an edge if it is valid, and not a ::LINESITE or ::NULLEDGE

@@ -47,6 +47,7 @@ VertexPositioner::VertexPositioner(HEGraph& gi): g(gi) {
     sep_solver =      new solvers::SEPSolver();
     alt_sep_solver =  new solvers::ALTSEPSolver();
     lll_para_solver = new solvers::LLLPARASolver();
+    silent = false;
     errstat.clear();
 }
 
@@ -136,7 +137,7 @@ solvers::Solution VertexPositioner::position(Site* s1, double k1, Site* s2, doub
     if (!s3->isPoint()) 
         solver_dispatch(s1,k1,s2,k2,s3,-1, solutions); // for lineSite or ArcSite we try k3=-1 also    
     
-    if (solutions.empty() ) 
+    if (solutions.empty() && !silent ) 
         std::cout << "WARNING empty solution set!!\n";
         
     if ( solutions.size() == 1 && (t_min<=solutions[0].t) && (t_max>=solutions[0].t) && (s3->in_region( solutions[0].p)) )
@@ -144,13 +145,13 @@ solvers::Solution VertexPositioner::position(Site* s1, double k1, Site* s2, doub
     
     // choose only in_region() solutions
     solutions.erase( std::remove_if(solutions.begin(),solutions.end(), in_region_filter(s3) ), solutions.end() );
-    if (solutions.empty() ) 
+    if (solutions.empty() && !silent ) 
         std::cout << "WARNING in_region_filter() results in empty solution set!!\n";
     
     
     // choose only t_min < t < t_max solutions 
     solutions.erase( std::remove_if(solutions.begin(),solutions.end(), t_filter(t_min,t_max) ), solutions.end() );
-    if (solutions.empty() ) 
+    if (solutions.empty() && !silent ) 
         std::cout << "WARNING t_filter() results in empty solution set!!\n";
 
     if ( solutions.size() == 1) // if only one solution is found, return that.
@@ -188,18 +189,21 @@ solvers::Solution VertexPositioner::position(Site* s1, double k1, Site* s2, doub
 
     // either 0, or >= 2 solutions found. This is an error.
     // std::cout << " None, or too many solutions found! solutions.size()=" << solutions.size() << "\n";
-    std::cout << " solution edge: " << g[ g.source(edge) ].position << "[" << g[ g.source(edge) ].type << "](t=" << g[ g.source(edge) ].dist() << ")";
-    std::cout << " - " << g[ g.target(edge) ].position << "[" << g[ g.target(edge) ].type << "](t=" << g[ g.target(edge) ].dist() << ") \n";
-    std::cout << " solution edge: " << g[ g.source(edge) ].index << "[" << g[ g.source(edge) ].type<<"]{" << g[ g.source(edge) ].status<<"}";
-    std::cout << " -[" << g[edge].type << "]- ";
-    std::cout << g[ g.target(edge) ].index << "[" << g[ g.target(edge) ].type << "]{" << g[ g.target(edge) ].status<<"}\n";
-    //std::cout << " t-vals t_min= " << t_min << " t_max= " << t_max << "\n";
-    //std::cout << "  sites: " << s1->str() << "(k="<< k1<< ") " << s2->str() << "(k="<< k2 << ") new= " << s3->str() << "\n";
-    std::cout << " s1= " << s1->str2() << "(k=" << k1<< ")\n";
-    std::cout << " s2= " << s2->str2() << "(k=" << k2<< ")\n";
-    std::cout << " s3= " << s3->str2() << "\n";
-    
-    std::cout << "Running solvers again: \n";
+     
+    if ( !silent) {
+        std::cout << " solution edge: " << g[ g.source(edge) ].position << "[" << g[ g.source(edge) ].type << "](t=" << g[ g.source(edge) ].dist() << ")";
+        std::cout << " - " << g[ g.target(edge) ].position << "[" << g[ g.target(edge) ].type << "](t=" << g[ g.target(edge) ].dist() << ") \n";
+        std::cout << " solution edge: " << g[ g.source(edge) ].index << "[" << g[ g.source(edge) ].type<<"]{" << g[ g.source(edge) ].status<<"}";
+        std::cout << " -[" << g[edge].type << "]- ";
+        std::cout << g[ g.target(edge) ].index << "[" << g[ g.target(edge) ].type << "]{" << g[ g.target(edge) ].status<<"}\n";
+        //std::cout << " t-vals t_min= " << t_min << " t_max= " << t_max << "\n";
+        //std::cout << "  sites: " << s1->str() << "(k="<< k1<< ") " << s2->str() << "(k="<< k2 << ") new= " << s3->str() << "\n";
+        std::cout << " s1= " << s1->str2() << "(k=" << k1<< ")\n";
+        std::cout << " s2= " << s2->str2() << "(k=" << k2<< ")\n";
+        std::cout << " s3= " << s3->str2() << "\n";
+        
+        std::cout << "Running solvers again: \n";
+    }
     solver_debug(true);
     // run the solver(s) one more time in order to print out un-filtered solution points for debugging
     std::vector<solvers::Solution> solutions2;
@@ -208,19 +212,21 @@ solvers::Solution VertexPositioner::position(Site* s1, double k1, Site* s2, doub
         solver_dispatch(s1,k1,s2,k2,s3,-1, solutions2); // for lineSite or ArcSite we try k3=-1 also    
     solver_debug(false);
     
-    if ( !solutions2.empty() ) {
-        std::cout << "The failing " << solutions2.size() << " solutions are: \n";
-        BOOST_FOREACH(solvers::Solution s, solutions2 ) {
-            std::cout << s.p << " t=" << s.t << " k3=" << s.k3  << " e_err=" << edge_error(s) <<"\n";
-            std::cout << " min<t<max=" << ((s.t>=t_min) && (s.t<=t_max));
-            std::cout << " s3.in_region=" << s3->in_region(s.p);
-            std::cout <<  " region-t=" << s3->in_region_t(s.p) << "\n";
-            std::cout <<  " t - t_min= " << s.t - t_min << "\n";
-            std::cout <<  " t_max - t= " << t_max - s.t << "\n";
-            std::cout <<  " edge type : " << g[edge].type << "\n"; //std::scientific;
-        }   
-    } else {
-        std::cout << "No solutions found by solvers!\n";
+    if ( !silent) { 
+        if ( !solutions2.empty() ) {
+            std::cout << "The failing " << solutions2.size() << " solutions are: \n";
+            BOOST_FOREACH(solvers::Solution s, solutions2 ) {
+                std::cout << s.p << " t=" << s.t << " k3=" << s.k3  << " e_err=" << edge_error(s) <<"\n";
+                std::cout << " min<t<max=" << ((s.t>=t_min) && (s.t<=t_max));
+                std::cout << " s3.in_region=" << s3->in_region(s.p);
+                std::cout <<  " region-t=" << s3->in_region_t(s.p) << "\n";
+                std::cout <<  " t - t_min= " << s.t - t_min << "\n";
+                std::cout <<  " t_max - t= " << t_max - s.t << "\n";
+                std::cout <<  " edge type : " << g[edge].type << "\n"; //std::scientific;
+            }   
+        } else {
+            std::cout << "No solutions found by solvers!\n";
+        }
     }
 
     //assert(0); // in Debug mode, stop here.
@@ -230,13 +236,14 @@ solvers::Solution VertexPositioner::position(Site* s1, double k1, Site* s2, doub
     VertexError s1_err_functor(g, edge, s1);
     VertexError s2_err_functor(g, edge, s2);
     VertexError s3_err_functor(g, edge, s3);
-
-    std::cout << "WARNING: Returning desperate solution: \n";
-    std::cout << desp.p << " t=" << desp.t << " k3=" << desp.k3  << " e_err=" << edge_error(desp) <<"\n";
-    std::cout << "     s1_err= " << s1_err_functor(desp.t) << "\n";
-    std::cout << "     s2_err= " << s2_err_functor(desp.t) << "\n";
-    std::cout << "     s3_err= " << s3_err_functor(desp.t) << "\n";
-
+    
+    if ( !silent) { 
+        std::cout << "WARNING: Returning desperate solution: \n";
+        std::cout << desp.p << " t=" << desp.t << " k3=" << desp.k3  << " e_err=" << edge_error(desp) <<"\n";
+        std::cout << "     s1_err= " << s1_err_functor(desp.t) << "\n";
+        std::cout << "     s2_err= " << s2_err_functor(desp.t) << "\n";
+        std::cout << "     s3_err= " << s3_err_functor(desp.t) << "\n";
+    }
     //exit(-1);
     return desp;
 }
@@ -254,9 +261,11 @@ solvers::Solution VertexPositioner::desperate_solution(Site* s3) {
     Point src_p = g[src].position;
     Point trg_p = g[trg].position;
     
-    std::cout << "VertexPositioner::desperate_solution() \n";
-    std::cout << " edge: " << src_p << " - " << trg_p << "\n";
-    std::cout << " dist(): " << g[src].dist() << " - " << g[trg].dist() << "\n";
+    if (!silent) {
+        std::cout << "VertexPositioner::desperate_solution() \n";
+        std::cout << " edge: " << src_p << " - " << trg_p << "\n";
+        std::cout << " dist(): " << g[src].dist() << " - " << g[trg].dist() << "\n";
+    }
     
     /*
     if (s1->isLine() && s2->isLine() ) {
@@ -313,6 +322,16 @@ void VertexPositioner::solver_debug(bool b) {
     lll_para_solver->set_debug(b);
 }
 
+void VertexPositioner::set_silent(bool b) {
+    silent=b;
+    ppp_solver->set_silent(b);
+    lll_solver->set_silent(b);
+    lll_para_solver->set_silent(b);
+    qll_solver->set_silent(b);
+    sep_solver->set_silent(b);
+    alt_sep_solver->set_silent(b);
+}
+    
 /// dispatch to the correct solver based on the sites
 int VertexPositioner::solver_dispatch(Site* s1, double k1, Site* s2, double k2, Site* s3, double k3, 
                                         std::vector<solvers::Solution>& solns) {

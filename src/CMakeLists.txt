@@ -45,8 +45,8 @@ endif (CMAKE_BUILD_TOOL MATCHES "make")
 
 
 # uncomment one of these to change build-type
- set(CMAKE_BUILD_TYPE Release)
-# set(CMAKE_BUILD_TYPE Debug)
+# set(CMAKE_BUILD_TYPE Release)
+ set(CMAKE_BUILD_TYPE Debug)
 # set(CMAKE_BUILD_TYPE Profile)
 # set(CMAKE_BUILD_TYPE Coverage)
 

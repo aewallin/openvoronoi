@@ -78,6 +78,8 @@ public:
     virtual ~VoronoiDiagram();
     int insert_point_site(const Point& p, int step=0);
     bool insert_line_site(int idx1, int idx2, int step=99); // default step should make algorithm run until the end!
+    void insert_arc_site(int idx1, int idx2, const Point& c, bool cw, int step=99);
+    
     /// return the far radius
     double get_far_radius() const {return far_radius;}
     /// return number of point sites in diagram
@@ -194,6 +196,7 @@ protected:
     double far_radius; ///< sites must fall within a circle with radius far_radius
     int num_psites; ///< the number of point sites
     int num_lsites; ///< the number of line-segment sites
+    int num_arc_sites; ///< the number of arc-sites
     FaceVector incident_faces; ///< temporary variable for ::INCIDENT faces, will be reset to ::NONINCIDENT after a site has been inserted
     std::set<HEVertex> modified_vertices; ///< temporary variable for in-vertices, out-vertices that need to be reset after a site has been inserted
     VertexVector v0; ///< IN-vertices, i.e. to-be-deleted

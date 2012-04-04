@@ -149,43 +149,45 @@ public:
         
         Point start = s->start()-s->center();
         Point end = s->end()-s->center();
+        // offset in tangent-directio
+        Point start_tang = start.xy_perp();
+        Point end_tang = end.xy_perp();
+        start_tang.normalize();
+        end_tang.normalize();
+        if (s->cw() ) {
+        start = start - null_edge_offset*start_tang;
+        end = end + null_edge_offset*end_tang;
+        } else {
+            start = start + null_edge_offset*start_tang;
+            end = end - null_edge_offset*end_tang;
+        }
         double theta1 = atan2(start.x,start.y);
         double theta2 = atan2(end.x,end.y);
-        
-        //alfa=[] # the list of angles
-        //da=0.1
+
         double CIRCLE_FUZZ = 1e-9;
-        //idea from emc2 / cutsim g-code interp G2/G3
-        // required only for multi-turn arcs??
-        if (!s->cw()) {
-            while ( (theta2 - theta1) > -CIRCLE_FUZZ) 
+        if (!s->cw()) { //idea from emc2 / cutsim g-code interp G2/G3
+            while ( (theta2 - theta1) > -CIRCLE_FUZZ)  // required only for multi-turn arcs??
                 theta2 -= 2*M_PI;
         } else {
             while( (theta2 - theta1) < CIRCLE_FUZZ) 
                 theta2 += 2*M_PI;
         }
-        
+
         double dtheta = theta2-theta1;
         double arclength = s->radius()*dtheta;
         double dlength =  arclength/10;
-        
+
         int steps = int( arclength / dlength );
         //print "arc subdivision steps: ",steps
         double rsteps = 1/(double)steps;
         double dc = cos(-dtheta*rsteps); // delta-cos  
         double ds = sin(-dtheta*rsteps); // delta-sin
-        
-        //previous = pt1
-        out.append( s->start() );
-        //tr = [start.x, start.y]
+
+        out.append( s->center() + start );
         Point tr = start;
         for(int i=0;i<steps;i++) { // in range(steps):
-            //#f = (i+1) * rsteps #; // varies from 1/rsteps..1 (?)
-            //#theta = theta1 + i* dtheta
             tr = rotate( tr, dc, ds); // rotate center-start vector by a small amount
             Point pt = s->center() + tr; //current = ovd.Point(x,y)
-            //myscreen.addActor( Line(p1=(previous.x,previous.y,0),p2=(current.x,current.y,0),color=arcColor) )
-            //previous = current
             out.append(pt); 
         }
         return out;

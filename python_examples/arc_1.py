@@ -51,7 +51,7 @@ if __name__ == "__main__":
     
     vod.textScale = 0.02
     vod.vertexRadius = 0.0031
-    vod.drawVertices=0
+    vod.drawVertices=1
     vod.drawVertexIndex=1
     vod.drawGenerators=1
     

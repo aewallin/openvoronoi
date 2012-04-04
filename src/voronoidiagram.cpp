@@ -42,6 +42,7 @@ VoronoiDiagram::VoronoiDiagram(double far, unsigned int n_bins) {
     initialize();
     num_psites=3;
     num_lsites=0;
+    num_arc_sites=0;
     reset_vertex_count();
     debug = false;
 }
@@ -440,6 +441,55 @@ if (step==current_step) return false; current_step++;
     assert( vd_checker->is_valid() );
 
     return true; 
+}
+
+void VoronoiDiagram::insert_arc_site(int idx1, int idx2, const Point& center, bool cw, int step) {
+    num_arc_sites++;
+    int current_step=1;
+    // find the vertices corresponding to idx1 and idx2
+    HEVertex start=HEVertex(), end=HEVertex();
+    boost::tie(start,end) = find_endpoints(idx1,idx2);
+    g[start].status=OUT;
+    g[end].status=OUT;   
+    g[start].zero_dist();
+    g[end].zero_dist();
+    double radius = (g[start].position - center).norm();
+    if (debug) {
+        std::cout << "insert_arc_site( " << g[start].index << " - " << g[end].index << "," ;
+        std::cout << " c= " << center << ", cw= " << cw;
+        std::cout << " )\n";
+        std::cout << " radius= " << radius << "\n";
+    }
+if (step==current_step) return; current_step++;
+    
+    ArcSite* pos_site;
+    ArcSite* neg_site;
+
+    pos_site = new ArcSite( g[end  ].position, g[start].position , center, cw);
+    neg_site = new ArcSite( g[start].position, g[end  ].position , center, !cw);
+
+    if (debug) {
+        std::cout << " pos site =  " << pos_site->str2() << "\n";
+        std::cout << " neg site =  " << neg_site->str2() << "\n";
+    }
+if (step==current_step) return; current_step++;
+
+    HEFace seed_face = g[start].face; // assumes this point-site has a face!
+    // on the face of start-point, find the seed vertex
+    HEVertex v_seed = find_seed_vertex(seed_face, pos_site ) ;
+    if (debug) std::cout << " start face seed  = " << g[v_seed].index << "\n";
+    mark_vertex( v_seed, pos_site  );
+
+if (step==current_step) return; current_step++;
+    
+    augment_vertex_set( pos_site  ); // it should not matter if we use pos_site or neg_site here
+    // todo(?) sanity checks:
+    // check that end_face is INCIDENT? 
+    // check that tree (i.e. v0) includes end_face_seed ?
+    if (debug) { std::cout << " delete-set |v0|="<< v0.size() <<" : ";  g.print_vertices(v0); }
+
+if (step==current_step) return; current_step++;
+
 }
 
 /// \brief find vertex descriptors corresponding to \a idx1 and \a idx2

@@ -86,6 +86,7 @@
 #include <sstream>
 
 #include "common/point.hpp"
+#include "common/numeric.hpp"
 
 namespace ovd {
 
@@ -499,7 +500,8 @@ private:
 class ArcSite : public Site {
 public:
     /// create arc-site
-    ArcSite( const Point& s, const Point& e, const Point& center, bool dir): _start(s), _end(e), _center(center), _dir(dir) {
+    ArcSite( const Point& s, const Point& e, const Point& center, bool dir) : 
+        _start(s), _end(e), _center(center), _dir(dir) {
         _radius = (_center - _start).norm();
         eq.q = true;
         eq.a = -2*_center.x;
@@ -509,21 +511,70 @@ public:
     }
     ~ArcSite() {}
     virtual Ofs* offset(Point p1,Point p2) {return new ArcOfs(p1,p2,_center,-1); } //FIXME: radius
+    
     Point apex_point(const Point& p) {
-        return p+Point(0,0); // FIXME
+        // project onto arc
+        // clamp to [0,1]
+        // line through center is c -> p
+        if ( p == _center )
+            return _start;
+        
+        Point dir = (p-_center);
+        dir.normalize();
+        
+        double dir_a = numeric::diangle( dir.x, dir.y );
+        double start_a = numeric::diangle( (_start-_center).x, (_start-_center).y );
+        double end_a = numeric::diangle( (_end-_center).x, (_end-_center).y );
+        
+        Point proj = _center + _radius*dir;
+        if (_dir && numeric::diangle_bracket(start_a, dir_a, end_a) ) {
+            return proj;
+        } else {
+            double d_start = (_start-p).norm();
+            double d_end = (_end-p).norm();
+            if (d_start < d_end)
+                return _start;
+            else
+                return _end;
+        }
+        // now check if proj is in the arc or not.
+        
+        //boost::tie(proj.x,proj.y) = numeric::diangle_xy(alfa);
+        //proj *= _radius;
+        
+        return proj; // FIXME
     }
+    
     virtual double x() const {return _center.x;}
     virtual double y() const {return _center.y;}
     virtual double r() const {return _radius;}
     virtual double k() const {return 1;} // ?
+    virtual bool in_region(const Point& ) const {
+        return true;
+    }
+    
     virtual std::string str() const {return "ArcSite";}
+    virtual std::string str2() const {
+        std::string out = "ArcSite: ";
+        out.append( _start.str() );
+        out.append( " - " );
+        out.append( _end.str() );
+        out.append( " c=" );
+        out.append( _center.str() );
+        return out;
+    }
 private:
+    void circle_line_intersection(const Point& cen, double rad, const Point& p) {
+        // translate so that center = (0,0)
+        Point pt = p - cen;
+        Point d = p-cen;
+    }
     ArcSite() {} // don't use!
-    Point _start; ///< start Point of arc
-    Point _end; ///< end Point of arc
-    Point _center; ///< center of arc
-    bool _dir; ///< CW or CCW direction flag
-    double _radius; ///< radius of arc
+    Point _start;  ///< start Point of arc
+    Point _end;    ///< end Point of arc
+    Point _center; ///< center Point of arc
+    bool _dir;     ///< CW or CCW direction flag
+    double _radius;///< radius of arc
 };
 
 

@@ -93,7 +93,7 @@ if __name__ == "__main__":
     #print "add segment ",id1, " to ", id2
     vd.debug_on()
     c1 = ovd.Point(0,0)
-    vd.addArcSite( id1, id2 , c1, True ,6 )
+    vd.addArcSite( id1, id2 , c1, True , 13 )
     
     #vd.addLineSite( id3, id4 )
     t_after = time.time()

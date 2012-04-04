@@ -452,7 +452,7 @@ class VD:
             return pink
         if (edgeType == ovd.EdgeType.SEPARATOR):
             return self.edgeStatusColor(src_status,trg_status, mag2)
-        if (edgeType == ovd.EdgeType.LINESITE):
+        if (edgeType == ovd.EdgeType.LINESITE or edgeType == ovd.EdgeType.ARCSITE):
             return yellow
         if (edgeType == ovd.EdgeType.PARABOLA):
             return self.edgeStatusColor(src_status,trg_status, blue2)
@@ -482,8 +482,7 @@ class VD:
                     actor = Line( p1=( p1.x,p1.y, 0), p2=(p2.x,p2.y, 0), color=ecolor)
                     self.myscreen.addActor(actor)
                     self.edges.append(actor)
-                
-            if (etype == ovd.VoronoiEdgeType.LINE):
+            elif (etype == ovd.VoronoiEdgeType.LINE):
                 ecolor = self.edgeStatusColor(src_status,trg_status,cyan)
                 for n in range( len(epts)-1 ):
                     p1 = self.scale*epts[n]  
@@ -491,22 +490,21 @@ class VD:
                     actor = Line( p1=( p1.x,p1.y, 0), p2=(p2.x,p2.y, 0), color=ecolor)
                     self.myscreen.addActor(actor)
                     self.edges.append(actor)
-
-            if (etype == ovd.VoronoiEdgeType.OUTEDGE):
+            elif (etype == ovd.VoronoiEdgeType.OUTEDGE):
                 ecolor = pink
                 p1 = self.scale*epts[0]  
                 p2 = self.scale*epts[1] 
                 actor = Line( p1=( p1.x,p1.y, 0), p2=(p2.x,p2.y, 0), color=ecolor)
                 self.myscreen.addActor(actor)
                 self.edges.append(actor)
-            if (etype == ovd.VoronoiEdgeType.SEPARATOR):
+            elif (etype == ovd.VoronoiEdgeType.SEPARATOR):
                 ecolor = self.edgeStatusColor(src_status,trg_status, orange)
                 p1 = self.scale*epts[0]  
                 p2 = self.scale*epts[1] 
                 actor = Line( p1=( p1.x,p1.y, 0), p2=(p2.x,p2.y, 0), color=ecolor)
                 self.myscreen.addActor(actor)
                 self.edges.append(actor)
-            if (etype == ovd.VoronoiEdgeType.LINESITE):
+            elif (etype == ovd.VoronoiEdgeType.LINESITE):
                 ecolor = yellow
                 p1 = self.scale*epts[0]  
                 p2 = self.scale*epts[1] 
@@ -515,6 +513,11 @@ class VD:
                 self.edges.append(actor)
             elif (etype == ovd.VoronoiEdgeType.PARABOLA):
                 ecolor = self.edgeStatusColor(src_status,trg_status, blue2)
+                eactor = PolyLine(pointList=epts,color=ecolor)
+                self.myscreen.addActor(eactor)
+                self.edges.append(eactor)
+            elif (etype == ovd.VoronoiEdgeType.ARCSITE):
+                ecolor = yellow #self.edgeStatusColor(src_status,trg_status, blue2)
                 eactor = PolyLine(pointList=epts,color=ecolor)
                 self.myscreen.addActor(eactor)
                 self.edges.append(eactor)

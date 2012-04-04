@@ -489,6 +489,56 @@ if (step==current_step) return; current_step++;
     if (debug) { std::cout << " delete-set |v0|="<< v0.size() <<" : ";  g.print_vertices(v0); }
 
 if (step==current_step) return; current_step++;
+    // process the null-faces here
+    HEVertex seg_start, seg_end; // new segment end-point vertices. these are created here.
+    HEFace start_null_face, end_null_face; // either existing or new null-faces at endpoints
+    HEVertex pos_sep_start = HEVertex(); // optional positive separator vertex at start
+    HEVertex neg_sep_start = HEVertex(); // optional negative separator vertex at start 
+    HEVertex pos_sep_end = HEVertex();   // optional positive separator vertex at end
+    HEVertex neg_sep_end = HEVertex();   // optional negative separator vertex at end
+    HEFace start_to_null = g.HFace(); // when a point-site completely disappears, we "null" the face belonging to this pointsite
+    HEFace   end_to_null = g.HFace();
+    Point src_se = g[start].position;
+    Point trg_se = g[end  ].position;
+    Point left = 0.5*(src_se+trg_se) + (trg_se-src_se).xy_perp(); // this is used below and in find_null_face()
+    // returns new seg_start/end vertices, new or existing null-faces, and separator endpoints (if separators should be added)
+    boost::tie(seg_start, start_null_face, pos_sep_start, neg_sep_start, start_to_null) = find_null_face(start, end  , left);
+    boost::tie(seg_end  , end_null_face  , pos_sep_end  , neg_sep_end  , end_to_null  ) = find_null_face(end  , start, left);
+
+    // now safe to set the zero-face edge
+    // in the collinear case, set the edge for the face that "disappears" to a null edge
+    if (start_to_null!=g.HFace())
+        g[start_to_null].edge = g[start_null_face].edge; 
+    if (end_to_null!=g.HFace())
+        g[end_to_null].edge = g[end_null_face].edge; 
+
+if (step==current_step) return; current_step++;
+    // create pseudo edges and faces
+    HEFace pos_face, neg_face; 
+    HEEdge pos_edge, neg_edge;
+    {
+        boost::tie( pos_edge, neg_edge) = g.add_twin_edges( seg_end  ,seg_start );
+        g[pos_edge].inserted_direction = false;
+        g[neg_edge].inserted_direction = true;
+        g[pos_edge].type = ARCSITE;
+        g[neg_edge].type = ARCSITE;
+        g[pos_edge].k = +1;
+        g[neg_edge].k = -1;
+        pos_face = add_face( pos_site ); //  this face to the left of start->end edge    
+        neg_face = add_face( neg_site ); //  this face is to the left of end->start edge
+        g[pos_face].edge = pos_edge;
+        g[neg_face].edge = neg_edge;
+        g[pos_edge].face = pos_face;
+        g[neg_edge].face = neg_face;
+        
+        // associate sites with LINESITE edges
+        pos_site->e = pos_edge;
+        neg_site->e = neg_edge;
+        
+        if (debug) std::cout << "created faces: pos_face=" << pos_face << " neg_face=" << neg_face << "\n";   
+    }
+
+if (step==current_step) return; current_step++;
 
 }
 

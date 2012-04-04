@@ -123,6 +123,7 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         .value("HYPERBOLA", HYPERBOLA)
         .value("SEPARATOR", SEPARATOR)
         .value("LINESITE", LINESITE)
+        .value("ARCSITE", ARCSITE)
         .value("NULLEDGE", NULLEDGE)
     ;
     bp::class_<Point>("Point") 

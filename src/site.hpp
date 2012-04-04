@@ -485,8 +485,8 @@ public:
     virtual const Point start() const {return _start;}
     virtual const Point end() const {return _end;}
     virtual HEEdge edge() {return e;}
-    /// store an edge_descriptor to the LINESITE edge
-    HEEdge e; 
+    
+    HEEdge e; ///< edge_descriptor to the ::LINESITE pseudo-edge
 private:
     LineSite() {} // don't use!
     /// start Point of LineSite
@@ -542,6 +542,12 @@ public:
         out.append( _center.str() );
         return out;
     }
+    HEEdge e; ///< edge_descriptor to ::ARCSITE pseudo-edge
+    Point start() {return _start;}
+    Point end() {return _end;}
+    Point center() {return _center;}
+    double radius() {return _radius;}
+    bool cw() {return _dir;}
 private:
     Point projection_point(const Point& p) const {
         if ( p == _center ) {

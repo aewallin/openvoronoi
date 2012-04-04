@@ -54,7 +54,8 @@ enum EdgeType {
     HYPERBOLA, 
     SEPARATOR,     /*!< Separator edge between PointSite (endpoint) and LineSite or ArcSite */ 
     NULLEDGE,      /*!< zero-length null-edge around a PointSite which is and endpoint */ 
-    LINESITE       /*!< pseudo-edge corresponding to a LineSite */ 
+    LINESITE,       /*!< pseudo-edge corresponding to a LineSite */ 
+    ARCSITE       /*!< pseudo-edge corresponding to a LineSite */ 
     };
 /*
 * bisector formulas

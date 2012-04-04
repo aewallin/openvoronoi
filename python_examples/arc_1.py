@@ -17,53 +17,6 @@ def writeFrame( w2if, lwr, n ):
     lwr.SetFileName( filename )
     #lwr.Write()
 
-def regularGridGenerators(far, Nmax):
-    # REGULAR GRID
-    rows = int(math.sqrt(Nmax))
-    print "rows= ",rows
-    gpos=[-0.7*far ,  1.4*far/float(rows-1) ]  # start, stride
-    plist = []
-    for n in range(rows):
-        for m in range(rows):
-            x=gpos[0]+gpos[1]*n
-            y=gpos[0]+gpos[1]*m
-            # rotation
-            #alfa = 0
-            #xt=x
-            #yt=y
-            #x = xt*math.cos(alfa)-yt*math.sin(alfa)
-            #y = xt*math.sin(alfa)+yt*math.cos(alfa)
-            plist.append( ovd.Point(x,y) )
-    random.shuffle(plist)
-    return plist
-
-def randomGenerators(far, Nmax):
-    pradius = (1.0/math.sqrt(2))*far
-    plist=[]
-    for n in range(Nmax):
-        x=-pradius+2*pradius*random.random()
-        y=-pradius+2*pradius*random.random()
-        plist.append( ovd.Point(x,y) )
-    return plist
-    
-def circleGenerators(far, Nmax):
-    # POINTS ON A CIRCLE
-    #"""
-    #cpos=[50,50]
-    #npts = 100
-    dalfa= float(2*math.pi)/float(Nmax-1)
-    #dgamma= 10*2*math.pi/npts
-    #alfa=0
-    #ofs=10
-    plist=[]
-    radius=0.81234*float(far)
-    for n in range(Nmax):
-        x=float(radius)*math.cos(float(n)*float(dalfa))
-        y=float(radius)*math.sin(float(n)*float(dalfa))
-        plist.append( ovd.Point(x,y) )
-    #random.shuffle(plist)
-    return plist
-
 if __name__ == "__main__":  
     #print ocl.revision()
     myscreen = ovdvtk.VTKScreen(width=1024, height=720) #(width=1920, height=1080)
@@ -102,7 +55,7 @@ if __name__ == "__main__":
     vod.drawVertexIndex=1
     vod.drawGenerators=1
     
-    vod.offsetEdges = 0
+    vod.offsetEdges = 1
     vd.setEdgeOffset(0.05)
     
     Nmax = 6
@@ -140,7 +93,7 @@ if __name__ == "__main__":
     #print "add segment ",id1, " to ", id2
     vd.debug_on()
     c1 = ovd.Point(0,0)
-    vd.addArcSite( id1, id2 , c1, True ,4 )
+    vd.addArcSite( id1, id2 , c1, True ,6 )
     
     #vd.addLineSite( id3, id4 )
     t_after = time.time()

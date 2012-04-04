@@ -141,6 +141,60 @@ public:
         }
         return plist;
     }
+    /// return arc-site points
+    boost::python::list get_arc_points(HEEdge e) {
+        boost::python::list out;
+        HEFace f = g[e].face;
+        ArcSite* s = dynamic_cast<ArcSite*>( g[f].site );
+        
+        Point start = s->start()-s->center();
+        Point end = s->end()-s->center();
+        double theta1 = atan2(start.x,start.y);
+        double theta2 = atan2(end.x,end.y);
+        
+        //alfa=[] # the list of angles
+        //da=0.1
+        double CIRCLE_FUZZ = 1e-9;
+        //idea from emc2 / cutsim g-code interp G2/G3
+        // required only for multi-turn arcs??
+        if (!s->cw()) {
+            while ( (theta2 - theta1) > -CIRCLE_FUZZ) 
+                theta2 -= 2*M_PI;
+        } else {
+            while( (theta2 - theta1) < CIRCLE_FUZZ) 
+                theta2 += 2*M_PI;
+        }
+        
+        double dtheta = theta2-theta1;
+        double arclength = s->radius()*dtheta;
+        double dlength =  arclength/10;
+        
+        int steps = int( arclength / dlength );
+        //print "arc subdivision steps: ",steps
+        double rsteps = 1/(double)steps;
+        double dc = cos(-dtheta*rsteps); // delta-cos  
+        double ds = sin(-dtheta*rsteps); // delta-sin
+        
+        //previous = pt1
+        out.append( s->start() );
+        //tr = [start.x, start.y]
+        Point tr = start;
+        for(int i=0;i<steps;i++) { // in range(steps):
+            //#f = (i+1) * rsteps #; // varies from 1/rsteps..1 (?)
+            //#theta = theta1 + i* dtheta
+            tr = rotate( tr, dc, ds); // rotate center-start vector by a small amount
+            Point pt = s->center() + tr; //current = ovd.Point(x,y)
+            //myscreen.addActor( Line(p1=(previous.x,previous.y,0),p2=(current.x,current.y,0),color=arcColor) )
+            //previous = current
+            out.append(pt); 
+        }
+        return out;
+    }
+    Point rotate(const Point& tr, double c, double s) {
+        double x = tr.x * c - tr.y * s;
+        double y = tr.x * s + tr.y * c;
+        return Point(x,y);
+    }
     /// return list of vd-edges to python
     boost::python::list getVoronoiEdges()  {
         boost::python::list edge_list;
@@ -168,6 +222,9 @@ public:
                         point_list.append(pt);
                     }
                     
+                } else if ( g[edge].type == ARCSITE  ) {
+                    // points corresponding to arc-site
+                    point_list = get_arc_points(edge);
                 } else {
                     //assert(0);
                 } 
@@ -263,6 +320,9 @@ public:
                         point_list.append(pt);
                     }
                     
+                } else if ( g[edge].type == ARCSITE  ) {
+                    // points corresponding to arc-site
+                    point_list = get_arc_points(edge);
                 } else {
                     //assert(0);
                 } 

@@ -512,46 +512,25 @@ public:
     ~ArcSite() {}
     virtual Ofs* offset(Point p1,Point p2) {return new ArcOfs(p1,p2,_center,-1); } //FIXME: radius
     
-    Point apex_point(const Point& p) {
-        // project onto arc
-        // clamp to [0,1]
-        // line through center is c -> p
-        if ( p == _center )
-            return _start;
-        
-        Point dir = (p-_center);
-        dir.normalize();
-        
-        double dir_a = numeric::diangle( dir.x, dir.y );
-        double start_a = numeric::diangle( (_start-_center).x, (_start-_center).y );
-        double end_a = numeric::diangle( (_end-_center).x, (_end-_center).y );
-        
-        Point proj = _center + _radius*dir;
-        if (_dir && numeric::diangle_bracket(start_a, dir_a, end_a) ) {
-            return proj;
+    virtual bool in_region(const Point& p) const {
+        if (_dir) {
+            return p.is_right(_center,_start) && !p.is_right(_center,_end);
         } else {
-            double d_start = (_start-p).norm();
-            double d_end = (_end-p).norm();
-            if (d_start < d_end)
-                return _start;
-            else
-                return _end;
+            return !p.is_right(_center,_start) && p.is_right(_center,_end);
         }
-        // now check if proj is in the arc or not.
-        
-        //boost::tie(proj.x,proj.y) = numeric::diangle_xy(alfa);
-        //proj *= _radius;
-        
-        return proj; // FIXME
+    }
+    Point apex_point(const Point& p) {
+        if (in_region(p))
+            return projection_point(p);
+        else
+            return closer_endpoint(p);
     }
     
     virtual double x() const {return _center.x;}
     virtual double y() const {return _center.y;}
     virtual double r() const {return _radius;}
     virtual double k() const {return 1;} // ?
-    virtual bool in_region(const Point& ) const {
-        return true;
-    }
+
     
     virtual std::string str() const {return "ArcSite";}
     virtual std::string str2() const {
@@ -564,10 +543,22 @@ public:
         return out;
     }
 private:
-    void circle_line_intersection(const Point& cen, double rad, const Point& p) {
-        // translate so that center = (0,0)
-        Point pt = p - cen;
-        Point d = p-cen;
+    Point projection_point(const Point& p) const {
+        if ( p == _center ) {
+            return _start;
+        } else {
+            Point dir = (p-_center);
+            dir.normalize();
+            return _center + _radius*dir;
+        }
+    }
+    Point closer_endpoint(const Point& p) const {
+        double d_start = (_start-p).norm();
+        double d_end = (_end-p).norm();
+        if (d_start < d_end)
+            return _start;
+        else
+            return _end;
     }
     ArcSite() {} // don't use!
     Point _start;  ///< start Point of arc

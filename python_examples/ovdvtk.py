@@ -40,14 +40,14 @@ magenta = ( float(153)/255 , float(42)/255 , float(165)/255  )
 def drawLine(myscreen, pt1, pt2, lineColor):
     myscreen.addActor( Line(p1=(pt1.x,pt1.y,0),p2=(pt2.x,pt2.y,0),color=lineColor) ) 
 
-def drawArc(myscreen, pt1, pt2, r, cen,cw,arcColor):
+def drawArc(myscreen, pt1, pt2, r, cen, cw, arcColor, da=0.1):
     # draw arc as many line-segments
     start = pt1-cen
     end = pt2-cen
     theta1 = math.atan2(start.x,start.y)
     theta2 = math.atan2(end.x,end.y)
     alfa=[] # the list of angles
-    da=0.1
+    #da=0.1
     CIRCLE_FUZZ = 1e-9
     # idea from emc2 / cutsim g-code interp G2/G3
     if (cw == False ): 
@@ -59,8 +59,9 @@ def drawArc(myscreen, pt1, pt2, r, cen,cw,arcColor):
     
     dtheta = theta2-theta1
     arclength = r*dtheta
-    dlength = min(0.01, arclength/10)
+    dlength = min(da, arclength/10)
     steps = int( float(arclength) / float(dlength))
+    print "arc subdivision steps: ",steps
     rsteps = float(1)/float(steps)
     dc = math.cos(-dtheta*rsteps) # delta-cos  
     ds = math.sin(-dtheta*rsteps) # delta-sin

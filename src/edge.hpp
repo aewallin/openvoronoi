@@ -105,11 +105,13 @@ public:
 private:
     double minimum_pp_t(Site* s1, Site* s2);
     double minimum_pl_t(Site* s1, Site* s2);
+    double minimum_pa_t(Site* s1, Site* s2);
 
     void set_pp_parameters(Site* s1, Site* s2);
     void set_pl_parameters(Site* s1, Site* s2);
     void set_ll_parameters(Site* s1, Site* s2);
     void set_ll_para_parameters(Site* s1, Site* s2);
+    void set_pa_parameters(Site* s1, Site* s2);
     void print_params() const;
 };
 

@@ -212,7 +212,7 @@ public:
                      (g[edge].type == LINELINE)  || (g[edge].type == PARA_LINELINE)) { // 
                     point_list.append( g[v1].position );
                     point_list.append( g[v2].position );
-                } else if ( g[edge].type == PARABOLA  ) { // these edge-types are drawn as polylines with edge_points number of points
+                } else if ( g[edge].type == PARABOLA || g[edge].type == HYPERBOLA  ) { // these edge-types are drawn as polylines with edge_points number of points
                     double t_src = g[v1].dist();
                     double t_trg = g[v2].dist();
                     double t_min = std::min(t_src,t_trg);

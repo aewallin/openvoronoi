@@ -548,6 +548,98 @@ if (step==current_step) return; current_step++;
 
 if (step==current_step) return; current_step++;
 
+    add_vertices( pos_site );  // add NEW vertices on all IN-OUT edges.
+    
+if (step==current_step) return; current_step++;
+
+    { // add SEPARATORS
+    
+        // find SEPARATOR targets first
+        typedef boost::tuple<HEEdge, HEVertex, HEEdge,bool> SepTarget;
+        SepTarget pos_start_target, neg_start_target;
+        pos_start_target = find_separator_target( g[start].face , pos_sep_start);
+        neg_start_target = find_separator_target( g[start].face , neg_sep_start);
+        
+        // add positive separator edge at start
+        add_separator( g[start].face , start_null_face, pos_start_target, pos_sep_start, g[pos_face].site , g[neg_face].site );
+        
+if (step==current_step) return; current_step++;
+        
+        // add negative separator edge at start
+        add_separator( g[start].face , start_null_face, neg_start_target, neg_sep_start, g[pos_face].site , g[neg_face].site );
+        g[ g[start].face ].status = NONINCIDENT; // face is now done.
+        assert( vd_checker->face_ok( g[start].face ) );
+        
+if (step==current_step) return; current_step++;
+
+        SepTarget pos_end_target, neg_end_target;
+        pos_end_target = find_separator_target( g[end].face ,  pos_sep_end);
+        neg_end_target = find_separator_target( g[end].face , neg_sep_end);
+        // add positive separator edge at end
+        add_separator( g[end].face , end_null_face, pos_end_target, pos_sep_end, g[pos_face].site , g[neg_face].site );
+        
+if (step==current_step) return; current_step++;
+        
+        // add negative separator edge at end
+        add_separator( g[end].face , end_null_face, neg_end_target, neg_sep_end, g[pos_face].site , g[neg_face].site );
+        g[ g[end].face ].status = NONINCIDENT;
+        assert( vd_checker->face_ok( g[end].face ) );
+
+        if(debug) std::cout << "all separators  done.\n";
+    } // end SEPARATORS
+
+if (step==current_step) return; current_step++;
+// add non-separator edges by calling add_edges on all INCIDENT faces
+    {
+        if(debug) std::cout << "adding edges.\n";
+        BOOST_FOREACH( HEFace f, incident_faces ) {
+            if ( g[f].status == INCIDENT )  {// end-point faces already dealt with in add_separator()
+                if(debug) { 
+                    std::cout << " add_edges f= " << f << "\n";
+                    g.print_face(f);
+                }
+                add_edges( pos_face, f, neg_face, std::make_pair(seg_start,seg_end)); // each INCIDENT face is split into two parts: newface and f
+            }
+        }
+        if(debug) std::cout << "adding edges. DONE.\n";
+    }
+
+if (step==current_step) return; current_step++;
+
+// new vertices and edges inserted. remove the delete-set, repair faces.
+
+    remove_vertex_set();
+
+    if (debug) { std::cout << "will now repair pos/neg faces: " << pos_face << " " << neg_face << "\n"; }
+
+    repair_face( pos_face, std::make_pair(seg_start,seg_end), 
+                           std::make_pair(start_to_null,end_to_null),
+                           std::make_pair(start_null_face,end_null_face) );
+    assert( vd_checker->face_ok( pos_face ) );
+
+    repair_face( neg_face, std::make_pair(seg_start,seg_end), 
+                           std::make_pair(start_to_null,end_to_null),
+                           std::make_pair(start_null_face,end_null_face) );
+    assert( vd_checker->face_ok( neg_face ) );
+    if (debug) { std::cout << "faces repaired.\n"; }
+
+if (step==current_step) return; current_step++;
+
+    // we are done and can remove split-vertices
+    BOOST_FOREACH(HEFace f, incident_faces) {
+        remove_split_vertex(f);
+    }
+    reset_status();
+
+
+    assert( vd_checker->face_ok( start_null_face ) );
+    assert( vd_checker->face_ok( end_null_face ) );
+    assert( vd_checker->face_ok( pos_face ) );
+    assert( vd_checker->face_ok( neg_face ) );    
+    assert( vd_checker->is_valid() );
+
+    //return true; 
+
 }
 
 /// \brief find vertex descriptors corresponding to \a idx1 and \a idx2
@@ -772,6 +864,7 @@ bool VoronoiDiagram::null_vertex_target( HEVertex v , HEVertex& trg) {
 /// \param start  the end of the segment for which we will find/create a null-face
 /// \param other  the other end of the new segment
 /// \param left   a point left of the new segment
+/// \param dir    alfa-direction for positioning vertices on null-face
 ///
 /// \return HEVertex ::ENDPOINT-vertex for the new vertex
 /// \return HEFace  null-face at endpoint (new or existing)
@@ -1425,10 +1518,7 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
     HEEdge twin_previous = ed.v2_prv;
     HEVertex new_target = ed.v2;         // -IN-NEW(v2)-OUT-
     HEEdge new_next = ed.v2_nxt;
-    
-    if (debug)
-        std::cout << " add_edge " << g[new_source].index << " - " << g[new_target].index << "\n";
-    
+        
     HEFace f = ed.f;
     Site* f_site = g[f].site;
     Site* new_site;
@@ -1455,9 +1545,9 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
 
     // check for potential apex-split
     bool src_sign=true, trg_sign=true;
-    if (f_site->isPoint()  && new_site->isLine() ) { // PL
+    if (f_site->isPoint()  && ( new_site->isLine() || new_site->isArc() ) ) { // PL
         Point pt1 = f_site->position();
-        Point pt2 = new_site->apex_point(pt1);
+        Point pt2 = new_site->apex_point(pt1); // projection of pt1 onto LineSite
         
         src_sign = g[new_source].position.is_right( pt1, pt2 );
         trg_sign = g[new_target].position.is_right( pt1, pt2 );
@@ -1490,7 +1580,6 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
                 assert( !g[new_source].position.is_right( new_site->start(), new_site->end() ) );
                 assert( !g[new_target].position.is_right( new_site->start(), new_site->end() ) );
         }
-
     } else { // unhandled case!
         std::cout << " add_edge() WARNING: no code to deremine src_sign and trg_sign!\n";
         assert(0);
@@ -1499,6 +1588,8 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
     // both src and trg are on the same side of the new site.
     // so no apex-split is required, just add a single edge.
     if ( src_sign == trg_sign ) {  // add a single src-trg edge
+        if (debug) std::cout << " add_edge " << g[new_source].index << " - " << g[new_target].index << "\n";
+        
         HEEdge e_new, e_twin;
         boost::tie(e_new,e_twin) = g.add_twin_edges( new_source, new_target );
         g[e_new].next = new_next;
@@ -1534,6 +1625,8 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
         //                       new1/new2         new1/new2
         //   
         HEVertex apex = g.add_vertex( VoronoiVertex(Point(0,0), NEW,APEX) );
+        if (debug) std::cout << " add_edge with APEX " << g[new_source].index << " - [" << g[apex].index << "] - " << g[new_target].index << "\n";
+        
         HEEdge e1, e1_tw;
         HEEdge e2, e2_tw;
         boost::tie(e1, e1_tw) = g.add_twin_edges( new_source, apex );

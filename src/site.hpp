@@ -321,6 +321,8 @@ public:
     inline virtual bool isPoint() const { return false;}
     /// true for LineSite
     inline virtual bool isLine() const  { return false;}
+    inline virtual bool isArc() const  { return false;}
+    virtual bool cw() {return false;}
     /// is given Point in_region ?
     virtual bool in_region(const Point& ) const =0; 
     /*{
@@ -328,14 +330,9 @@ public:
         return false;
     }*/
     /// is given Point in region?
-    virtual double in_region_t(const Point& ) const {
-        std::cout << " WARNING: never call Site !\n";
-        return 0;
-    } 
+    virtual double in_region_t(const Point& ) const { std::cout << " WARNING: never call Site !\n"; return 0; } 
     /// in-region t-valye
-    virtual double in_region_t_raw(const Point&) const {
-        return -99;
-    }
+    virtual double in_region_t_raw(const Point&) const { return -99; }
     /// return edge (if this is a LineSite or ArcSite
     virtual HEEdge edge() {return HEEdge();}
     /// return vertex, if this is a PointSite
@@ -548,6 +545,8 @@ public:
     Point center() {return _center;}
     double radius() {return _radius;}
     bool cw() {return _dir;}
+    inline virtual bool isArc() const  { return true;}
+
 private:
     Point projection_point(const Point& p) const {
         if ( p == _center ) {

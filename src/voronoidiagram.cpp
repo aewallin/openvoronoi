@@ -304,8 +304,10 @@ if (step==current_step) return false; current_step++;
     HEFace start_to_null = g.HFace(); // when a point-site completely disappears, we "null" the face belonging to this pointsite
     HEFace   end_to_null = g.HFace();
     // returns new seg_start/end vertices, new or existing null-faces, and separator endpoints (if separators should be added)
-    boost::tie(seg_start, start_null_face, pos_sep_start, neg_sep_start, start_to_null) = find_null_face(start, end  , left);
-    boost::tie(seg_end  , end_null_face  , pos_sep_end  , neg_sep_end  , end_to_null  ) = find_null_face(end  , start, left);
+    Point dir2 = g[start].position - g[end].position;
+    Point dir1 = g[end].position - g[start].position;
+    boost::tie(seg_start, start_null_face, pos_sep_start, neg_sep_start, start_to_null) = find_null_face(start, end  , left, dir1);
+    boost::tie(seg_end  , end_null_face  , pos_sep_end  , neg_sep_end  , end_to_null  ) = find_null_face(end  , start, left, dir2);
 
     // now safe to set the zero-face edge
     // in the collinear case, set the edge for the face that "disappears" to a null edge
@@ -500,10 +502,14 @@ if (step==current_step) return; current_step++;
     HEFace   end_to_null = g.HFace();
     Point src_se = g[start].position;
     Point trg_se = g[end  ].position;
+
     Point left = 0.5*(src_se+trg_se) + (trg_se-src_se).xy_perp(); // this is used below and in find_null_face()
     // returns new seg_start/end vertices, new or existing null-faces, and separator endpoints (if separators should be added)
-    boost::tie(seg_start, start_null_face, pos_sep_start, neg_sep_start, start_to_null) = find_null_face(start, end  , left);
-    boost::tie(seg_end  , end_null_face  , pos_sep_end  , neg_sep_end  , end_to_null  ) = find_null_face(end  , start, left);
+    Point dir1 = (g[start].position - center).xy_perp();
+    Point dir2 = -1*(g[end].position - center).xy_perp();
+
+    boost::tie(seg_start, start_null_face, pos_sep_start, neg_sep_start, start_to_null) = find_null_face(start, end  , left, dir1);
+    boost::tie(seg_end  , end_null_face  , pos_sep_end  , neg_sep_end  , end_to_null  ) = find_null_face(end  , start, left, dir2);
 
     // now safe to set the zero-face edge
     // in the collinear case, set the edge for the face that "disappears" to a null edge
@@ -518,6 +524,8 @@ if (step==current_step) return; current_step++;
     HEEdge pos_edge, neg_edge;
     {
         boost::tie( pos_edge, neg_edge) = g.add_twin_edges( seg_end  ,seg_start );
+        if (debug) std::cout << "created ARCSITE edge " << g[seg_end].index << " - " << g[seg_start].index << "\n";   
+
         g[pos_edge].inserted_direction = false;
         g[neg_edge].inserted_direction = true;
         g[pos_edge].type = ARCSITE;
@@ -759,38 +767,39 @@ bool VoronoiDiagram::null_vertex_target( HEVertex v , HEVertex& trg) {
     return false;
 }
 
-//
+
 /// \brief either find an existing null-face, or create a new one.
-//
-// return segment-endpoint and separator-points,
-// HEVertex: new segment ENDPOINT-vertex
-// HEFace:   null-face (new or existing)
-// HEVertex: positive separator ENDPOINT vertex (if a positive separator should be added)
-// HEVertex: negative separator ENDPOINT vertex (of neg separator should be added)
-// HEFace:    
+/// \param start  the end of the segment for which we will find/create a null-face
+/// \param other  the other end of the new segment
+/// \param left   a point left of the new segment
+///
+/// \return HEVertex ::ENDPOINT-vertex for the new vertex
+/// \return HEFace  null-face at endpoint (new or existing)
+/// \return HEVertex positive ::SEPARATOR edge endpoint vertex (if a positive separator should be added)
+/// \return HEVertex negative ::SEPARATOR edge endpoint vertex (if a negative separator should be added)
+/// \return HEFace face-to-null. if a PointSite face should disappear, we return it here.
 boost::tuple<HEVertex,HEFace,HEVertex,HEVertex,HEFace>
-VoronoiDiagram::find_null_face(HEVertex start, HEVertex other, Point left) {
+VoronoiDiagram::find_null_face(HEVertex start, HEVertex other, Point left, Point dir) {
     HEVertex seg_start = HEVertex(); // new end-point vertices
-    HEFace start_null_face; // either existing or new null-faces at endpoints
+    HEFace start_null_face; // either existing or new null-face at start-vertex
     
     HEVertex pos_sep_start = HEVertex(); // optional separator endpoints at start
     HEVertex neg_sep_start = HEVertex(); // invalid vertices are default
     
     HEFace face_to_null = g.HFace(); // invalid face is default
     
-    Point dir = g[other].position - g[start].position;
-    //double alfa = numeric::diangle( dir.x, dir.y ); // alfa for the new endpoint vertex
+    //Point dir = g[other].position - g[start].position; // direction towards other
+
     bool k3_sign = left.is_right( g[start].position , g[other].position); // this is used below and in find_null_face()
     // k3_sign is already calculated in insert_line_segment() ??
     
     if (g[start].null_face != g.HFace() ) { // there is an existing null face
-        
         if (debug) {
             std::cout << "find_null_face() endp= " << g[start].index << " has existing null_face : " << g[start].null_face << "\n";
             g.print_face( g[start].null_face  );
         }
         start_null_face = g[start].null_face;
-        
+
         // create a new segment ENDPOINT vertex with zero clearance-disk
         seg_start = g.add_vertex( VoronoiVertex(g[start].position,OUT,ENDPOINT,0) );
         // find the edge on the null-face where we insert seg_start
@@ -824,15 +833,15 @@ VoronoiDiagram::find_null_face(HEVertex start, HEVertex other, Point left) {
             if (debug) { std::cout << "find_null_face() endpoint edge is "; g.print_edge(insert_edge); }
         }
         g.add_vertex_in_edge(seg_start,insert_edge); // insert endpoint in null-edge
-        
+
         if (debug) { std::cout << "find_null_face() new endpoint vertex " << g[seg_start].index << " inserted in edge "; g.print_edge(insert_edge); }
-        
+
         // "process" the adjacent null-edges 
         HEEdge next_edge, prev_edge;
         boost::tie(next_edge,prev_edge) = g.find_next_prev(start_null_face, seg_start);
         //assert( g[prev_edge].next == next_edge );
-        boost::tie( neg_sep_start, face_to_null) = process_null_edge(dir,next_edge, k3_sign, true);
-        boost::tie( pos_sep_start, face_to_null) = process_null_edge(dir,prev_edge, k3_sign, false);
+        boost::tie( neg_sep_start, face_to_null ) = process_null_edge(dir, next_edge, k3_sign, true);
+        boost::tie( pos_sep_start, face_to_null ) = process_null_edge(dir, prev_edge, k3_sign, false);
 
         return boost::make_tuple( seg_start, start_null_face, pos_sep_start, neg_sep_start, face_to_null);
     } else { // no existing null-face
@@ -861,16 +870,14 @@ VoronoiDiagram::find_null_face(HEVertex start, HEVertex other, Point left) {
             g[pos_sep_start].k3 = -1; 
             g[neg_sep_start].k3 = +1;
         }
-        
         g[pos_sep_start].set_alfa( dir.xy_perp()*(+1) );        
         g[neg_sep_start].set_alfa( dir.xy_perp()*(-1) );
-        
         if (debug) {
             std::cout << " k3_sign = " << k3_sign <<"\n"; 
             std::cout << " sep1 = " << g[pos_sep_start].index << " k3=" << g[pos_sep_start].k3 << "\n";
             std::cout << " sep2 = " << g[neg_sep_start].index << " k3=" << g[neg_sep_start].k3 << "\n";
         }
-        
+        // null-edges around the face
         HEEdge e1,e1_tw;
         boost::tie(e1,e1_tw) = g.add_twin_edges(seg_start,pos_sep_start);
         HEEdge e2,e2_tw;
@@ -895,7 +902,7 @@ VoronoiDiagram::find_null_face(HEVertex start, HEVertex other, Point left) {
         
         return boost::make_tuple( seg_start, start_null_face, pos_sep_start, neg_sep_start, face_to_null);
     }
-    
+
 }
 
 /// \brief add ::SEPARATOR edge on the face f, which contains the endpoint

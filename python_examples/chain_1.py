@@ -53,7 +53,7 @@ if __name__ == "__main__":
     vod.drawVertices=0
     vod.drawVertexIndex=1
     vod.drawGenerators=0
-    vod.offsetEdges = 0
+    vod.offsetEdges = 1
     vd.setEdgeOffset(0.05)
     
     

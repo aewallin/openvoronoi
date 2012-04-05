@@ -1548,8 +1548,10 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
     //                                           new_face   
 
     // check for potential apex-split
+    // we need an apex-vertex if the source and target are on different branches of the new quadratic edge
+    // we can set the src_sign and trg_sign by with is_right where we compare to a line through the apex 
     bool src_sign=true, trg_sign=true;
-    if (f_site->isPoint()  && ( new_site->isLine() || new_site->isArc() ) ) { // PL
+    if (f_site->isPoint()  && ( new_site->isLine() || new_site->isArc() ) ) { // PL or PA
         Point pt1 = f_site->position();
         Point pt2 = new_site->apex_point(pt1); // projection of pt1 onto LineSite
         
@@ -1584,8 +1586,15 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
                 assert( !g[new_source].position.is_right( new_site->start(), new_site->end() ) );
                 assert( !g[new_target].position.is_right( new_site->start(), new_site->end() ) );
         }
+    } else if (f_site->isLine() && new_site->isArc() )  { // LA
+        Point pt2 = Point( new_site->x(), new_site->y() );
+        Point pt1 = f_site->apex_point(pt2);
+        src_sign = g[new_source].position.is_right( pt1, pt2 );
+        trg_sign = g[new_target].position.is_right( pt1, pt2 );
     } else { // unhandled case!
         std::cout << " add_edge() WARNING: no code to deremine src_sign and trg_sign!\n";
+        std::cout << " add_edge() f_site " << f_site->str() << "\n";
+        std::cout << " add_edge() new_site " << new_site->str() << "\n"; // WARNING: no code to deremine src_sign and trg_sign!\n";
         assert(0);
     }
     

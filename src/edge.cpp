@@ -124,10 +124,13 @@ void EdgeProps::set_parameters(Site* s1, Site* s2, bool sig) {
         set_pa_parameters(s1,s2);
     else if (s2->isPoint() && s1->isArc() ) // AP
         set_pa_parameters(s2,s1);
+    else if (s1->isLine() && s2->isArc() ) // LA
+        set_la_parameters(s1,s2);
+    else if (s2->isLine() && s1->isArc() ) // AL
+        set_la_parameters(s2,s1);
     else
         assert(0);
         // AA
-        // AL & LA
 }
 
 /// assignment of edge-parameters
@@ -337,7 +340,7 @@ void EdgeProps::set_ll_parameters(Site* s1, Site* s2) {  // Held thesis p96
 
 void EdgeProps::set_pa_parameters(Site* s1, Site* s2) {
     assert( s1->isPoint() && s2->isArc() );
-    std::cout << "set_pa_parameters()\n";
+    //std::cout << "set_pa_parameters()\n";
     
     type = HYPERBOLA; // hyperbola or ellipse?
     double lamb2;
@@ -368,38 +371,55 @@ void EdgeProps::set_pa_parameters(Site* s1, Site* s2) {
     y[5] = +1; //lamb1;
     y[6] = alfa3;
     y[7] = alfa4;
+    //print_params();
+}
+
+
+// arc(s1)-line(s2)
+void EdgeProps::set_la_parameters(Site* s1, Site* s2) { 
+    assert( s1->isLine() && s2->isArc() );
+    std::cout << "set_la_parameters() sign= " << sign << " cw= " << s2->cw() << "\n";
+    type = PARABOLA;
+    double lamb2;
+    if (s2->cw())
+        lamb2 = +1.0;
+    else
+        lamb2 = -1.0;
+    double alfa1 = s1->a(); //a2
+    double alfa2 = s1->b(); //b2
+    double alfa3 = ( s1->a()*s2->x() + s1->b()*s2->y() + s1->c() );
+    double alfa4 = s2->r();
+    double kk = +1; // # positive line-offset
+    if (alfa3 > 0) {
+        kk = -1;
+    }
+    sign = false;
+    // figure out sign?
+    
+    x[0] = s2->x();
+    x[1] = alfa1*alfa3;
+    x[2] = alfa1*kk;
+    x[3] = alfa2;
+    x[4] = alfa4;
+    x[5] = lamb2;
+    x[6] = alfa3;
+    x[7] = kk;
+    
+    y[0] = s2->y();
+    y[1] = alfa2*alfa3;
+    y[2] = alfa2*kk;
+    y[3] = alfa1;
+    y[4] = alfa4;
+    y[5] = lamb2;
+    y[6] = alfa3;
+    y[7] = kk;
     print_params();
 }
 
-/*
-// arc(s1)-line(s2)
-void EdgeProps::set_la_parameters(Site* s1, Site* s2) { 
-    d = sqrt( (xc1 - xc2)^2 + (yc1-yc2)^2 )
-    double alfa1 = a2
-    double alfa2 = b2
-    double alfa3 = ( a2*xc1 + b2*yc1 + c2 )
-    double alfa4 = r1
-    x[0]= xc1
-    x[1] = alfa1*alfa3
-    x[2] = -alfa1
-    x[3] = alfa2
-    x[4] = alfa4
-    x[5] = lamb1
-    x[6] = alfa3
-    x[7] = -1
-    
-    y[0] = yc1
-    y[1] = alfa2*alfa3
-    y[2] = -alfa2
-    y[3] = alfa1
-    y[4] = alfa4
-    y[5] = lamb1
-    y[6] = alfa3
-    y[7] = -1
-}
-*/
+
 /// \return minumum t-value for this edge
 /// this function dispatches to a helper-function based on the Site:s \a s1 and \a s2
+// used only for positioning APEX vertices?
 double EdgeProps::minimum_t( Site* s1, Site* s2) {
     if (s1->isPoint() && s2->isPoint())        // PP
         return minimum_pp_t(s1,s2);

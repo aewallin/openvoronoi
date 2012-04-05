@@ -70,9 +70,10 @@ int solve( Site* s1, double k1,
     if (debug)
         std::cout << "LLLPARASolver.\n";    
     assert( s1->isLine() && s2->isLine() && s3->isLine() );
+    
     Eq<double> bis;
-    bis.a = s1->a(); //eq[0].a;
-    bis.b = s1->b(); //eq[0].b;
+    bis.a = s1->a();
+    bis.b = s1->b();
     double s2c = s2->c();
     // if s1 and s2 have opposite (a,b) normals, flip the sign of s2c
     if ( Point(s1->a(),s1->b()) == -1*Point(s2->a(),s2->b()) ) {
@@ -80,27 +81,46 @@ int solve( Site* s1, double k1,
     }
     
     bis.c = (s1->c() + s2c)/2;
-    double tb = fabs( (s1->c() - s2c )/2 );
+    double tb = fabs( (s1->c() - s2c )/2 ); // bisector offset distance
     
     if (debug) {
         std::cout << " s1 : " << s1->a() << " " << s1->b() << " " << s1->c() << " " << s1->k() << "\n";
         std::cout << " s2 : " << s2->a() << " " << s2->b() << " " << s2->c() << " " << s2->k() << "\n";
-        std::cout << " s3 : " << s3->a() << " " << s3->b() << " " << s3->c() << " " << s3->k() << "\n";
+        if ( s3->isLine() )
+            std::cout << " s3 : " << s3->a() << " " << s3->b() << " " << s3->c() << " " << s3->k() << "\n";
         std::cout << " bis: " << bis.a << " " << bis.b << " " << bis.c << " \n";
     }
-    double x,y;
-    if ( two_by_two_solver(bis.a, bis.b, s3->a(), s3->b(), -bis.c, -s3->c()-k3*tb, x,y) ) {
-        if (debug) std::cout << " Solution: t=" << tb << " " << Point( x, y ) << " k3=" << k3 << " \n";
-        slns.push_back( Solution( Point( x, y ) , tb, k3 ) ); 
+    //if ( s3->isLine() ) {
+        double x,y;
+        if ( two_by_two_solver(bis.a, bis.b, s3->a(), s3->b(), -bis.c, -s3->c()-k3*tb, x,y) ) {
+            if (debug) std::cout << " Solution: t=" << tb << " " << Point( x, y ) << " k3=" << k3 << " \n";
+            slns.push_back( Solution( Point( x, y ) , tb, k3 ) ); 
+            return 1;
+        } else {
+            if (debug) std::cout << "LLLPARASolver. NO Solution!\n";    
+            return 0;
+        }
+    //}
+    /*
+    if ( s3->isArc() ) {
+        // bisector ax + by + c = 0
+        // all points are at offset tb from s1 and s2
+        // find a point on the bisector which is also a distance tb from the circle
+        // this point is a distance r+tb from the circle center (?)
+        circle_line_intersection(bis.a, bis.b, bis.c, s3->x(), s3->y(), s3->r(), tb,slns);
         return 1;
-    } else {
-        if (debug) std::cout << "LLLPARASolver. NO Solution!\n";    
-        return 0;
-    }
+    }*/
+    return 0;
 }
 
 private:
-
+/*
+void circle_line_intersection(double a, double b, double c, 
+         double cx, double cy, double r, double tb, std::vector<Solution>& slns) {
+    // line ax+by+c = 0
+    // circle (cx,cy) radius r
+}*/
+    
 /// solve 2z2 system Ax = y by inverting A
 /// x = Ainv * y
 /// returns false if det(A)==0, i.e. no solution found

@@ -370,7 +370,7 @@ int VertexPositioner::solver_dispatch(Site* s1, double k1, Site* s2, double k2, 
         }
         assert( s1->isLine() && s2->isPoint() ); // we have previously set s1(line) s2(point)
         return sep_solver->solve(s1,k1,s2,k2,s3,k3,solns); 
-    } else if ( g[edge].type == PARA_LINELINE ) { // an edge betwee parallel LineSites
+    } else if ( g[edge].type == PARA_LINELINE  && s3->isLine() ) { // an edge betwee parallel LineSites
         //std::cout << " para lineline! \n";
         return lll_para_solver->solve( s1,k1,s2,k2,s3,k3, solns );
     } else if ( s1->isLine() && s2->isLine() && s3->isLine() ) 

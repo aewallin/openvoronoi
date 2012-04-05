@@ -95,11 +95,23 @@ if __name__ == "__main__":
     id4 = id_list[3]
     
     vd.addLineSite(id1,id3)
+    vd.addLineSite(id4,id3)
+    vd.addLineSite(id4,id2)
     
     #print "add segment ",id1, " to ", id2
     vd.debug_on()
     c1 = ovd.Point(0,0)
-    vd.addArcSite( id1, id2 , c1, True , 5 )
+    vd.addArcSite( id1, id2 , c1, True , 14 )
+    # 5 delete-tree
+    # 6 pseudo-edges
+    # 7 NEW vertices
+    # 8 start pos separator
+    # 9 start neg separator
+    # 10 endp pos separator
+    # 11 endp neg separator
+    # 12 add non-separator edges
+    # 13 remove delete-tree
+    # 14 reset status
     
     #vd.addLineSite( id3, id4 )
     t_after = time.time()

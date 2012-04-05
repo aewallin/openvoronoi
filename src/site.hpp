@@ -497,8 +497,8 @@ private:
 class ArcSite : public Site {
 public:
     /// create arc-site
-    ArcSite( const Point& s, const Point& e, const Point& center, bool dir) : 
-        _start(s), _end(e), _center(center), _dir(dir) {
+    ArcSite( const Point& startpt, const Point& endpt, const Point& centr, bool dir) : 
+        _start(startpt), _end(endpt), _center(centr), _dir(dir) {
         _radius = (_center - _start).norm();
         eq.q = true;
         eq.a = -2*_center.x;

@@ -112,6 +112,7 @@ private:
     void set_ll_parameters(Site* s1, Site* s2);
     void set_ll_para_parameters(Site* s1, Site* s2);
     void set_pa_parameters(Site* s1, Site* s2);
+    void set_la_parameters(Site* s1, Site* s2);
     void print_params() const;
 };
 

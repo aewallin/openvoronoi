@@ -395,6 +395,7 @@ class VD:
         # go through edges once more and set colors
         m=0
         for e in vd_edges:
+            # e[1]  edgeType
             src_status = e[2] # src status
             trg_status = e[3] # trg status
             ecolor = self.edgeTypeColor( e[1], e[2], e[3] ) 
@@ -456,8 +457,12 @@ class VD:
             return yellow
         if (edgeType == ovd.EdgeType.PARABOLA):
             return self.edgeStatusColor(src_status,trg_status, blue2)
+        if (edgeType == ovd.EdgeType.HYPERBOLA):
+            return self.edgeStatusColor(src_status,trg_status, blue2)
+        if (edgeType == ovd.EdgeType.NULLEDGE):
+            return white
         else:
-            #print "UNKOWN edge type = ", edgeType
+            print "UNKOWN edge type = ", edgeType
             return white
             
     def setEdges(self):

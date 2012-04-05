@@ -1655,6 +1655,7 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
         assert( g[twin_previous].k == g[twin_next].k );  
         assert( g[twin_previous].face == g[twin_next].face );        
         // twin_prev -> e2_tw -> e1_tw -> twin_next   on new_face 
+
         //g.set_next_chain( boost::assign::list_of(twin_previous)(e2_tw)(e1_tw)(twin_next) );
         g[twin_previous].next=e2_tw; g[e2_tw].next=e1_tw; g[e1_tw].next=twin_next;
         //g[e1].face=f; g[e2].face=f;

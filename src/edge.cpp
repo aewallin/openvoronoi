@@ -337,17 +337,18 @@ void EdgeProps::set_ll_parameters(Site* s1, Site* s2) {  // Held thesis p96
 
 void EdgeProps::set_pa_parameters(Site* s1, Site* s2) {
     assert( s1->isPoint() && s2->isArc() );
-
+    std::cout << "set_pa_parameters()\n";
+    
     type = HYPERBOLA; // hyperbola or ellipse?
     double lamb2;
     if (s2->cw())
-        lamb2 = 1.0;
+        lamb2 = +1.0;
     else
         lamb2 = -1.0;
         
     double d = sqrt( (s1->x() - s2->x())*(s1->x() - s2->x()) + (s1->y()-s2->y())*(s1->y()-s2->y()) );
     double alfa1 = ( s2->x() - s1->x() ) / d;
-    double alfa2 = ( s2->x() - s1->x() ) / d;
+    double alfa2 = ( s2->y() - s1->y() ) / d;
     double alfa3 = ( s2->r()*s2->r() -  d*d) / (2*d);
     double alfa4 = ( lamb2 * s2->r()  ) / d;
     x[0] = s1->x();
@@ -355,7 +356,7 @@ void EdgeProps::set_pa_parameters(Site* s1, Site* s2) {
     x[2] = alfa1*alfa4;
     x[3] = alfa2;
     x[4] = 0; //r1;
-    x[5] = 0; //lamb1;
+    x[5] = +1; //lamb1;
     x[6] = alfa3;
     x[7] = alfa4;
     
@@ -364,9 +365,10 @@ void EdgeProps::set_pa_parameters(Site* s1, Site* s2) {
     y[2] = alfa2*alfa4;
     y[3] = alfa1;
     y[4] = 0; //r1;
-    y[5] = 0; //lamb1;
+    y[5] = +1; //lamb1;
     y[6] = alfa3;
     y[7] = alfa4;
+    print_params();
 }
 
 /*
@@ -432,7 +434,7 @@ double EdgeProps::minimum_pl_t(Site* , Site* ) {
 /// minimum t-value for edge between PointSite and ArcSite
 double EdgeProps::minimum_pa_t(Site* s1, Site* s2) {
     assert( s1->isPoint() && s2->isArc() );
-    double p1p2 = (s1->position() - s2->apex_point(s1->position()) ).norm() ;
+    double p1p2 = (s1->position() - s2->apex_point(s1->position()) ).norm(); // - s2->r() ;
     assert( p1p2 >=0 );
     return p1p2/2; // this splits point-point edges at APEX
 }
@@ -441,7 +443,9 @@ void EdgeProps::print_params() const {
     std::cout << "x-params: ";
     for (int m=0;m<8;m++)
         std::cout << x[m] << " ";
+    std::cout << "sign= " << sign;
     std::cout << "\n";
+    
     std::cout << "y-params: ";
     for (int m=0;m<8;m++)
         std::cout << y[m] << " ";

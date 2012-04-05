@@ -68,6 +68,9 @@ if __name__ == "__main__":
     plist = []
     plist.append( ovd.Point(0.1,0.1) )
     plist.append( ovd.Point(-0.1,0.1) )
+    
+    plist.append( ovd.Point(0.1,-0.1) )
+    plist.append( ovd.Point(-0.1,-0.1) )
     #plist.append( ovd.Point(-0.15, -0.15) )
     #+ regularGridGenerators(far, Nmax) + circleGenerators(far, Nmax)
 
@@ -88,12 +91,15 @@ if __name__ == "__main__":
     
     id1 = id_list[0]
     id2 = id_list[1]
-    #id3 = id_list[2]
-    #id4 = id_list[3]
+    id3 = id_list[2]
+    id4 = id_list[3]
+    
+    vd.addLineSite(id1,id3)
+    
     #print "add segment ",id1, " to ", id2
     vd.debug_on()
     c1 = ovd.Point(0,0)
-    vd.addArcSite( id1, id2 , c1, True , 13 )
+    vd.addArcSite( id1, id2 , c1, True , 5 )
     
     #vd.addLineSite( id3, id4 )
     t_after = time.time()

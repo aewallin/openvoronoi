@@ -90,15 +90,18 @@ if __name__ == "__main__":
     vd = ovd.VoronoiDiagram(far,120)
     print ovd.version()
     vod = ovdvtk.VD(myscreen,vd,float(scale))
+    vod.drawVertices=0
+    vod.drawVertexIndex=0
+    vod.vertexRadius = 0.0031
     drawFarCircle(myscreen, vd.getFarRadius(), ovdvtk.orange)
     
-    Nmax = 50
+    Nmax = 500
     
-    #plist = randomGenerators(far, Nmax)
+    plist = randomGenerators(far, Nmax)
     #plist = regularGridGenerators(far, Nmax)
     #plist = circleGenerators(far, Nmax)
     
-    plist = randomGenerators(far, Nmax) + regularGridGenerators(far, Nmax) + circleGenerators(far, Nmax)
+    #plist = randomGenerators(far, Nmax) + regularGridGenerators(far, Nmax) + circleGenerators(far, Nmax)
 
     #plist = [ovd.Point(0,0)]
     
@@ -113,7 +116,7 @@ if __name__ == "__main__":
     if Nmax==0:
         Nmax=1
     print " VD done in ", calctime," s, ", calctime/Nmax," s per generator"
-    
+    vd.check()
     vod.setAll()
     myscreen.render()
             

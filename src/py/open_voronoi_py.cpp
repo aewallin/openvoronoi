@@ -66,6 +66,7 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         .def("addLineSite",  &VoronoiDiagram_py::insert_line_site2 ) // takes two arguments
         .def("addLineSite",  &VoronoiDiagram_py::insert_line_site3 ) // takes three arguments (idx1, idx2, step)
         .def("addArcSite",  &VoronoiDiagram_py::insert_arc_site ) // arc-site (idx1,idx2, center, cw?, step) 
+        .def("addArcSite",  &VoronoiDiagram_py::insert_arc_site4 ) // arc-site (idx1,idx2, center, cw?, step) 
         .def("getGenerators",  &VoronoiDiagram_py::getGenerators)
         .def("getEdgesGenerators",  &VoronoiDiagram_py::getEdgesGenerators)
         .def("getVoronoiVertices",  &VoronoiDiagram_py::getVoronoiVertices)

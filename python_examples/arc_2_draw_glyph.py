@@ -8,7 +8,7 @@ def drawLine(myscreen, previous, p, loopColor):
     myscreen.addActor( ovdvtk.Line(p1=(previous[0],previous[1],0),p2=(p[0],p[1],0),color=loopColor) )
     
 def drawSeg(myscreen, previous, p):
-    ovdvtk.drawVertex(myscreen, ovd.Point(p[0],p[1]), 0.001, ovdvtk.red)
+    ovdvtk.drawVertex(myscreen, ovd.Point(p[0],p[1]), 0.0001, ovdvtk.red)
     if (p[2]==-1): # a line-segment
         drawLine(myscreen, previous, p, ovdvtk.yellow)
     else: # an arc
@@ -66,6 +66,8 @@ def translate(segs,x,y):
             p2 = p
             p2[0] += x
             p2[1] += y
+            p2[4] += x
+            p2[5] += y
             seg2.append(p2)
             #seg2.append(seg[3] + y)
         out.append(seg2)
@@ -83,15 +85,14 @@ def modify_segments(segs):
 
 def draw_ttt(myscreen, text, x,y,scale):
     wr = ttt.SEG_Writer()
-    print wr.arc
+    #wr.arc = False
     wr.arc = True
-    print wr.arc
     #wr.conic = False
     #wr.cubic = False
     wr.scale = float(1)/float(scale)
     # "L" has 36 points by default
-    wr.conic_biarc_subdivision = 200 # this has no effect?
-    wr.conic_line_subdivision = 100 # this increasesn nr of points to 366
+    wr.conic_biarc_subdivision = 200 
+    wr.conic_line_subdivision = 50 # this increasesn nr of points to 366
     #wr.cubic_biarc_subdivision = 10 # no effect?
     #wr.cubic_line_subdivision = 10 # no effect?
     wr.setFont(2)
@@ -103,9 +104,12 @@ def draw_ttt(myscreen, text, x,y,scale):
     segs = translate(segs, x, y)
     print "number of polygons: ", len(segs)
     np = 0
+    sum_pts=0
     for s in segs:
+        sum_pts+=len(s)
         print " polygon ",np," has ",len(s)," points"
-        np=np+1        
+        np=np+1
+    print "total points: ",sum_pts
     segs = modify_segments(segs)
     drawLoops(myscreen, segs, ovdvtk.yellow )
     
@@ -136,9 +140,9 @@ if __name__ == "__main__":
     
     # draw a unit-circle
     ca = ovdvtk.Circle(center=(0,0,0) , radius=1, color=(0,1,1), resolution=50 )
-    myscreen.addActor(ca)   
-    draw_ttt(myscreen, "B", 0,0,10000)
-    #draw_ttt(myscreen, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", -0.5,0,80000)
+    myscreen.addActor(ca)
+    #draw_ttt(myscreen, "R", 0,0,80000)
+    draw_ttt(myscreen, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", -0.5,0,80000)
     #draw_ttt(myscreen, "abcdefghijklmnopqrstuvwxyz", -0.5,-0.1,80000)
     #draw_ttt(myscreen, "1234567890*", -0.5,-0.2,80000)
     #draw_ttt(myscreen, "m", -0.5,-0.2,80000)

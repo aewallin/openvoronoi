@@ -486,11 +486,8 @@ public:
     HEEdge e; ///< edge_descriptor to the ::LINESITE pseudo-edge
 private:
     LineSite() {} // don't use!
-    /// start Point of LineSite
-    Point _start;
-    /// end Point of LineSite
-    Point _end;
-    
+    Point _start; ///< start Point of LineSite
+    Point _end; /// end Point of LineSite
 };
 
 /// circular arc Site
@@ -503,7 +500,8 @@ public:
         eq.q = true;
         eq.a = -2*_center.x;
         eq.b = -2*_center.y;
-        eq.k = -2*_radius; 
+        _k = 1;
+        eq.k = -2*_k*_radius; 
         eq.c = _center.x*_center.x + _center.y*_center.y - _radius*_radius;
     }
     ~ArcSite() {}
@@ -526,7 +524,7 @@ public:
     virtual double x() const {return _center.x;}
     virtual double y() const {return _center.y;}
     virtual double r() const {return _radius;}
-    virtual double k() const {return 1;} // ?
+    virtual double k() const {return _k;} // ?
 
     
     virtual std::string str() const {return "ArcSite";}
@@ -574,6 +572,7 @@ private:
     Point _center; ///< center Point of arc
     bool _dir;     ///< CW or CCW direction flag
     double _radius;///< radius of arc
+    double _k; ///< offset-direction. +1 for enlarging, -1 for shrinking circle
 };
 
 

@@ -170,7 +170,7 @@ protected:
     void   add_edge(EdgeData ed, HEFace new1, HEFace new2=0);
     void   add_separator(HEFace f, HEFace nf, boost::tuple<HEEdge, HEVertex, HEEdge,bool> target, HEVertex endp, Site* s1, Site* s2);
     void   add_split_vertex(HEFace f, Site* s);
-    boost::tuple<HEVertex,HEFace,HEVertex,HEVertex,HEFace> find_null_face(HEVertex start, HEVertex other, Point l, Point dir);
+    boost::tuple<HEVertex,HEFace,HEVertex,HEVertex,HEFace> find_null_face(HEVertex start, HEVertex other, Point l, Point dir, Site* new_site);
     boost::tuple<HEEdge,HEVertex,HEEdge,bool> find_separator_target(HEFace f, HEVertex endp);
     std::pair<HEVertex,HEFace> process_null_edge(Point dir, HEEdge next_edge , bool k3, bool next_prev);
     HEVertex add_separator_vertex(HEVertex endp, HEEdge edge, Point sep_dir);

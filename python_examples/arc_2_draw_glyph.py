@@ -4,6 +4,27 @@ import ovdvtk
 import time
 import vtk
 
+def drawLine(myscreen, previous, p, loopColor):
+    myscreen.addActor( ovdvtk.Line(p1=(previous[0],previous[1],0),p2=(p[0],p[1],0),color=loopColor) )
+    
+def drawSeg(myscreen, previous, p):
+    ovdvtk.drawVertex(myscreen, ovd.Point(p[0],p[1]), 0.001, ovdvtk.red)
+    if (p[2]==-1): # a line-segment
+        drawLine(myscreen, previous, p, ovdvtk.yellow)
+    else: # an arc
+        prev = ovd.Point(previous[0],previous[1])
+        target = ovd.Point(p[0],p[1])
+        radius = p[2]
+        cw = p[3]
+        center = ovd.Point(p[4],p[5])
+        #print "prev ",prev
+        #print "center ",center
+        #print "diff ",prev-center
+        #print "p ",p
+        ovdvtk.drawArc(myscreen, prev, target, radius, center, cw, ovdvtk.orange) 
+        #      drawArc(myscreen,  pt1,    pt2,      r, cen,     cw, arcColor, da=0.1)
+        # r, cen, cw, arcColor, da=0.1)
+         
 def drawLoops(myscreen,loops,loopColor):
     # draw the loops
     nloop = 0
@@ -13,15 +34,25 @@ def drawLoops(myscreen,loops,loopColor):
         first_point=[]
         previous=[]
         for p in lop:
+            # x, y, r, cw, cx, cy
+            #if p[2] > 0:
+            #    print "arc: ",p
+            #else:
+            #    print "line: ",p
             if n==0: # don't draw anything on the first iteration
                 previous=p 
                 first_point = p
             elif n== (N-1): # the last point
-                myscreen.addActor( ovdvtk.Line(p1=(previous[0],previous[1],0),p2=(p[0],p[1],0),color=loopColor) ) # the normal line
+                drawSeg(myscreen,previous,p)
+                #drawLine(myscreen, previous, p, loopColor)
+                #myscreen.addActor( ovdvtk.Line(p1=(previous[0],previous[1],0),p2=(p[0],p[1],0),color=loopColor) ) # the normal line
                 # and a line from p to the first point
-                myscreen.addActor( ovdvtk.Line(p1=(p[0],p[1],0),p2=(first_point[0],first_point[1],0),color=loopColor) )
+                #myscreen.addActor( ovdvtk.Line(p1=(p[0],p[1],0),p2=(first_point[0],first_point[1],0),color=loopColor) )
+                drawSeg(myscreen,p, first_point)
+                #drawLine(myscreen, p, first_point, loopColor)
             else:
-                myscreen.addActor( ovdvtk.Line(p1=(previous[0],previous[1],0),p2=(p[0],p[1],0),color=loopColor) )
+                drawSeg(myscreen,previous,p)
+                #myscreen.addActor( ovdvtk.Line(p1=(previous[0],previous[1],0),p2=(p[0],p[1],0),color=loopColor) )
                 previous=p
             n=n+1
         print "rendered loop ",nloop, " with ", len(lop), " points"
@@ -32,9 +63,9 @@ def translate(segs,x,y):
     for seg in segs:
         seg2 = []
         for p in seg:
-            p2 = []
-            p2.append(p[0] + x)
-            p2.append(p[1] + y)
+            p2 = p
+            p2[0] += x
+            p2[1] += y
             seg2.append(p2)
             #seg2.append(seg[3] + y)
         out.append(seg2)
@@ -52,15 +83,17 @@ def modify_segments(segs):
 
 def draw_ttt(myscreen, text, x,y,scale):
     wr = ttt.SEG_Writer()
-    wr.arc = False
-    wr.conic = False
-    wr.cubic = False
+    print wr.arc
+    wr.arc = True
+    print wr.arc
+    #wr.conic = False
+    #wr.cubic = False
     wr.scale = float(1)/float(scale)
     # "L" has 36 points by default
-    wr.conic_biarc_subdivision = 10 # this has no effect?
-    wr.conic_line_subdivision = 10 # this increasesn nr of points to 366
-    wr.cubic_biarc_subdivision = 10 # no effect?
-    wr.cubic_line_subdivision = 10 # no effect?
+    wr.conic_biarc_subdivision = 200 # this has no effect?
+    wr.conic_line_subdivision = 100 # this increasesn nr of points to 366
+    #wr.cubic_biarc_subdivision = 10 # no effect?
+    #wr.cubic_line_subdivision = 10 # no effect?
     wr.setFont(2)
     s3 = ttt.ttt(text,wr) 
     ext = wr.extents
@@ -104,7 +137,7 @@ if __name__ == "__main__":
     # draw a unit-circle
     ca = ovdvtk.Circle(center=(0,0,0) , radius=1, color=(0,1,1), resolution=50 )
     myscreen.addActor(ca)   
-    draw_ttt(myscreen, "A", 0,0,10000)
+    draw_ttt(myscreen, "B", 0,0,10000)
     #draw_ttt(myscreen, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", -0.5,0,80000)
     #draw_ttt(myscreen, "abcdefghijklmnopqrstuvwxyz", -0.5,-0.1,80000)
     #draw_ttt(myscreen, "1234567890*", -0.5,-0.2,80000)

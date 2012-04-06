@@ -42,6 +42,9 @@ magenta = ( float(153)/255 , float(42)/255 , float(165)/255  )
 def drawLine(myscreen, pt1, pt2, lineColor):
     myscreen.addActor( Line(p1=(pt1.x,pt1.y,0),p2=(pt2.x,pt2.y,0),color=lineColor) ) 
 
+def drawVertex(myscreen, p, r, vcolor):
+    myscreen.addActor( Sphere( center=(p.x,p.y, 0), radius=r, color=vcolor ) )
+
 def drawArc(myscreen, pt1, pt2, r, cen, cw, arcColor, da=0.1):
     # draw arc as many line-segments
     start = pt1-cen
@@ -63,7 +66,7 @@ def drawArc(myscreen, pt1, pt2, r, cen, cw, arcColor, da=0.1):
     arclength = r*dtheta
     dlength = min(da, arclength/10)
     steps = int( float(arclength) / float(dlength))
-    print "arc subdivision steps: ",steps
+    #print "arc subdivision steps: ",steps
     rsteps = float(1)/float(steps)
     dc = math.cos(-dtheta*rsteps) # delta-cos  
     ds = math.sin(-dtheta*rsteps) # delta-sin

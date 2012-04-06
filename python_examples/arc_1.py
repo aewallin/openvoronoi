@@ -55,16 +55,9 @@ if __name__ == "__main__":
     vod.drawVertexIndex=1
     vod.drawGenerators=1
     
-    vod.offsetEdges = 0
-    vd.setEdgeOffset(0.00)
-    
-    Nmax = 6
-    
-    #plist = randomGenerators(far, Nmax)
-    #plist = regularGridGenerators(far, Nmax)
-    #plist = circleGenerators(far, Nmax)
-    
-    #plist = randomGenerators(far, Nmax) 
+    vod.offsetEdges = 1
+    vd.setEdgeOffset(0.03)
+
     plist = []
     plist.append( ovd.Point(0.1,0.1) )
     plist.append( ovd.Point(-0.1,0.1) )
@@ -102,9 +95,16 @@ if __name__ == "__main__":
     #print "add segment ",id1, " to ", id2
     vd.debug_on()
     c1 = ovd.Point(0,0)
-    vd.addArcSite( id1, id2 , c1, True , 14 )
-    # 5 delete-tree
-    # 6 pseudo-edges
+    vd.addArcSite( id1, id2 , c1, True , 14 ) # right-to-left arc
+    
+    #vd.addArcSite( id2, id1 , c1, False , 14) # left-to-right arc
+    
+    # 1 lookup vertex descriptors
+    # 2 create Sites
+    # 3 find seed vertex
+    # 4 find dlete-tree
+    # 5 process null-faces
+    # 6 add pseudo-edges
     # 7 NEW vertices
     # 8 start pos separator
     # 9 start neg separator
@@ -118,9 +118,9 @@ if __name__ == "__main__":
     t_after = time.time()
     calctime = t_after-t_before
     times.append(calctime)
-    if Nmax==0:
-        Nmax=1
-    print " VD done in ", calctime," s, ", calctime/Nmax," s per generator"
+    #if Nmax==0:
+    #    Nmax=1
+    #print " VD done in ", calctime," s, ", calctime/Nmax," s per generator"
     
     vod.setVDText2(times)
     

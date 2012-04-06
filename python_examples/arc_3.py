@@ -56,15 +56,22 @@ if __name__ == "__main__":
     vod.drawGenerators=1
     
     vod.offsetEdges = 1
-    vd.setEdgeOffset(0.03)
+    vd.setEdgeOffset(0.0053)
 
     plist = []
-    plist.append( ovd.Point(0.1,0.1) )
-    plist.append( ovd.Point(-0.1,0.1) )
+    d=0.02
+    plist.append( ovd.Point( -0.1+d, 0.1) )
+    plist.append( ovd.Point( 0.1-d,  0.1) )
+    plist.append( ovd.Point( 0.1, 0.1-d) )
+    plist.append( ovd.Point( 0.1,-0.1+d) )
     
-    plist.append( ovd.Point(0.1,-0.1) )
-    plist.append( ovd.Point(-0.1,-0.1) )
-    plist.append( ovd.Point(-0.03,-0.03) )
+    plist.append( ovd.Point( 0.1-d,-0.1) )
+    plist.append( ovd.Point( -0.1+d,-0.1) )
+
+    plist.append( ovd.Point( -0.1,-0.1+d) )
+    plist.append( ovd.Point( -0.1, 0.1-d) )
+    
+    #plist.append( ovd.Point(-0.03,-0.03) )
     #plist.append( ovd.Point(-0.15, -0.15) )
     #+ regularGridGenerators(far, Nmax) + circleGenerators(far, Nmax)
 
@@ -83,19 +90,18 @@ if __name__ == "__main__":
     calctime = t_after-t_before
     times.append(calctime)
     
-    id1 = id_list[0]
-    id2 = id_list[1]
-    id3 = id_list[2]
-    id4 = id_list[3]
     
-    vd.addLineSite(id1,id3)
-    vd.addLineSite(id4,id3)
-    vd.addLineSite(id4,id2)
+    vd.addLineSite(id_list[0],id_list[1])
+    vd.addLineSite(id_list[2],id_list[3])
+    vd.addLineSite(id_list[4],id_list[5])
+    vd.addLineSite(id_list[6],id_list[7])
+    #vd.addLineSite(id4,id3)
+    #vd.addLineSite(id4,id2)
     
     #print "add segment ",id1, " to ", id2
     vd.debug_on()
-    c1 = ovd.Point(0,0)
-    vd.addArcSite( id1, id2 , c1, True , 14 ) # right-to-left arc
+    c1 = ovd.Point(0.1-d,0.1-d)
+    vd.addArcSite( id_list[1], id_list[2] , c1, True  ,3) 
     
     #vd.addArcSite( id2, id1 , c1, False , 14) # left-to-right arc
     

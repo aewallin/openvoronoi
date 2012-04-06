@@ -1161,6 +1161,11 @@ HEVertex VoronoiDiagram::find_seed_vertex(HEFace f, Site* site)  {
         HEVertex q = g.target(current);
         if ( (g[q].status != OUT) && (g[q].type == NORMAL) ) {
             double h = g[q].in_circle( site->apex_point( g[q].position ) ); 
+            if (debug) { 
+                std::cout << g[q].index << " h= " << h << " dist=" << g[q].dist();
+                std::cout << "apex="<< site->apex_point( g[q].position ) << "  ";
+                std::cout << "\n";  
+            }
             if ( first || ( (h<minPred) && (site->in_region(g[q].position) ) ) ) {
                 minPred = h;
                 minimalVertex = q;

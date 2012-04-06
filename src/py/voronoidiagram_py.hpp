@@ -63,6 +63,10 @@ public:
     bool insert_line_site3(int idx1, int idx2, int step) {
         return insert_line_site( idx1, idx2, step);
     }
+    /// 4-parameter arc-insert
+    void insert_arc_site4(int idx1, int idx2, const Point& c, bool cw) {
+        insert_arc_site( idx1, idx2, c, cw);
+    }
     /// set amount to offset null-edges
     void set_null_edge_offset(double ofs) {
         null_edge_offset=ofs;

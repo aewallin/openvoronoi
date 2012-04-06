@@ -319,7 +319,8 @@ public:
                         //double t = t_min + n*(t_max-t_min)/(_edge_points-1); // linear
                         double t = t_min + ((t_max-t_min)/sq(_edge_points-1))*sq(n);
                         Point pt = g[edge].point(t);
-                        point_list.append(pt);
+                        if (t>null_edge_offset) // don't draw inside the null-face circle
+                            point_list.append(pt);
                     }
                     
                 } else if ( g[edge].type == ARCSITE  ) {

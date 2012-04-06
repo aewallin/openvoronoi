@@ -110,7 +110,7 @@ Point EdgeProps::point(double t) const {
 
 /// dispatch to setter functions based on type of \a s1 and \a s2
 void EdgeProps::set_parameters(Site* s1, Site* s2, bool sig) {
-    sign = sig;
+    sign = sig; // sqrt() sign for edge-parametrization
     if (s1->isPoint() && s2->isPoint())        // PP
         set_pp_parameters(s1,s2);
     else if (s1->isPoint() && s2->isLine())    // PL
@@ -196,32 +196,38 @@ void EdgeProps::set_pl_parameters(Site* s1, Site* s2) {
     assert( s1->isPoint() && s2->isLine() );
     
     type = PARABOLA;
-    double alfa3 = s2->a()*s1->x() + s2->b()*s1->y() + s2->c();
+    double alfa3 = s2->a()*s1->x() + s2->b()*s1->y() + s2->c(); // signed distance to line
+    
     // figure out kk, i.e. offset-direction for LineSite
-    double kk = 1.0;
+    //double kk = 1.0;
+    /*
     if (alfa3>0.0) {
+        std::cout << " alfa3>0 ! \n";
         kk = -1.0;
+        assert(0); // this branch never taken?
     } else {
-        sign = !sign;
-    }
+    */    
+        //std::cout << " alfa3<0 ! \n";
+    //    sign = !sign;
+    //}
     
     x[0]=s1->x();       // xc1
     x[1]=s2->a()*alfa3; // alfa1*alfa3
-    x[2]=s2->a()*kk;    // -alfa1 = - a2 * k2?
+    x[2]=s2->a(); //*kk;    // -alfa1 = - a2 * k2?
     x[3]=s2->b();       // alfa2 = b2
-    x[4]=0;             // alfa4 = r1 
-    x[5]=+1;            // lambda1 (allways positive offset from PointSite?)
+    x[4]=0;             // alfa4 = r1 (PointSite has zero radius)
+    x[5]=+1;            // lambda1 (allways positive offset from PointSite)
     x[6]=alfa3;         // alfa3= a2*xc1+b2*yc1+d2?
-    x[7]=kk;            // -1 = k2 side of line??
+    x[7]=+1; //kk;            // -1 = k2 side of line??
 
     y[0]=s1->y();       // yc1
     y[1]=s2->b()*alfa3; // alfa2*alfa3
-    y[2]=s2->b()*kk;    // -alfa2 = -b2
+    y[2]=s2->b(); //*kk;    // -alfa2 = -b2
     y[3]=s2->a();       // alfa1 = a2
-    y[4]=0;             // alfa4 = r1
-    y[5]=+1;            // lambda1 (allways positive offset from PointSite?)
+    y[4]=0;             // alfa4 = r1 (PointSite has zero radius)
+    y[5]=+1;            // lambda1 (allways positive offset from PointSite)
     y[6]=alfa3;         // alfa3
-    y[7]=kk;            // -1 = k2 side of line??
+    y[7]=+1; //kk;            // -1 = k2 side of line??
 }
 
 /// set ::SEPARATOR edge parameters
@@ -344,12 +350,19 @@ void EdgeProps::set_pa_parameters(Site* s1, Site* s2) {
     
     type = HYPERBOLA; // hyperbola or ellipse?
     double lamb2;
-    if (s2->cw())
-        lamb2 = +1.0;
-    else
-        lamb2 = -1.0;
-        
+    //if (s2->cw())
+    //    lamb2 = +1.0;
+    //else
+    sign=!sign;
+    
+    // distance between centers
     double d = sqrt( (s1->x() - s2->x())*(s1->x() - s2->x()) + (s1->y()-s2->y())*(s1->y()-s2->y()) );
+    assert( d > 0 );
+    if (d>s2->r())
+        lamb2 = +1.0; // offset towards growing circle
+    else
+        lamb2 = -1.0; // offset towards shrinking circle
+        
     double alfa1 = ( s2->x() - s1->x() ) / d;
     double alfa2 = ( s2->y() - s1->y() ) / d;
     double alfa3 = ( s2->r()*s2->r() -  d*d) / (2*d);
@@ -358,8 +371,8 @@ void EdgeProps::set_pa_parameters(Site* s1, Site* s2) {
     x[1] = alfa1*alfa3;
     x[2] = alfa1*alfa4;
     x[3] = alfa2;
-    x[4] = 0; //r1;
-    x[5] = +1; //lamb1;
+    x[4] = 0; //r1;  PointSite has zero radius
+    x[5] = +1; //lamb1; allways outward offset from PointSite
     x[6] = alfa3;
     x[7] = alfa4;
     
@@ -367,8 +380,8 @@ void EdgeProps::set_pa_parameters(Site* s1, Site* s2) {
     y[1] = alfa2*alfa3;
     y[2] = alfa2*alfa4;
     y[3] = alfa1;
-    y[4] = 0; //r1;
-    y[5] = +1; //lamb1;
+    y[4] = 0; //r1;     PointSite has zero radius
+    y[5] = +1; //lamb1; allways outward offset from PointSite
     y[6] = alfa3;
     y[7] = alfa4;
     //print_params();
@@ -390,10 +403,11 @@ void EdgeProps::set_la_parameters(Site* s1, Site* s2) {
     double alfa3 = ( s1->a()*s2->x() + s1->b()*s2->y() + s1->c() );
     double alfa4 = s2->r();
     double kk = +1; // # positive line-offset
-    if (alfa3 > 0) {
-        kk = -1;
-    }
-    sign = false;
+    //if (alfa3 > 0) {
+    //    kk = -1;
+    //    assert(0);
+    //}
+    //sign = false;
     // figure out sign?
     
     x[0] = s2->x();

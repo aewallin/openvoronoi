@@ -22,6 +22,7 @@ red= (1,0,0)
 pink = ( float(255)/255,float(192)/255,float(203)/255)
 orange = ( float(255)/255,float(165)/255,float(0)/255)
 yellow= (1,1,0)
+yellow2= ( float(180)/255,float(255)/255,float(0)/255)
 purple=( float(255)/255,float(0)/255,float(176)/255)
 
 green= (0,1,0)
@@ -32,6 +33,7 @@ grass = ( float(182)/255,float(248)/255,float(71)/255)
 blue= (0,0,1)
 lblue= ( float(125)/255,float(191)/255,float(255)/255 )
 blue2= ( float(0)/255,float(188)/255,float(255)/255 )
+blue3= ( float(128)/255,float(0)/255,float(255)/255 )
 cyan=  (0,1,1)
 mag2 =( float(123)/255 , float(35)/255 , float(251)/255  )
 magenta = ( float(153)/255 , float(42)/255 , float(165)/255  )
@@ -453,12 +455,14 @@ class VD:
             return pink
         if (edgeType == ovd.EdgeType.SEPARATOR):
             return self.edgeStatusColor(src_status,trg_status, mag2)
-        if (edgeType == ovd.EdgeType.LINESITE or edgeType == ovd.EdgeType.ARCSITE):
+        if (edgeType == ovd.EdgeType.LINESITE):
             return yellow
+        if (edgeType == ovd.EdgeType.ARCSITE):
+            return yellow2
         if (edgeType == ovd.EdgeType.PARABOLA):
             return self.edgeStatusColor(src_status,trg_status, blue2)
         if (edgeType == ovd.EdgeType.HYPERBOLA):
-            return self.edgeStatusColor(src_status,trg_status, blue2)
+            return self.edgeStatusColor(src_status,trg_status, blue3)
         if (edgeType == ovd.EdgeType.NULLEDGE):
             return white
         else:

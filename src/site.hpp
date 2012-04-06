@@ -537,6 +537,9 @@ public:
         out.append( _end.str() );
         out.append( " c=" );
         out.append( _center.str() );
+        out.append( " cw=" );
+        out.append( (_dir ? "1" : "0" ) );
+
         return out;
     }
     HEEdge e; ///< edge_descriptor to ::ARCSITE pseudo-edge

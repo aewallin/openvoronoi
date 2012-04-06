@@ -43,20 +43,20 @@ if __name__ == "__main__":
     vd = ovd.VoronoiDiagram(far,120)
     print ovd.version()
     vd.check()
-    print "created."
+    #print "created."
     
     # for vtk visualization
     vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
     vod.drawFarCircle()
     
-    vod.textScale = 0.02
-    vod.vertexRadius = 0.0031
+    vod.textScale = 0.005
+    vod.vertexRadius = 0.00031
     vod.drawVertices=1
     vod.drawVertexIndex=1
     vod.drawGenerators=1
     
-    vod.offsetEdges = 1
-    vd.setEdgeOffset(0.05)
+    vod.offsetEdges = 0
+    vd.setEdgeOffset(0.00)
     
     Nmax = 6
     
@@ -71,18 +71,19 @@ if __name__ == "__main__":
     
     plist.append( ovd.Point(0.1,-0.1) )
     plist.append( ovd.Point(-0.1,-0.1) )
+    plist.append( ovd.Point(-0.03,-0.03) )
     #plist.append( ovd.Point(-0.15, -0.15) )
     #+ regularGridGenerators(far, Nmax) + circleGenerators(far, Nmax)
 
     #plist = [ovd.Point(0,0)]
-    print plist
+    #print plist
     times=[]
     t_before = time.time() 
     n=0
     id_list=[]
     #vd.debug_on()
     for p in plist: 
-        print n," adding ",p
+        print n," adding PointSite ",p
         id_list.append( vd.addVertexSite( p ) )
         n=n+1
     t_after = time.time()

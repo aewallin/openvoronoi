@@ -1552,12 +1552,10 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
     // we can set the src_sign and trg_sign by with is_right where we compare to a line through the apex 
     bool src_sign=true, trg_sign=true;
     if (f_site->isPoint()  && ( new_site->isLine() || new_site->isArc() ) ) { // PL or PA
-        Point pt1 = f_site->position();
-        Point pt2 = new_site->apex_point(pt1); // projection of pt1 onto LineSite
-        
+        Point pt2 = f_site->position();
+        Point pt1 = new_site->apex_point(pt2); // projection of pt1 onto LineSite or ArcSite
         src_sign = g[new_source].position.is_right( pt1, pt2 );
         trg_sign = g[new_target].position.is_right( pt1, pt2 );
-        
     } else if (f_site->isPoint() && new_site->isPoint() ) { // PP
         src_sign = g[new_source].position.is_right( f_site->position(), new_site->position() );
         trg_sign = g[new_target].position.is_right( f_site->position(), new_site->position() );
@@ -1591,6 +1589,14 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
         Point pt1 = f_site->apex_point(pt2);
         src_sign = g[new_source].position.is_right( pt1, pt2 );
         trg_sign = g[new_target].position.is_right( pt1, pt2 );
+        // if one vertex is on a null-face, we cannot trust the sign
+        if ( g[new_source].dist() == 0 || g[new_target].dist() == 0 ) {
+            if ( g[new_source].dist() > g[new_target].dist() ) {
+                src_sign = trg_sign;
+            } else {
+                trg_sign = src_sign;
+            }
+        }
     } else { // unhandled case!
         std::cout << " add_edge() WARNING: no code to deremine src_sign and trg_sign!\n";
         std::cout << " add_edge() f_site " << f_site->str() << "\n";
@@ -1612,12 +1618,11 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
         g[new_previous].next = e_new;
         g[f].edge = e_new; 
         g[e_new].set_parameters( f_site, new_site, !src_sign ); 
-        // the twin edge that bounds the new face
-        //HEEdge e_twin = g.add_edge( new_target, new_source );
+
         g[twin_previous].next = e_twin;
         g[e_twin].next = twin_next;
         g[e_twin].k = g[new_source].k3; 
-        g[e_twin].set_parameters( new_site, f_site, src_sign );
+        g[e_twin].set_parameters( f_site, new_site,  !src_sign ); // new_site, f_site, src_sign 
         g[e_twin].face = new_face; 
         g[new_face].edge = e_twin;
 

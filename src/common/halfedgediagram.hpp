@@ -253,8 +253,10 @@ void add_vertex_in_edge( Vertex v, Edge e) {
     Edge e2, te1;
     boost::tie(e2,te1) = add_twin_edges( v, etarget );    
     // next-pointers
-    set_next_chain( boost::assign::list_of(previous)(e1)(e2)(g[e].next) );
-    set_next_chain( boost::assign::list_of(twin_previous)(te1)(te2)(g[e_twin].next) );    
+    g[previous].next = e1; g[e1].next=e2; g[e2].next = g[e].next;
+    //set_next_chain( boost::assign::list_of(previous)(e1)(e2)(g[e].next) );
+    //set_next_chain( boost::assign::list_of(twin_previous)(te1)(te2)(g[e_twin].next) );
+    g[twin_previous].next = te1; g[te1].next=te2; g[te2].next = g[e_twin].next;    
     // this copies params, face, k, type
     g[e1] = g[e];       g[e2] = g[e];       // NOTE: we use EdgeProperties::operator= here to copy !
     g[te1] = g[e_twin]; g[te2] = g[e_twin];
@@ -597,7 +599,6 @@ void set_next_chain( std::list<Edge> list, Face f, double k) {
 void set_next_chain( std::list<Edge> list ) {
     typename std::list<Edge>::iterator it,nxt,end;
     it= list.begin();
-    //begin = it;
     end= list.end();
     for( ; it!=end ; it++ ) {
         nxt = it;

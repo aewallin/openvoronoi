@@ -36,7 +36,9 @@ namespace ovd {
 /// \param n_bins is the number of bins for FaceGrid, the bucket-search for nearest-neighbors used in insert_point_site()
 VoronoiDiagram::VoronoiDiagram(double far, unsigned int n_bins) {
     fgrid = new FaceGrid(far, n_bins); // helper-class for nearest-neighbor search 
-    vd_checker = new VoronoiDiagramChecker( g ); // helper-class that checks topology/geometry
+    #ifndef NDEBUG
+        vd_checker = new VoronoiDiagramChecker( g ); // helper-class that checks topology/geometry
+    #endif 
     vpos = new VertexPositioner( g ); // helper-class that positions vertices
     far_radius=far;
     initialize();
@@ -50,8 +52,11 @@ VoronoiDiagram::VoronoiDiagram(double far, unsigned int n_bins) {
 VoronoiDiagram::~VoronoiDiagram() { 
     //std::cout << "~VoronoiDiagram()\n";
     delete fgrid; 
-    delete vd_checker;
     delete vpos;
+    #ifndef NDEBUG
+        delete vd_checker;
+    #endif
+
     //std::cout << "~VoronoiDiagram() DONE.\n";
 }
 
@@ -175,7 +180,7 @@ void VoronoiDiagram::initialize() {
 /// -# reset vertex/face status to be ready for next incremental operation, see reset_status()
 int VoronoiDiagram::insert_point_site(const Point& p, int step) {
     num_psites++;
-    int current_step=1;
+    //int current_step=1;
     assert( p.norm() < far_radius );     // only add vertices within the far_radius circle
     
     HEVertex new_vert = g.add_vertex( VoronoiVertex(p,OUT,POINTSITE) );
@@ -185,24 +190,26 @@ int VoronoiDiagram::insert_point_site(const Point& p, int step) {
 
     HEVertex v_seed = find_seed_vertex( fgrid->grid_find_closest_face( p ), new_site);
     mark_vertex( v_seed, new_site );
-if (step==current_step) return -1; current_step++;
+//if (step==current_step) return -1; current_step++;
     augment_vertex_set( new_site ); // grow the tree to maximum size
-if (step==current_step) return -1; current_step++;
+//if (step==current_step) return -1; current_step++;
     add_vertices( new_site );  // insert new vertices on IN-OUT edges
-if (step==current_step) return -1; current_step++;
+//if (step==current_step) return -1; current_step++;
     HEFace newface = add_face( new_site );
     g[new_vert].face = newface; // Vertices that correspond to point-sites have their .face property set!
     BOOST_FOREACH( HEFace f, incident_faces ) { // add NEW-NEW edges on all INCIDENT faces
         add_edges(newface, f);
     }
-if (step==current_step) return -1; current_step++;
+//if (step==current_step) return -1; current_step++;
     repair_face( newface  );
     if (debug) { std::cout << " new face: "; g.print_face( newface ); }
     remove_vertex_set(); // remove all IN vertices and adjacent edges
-if (step==current_step) return -1; current_step++;
+//if (step==current_step) return -1; current_step++;
     reset_status(); // reset all vertices to UNDECIDED
+ 
     assert( vd_checker->face_ok( newface ) );
     assert( vd_checker->is_valid() );
+ 
     return g[new_vert].index;
 }
 

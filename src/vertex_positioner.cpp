@@ -139,11 +139,11 @@ solvers::Solution VertexPositioner::position(Site* s1, double k1, Site* s2, doub
     if (!s3->isPoint()) 
         solver_dispatch(s1,k1,s2,k2,s3,-1, solutions); // for lineSite or ArcSite we try k3=-1 also    
     
-    if (solutions.empty() && !silent ) 
-        std::cout << "WARNING empty solution set!!\n";
-        
     if ( solutions.size() == 1 && (t_min<=solutions[0].t) && (t_max>=solutions[0].t) && (s3->in_region( solutions[0].p)) )
         return solutions[0];
+            
+    if (solutions.empty() && !silent ) 
+        std::cout << "WARNING empty solution set!!\n";
     
     // choose only in_region() solutions
     solutions.erase( std::remove_if(solutions.begin(),solutions.end(), in_region_filter(s3) ), solutions.end() );

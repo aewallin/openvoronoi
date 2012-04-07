@@ -42,13 +42,14 @@ int main(int argc,char *argv[]) {
         binmult = vm["b"].as<int>();
         
     std::cout << "Number of points: " << nmax << ".\n";
-    int bins = std::min( 200, (int)sqrt(nmax) ); // more than 200x200 bins causes a lot of memory use, so limit.
+    //int bins = std::min( 200, (int)sqrt(nmax) ); // more than 200x200 bins causes a lot of memory use, so limit.
+    int bins = (int)sqrt(nmax) ; // more than 200x200 bins causes a lot of memory use, so limit.
+
     std::cout << "Using " << binmult*bins << " bins \n";
     
-    // try to optimize number of bins by changing binmult and seing what is fast.
-    ovd::VoronoiDiagram* vd = new ovd::VoronoiDiagram(1,binmult*bins);
+
     
-    std::cout << "version: " << ovd::version() << "\n";
+    std::cout << "OpenVoronoi " << ovd::version() << " " << ovd::build_type() << "\n";
     
     boost::mt19937 rng(42); // mersenne-twister random number generator
     boost::uniform_01<boost::mt19937> rnd(rng);
@@ -61,16 +62,20 @@ int main(int argc,char *argv[]) {
         pts.push_back(p);
     }
     boost::timer tmr;
+    // try to optimize number of bins by changing binmult and seing what is fast.
+    ovd::VoronoiDiagram* vd = new ovd::VoronoiDiagram(1,binmult*bins);
+    
     BOOST_FOREACH(ovd::Point p, pts ) {
         vd->insert_point_site(p); // insert each point. This returns an int-handle which we do not use here.
     }
+    delete vd;
     double t = tmr.elapsed();
     std::cout << t << " seconds \n";
     double norm = nmax*log((double)nmax)/log(2.0);
     std::cout << 1e6*t/norm << " us * n*log2(n)\n";
-    std::cout << vd->print();
+    /*std::cout << vd->print();
     vd2svg("random_points.svg", vd);
-    delete vd;
+    delete vd; */
     return 0;
 }
 

@@ -53,8 +53,6 @@ class FaceGrid {
         virtual ~FaceGrid();
         /// add face with FaceProps
         void add_face(FaceProps props);
-        // find and return the closest face to a given Point p. Naive algorithm.
-        //HEFace find_closest_face(const Point& p);
         /// find and return the closest face to a given Point p. Faster grid-search algorithm.
         HEFace grid_find_closest_face(const Point& p);
 
@@ -81,4 +79,4 @@ class FaceGrid {
 };
 
 } // ovd
-// end facegrid.h
+// end facegrid.hpp

@@ -23,10 +23,6 @@
 
 namespace ovd {
 
-//FaceGrid::FaceGrid() {
-//    assert(0); // DO NOT use. There are problems because operator= is not defined...
-//}
-
 FaceGrid::~FaceGrid() {
     for ( GridIndex m=0 ; m<nbins ; ++m ) {
         for ( GridIndex n=0 ; n<nbins ; ++n ) {
@@ -57,27 +53,13 @@ void FaceGrid::add_face(FaceProps f_prop) {
     bucket->push_back( f_prop );
 } 
 
+/// convert x or y coordinate into a grid index
 GridIndex FaceGrid::get_grid_index( double x ) {
     GridIndex idx;
     idx = (int)( floor( (x+far_radius)/binwidth ) );                
     assert( (idx >= 0) && (idx <= nbins) );     
     return idx;
 }
-
-// simple implementation to find the closest face to the new generator p
-// Naive! very slow! don't use!
-/*
-HEFace FaceGrid::find_closest_face(const Point& p) {
-    HEFace closest_face;
-    face_set.clear(); // the set we are searching in
-    for ( GridIndex m=0 ; m<nbins ; ++m ) {
-        for ( GridIndex n=0 ; n<nbins ; ++n ) {
-            insert_faces_from_bucket(  m, n ); // add ALL
-        }
-    }
-    closest_face = find_closest_in_set(  p );
-    return closest_face;
-}*/
     
 // grid-based search for the closest face to generator p
 // grid search algorithm:

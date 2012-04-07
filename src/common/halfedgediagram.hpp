@@ -264,14 +264,18 @@ void add_vertex_in_edge( Vertex v, Edge e) {
     faces[face].edge = e1;
     faces[twin_face].edge = te1;
     // finally, remove the old edge
-    remove_twin_edges(esource, etarget);
+    //remove_twin_edges(esource, etarget);
+    boost::remove_edge( e , g );
+    boost::remove_edge( e_twin , g );
 }
 /// ad two edges, one from \a v1 to \a v2 and one from \a v2 to \a v1
 std::pair<Edge,Edge> add_twin_edges(Vertex v1, Vertex v2) {
     Edge e1,e2;
-    bool b;
-    boost::tie( e1 , b ) = boost::add_edge( v1, v2, g);
-    boost::tie( e2 , b ) = boost::add_edge( v2, v1, g);
+    //bool b;
+    //boost::tie( e1 , b ) = boost::add_edge( v1, v2, g);
+    //boost::tie( e2 , b ) = boost::add_edge( v2, v1, g);
+    e1 = boost::add_edge( v1, v2, g).first;
+    e2 = boost::add_edge( v2, v1, g).first;
     twin_edges(e1,e2);
     return std::make_pair(e1,e2);
 }

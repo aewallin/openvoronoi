@@ -1442,12 +1442,15 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
         g[e2].set_parameters( f_site, new_site, !trg_sign);
         
         assert( g[new_previous].face == f );
-        assert( g[new_next].face == f );
+        assert( g[new_next].face == g[new_previous].face );
         assert( g[new_next].k == g[new_previous].k );
 
         // new_previous -> e1 -> e2 -> new_next
-        g.set_next_chain( boost::assign::list_of(new_previous)(e1)(e2)(new_next), f, g[new_next].k );
-        
+        //g.set_next_chain( boost::assign::list_of(new_previous)(e1)(e2)(new_next), f, g[new_next].k );
+        g[new_previous].next=e1; g[e1].next=e2; g[e2].next=new_next;
+        g[e1].face=f; g[e2].face=f;
+        g[e1].k=g[new_next].k; g[e2].k=g[new_next].k;
+        g[f].edge=e1;
     // twin edges
         g[e1_tw].set_parameters(new_site, f_site, src_sign);
         g[e2_tw].set_parameters(new_site, f_site, trg_sign);
@@ -1455,7 +1458,11 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
         assert( g[twin_previous].k == g[twin_next].k );  
         assert( g[twin_previous].face == g[twin_next].face );        
         // twin_prev -> e2_tw -> e1_tw -> twin_next   on new_face 
-        g.set_next_chain( boost::assign::list_of(twin_previous)(e2_tw)(e1_tw)(twin_next) );
+        //g.set_next_chain( boost::assign::list_of(twin_previous)(e2_tw)(e1_tw)(twin_next) );
+        g[twin_previous].next=e2_tw; g[e2_tw].next=e1_tw; g[e1_tw].next=twin_next;
+        //g[e1].face=f; g[e2].face=f;
+        //g[e1].k=g[new_next].k; g[e2].k=g[new_next].k;
+
         //, new_face,  g[new_source].k3  );
                 
         g[e1_tw].k = g[new_source].k3;

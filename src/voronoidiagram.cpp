@@ -98,7 +98,7 @@ void VoronoiDiagram::initialize() {
     HEFace f1   =  g.add_face(); 
     g[f1].site  = new PointSite(gen3,f1, vert3);
     g[f1].status = NONINCIDENT;
-    fgrid->add_face( g[f1] ); // for grid search
+    fgrid->add_face( f1, gen3 ); // for grid search
     g.set_next_cycle( list_of(e1_1)(e1_2)(e2)(e3_1)(e3_2) , f1 ,1);
 
     // add face 2: v0-v02-v03 which encloses gen1
@@ -110,7 +110,7 @@ void VoronoiDiagram::initialize() {
     HEFace f2   =  g.add_face();
     g[f2].site  = new PointSite(gen1,f2, vert1);
     g[f2].status = NONINCIDENT;    
-    fgrid->add_face( g[f2] );
+    fgrid->add_face( f2, gen1 );
     g.set_next_cycle( list_of(e4_1)(e4_2)(e5)(e6_1)(e6_2) , f2 ,1);
 
     // add face 3: v0-v3-v1 which encloses gen2
@@ -122,7 +122,7 @@ void VoronoiDiagram::initialize() {
     HEFace f3   =  g.add_face();
     g[f3].site  = new PointSite(gen2,f3, vert2); // this constructor needs f3...
     g[f3].status = NONINCIDENT;    
-    fgrid->add_face( g[f3] );
+    fgrid->add_face( f3, gen2 );
     g.set_next_cycle( list_of(e7_1)(e7_2)(e8)(e9_1)(e9_2) , f3 , 1);    
 
     // set type. 
@@ -1280,7 +1280,7 @@ HEFace VoronoiDiagram::add_face(Site* s) {
     s->face = newface;
     g[newface].status = NONINCIDENT;
     if (s->isPoint() )
-        fgrid->add_face( g[newface] ); 
+        fgrid->add_face( newface, s->position() ); 
     
     return newface;
 }

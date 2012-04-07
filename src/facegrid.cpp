@@ -45,12 +45,12 @@ FaceGrid::FaceGrid(double far, unsigned int n_bins) {
 }
 
 // insert f_prop into the correct bucket
-void FaceGrid::add_face(FaceProps f_prop) {
-    assert( f_prop.site->isPoint() );
-    GridIndex row = get_grid_index( f_prop.site->position().x );
-    GridIndex col = get_grid_index( f_prop.site->position().y );
+void FaceGrid::add_face(HEFace f, const Point& p) {
+    //assert( f_prop.site->isPoint() );
+    GridIndex row = get_grid_index( p.x );
+    GridIndex col = get_grid_index( p.y );
     FacePropVector* bucket = (*grid)[row][col];
-    bucket->push_back( f_prop );
+    bucket->push_back( std::make_pair(f,p) );
 } 
 
 /// convert x or y coordinate into a grid index
@@ -74,11 +74,13 @@ HEFace FaceGrid::grid_find_closest_face(const Point& p) {
     GridIndex col = get_grid_index( p.y );
     insert_faces_from_bucket( row, col ); // the closest bucket
     GridIndex dist = 0;
-    do {
+    do { // expand search-region until we have one face in the face_set
         dist++;
         insert_faces_from_neighbors(  row, col , dist );
     } while (face_set.empty());
-    GridIndex max_dist = (int)( ceil( sqrt(2.0)*dist ) ); // expand up to this radius, to be sure to find the closest point
+    
+    // now expand further, to be sure to find the closest point
+    GridIndex max_dist = (int)( ceil( sqrt(2.0)*dist ) ); 
     for (GridIndex d = dist; d<=max_dist;d++)
         insert_faces_from_neighbors(  row, col , d );
 
@@ -87,16 +89,16 @@ HEFace FaceGrid::grid_find_closest_face(const Point& p) {
 
 
 // go through the HEFace set and return the one closest to p
-HEFace FaceGrid::find_closest_in_set(  const Point& p ) {
+HEFace FaceGrid::find_closest_in_set( const Point& p ) {
     HEFace closest_face(0);
     double closest_distance = 30*far_radius; // a big number...
     double d;
-    BOOST_FOREACH( FaceProps f, face_set ) {
-        assert( f.site->isPoint() );
-        d = (f.site->position() - p).norm_sq();
+    BOOST_FOREACH( FaceData fd, face_set ) {
+        //assert( f.site->isPoint() );
+        d = ( fd.second - p).norm_sq();
         if (d<closest_distance ) {
             closest_distance=d;
-            closest_face=f.idx;
+            closest_face=fd.first;
         }
     }
     return closest_face;
@@ -120,8 +122,7 @@ void FaceGrid::insert_faces_from_neighbors(  GridIndex row, GridIndex col , Grid
     
 void FaceGrid::insert_faces_from_bucket( GridIndex row, GridIndex col ) {
     FacePropVector* bucket = (*grid)[row][col];
-    BOOST_FOREACH( FaceProps f, *bucket ) {
-        //face_set.insert(f);
+    BOOST_FOREACH( FaceData f, *bucket ) {
         face_set.push_back(f);
     }
 }

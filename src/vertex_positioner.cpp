@@ -40,8 +40,8 @@ namespace ovd {
 
 /// create positioner, set graph.
 VertexPositioner::VertexPositioner(HEGraph& gi): g(gi) {
-    //ppp_solver = new PPPSolver<double>(); // faster, but inaccurate
-    ppp_solver =      new solvers::PPPSolver<qd_real>();
+    ppp_solver = new solvers::PPPSolver<double>(); // faster, but inaccurate
+    //ppp_solver =      new solvers::PPPSolver<qd_real>();
     lll_solver =      new solvers::LLLSolver();
     qll_solver =      new solvers::QLLSolver();
     sep_solver =      new solvers::SEPSolver();
@@ -95,10 +95,11 @@ solvers::Solution VertexPositioner::position(HEEdge e, Site* s3) {
     solvers::Solution sl = position(  s1 , g[e].k, s2, g[twin].k, s3 );
 
     assert( solution_on_edge(sl) );
-    assert( check_far_circle(sl) );
+    //assert( check_far_circle(sl) );
     assert( check_dist(edge, sl, s3) );
     
     // error logging (FIXME: make optional, for max performance?)
+    #ifndef NDEBUG
     {
         errstat.push_back( dist_error(edge, sl, s3) );
         if ( dist_error(edge, sl, s3) > 1e-9 ) {
@@ -119,6 +120,7 @@ solvers::Solution VertexPositioner::position(HEEdge e, Site* s3) {
             //return fabs(t-s3_dist);
         }
     }
+    #endif
     
     return sl;
 }

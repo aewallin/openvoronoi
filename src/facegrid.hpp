@@ -29,12 +29,14 @@
 
 namespace ovd
 {
-
-typedef std::vector<FaceProps>                   FacePropVector; ///< vector of faces
+    
+    
+typedef unsigned int HEFace; ///< face descriptor
+typedef std::pair<HEFace, Point> FaceData;
+typedef std::vector<FaceData>                   FacePropVector; ///< vector of faces
 typedef boost::multi_array< FacePropVector* , 2> Grid; ///< grid for storing faces
 typedef Grid::index                              GridIndex; ///< index type of grid
 
-typedef unsigned int HEFace; ///< face descriptor
 
 /// \brief Grid-search for nearest-neighbor search
 ///
@@ -52,9 +54,7 @@ class FaceGrid {
         FaceGrid(double far, unsigned int n_bins);
         virtual ~FaceGrid();
         /// add face with FaceProps
-        void add_face(FaceProps props);
-        // find and return the closest face to a given Point p. Naive algorithm.
-        //HEFace find_closest_face(const Point& p);
+        void add_face(HEFace f, const Point& p);
         /// find and return the closest face to a given Point p. Faster grid-search algorithm.
         HEFace grid_find_closest_face(const Point& p);
 
@@ -76,9 +76,9 @@ class FaceGrid {
         /// a 2D grid where each cell contains a 
         /// pointer to a vector of FaceProps, corresponding to the faces in the cell
         Grid* grid;
-        typedef std::vector<FaceProps> FaceSetContainer; ///< container for faces
+        typedef std::vector<FaceData> FaceSetContainer; ///< container for faces
         FaceSetContainer face_set; ///< set of faces to search
 };
 
 } // ovd
-// end facegrid.h
+// end facegrid.hpp

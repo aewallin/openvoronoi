@@ -37,6 +37,7 @@ namespace ovd {
 VoronoiDiagram::VoronoiDiagram(double far, unsigned int n_bins) {
     fgrid = new FaceGrid(far, n_bins); // helper-class for nearest-neighbor search 
     vd_checker = new VoronoiDiagramChecker( g ); // helper-class that checks topology/geometry
+     
     vpos = new VertexPositioner( g ); // helper-class that positions vertices
     far_radius=far;
     initialize();
@@ -50,8 +51,9 @@ VoronoiDiagram::VoronoiDiagram(double far, unsigned int n_bins) {
 VoronoiDiagram::~VoronoiDiagram() { 
     //std::cout << "~VoronoiDiagram()\n";
     delete fgrid; 
-    delete vd_checker;
     delete vpos;
+    delete vd_checker;
+    
     //std::cout << "~VoronoiDiagram() DONE.\n";
 }
 
@@ -93,7 +95,7 @@ void VoronoiDiagram::initialize() {
     HEFace f1   =  g.add_face(); 
     g[f1].site  = new PointSite(gen3,f1, vert3);
     g[f1].status = NONINCIDENT;
-    fgrid->add_face( g[f1] ); // for grid search
+    fgrid->add_face( f1, gen3 ); // for grid search
     g.set_next_cycle( list_of(e1_1)(e1_2)(e2)(e3_1)(e3_2) , f1 ,1);
 
     // add face 2: v0-v02-v03 which encloses gen1
@@ -105,7 +107,7 @@ void VoronoiDiagram::initialize() {
     HEFace f2   =  g.add_face();
     g[f2].site  = new PointSite(gen1,f2, vert1);
     g[f2].status = NONINCIDENT;    
-    fgrid->add_face( g[f2] );
+    fgrid->add_face( f2, gen1 );
     g.set_next_cycle( list_of(e4_1)(e4_2)(e5)(e6_1)(e6_2) , f2 ,1);
 
     // add face 3: v0-v3-v1 which encloses gen2
@@ -117,7 +119,7 @@ void VoronoiDiagram::initialize() {
     HEFace f3   =  g.add_face();
     g[f3].site  = new PointSite(gen2,f3, vert2); // this constructor needs f3...
     g[f3].status = NONINCIDENT;    
-    fgrid->add_face( g[f3] );
+    fgrid->add_face( f3, gen2 );
     g.set_next_cycle( list_of(e7_1)(e7_2)(e8)(e9_1)(e9_2) , f3 , 1);    
 
     // set type. 
@@ -175,7 +177,7 @@ void VoronoiDiagram::initialize() {
 /// -# reset vertex/face status to be ready for next incremental operation, see reset_status()
 int VoronoiDiagram::insert_point_site(const Point& p, int step) {
     num_psites++;
-    int current_step=1;
+    //int current_step=1;
     assert( p.norm() < far_radius );     // only add vertices within the far_radius circle
     
     HEVertex new_vert = g.add_vertex( VoronoiVertex(p,OUT,POINTSITE) );
@@ -185,24 +187,26 @@ int VoronoiDiagram::insert_point_site(const Point& p, int step) {
 
     HEVertex v_seed = find_seed_vertex( fgrid->grid_find_closest_face( p ), new_site);
     mark_vertex( v_seed, new_site );
-if (step==current_step) return -1; current_step++;
+//if (step==current_step) return -1; current_step++;
     augment_vertex_set( new_site ); // grow the tree to maximum size
-if (step==current_step) return -1; current_step++;
+//if (step==current_step) return -1; current_step++;
     add_vertices( new_site );  // insert new vertices on IN-OUT edges
-if (step==current_step) return -1; current_step++;
+//if (step==current_step) return -1; current_step++;
     HEFace newface = add_face( new_site );
     g[new_vert].face = newface; // Vertices that correspond to point-sites have their .face property set!
     BOOST_FOREACH( HEFace f, incident_faces ) { // add NEW-NEW edges on all INCIDENT faces
         add_edges(newface, f);
     }
-if (step==current_step) return -1; current_step++;
+//if (step==current_step) return -1; current_step++;
     repair_face( newface  );
     if (debug) { std::cout << " new face: "; g.print_face( newface ); }
     remove_vertex_set(); // remove all IN vertices and adjacent edges
-if (step==current_step) return -1; current_step++;
+//if (step==current_step) return -1; current_step++;
     reset_status(); // reset all vertices to UNDECIDED
+ 
     assert( vd_checker->face_ok( newface ) );
     assert( vd_checker->is_valid() );
+ 
     return g[new_vert].index;
 }
 
@@ -1004,7 +1008,7 @@ void VoronoiDiagram::mark_vertex(HEVertex& v,  Site* site) {
     modified_vertices.insert(v);
     
     if (site->isPoint())
-        mark_adjacent_faces_p(v,site);
+        mark_adjacent_faces_p(v);
     else
         mark_adjacent_faces( v, site );
 
@@ -1024,7 +1028,7 @@ void VoronoiDiagram::mark_vertex(HEVertex& v,  Site* site) {
 // IN-Vertex v has three adjacent faces, mark nonincident faces incident
 // and push them to the incident_faces queue
 // NOTE: call this only when inserting point-sites
-void VoronoiDiagram::mark_adjacent_faces_p( HEVertex v, Site* site) {
+void VoronoiDiagram::mark_adjacent_faces_p( HEVertex v ) {
     assert( g[v].status == IN );
     BOOST_FOREACH(HEEdge e, g.out_edge_itr( v )) {
         HEFace adj_face = g[e].face;
@@ -1273,7 +1277,7 @@ HEFace VoronoiDiagram::add_face(Site* s) {
     s->face = newface;
     g[newface].status = NONINCIDENT;
     if (s->isPoint() )
-        fgrid->add_face( g[newface] ); 
+        fgrid->add_face( newface, s->position() ); 
     
     return newface;
 }
@@ -1435,12 +1439,15 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
         g[e2].set_parameters( f_site, new_site, !trg_sign);
         
         assert( g[new_previous].face == f );
-        assert( g[new_next].face == f );
+        assert( g[new_next].face == g[new_previous].face );
         assert( g[new_next].k == g[new_previous].k );
 
         // new_previous -> e1 -> e2 -> new_next
-        g.set_next_chain( boost::assign::list_of(new_previous)(e1)(e2)(new_next), f, g[new_next].k );
-        
+        //g.set_next_chain( boost::assign::list_of(new_previous)(e1)(e2)(new_next), f, g[new_next].k );
+        g[new_previous].next=e1; g[e1].next=e2; g[e2].next=new_next;
+        g[e1].face=f; g[e2].face=f;
+        g[e1].k=g[new_next].k; g[e2].k=g[new_next].k;
+        g[f].edge=e1;
     // twin edges
         g[e1_tw].set_parameters(new_site, f_site, src_sign);
         g[e2_tw].set_parameters(new_site, f_site, trg_sign);
@@ -1448,7 +1455,11 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
         assert( g[twin_previous].k == g[twin_next].k );  
         assert( g[twin_previous].face == g[twin_next].face );        
         // twin_prev -> e2_tw -> e1_tw -> twin_next   on new_face 
-        g.set_next_chain( boost::assign::list_of(twin_previous)(e2_tw)(e1_tw)(twin_next) );
+        //g.set_next_chain( boost::assign::list_of(twin_previous)(e2_tw)(e1_tw)(twin_next) );
+        g[twin_previous].next=e2_tw; g[e2_tw].next=e1_tw; g[e1_tw].next=twin_next;
+        //g[e1].face=f; g[e2].face=f;
+        //g[e1].k=g[new_next].k; g[e2].k=g[new_next].k;
+
         //, new_face,  g[new_source].k3  );
                 
         g[e1_tw].k = g[new_source].k3;
@@ -1808,14 +1819,14 @@ bool VoronoiDiagram::predicate_c5(HEVertex v) {
     FaceVector adjacent_incident_faces;
 
     BOOST_FOREACH(HEEdge e, g.out_edge_itr(v)){
-        HEFace f = g[e].face;
-        if ( g[f].status == INCIDENT )
-            adjacent_incident_faces.push_back( f );
+        //HEFace f = ;
+        if ( g[ g[e].face ].status == INCIDENT )
+            adjacent_incident_faces.push_back( g[e].face );
     }
 
     assert( !adjacent_incident_faces.empty() );
     
-    bool all_found = true;
+    //bool all_found = true;
     BOOST_FOREACH( HEFace f, adjacent_incident_faces ) { // check each adjacent face f for an IN-vertex
         bool face_ok=false;
         HEEdge current = g[f].edge;
@@ -1828,11 +1839,13 @@ bool VoronoiDiagram::predicate_c5(HEVertex v) {
                 face_ok=true;
             current = g[current].next;
         } while(current!=start);  
-        
+
         if (!face_ok)
-            all_found=false;
+            return false;
+            //all_found=false;
     }
-    return all_found; // if this returns false, we mark a vertex OUT, on topology grounds.
+    return true; // if we get here we found all ok
+    //return all_found; // if this returns false, we mark a vertex OUT, on topology grounds.
 }
 
 /// return number of ::SPLIT vertices

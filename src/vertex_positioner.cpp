@@ -40,8 +40,8 @@ namespace ovd {
 
 /// create positioner, set graph.
 VertexPositioner::VertexPositioner(HEGraph& gi): g(gi) {
-    //ppp_solver = new PPPSolver<double>(); // faster, but inaccurate
-    ppp_solver =      new solvers::PPPSolver<qd_real>();
+    //ppp_solver = new solvers::PPPSolver<double>(); // faster, but inaccurate
+    ppp_solver =      new solvers::PPPSolver<qd_real>(); // slower, more accurate
     lll_solver =      new solvers::LLLSolver();
     qll_solver =      new solvers::QLLSolver();
     sep_solver =      new solvers::SEPSolver();
@@ -96,10 +96,11 @@ solvers::Solution VertexPositioner::position(HEEdge e, Site* s3) {
     solvers::Solution sl = position(  s1 , g[e].k, s2, g[twin].k, s3 );
 
     assert( solution_on_edge(sl) );
-    assert( check_far_circle(sl) );
+    //assert( check_far_circle(sl) );
     assert( check_dist(edge, sl, s3) );
     
     // error logging (FIXME: make optional, for max performance?)
+    #ifndef NDEBUG
     {
         errstat.push_back( dist_error(edge, sl, s3) );
         if ( dist_error(edge, sl, s3) > 1e-6 ) {
@@ -120,6 +121,7 @@ solvers::Solution VertexPositioner::position(HEEdge e, Site* s3) {
             //return fabs(t-s3_dist);
         }
     }
+    #endif
     
     return sl;
 }
@@ -138,11 +140,11 @@ solvers::Solution VertexPositioner::position(Site* s1, double k1, Site* s2, doub
     if (!s3->isPoint()) 
         solver_dispatch(s1,k1,s2,k2,s3,-1, solutions); // for lineSite or ArcSite we try k3=-1 also    
     
-    if (solutions.empty() && !silent ) 
-        std::cout << "WARNING empty solution set!!\n";
-        
     if ( solutions.size() == 1 && (t_min<=solutions[0].t) && (t_max>=solutions[0].t) && (s3->in_region( solutions[0].p)) )
         return solutions[0];
+            
+    if (solutions.empty() && !silent ) 
+        std::cout << "WARNING empty solution set!!\n";
     
     // choose only in_region() solutions
     solutions.erase( std::remove_if(solutions.begin(),solutions.end(), in_region_filter(s3) ), solutions.end() );

@@ -51,7 +51,7 @@ if __name__ == "__main__":
     myscreen.camera.SetFocalPoint(0.0, 0, 0)
     
     vd = ovd.VoronoiDiagram(far,120)
-    print ovd.version()
+    print ovd.version(), " ", ovd.build_type()
     
     # for vtk visualization
     vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
@@ -128,7 +128,7 @@ if __name__ == "__main__":
         if 0: # s[0] == 119:
             print n," adding line-segment",s[0]," - ",s[1]
             vd.debug_on()
-            vd.addLineSite(s[0],s[1],7)
+            vd.addLineSite(s[0],s[1])
             vod.setVDText2([1,1])
             vod.setAll()
             #verts=[id_list[n], id_list[n_nxt], 117443,117445,117460,117454]
@@ -150,6 +150,7 @@ if __name__ == "__main__":
             myscreen.iren.Start()
         elif n<= nsegs and linesegs==1:
             print n," adding line-segment",s[0]," - ",s[1]
+            vd.debug_on()
             vd.addLineSite(s[0],s[1])
             
         n=n+1

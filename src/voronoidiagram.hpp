@@ -159,7 +159,7 @@ protected:
     bool predicate_c4(HEVertex v);
     bool predicate_c5(HEVertex v);
     void mark_adjacent_faces(HEVertex v, Site* site);
-    void mark_adjacent_faces_p( HEVertex v, Site* site);
+    void mark_adjacent_faces_p( HEVertex v );
     void mark_vertex(HEVertex& v,  Site* site); 
     void   add_vertices( Site* site );
     HEFace add_face(Site* site);

@@ -86,7 +86,7 @@ int main(int argc,char *argv[]) {
         std::cout << "Loop " << nloop << " has " << l.size() << " points:\n";
         int npoint=0;
         BOOST_FOREACH(Point pt, l) {
-            std::cout << " Point " << npoint << " x= " << pt.first << " y= " << pt.second << "\n";
+            std::cout << " Point " << npoint << " x= " << pt.x << " y= " << pt.y << "\n";
             npoint++;
         }
         std::cout << "End Loop " << nloop << "\n";
@@ -98,13 +98,13 @@ int main(int argc,char *argv[]) {
     
     // store the verted IDs here, for later inserting line-segments
     std::vector< std::vector<int> > loops_id;
-    typedef std::pair<double,double> ttt_pt;
+    ///typedef std::pair<double,double> ttt_pt;
     boost::timer tmr;
     int n_points=0;
     BOOST_FOREACH(Loop loop, all_loops) {
         std::vector<int> loop_id;
-        BOOST_FOREACH(ttt_pt pt, loop) {
-            loop_id.push_back( vd->insert_point_site( ovd::Point(pt.first,pt.second)) ); 
+        BOOST_FOREACH( Point pt, loop) {
+            loop_id.push_back( vd->insert_point_site( ovd::Point(pt.x,pt.y)) ); 
             n_points++;
         }
         loops_id.push_back(loop_id);

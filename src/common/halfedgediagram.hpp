@@ -239,19 +239,27 @@ void add_vertex_in_edge( Vertex v, Edge e) {
 
     Edge e_twin = g[e].twin;
     assert( e_twin != Edge() );
-    Vertex esource = source(e); 
-    Vertex etarget = target(e); 
+    Vertex esource = boost::source(e,g); 
+    Vertex etarget = boost::target(e,g); 
     Face face = g[e].face;
     Face twin_face = g[e_twin].face;
     Edge previous = previous_edge(e);
-    assert( g[previous].face == g[e].face );
     Edge twin_previous = previous_edge(e_twin);
+    
+    assert( g[previous].face == g[e].face );
     assert( g[twin_previous].face == g[e_twin].face );
     
-    Edge e1, te2;
-    boost::tie(e1,te2) = add_twin_edges( esource, v ); 
-    Edge e2, te1;
-    boost::tie(e2,te1) = add_twin_edges( v, etarget );    
+    Edge e1 = boost::add_edge( esource, v, g).first;
+    Edge te2 = boost::add_edge( v, esource,  g).first;
+    g[e1].twin = te2; g[te2].twin = e1;
+    //boost::tie(e1,te2) = add_twin_edges( esource, v ); 
+    //Edge e2, te1;
+    //boost::tie(e2,te1) = add_twin_edges( v, etarget );    
+    Edge e2 = boost::add_edge( v, etarget, g).first;
+    Edge te1 = boost::add_edge( etarget, v,  g).first;
+    g[e2].twin = te1; g[te1].twin = e2;
+
+
     // next-pointers
     g[previous].next = e1; g[e1].next=e2; g[e2].next = g[e].next;
     //set_next_chain( boost::assign::list_of(previous)(e1)(e2)(g[e].next) );
@@ -270,13 +278,15 @@ void add_vertex_in_edge( Vertex v, Edge e) {
 }
 /// ad two edges, one from \a v1 to \a v2 and one from \a v2 to \a v1
 std::pair<Edge,Edge> add_twin_edges(Vertex v1, Vertex v2) {
-    Edge e1,e2;
+    //Edge e1,e2;
     //bool b;
     //boost::tie( e1 , b ) = boost::add_edge( v1, v2, g);
     //boost::tie( e2 , b ) = boost::add_edge( v2, v1, g);
-    e1 = boost::add_edge( v1, v2, g).first;
-    e2 = boost::add_edge( v2, v1, g).first;
-    twin_edges(e1,e2);
+    Edge e1 = boost::add_edge( v1, v2, g).first;
+    Edge e2 = boost::add_edge( v2, v1, g).first;
+    //twin_edges(e1,e2);
+    g[e1].twin = e2;
+    g[e2].twin = e1;
     return std::make_pair(e1,e2);
 }
 

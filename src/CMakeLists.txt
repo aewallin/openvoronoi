@@ -76,8 +76,8 @@ endif (CMAKE_BUILD_TYPE MATCHES "Coverage")
 
 option(BUILD_DOC "Build doxygen documentation? " ON)
 
-#set(BUILD_TESTS 1)
-set(BUILD_TESTS 0) # don't build tests
+set(BUILD_TESTS 1)
+#set(BUILD_TESTS 0) # don't build tests
 
 
 #

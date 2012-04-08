@@ -1011,7 +1011,7 @@ void VoronoiDiagram::mark_vertex(HEVertex& v,  Site* site) {
     modified_vertices.insert(v);
     
     if (site->isPoint())
-        mark_adjacent_faces_p(v,site);
+        mark_adjacent_faces_p(v);
     else
         mark_adjacent_faces( v, site );
 
@@ -1031,7 +1031,7 @@ void VoronoiDiagram::mark_vertex(HEVertex& v,  Site* site) {
 // IN-Vertex v has three adjacent faces, mark nonincident faces incident
 // and push them to the incident_faces queue
 // NOTE: call this only when inserting point-sites
-void VoronoiDiagram::mark_adjacent_faces_p( HEVertex v, Site* site) {
+void VoronoiDiagram::mark_adjacent_faces_p( HEVertex v ) {
     assert( g[v].status == IN );
     BOOST_FOREACH(HEEdge e, g.out_edge_itr( v )) {
         HEFace adj_face = g[e].face;
@@ -1822,14 +1822,14 @@ bool VoronoiDiagram::predicate_c5(HEVertex v) {
     FaceVector adjacent_incident_faces;
 
     BOOST_FOREACH(HEEdge e, g.out_edge_itr(v)){
-        HEFace f = g[e].face;
-        if ( g[f].status == INCIDENT )
-            adjacent_incident_faces.push_back( f );
+        //HEFace f = ;
+        if ( g[ g[e].face ].status == INCIDENT )
+            adjacent_incident_faces.push_back( g[e].face );
     }
 
     assert( !adjacent_incident_faces.empty() );
     
-    bool all_found = true;
+    //bool all_found = true;
     BOOST_FOREACH( HEFace f, adjacent_incident_faces ) { // check each adjacent face f for an IN-vertex
         bool face_ok=false;
         HEEdge current = g[f].edge;
@@ -1842,11 +1842,13 @@ bool VoronoiDiagram::predicate_c5(HEVertex v) {
                 face_ok=true;
             current = g[current].next;
         } while(current!=start);  
-        
+
         if (!face_ok)
-            all_found=false;
+            return false;
+            //all_found=false;
     }
-    return all_found; // if this returns false, we mark a vertex OUT, on topology grounds.
+    return true; // if we get here we found all ok
+    //return all_found; // if this returns false, we mark a vertex OUT, on topology grounds.
 }
 
 /// return number of ::SPLIT vertices

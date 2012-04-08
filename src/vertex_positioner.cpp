@@ -48,6 +48,7 @@ VertexPositioner::VertexPositioner(HEGraph& gi): g(gi) {
     alt_sep_solver =  new solvers::ALTSEPSolver();
     lll_para_solver = new solvers::LLLPARASolver();
     silent = false;
+    solver_debug(false);
     errstat.clear();
 }
 
@@ -101,7 +102,7 @@ solvers::Solution VertexPositioner::position(HEEdge e, Site* s3) {
     // error logging (FIXME: make optional, for max performance?)
     {
         errstat.push_back( dist_error(edge, sl, s3) );
-        if ( dist_error(edge, sl, s3) > 1e-9 ) {
+        if ( dist_error(edge, sl, s3) > 1e-6 ) {
             // 2012-02-04: 1e-9 passes 79/79 tests
             //             1e-10 passes 79/79
             //             1e-12 passes 79/79

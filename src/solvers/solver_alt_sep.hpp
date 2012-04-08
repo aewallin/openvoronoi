@@ -73,7 +73,7 @@ public:
 int solve( Site* s1, double k1, 
            Site* s2, double k2, 
            Site* s3, double k3, std::vector<Solution>& slns ) {
-    if (debug) 
+    if (debug && !silent) 
         std::cout << "ALTSEPSolver.\n";
     Site* lsite;
     Site* psite;
@@ -96,7 +96,7 @@ int solve( Site* s1, double k1,
     // separator direction
     Point sv = (k3 == - 1) ? Point(lsite->a(),lsite->b()) : Point(-lsite->a(),-lsite->b());
     
-    if (debug) {
+    if (debug && !silent) {
         std::cout << "ALTSEPSolver type="<< type <<"\n";
         std::cout << " s1= " << s1->str2() << "(k=" << k1<< ")\n";
         std::cout << " s2= " << s2->str2() << "(k=" << k2<< ")\n";

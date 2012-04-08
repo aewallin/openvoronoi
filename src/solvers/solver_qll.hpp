@@ -41,7 +41,7 @@ public:
 int solve( Site* s1, double k1, 
                 Site* s2, double k2, 
                 Site* s3, double k3, std::vector<Solution>& slns ) {
-    if (debug) 
+    if (debug && !silent) 
         std::cout << "QLLSolver.\n";
     
     std::vector< Eq<qd_real> > quads,lins; // equation-parameters, in quad-precision

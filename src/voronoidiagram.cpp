@@ -1240,7 +1240,7 @@ void VoronoiDiagram::add_vertices( Site* new_site ) {
         }
         solvers::Solution sl = vpos->position( q_edges[m], new_site ); // vertex_positioner.cpp
 
-        if ( vpos->dist_error( q_edges[m], sl, new_site) > 1e-9 ) {
+        if ( vpos->dist_error( q_edges[m], sl, new_site) > 1e-3 ) {
             HEVertex src = g.source(q_edges[m]);
             HEVertex trg = g.target(q_edges[m]);
             std::cout << "ERROR while positioning new vertex  on edge\n";

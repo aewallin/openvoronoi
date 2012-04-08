@@ -36,9 +36,8 @@ namespace ovd {
 /// \param n_bins is the number of bins for FaceGrid, the bucket-search for nearest-neighbors used in insert_point_site()
 VoronoiDiagram::VoronoiDiagram(double far, unsigned int n_bins) {
     fgrid = new FaceGrid(far, n_bins); // helper-class for nearest-neighbor search 
-    #ifndef NDEBUG
-        vd_checker = new VoronoiDiagramChecker( g ); // helper-class that checks topology/geometry
-    #endif 
+    vd_checker = new VoronoiDiagramChecker( g ); // helper-class that checks topology/geometry
+     
     vpos = new VertexPositioner( g ); // helper-class that positions vertices
     far_radius=far;
     initialize();
@@ -53,10 +52,8 @@ VoronoiDiagram::~VoronoiDiagram() {
     //std::cout << "~VoronoiDiagram()\n";
     delete fgrid; 
     delete vpos;
-    #ifndef NDEBUG
-        delete vd_checker;
-    #endif
-
+    delete vd_checker;
+    
     //std::cout << "~VoronoiDiagram() DONE.\n";
 }
 

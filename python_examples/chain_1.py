@@ -41,7 +41,7 @@ if __name__ == "__main__":
     myscreen.camera.SetFocalPoint(0.0, 0, 0)
     
     vd = ovd.VoronoiDiagram(far,120)
-    print ovd.version()
+    print ovd.version(), ovd.build_type()
     
     # for vtk visualization
     vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
@@ -79,7 +79,7 @@ if __name__ == "__main__":
     for p in pts:
         
         id_list.append( vd.addVertexSite( p ) )
-        #print m," added vertex", seg_id[0]
+        print m," added vertex", id_list[m]
         m=m+1
    
     t_after = time.time()

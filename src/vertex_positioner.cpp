@@ -40,8 +40,8 @@ namespace ovd {
 
 /// create positioner, set graph.
 VertexPositioner::VertexPositioner(HEGraph& gi): g(gi) {
-    ppp_solver = new solvers::PPPSolver<double>(); // faster, but inaccurate
-    //ppp_solver =      new solvers::PPPSolver<qd_real>(); // slower, more accurate
+    //ppp_solver = new solvers::PPPSolver<double>(); // faster, but inaccurate
+    ppp_solver =      new solvers::PPPSolver<qd_real>(); // slower, more accurate
     lll_solver =      new solvers::LLLSolver();
     qll_solver =      new solvers::QLLSolver();
     sep_solver =      new solvers::SEPSolver();

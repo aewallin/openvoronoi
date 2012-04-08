@@ -79,7 +79,6 @@ option(BUILD_DOC "Build doxygen documentation? " ON)
 set(BUILD_TESTS 1)
 #set(BUILD_TESTS 0) # don't build tests
 
-
 #
 # this figures out the Python include directories and adds them to the
 # header file search path

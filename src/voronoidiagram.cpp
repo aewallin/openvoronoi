@@ -1703,6 +1703,7 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
         //g[e1].k=g[new_next].k; g[e2].k=g[new_next].k;
 
         //, new_face,  g[new_source].k3  );
+
                 
         g[e1_tw].k = g[new_source].k3;
         g[e2_tw].k = g[new_source].k3;

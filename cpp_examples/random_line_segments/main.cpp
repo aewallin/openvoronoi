@@ -90,6 +90,7 @@ int main(int argc,char *argv[]) {
     desc.add_options()
         ("help", "produce help message")
         ("n", po::value<int>(), "set number of points")
+        ("svg", "write output to SVG file")
     ;
 
     po::variables_map vm;
@@ -148,7 +149,8 @@ int main(int argc,char *argv[]) {
     std::cout << "Points: " << 1e6*t_points/norm << " us * n*log2(n)\n";
     std::cout << "Lines: " << 1e6*t_lines/norm << " us * n*log2(n)\n";
     std::cout << vd->print();
-    vd2svg("random_segments.svg", vd);
+    if (vm.count("svg")) 
+        vd2svg("random_segments.svg", vd);
     delete vd;
     return 0;
 }

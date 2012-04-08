@@ -206,7 +206,7 @@ Edge add_edge( Vertex v1, Vertex  v2, const TEdgeProperties& prop ) { return boo
 /// return begin/edge iterators for out-edges of Vertex \a v
 std::pair<OutEdgeItr, OutEdgeItr> out_edge_itr( Vertex v ) { return boost::out_edges( v, g ); } // FIXME: change name to out_edges!!
 /// return true if v1-v2 edge exists
-bool has_edge( Vertex v1, Vertex v2) { return boost::edge( v1, v2, g ).second; }
+inline bool has_edge( Vertex v1, Vertex v2) { return boost::edge( v1, v2, g ).second; }
 /// return v1-v2 Edge
 Edge edge( Vertex v1, Vertex v2) { assert(has_edge(v1,v2)); return boost::edge( v1, v2, g ).first; }
 /// clear given vertex. this removes all edges connecting to the vertex.

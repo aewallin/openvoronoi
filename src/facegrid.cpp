@@ -93,12 +93,14 @@ HEFace FaceGrid::find_closest_in_set( const Point& p ) {
     HEFace closest_face(0);
     double closest_distance = 30*far_radius; // a big number...
     double d;
-    BOOST_FOREACH( FaceData fd, face_set ) {
+    //BOOST_FOREACH( FaceData fd, face_set ) {
+    for(unsigned int n=0;n<face_set.size();++n) {
         //assert( f.site->isPoint() );
-        d = ( fd.second - p).norm_sq();
+        //d = ( fd.second - p).norm_sq();
+        d = (face_set[n].second.x-p.x)*(face_set[n].second.x-p.x) + (face_set[n].second.y-p.y)*(face_set[n].second.y-p.y);
         if (d<closest_distance ) {
             closest_distance=d;
-            closest_face=fd.first;
+            closest_face=face_set[n].first;
         }
     }
     return closest_face;

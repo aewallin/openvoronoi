@@ -45,15 +45,15 @@ endif (CMAKE_BUILD_TOOL MATCHES "make")
 
 
 # uncomment one of these to change build-type
- set(CMAKE_BUILD_TYPE Release)
+# set(CMAKE_BUILD_TYPE Release)
 # set(CMAKE_BUILD_TYPE Debug)
-# set(CMAKE_BUILD_TYPE Profile)
+ set(CMAKE_BUILD_TYPE Profile)
 # set(CMAKE_BUILD_TYPE Coverage)
 
 MESSAGE(STATUS " CMAKE_BUILD_TYPE  = " ${CMAKE_BUILD_TYPE})
 
 if (CMAKE_BUILD_TYPE MATCHES "Profile")
-    set(CMAKE_CXX_FLAGS_PROFILE "-pg -DNDEBUG")
+    set(CMAKE_CXX_FLAGS_PROFILE "-p -g -DNDEBUG")
     MESSAGE(STATUS " CMAKE_CXX_FLAGS_PROFILE = " ${CMAKE_CXX_FLAGS_PROFILE})
 endif (CMAKE_BUILD_TYPE MATCHES "Profile")
 

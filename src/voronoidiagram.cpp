@@ -25,7 +25,7 @@
 #include <boost/assign/list_of.hpp>
 
 #include "voronoidiagram.hpp"
-#include "facegrid.hpp"
+//#include "facegrid.hpp"
 #include "checker.hpp"
 #include "common/numeric.hpp" // for diangle
 

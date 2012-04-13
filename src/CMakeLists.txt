@@ -45,9 +45,9 @@ endif (CMAKE_BUILD_TOOL MATCHES "make")
 
 
 # uncomment one of these to change build-type
-# set(CMAKE_BUILD_TYPE Release)
+ set(CMAKE_BUILD_TYPE Release)
 # set(CMAKE_BUILD_TYPE Debug)
- set(CMAKE_BUILD_TYPE Profile)
+# set(CMAKE_BUILD_TYPE Profile)
 # set(CMAKE_BUILD_TYPE Coverage)
 
 MESSAGE(STATUS " CMAKE_BUILD_TYPE  = " ${CMAKE_BUILD_TYPE})
@@ -124,7 +124,7 @@ set(OVD_SRC
     ${OpenVoronoi_SOURCE_DIR}/vertex.cpp
     ${OpenVoronoi_SOURCE_DIR}/edge.cpp
     ${OpenVoronoi_SOURCE_DIR}/checker.cpp
-    ${OpenVoronoi_SOURCE_DIR}/facegrid.cpp
+    #${OpenVoronoi_SOURCE_DIR}/facegrid.cpp
     ${OpenVoronoi_SOURCE_DIR}/common/point.cpp
     ${OpenVoronoi_SOURCE_DIR}/vertex_positioner.cpp
     ${OpenVoronoi_SOURCE_DIR}/common/numeric.cpp
@@ -140,7 +140,8 @@ set( OVD_INCLUDE_FILES
     ${OpenVoronoi_SOURCE_DIR}/site.hpp
     ${OpenVoronoi_SOURCE_DIR}/checker.hpp
     ${OpenVoronoi_SOURCE_DIR}/vertex_positioner.hpp
-    ${OpenVoronoi_SOURCE_DIR}/facegrid.hpp
+    #${OpenVoronoi_SOURCE_DIR}/facegrid.hpp
+    ${OpenVoronoi_SOURCE_DIR}/kdtree.hpp
     
     ${OpenVoronoi_SOURCE_DIR}/offset.hpp
     ${OpenVoronoi_SOURCE_DIR}/offset2.hpp

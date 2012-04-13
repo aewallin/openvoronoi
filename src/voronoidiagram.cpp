@@ -35,7 +35,9 @@ namespace ovd {
 /// \param far is the radius of a circle within which all sites must be located. use far==1.0
 /// \param n_bins is the number of bins for FaceGrid, the bucket-search for nearest-neighbors used in insert_point_site()
 VoronoiDiagram::VoronoiDiagram(double far, unsigned int n_bins) {
-    fgrid = new FaceGrid(far, n_bins); // helper-class for nearest-neighbor search 
+    //fgrid = new FaceGrid(far, n_bins); // helper-class for nearest-neighbor search 
+    kd_tree = new kdtree::KDTree<kd_point>(2);
+    
     vd_checker = new VoronoiDiagramChecker( g ); // helper-class that checks topology/geometry
      
     vpos = new VertexPositioner( g ); // helper-class that positions vertices
@@ -50,7 +52,8 @@ VoronoiDiagram::VoronoiDiagram(double far, unsigned int n_bins) {
 /// \brief delete allocated resources: FaceGrid, checker, positioner
 VoronoiDiagram::~VoronoiDiagram() { 
     //std::cout << "~VoronoiDiagram()\n";
-    delete fgrid; 
+    //delete fgrid; 
+    delete kd_tree;
     delete vpos;
     delete vd_checker;
     
@@ -95,7 +98,8 @@ void VoronoiDiagram::initialize() {
     HEFace f1   =  g.add_face(); 
     g[f1].site  = new PointSite(gen3,f1, vert3);
     g[f1].status = NONINCIDENT;
-    fgrid->add_face( f1, gen3 ); // for grid search
+    //fgrid->add_face( f1, gen3 ); // for grid search
+    kd_tree->insert( kd_point(gen3,f1) );
     g.set_next_cycle( list_of(e1_1)(e1_2)(e2)(e3_1)(e3_2) , f1 ,1);
 
     // add face 2: v0-v02-v03 which encloses gen1
@@ -107,7 +111,8 @@ void VoronoiDiagram::initialize() {
     HEFace f2   =  g.add_face();
     g[f2].site  = new PointSite(gen1,f2, vert1);
     g[f2].status = NONINCIDENT;    
-    fgrid->add_face( f2, gen1 );
+    //fgrid->add_face( f2, gen1 );
+    kd_tree->insert( kd_point(gen1,f2) );
     g.set_next_cycle( list_of(e4_1)(e4_2)(e5)(e6_1)(e6_2) , f2 ,1);
 
     // add face 3: v0-v3-v1 which encloses gen2
@@ -119,7 +124,8 @@ void VoronoiDiagram::initialize() {
     HEFace f3   =  g.add_face();
     g[f3].site  = new PointSite(gen2,f3, vert2); // this constructor needs f3...
     g[f3].status = NONINCIDENT;    
-    fgrid->add_face( f3, gen2 );
+    //fgrid->add_face( f3, gen2 );
+    kd_tree->insert( kd_point(gen2,f3) );
     g.set_next_cycle( list_of(e7_1)(e7_2)(e8)(e9_1)(e9_2) , f3 , 1);    
 
     // set type. 
@@ -184,8 +190,9 @@ int VoronoiDiagram::insert_point_site(const Point& p, int step) {
     PointSite* new_site =  new PointSite(p);
     new_site->v = new_vert;
     vertex_map.insert( VertexMapPair(g[new_vert].index,new_vert) ); // so that we can find the descriptor later based on its index
-
-    HEVertex v_seed = find_seed_vertex( fgrid->grid_find_closest_face( p ), new_site);
+    std::pair<kd_point,bool> nearest = kd_tree->nearest( kd_point(p) );
+    assert( nearest.second );
+    HEVertex v_seed = find_seed_vertex( nearest.first.face , new_site);
     mark_vertex( v_seed, new_site );
 //if (step==current_step) return -1; current_step++;
     augment_vertex_set( new_site ); // grow the tree to maximum size
@@ -1277,7 +1284,8 @@ HEFace VoronoiDiagram::add_face(Site* s) {
     s->face = newface;
     g[newface].status = NONINCIDENT;
     if (s->isPoint() )
-        fgrid->add_face( newface, s->position() ); 
+        kd_tree->insert( kd_point( s->position(), newface ) );
+        //fgrid->add_face( newface, s->position() ); 
     
     return newface;
 }

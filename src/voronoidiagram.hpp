@@ -26,6 +26,7 @@
 #include "graph.hpp"
 #include "vertex_positioner.hpp"
 #include "filter.hpp"
+#include "kdtree.hpp"
 
 /*! \mainpage OpenVoronoi
  *
@@ -57,7 +58,31 @@ namespace ovd
  
  
 class VoronoiDiagramChecker;
-class FaceGrid;
+//class FaceGrid;
+//typedef std::pair<Point,HEFace> kd_point;
+struct kd_point {
+    kd_point() {
+        p.x=0; p.y=0;
+        face = 0;
+    }
+    kd_point(Point pt, HEFace f) : p(pt), face(f) { 
+    }
+    kd_point(Point pt) : p(pt), face(0) { 
+    }
+    double dist(const kd_point& pt) const {
+        return (p.x-pt.p.x)*(p.x-pt.p.x) + (p.y-pt.p.y)*(p.y-pt.p.y); 
+    }
+    double operator[](unsigned int i) const {
+        return i == 0 ? p.x : p.y; 
+    }
+    double& operator[](unsigned int i) { 
+        return i == 0 ? p.x : p.y; 
+    }
+    Point p;
+    HEFace face;
+    
+};
+typedef kdtree::KDTree<kd_point> kd_type; // fwd decl * kd_tree;
 
 /// \brief Voronoi diagram.
 ///
@@ -146,7 +171,6 @@ protected:
         HEFace f; 
     };
 
-    
     void initialize();
     HEVertex   find_seed_vertex(HEFace f, Site* site);
     EdgeVector find_in_out_edges(); 
@@ -182,7 +206,9 @@ protected:
     int num_new_vertices(HEFace f);
 // HELPER-CLASSES
     VoronoiDiagramChecker* vd_checker; ///< sanity-checks on the diagram are done by this helper class
-    FaceGrid* fgrid; ///< a grid-search algorithm which allows fast nearest-neighbor search
+    //typedef std::pair<Point,HEFace> kd_point;
+    kd_type* kd_tree;
+    //FaceGrid* fgrid; ///< a grid-search algorithm which allows fast nearest-neighbor search
     VertexPositioner* vpos; ///< an algorithm for positioning vertices
 // DATA
     typedef std::map<int,HEVertex> VertexMap; ///< type for vertex-index to vertex-descriptor map

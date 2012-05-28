@@ -94,7 +94,7 @@ void write_arc_to_svd(ovd::HEGraph& g, svg::Document& doc, ovd::Point src, ovd::
     doc << arc;
 }
 
-void write_edge_to_svd(ovd::HEGraph& g, svg::Document& doc, ovd::HEEdge e) {
+void write_edge_to_svg(ovd::HEGraph& g, svg::Document& doc, ovd::HEEdge e) {
     ovd::HEVertex src = g.source(e);
     ovd::HEVertex trg = g.target(e);
     ovd::Point src_p = scale( g[src].position );
@@ -123,14 +123,25 @@ void write_edge_to_svd(ovd::HEGraph& g, svg::Document& doc, ovd::HEEdge e) {
     doc << polyline;
 }
 
+void write_pointsite_to_svg(ovd::HEGraph& g, svg::Document& doc, ovd::HEVertex v) {
+    if ( g[v].type == ovd::POINTSITE ) {
+        ovd::Point p = scale( g[v].position );
+        doc << svg::Circle( svg::Point(p.x, p.y), 0.1, 
+                              svg::Fill( svg::Color(100, 200, 120)), svg::Stroke(0.01, svg::Color(200, 250, 150) ) 
+                            );
+    }
+}
+
 void vd2svg(std::string filename, ovd::VoronoiDiagram* vd) {
     svg::Dimensions dimensions(1024, 1024);
     svg::Document doc(filename, svg::Layout(dimensions, svg::Layout::BottomLeft));
     
     ovd::HEGraph& g = vd->get_graph_reference();
     BOOST_FOREACH( ovd::HEEdge e, g.edges() ) {
-        write_edge_to_svd(g,doc,e);
+        write_edge_to_svg(g,doc,e);
     }
-    
+    BOOST_FOREACH( ovd::HEVertex v, g.vertices() ) {
+        write_pointsite_to_svg(g,doc,v);
+    }
     doc.save();
 }

@@ -1,4 +1,6 @@
 
+// from: http://code.google.com/p/simple-svg/
+
 /*******************************************************************************
 *  The "New BSD License" : http://www.opensource.org/licenses/bsd-license.php  *
 ********************************************************************************

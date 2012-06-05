@@ -138,6 +138,7 @@ if __name__ == "__main__":
     s = id_list[1]
     vd.addLineSite( s[0], s[1]) 
     
+    """
     err = vd.getStat()
     #print err 
     print "got ",len(err)," errors"
@@ -145,6 +146,7 @@ if __name__ == "__main__":
     maxerr = max(err)
     print minerr
     print maxerr
+    """
     
     for s in ssegs:
         print s[0]," ",s[1]

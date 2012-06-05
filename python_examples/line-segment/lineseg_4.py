@@ -83,14 +83,16 @@ if __name__ == "__main__":
     print "waiting for ",Nmax," segments..",
     sys.stdout.flush()
     t_before = time.time()
-    #segs = gens.randomSegments(far,Nmax) # uncomment this to generate segments on the fly 
+    segs = gens.randomSegments(far,Nmax) # uncomment this to generate segments on the fly 
     
+    """
     filename = "../src/test/data/randomsegments_{0}.pickle.gz".format(Nmax) # or use this to load pre-computed segments 
     # (produced with lineseg_dataset_generator.py)
     f = gzip.open(filename, 'rb')
     pstring = f.read()
     segs = pickle.loads( pstring )
     f.close()
+    """
     
     """    
     print "waiting for ",Nmax," segments..",

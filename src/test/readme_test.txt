@@ -8,6 +8,8 @@ or
   $ make test ARGS="-R ttt"
 for example, to run all python tests
 $ ctest -R pytest
+or tu run all c++ tests (these are usually much faster than the python tests)
+$ ctest -R cpp
 
 Notes
 
@@ -36,7 +38,7 @@ Adding new C++ tests
 
 C++ tests are also easy to write: an "int main()" function returns "0" for
 success, and "-1" for failure. Each C++ test has its own subdirectory starting
-with "test_", which should contain a CMakeLists.txt that calls 
+with "cpptest_", which should contain a CMakeLists.txt that calls 
   ADD_TEST( <test name> )
 
 The easiest way to add a C++ test is to make a copy of the template

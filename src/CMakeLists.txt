@@ -251,9 +251,17 @@ MESSAGE(STATUS "Python libraries will be installed to: " ${Python_site_packages}
     # this installs the python library
     install(
         TARGETS openvoronoi
-        LIBRARY DESTINATION ${Python_site_packages}
+        LIBRARY 
+        DESTINATION ${Python_site_packages}
     )
-
+    
+    # this installs the python VTK-visualization helper library
+    install(
+        FILES ${OpenVoronoi_SOURCE_DIR}/py/ovdvtk.py
+        DESTINATION ${Python_site_packages}
+        PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
+    )
+    
 # this installs the c++ library
     install(
         TARGETS libopenvoronoi
@@ -279,7 +287,6 @@ MESSAGE(STATUS "Python libraries will be installed to: " ${Python_site_packages}
         DESTINATION include/openvoronoi/utility
         PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
     )
-
     install(
         FILES ${OVD_INCLUDE_SOLVERS_FILES}
         DESTINATION include/openvoronoi/solvers
@@ -289,16 +296,12 @@ MESSAGE(STATUS "Python libraries will be installed to: " ${Python_site_packages}
 
 # tests
 if( ${BUILD_TESTS} )
-include(${CMAKE_SOURCE_DIR}/test/ovd_tests.cmake)
+    include(${CMAKE_SOURCE_DIR}/test/ovd_tests.cmake)
 endif( ${BUILD_TESTS} )
 
 # doxygen documentation
 include(doxygen.cmake)
 
-#add_custom_target( 
-#    coverage-data
-#    COMMAND ctest -R cpptest
-#    )
 # coverage-report target
 message(STATUS "lcov cmake src dir ${CMAKE_SOURCE_DIR}")
 add_custom_target(coverage-report

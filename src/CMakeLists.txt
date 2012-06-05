@@ -258,6 +258,7 @@ MESSAGE(STATUS "Python libraries will be installed to: " ${Python_site_packages}
     # this installs the python VTK-visualization helper library
     install(
         FILES ${OpenVoronoi_SOURCE_DIR}/py/ovdvtk.py
+              ${OpenVoronoi_SOURCE_DIR}/py/ngc_writer.py
         DESTINATION ${Python_site_packages}
         PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
     )

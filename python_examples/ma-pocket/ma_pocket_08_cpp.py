@@ -591,7 +591,9 @@ if __name__ == "__main__":
     mapocket.debug(False)
     t_before = time.time()
     mapocket.run()
-    mic_list = mapocket.get_mic_list()
+    mic_components = mapocket.get_mic_components()
+    #for mic_list in mic_components:
+    mic_list = mic_components[0] #mapocket.get_mic_list()
     t_after = time.time()
     #print "( ma-pocket done in ", 1e3*(t_after-t_before)," milliseconds. got ",  len(mic_list)," MICs )"
     print "( MA-pocket done in %.3f s. Got %d MICs )" % ((t_after-t_before),len(mic_list) )

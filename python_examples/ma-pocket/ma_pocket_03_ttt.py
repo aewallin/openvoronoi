@@ -228,29 +228,28 @@ if __name__ == "__main__":
     mapocket.debug(True)
     mapocket.setWidth(0.005)
     
-    #maxmic = mapocket.maxMic()
     mapocket.run()
-    mic_list = mapocket.get_mic_list()
-    
-    #print maxmic
     
     #drawCircle( myscreen, maxmic[0], maxmic[1] , ovdvtk.red )
-    nframe=0
-    
-    for n in range( len(mic_list) ):
-        mic = mic_list[n]
-        if n == 0:
-            print "maxmic at ", mic[0]," r = ",mic[1]
-            drawCircle( myscreen, mic[0], mic[1] , ovdvtk.red )
-        else:
-            drawCircle( myscreen, mic[0], mic[1] , ovdvtk.green )
-        w2if.Modified()
-        lwr.SetFileName("frames/%06d.png" % ( nframe ) )
-        #lwr.Write()
-        time.sleep(0.1)
-        myscreen.render()
-    print "mic done."
-    
+    mic_components = mapocket.get_mic_components()
+    for mic_list in mic_components:
+        
+        nframe=0
+        
+        for n in range( len(mic_list) ):
+            mic = mic_list[n]
+            if n == 0:
+                print "maxmic at ", mic[0]," r = ",mic[1]
+                drawCircle( myscreen, mic[0], mic[1] , ovdvtk.red )
+            else:
+                drawCircle( myscreen, mic[0], mic[1] , ovdvtk.green )
+            w2if.Modified()
+            lwr.SetFileName("frames/%06d.png" % ( nframe ) )
+            #lwr.Write()
+            time.sleep(0.1)
+            myscreen.render()
+        print "mic done."
+        
     """
     nframe=0
     while True:

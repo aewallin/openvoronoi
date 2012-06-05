@@ -182,8 +182,8 @@ class CircleCircle:
             self.alfa3 = (c2.r*c2.r-c1.r*c1.r-self.d*self.d)/(2*self.d)
             self.alfa4 = (c2.cw*c2.r-c1.cw*c1.r)/self.d
         self.c1 = c1 # store all of c1 also??
-        print " alfa4:",self.alfa4
-        self.tmin = (c1.c-c2.c).norm() / 2 
+        #print " alfa4:",self.alfa4
+        self.tmin = ((c1.c-c2.c).norm()-c2.r) / 2 
         self.tmax = 100
         
     def getX(self):
@@ -233,7 +233,7 @@ class CircleCircle:
 
 class CircleLine:
     def __init__(self, c1, l2):
-        self.delta = l2.a*c1.c.x + l2.b*c1.c.y + l2.c 
+        #self.delta = l2.a*c1.c.x + l2.b*c1.c.y + l2.c 
         self.alfa1 = l2.a
         self.alfa2 = l2.b
         self.alfa3 = l2.a*c1.c.x + l2.b*c1.c.y + l2.c
@@ -242,7 +242,10 @@ class CircleLine:
         self.k = +1 # positive line-offset
         if self.alfa3 > 0:
             self.k = -1 # negative line-offset
-        self.tmin = -self.alfa3/(2.0*self.k)
+        
+        # alfa3 is distance from circle-center to line
+        self.tmin = (abs(self.alfa3)-c1.r)/(2.0)
+        
         self.tmax = 100
         print " tmax=",self.tmax," tmin=",self.tmin
     def getX(self):
@@ -415,6 +418,77 @@ def drawLineLineTest():
     myscreen.render()
     myscreen.iren.Start()
 
+def drawPointArcTest():
+    myscreen = ovdvtk.VTKScreen()
+    myscreen.camera.SetPosition(0.01, 0,  1000 ) 
+    myscreen.camera.SetFocalPoint(0, 0, 0)
+    myscreen.camera.SetClippingRange(-100,3000)
+    
+    c1 = Circle(c=ovd.Point(-10,20), r=0, cw=+1) # first site
+    drawVertex(myscreen, c1.c, ovdvtk.yellow)
+    
+    c2 = Circle(c=ovd.Point(30,50), r=20, cw=+1) # first site
+    drawVertex(myscreen, c1.c, ovdvtk.orange)
+    drawCircle(myscreen, c2.c, c2.r, ovdvtk.orange)
+    #myscreen.addActor( ovdvtk.Circle( center=(c.c.x,c.c.y,c.c.z), radius=c.r, color=circleColor ) )
+        
+    c1c2 = CircleCircle( c1, c2 ) # bisectors
+    
+    b1= Bisector( c1c2 )
+    #b2= Bisector( l2l1 )
+    drawBisector( myscreen, b1 )
+    #drawBisector( myscreen, b2 )
+    myscreen.render()
+    myscreen.iren.Start()
+
+def drawPointArcTest2():
+    myscreen = ovdvtk.VTKScreen()
+    myscreen.camera.SetPosition(0.01, 0,  1000 ) 
+    myscreen.camera.SetFocalPoint(0, 0, 0)
+    myscreen.camera.SetClippingRange(-100,3000)
+    
+    c1 = Circle(c=ovd.Point(-10,20), r=0, cw=+1) # first site
+    drawVertex(myscreen, c1.c, ovdvtk.yellow)
+    
+
+    
+    c2 = Circle(c=ovd.Point(30,50), r=20, cw=+1) # first site
+    drawVertex(myscreen, c1.c, ovdvtk.orange)
+    drawCircle(myscreen, c2.c, c2.r, ovdvtk.orange)
+    #myscreen.addActor( ovdvtk.Circle( center=(c.c.x,c.c.y,c.c.z), radius=c.r, color=circleColor ) )
+        
+    c1c2 = CircleCircle( c1, c2 ) # bisectors
+    
+    b1= Bisector( c1c2 )
+    #b2= Bisector( l2l1 )
+    drawBisector( myscreen, b1 )
+    #drawBisector( myscreen, b2 )
+    myscreen.render()
+    myscreen.iren.Start()
+
+def drawLineArcTest():
+    myscreen = ovdvtk.VTKScreen()
+    myscreen.camera.SetPosition(0.01, 0,  1000 ) 
+    myscreen.camera.SetFocalPoint(0, 0, 0)
+    myscreen.camera.SetClippingRange(-100,3000)
+    
+    l1 = Line( math.cos(1),   math.sin(1)   , -50 , +1) # first line-site
+    drawLine(myscreen, l1, ovdvtk.yellow )
+    
+    c2 = Circle(c=ovd.Point(30,50), r=20, cw=+1) # first site
+    drawVertex(myscreen, c2.c, ovdvtk.orange)
+    drawCircle(myscreen, c2.c, c2.r, ovdvtk.orange)
+    #myscreen.addActor( ovdvtk.Circle( center=(c.c.x,c.c.y,c.c.z), radius=c.r, color=circleColor ) )
+        
+    c1c2 = CircleLine( c2, l1 ) # bisectors
+    #CircleLine
+    b1= Bisector( c1c2 )
+    #b2= Bisector( l2l1 )
+    drawBisector( myscreen, b1 )
+    #drawBisector( myscreen, b2 )
+    myscreen.render()
+    myscreen.iren.Start()
+    
 # s1= l1: line-site
 # s2= p2: point-site (and end-point of l1)
 # s3: l3: line-site
@@ -774,4 +848,7 @@ if __name__ == "__main__":
     
     #drawSeparatorSolver1(4.3)
     #drawSeparatorSolver2(4.3)
-    drawBitangents2()
+    #drawBitangents2()
+    #drawPointArcTest()
+    #drawPointArcTest2()
+    drawLineArcTest()

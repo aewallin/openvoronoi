@@ -103,6 +103,8 @@ public:
     virtual ~VoronoiDiagram();
     int insert_point_site(const Point& p, int step=0);
     bool insert_line_site(int idx1, int idx2, int step=99); // default step should make algorithm run until the end!
+    void insert_arc_site(int idx1, int idx2, const Point& c, bool cw, int step=99);
+    
     /// return the far radius
     double get_far_radius() const {return far_radius;}
     /// return number of point sites in diagram
@@ -192,7 +194,7 @@ protected:
     void   add_edge(EdgeData ed, HEFace new1, HEFace new2=0);
     void   add_separator(HEFace f, HEFace nf, boost::tuple<HEEdge, HEVertex, HEEdge,bool> target, HEVertex endp, Site* s1, Site* s2);
     void   add_split_vertex(HEFace f, Site* s);
-    boost::tuple<HEVertex,HEFace,HEVertex,HEVertex,HEFace> find_null_face(HEVertex start, HEVertex other, Point l);
+    boost::tuple<HEVertex,HEFace,HEVertex,HEVertex,HEFace> find_null_face(HEVertex start, HEVertex other, Point l, Point dir, Site* new_site);
     boost::tuple<HEEdge,HEVertex,HEEdge,bool> find_separator_target(HEFace f, HEVertex endp);
     std::pair<HEVertex,HEFace> process_null_edge(Point dir, HEEdge next_edge , bool k3, bool next_prev);
     HEVertex add_separator_vertex(HEVertex endp, HEEdge edge, Point sep_dir);
@@ -220,6 +222,7 @@ protected:
     double far_radius; ///< sites must fall within a circle with radius far_radius
     int num_psites; ///< the number of point sites
     int num_lsites; ///< the number of line-segment sites
+    int num_arc_sites; ///< the number of arc-sites
     FaceVector incident_faces; ///< temporary variable for ::INCIDENT faces, will be reset to ::NONINCIDENT after a site has been inserted
     std::set<HEVertex> modified_vertices; ///< temporary variable for in-vertices, out-vertices that need to be reset after a site has been inserted
     VertexVector v0; ///< IN-vertices, i.e. to-be-deleted

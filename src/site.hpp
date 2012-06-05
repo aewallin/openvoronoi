@@ -86,6 +86,7 @@
 #include <sstream>
 
 #include "common/point.hpp"
+#include "common/numeric.hpp"
 
 namespace ovd {
 
@@ -320,6 +321,8 @@ public:
     inline virtual bool isPoint() const { return false;}
     /// true for LineSite
     inline virtual bool isLine() const  { return false;}
+    inline virtual bool isArc() const  { return false;}
+    virtual bool cw() {return false;}
     /// is given Point in_region ?
     virtual bool in_region(const Point& ) const =0; 
     /*{
@@ -327,14 +330,9 @@ public:
         return false;
     }*/
     /// is given Point in region?
-    virtual double in_region_t(const Point& ) const {
-        std::cout << " WARNING: never call Site !\n";
-        return 0;
-    } 
+    virtual double in_region_t(const Point& ) const { std::cout << " WARNING: never call Site !\n"; return 0; } 
     /// in-region t-valye
-    virtual double in_region_t_raw(const Point&) const {
-        return -99;
-    }
+    virtual double in_region_t_raw(const Point&) const { return -99; }
     /// return edge (if this is a LineSite or ArcSite
     virtual HEEdge edge() {return HEEdge();}
     /// return vertex, if this is a PointSite
@@ -484,46 +482,97 @@ public:
     virtual const Point start() const {return _start;}
     virtual const Point end() const {return _end;}
     virtual HEEdge edge() {return e;}
-    /// store an edge_descriptor to the LINESITE edge
-    HEEdge e; 
+    
+    HEEdge e; ///< edge_descriptor to the ::LINESITE pseudo-edge
 private:
     LineSite() {} // don't use!
-    /// start Point of LineSite
-    Point _start;
-    /// end Point of LineSite
-    Point _end;
-    
+    Point _start; ///< start Point of LineSite
+    Point _end; /// end Point of LineSite
 };
 
 /// circular arc Site
 class ArcSite : public Site {
 public:
     /// create arc-site
-    ArcSite( const Point& s, const Point& e, const Point& center, bool dir): _start(s), _end(e), _center(center), _dir(dir) {
+    ArcSite( const Point& startpt, const Point& endpt, const Point& centr, bool dir) : 
+        _start(startpt), _end(endpt), _center(centr), _dir(dir) {
         _radius = (_center - _start).norm();
         eq.q = true;
         eq.a = -2*_center.x;
         eq.b = -2*_center.y;
-        eq.k = -2*_radius; 
+        _k = 1;
+        eq.k = -2*_k*_radius; 
         eq.c = _center.x*_center.x + _center.y*_center.y - _radius*_radius;
     }
     ~ArcSite() {}
     virtual Ofs* offset(Point p1,Point p2) {return new ArcOfs(p1,p2,_center,-1); } //FIXME: radius
-    Point apex_point(const Point& p) {
-        return p+Point(0,0); // FIXME
+    
+    virtual bool in_region(const Point& p) const {
+        if (_dir) {
+            return p.is_right(_center,_start) && !p.is_right(_center,_end);
+        } else {
+            return !p.is_right(_center,_start) && p.is_right(_center,_end);
+        }
     }
+    Point apex_point(const Point& p) {
+        if (in_region(p))
+            return projection_point(p);
+        else
+            return closer_endpoint(p);
+    }
+    
     virtual double x() const {return _center.x;}
     virtual double y() const {return _center.y;}
     virtual double r() const {return _radius;}
-    virtual double k() const {return 1;} // ?
+    virtual double k() const {return _k;} // ?
+
+    
     virtual std::string str() const {return "ArcSite";}
+    virtual std::string str2() const {
+        std::string out = "ArcSite: ";
+        out.append( _start.str() );
+        out.append( " - " );
+        out.append( _end.str() );
+        out.append( " c=" );
+        out.append( _center.str() );
+        out.append( " cw=" );
+        out.append( (_dir ? "1" : "0" ) );
+
+        return out;
+    }
+    HEEdge e; ///< edge_descriptor to ::ARCSITE pseudo-edge
+    Point start() {return _start;}
+    Point end() {return _end;}
+    Point center() {return _center;}
+    double radius() {return _radius;}
+    bool cw() {return _dir;}
+    inline virtual bool isArc() const  { return true;}
+
 private:
+    Point projection_point(const Point& p) const {
+        if ( p == _center ) {
+            return _start;
+        } else {
+            Point dir = (p-_center);
+            dir.normalize();
+            return _center + _radius*dir;
+        }
+    }
+    Point closer_endpoint(const Point& p) const {
+        double d_start = (_start-p).norm();
+        double d_end = (_end-p).norm();
+        if (d_start < d_end)
+            return _start;
+        else
+            return _end;
+    }
     ArcSite() {} // don't use!
-    Point _start; ///< start Point of arc
-    Point _end; ///< end Point of arc
-    Point _center; ///< center of arc
-    bool _dir; ///< CW or CCW direction flag
-    double _radius; ///< radius of arc
+    Point _start;  ///< start Point of arc
+    Point _end;    ///< end Point of arc
+    Point _center; ///< center Point of arc
+    bool _dir;     ///< CW or CCW direction flag
+    double _radius;///< radius of arc
+    double _k; ///< offset-direction. +1 for enlarging, -1 for shrinking circle
 };
 
 

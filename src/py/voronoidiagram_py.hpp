@@ -63,6 +63,10 @@ public:
     bool insert_line_site3(int idx1, int idx2, int step) {
         return insert_line_site( idx1, idx2, step);
     }
+    /// 4-parameter arc-insert
+    void insert_arc_site4(int idx1, int idx2, const Point& c, bool cw) {
+        insert_arc_site( idx1, idx2, c, cw);
+    }
     /// set amount to offset null-edges
     void set_null_edge_offset(double ofs) {
         null_edge_offset=ofs;
@@ -141,6 +145,62 @@ public:
         }
         return plist;
     }
+    /// return arc-site points
+    boost::python::list get_arc_points(HEEdge e) {
+        boost::python::list out;
+        HEFace f = g[e].face;
+        ArcSite* s = dynamic_cast<ArcSite*>( g[f].site );
+        
+        Point start = s->start()-s->center();
+        Point end = s->end()-s->center();
+        // offset in tangent-directio
+        Point start_tang = start.xy_perp();
+        Point end_tang = end.xy_perp();
+        start_tang.normalize();
+        end_tang.normalize();
+        if (s->cw() ) {
+        start = start - null_edge_offset*start_tang;
+        end = end + null_edge_offset*end_tang;
+        } else {
+            start = start + null_edge_offset*start_tang;
+            end = end - null_edge_offset*end_tang;
+        }
+        double theta1 = atan2(start.x,start.y);
+        double theta2 = atan2(end.x,end.y);
+
+        double CIRCLE_FUZZ = 1e-9;
+        if (!s->cw()) { //idea from emc2 / cutsim g-code interp G2/G3
+            while ( (theta2 - theta1) > -CIRCLE_FUZZ)  // required only for multi-turn arcs??
+                theta2 -= 2*M_PI;
+        } else {
+            while( (theta2 - theta1) < CIRCLE_FUZZ) 
+                theta2 += 2*M_PI;
+        }
+
+        double dtheta = theta2-theta1;
+        double arclength = s->radius()*dtheta;
+        double dlength =  arclength/10;
+
+        int steps = int( arclength / dlength );
+        //print "arc subdivision steps: ",steps
+        double rsteps = 1/(double)steps;
+        double dc = cos(-dtheta*rsteps); // delta-cos  
+        double ds = sin(-dtheta*rsteps); // delta-sin
+
+        out.append( s->center() + start );
+        Point tr = start;
+        for(int i=0;i<steps;i++) { // in range(steps):
+            tr = rotate( tr, dc, ds); // rotate center-start vector by a small amount
+            Point pt = s->center() + tr; //current = ovd.Point(x,y)
+            out.append(pt); 
+        }
+        return out;
+    }
+    Point rotate(const Point& tr, double c, double s) {
+        double x = tr.x * c - tr.y * s;
+        double y = tr.x * s + tr.y * c;
+        return Point(x,y);
+    }
     /// return list of vd-edges to python
     boost::python::list getVoronoiEdges()  {
         boost::python::list edge_list;
@@ -156,7 +216,7 @@ public:
                      (g[edge].type == LINELINE)  || (g[edge].type == PARA_LINELINE)) { // 
                     point_list.append( g[v1].position );
                     point_list.append( g[v2].position );
-                } else if ( g[edge].type == PARABOLA  ) { // these edge-types are drawn as polylines with edge_points number of points
+                } else if ( g[edge].type == PARABOLA || g[edge].type == HYPERBOLA  ) { // these edge-types are drawn as polylines with edge_points number of points
                     double t_src = g[v1].dist();
                     double t_trg = g[v2].dist();
                     double t_min = std::min(t_src,t_trg);
@@ -168,6 +228,9 @@ public:
                         point_list.append(pt);
                     }
                     
+                } else if ( g[edge].type == ARCSITE  ) {
+                    // points corresponding to arc-site
+                    point_list = get_arc_points(edge);
                 } else {
                     //assert(0);
                 } 
@@ -251,7 +314,7 @@ public:
                         }
                     }
                     
-                } else if ( g[edge].type == PARABOLA ) { // these edge-types are drawn as polylines with edge_points number of points
+                } else if ( g[edge].type == PARABOLA || g[edge].type == HYPERBOLA ) { // these edge-types are drawn as polylines with edge_points number of points
                     double t_src = g[v1].dist();
                     double t_trg = g[v2].dist();
                     double t_min = std::min(t_src,t_trg);
@@ -260,9 +323,13 @@ public:
                         //double t = t_min + n*(t_max-t_min)/(_edge_points-1); // linear
                         double t = t_min + ((t_max-t_min)/sq(_edge_points-1))*sq(n);
                         Point pt = g[edge].point(t);
-                        point_list.append(pt);
+                        if (t>null_edge_offset) // don't draw inside the null-face circle
+                            point_list.append(pt);
                     }
                     
+                } else if ( g[edge].type == ARCSITE  ) {
+                    // points corresponding to arc-site
+                    point_list = get_arc_points(edge);
                 } else {
                     //assert(0);
                 } 

@@ -65,6 +65,8 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         .def("addVertexSite",  &VoronoiDiagram_py::insert_point_site2 ) // (point, step)
         .def("addLineSite",  &VoronoiDiagram_py::insert_line_site2 ) // takes two arguments
         .def("addLineSite",  &VoronoiDiagram_py::insert_line_site3 ) // takes three arguments (idx1, idx2, step)
+        .def("addArcSite",  &VoronoiDiagram_py::insert_arc_site ) // arc-site (idx1,idx2, center, cw?, step) 
+        .def("addArcSite",  &VoronoiDiagram_py::insert_arc_site4 ) // arc-site (idx1,idx2, center, cw?, step) 
         .def("getGenerators",  &VoronoiDiagram_py::getGenerators)
         .def("getEdgesGenerators",  &VoronoiDiagram_py::getEdgesGenerators)
         .def("getVoronoiVertices",  &VoronoiDiagram_py::getVoronoiVertices)
@@ -122,6 +124,7 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         .value("HYPERBOLA", HYPERBOLA)
         .value("SEPARATOR", SEPARATOR)
         .value("LINESITE", LINESITE)
+        .value("ARCSITE", ARCSITE)
         .value("NULLEDGE", NULLEDGE)
     ;
     bp::class_<Point>("Point") 

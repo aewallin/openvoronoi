@@ -110,7 +110,7 @@ Point EdgeProps::point(double t) const {
 
 /// dispatch to setter functions based on type of \a s1 and \a s2
 void EdgeProps::set_parameters(Site* s1, Site* s2, bool sig) {
-    sign = sig;
+    sign = sig; // sqrt() sign for edge-parametrization
     if (s1->isPoint() && s2->isPoint())        // PP
         set_pp_parameters(s1,s2);
     else if (s1->isPoint() && s2->isLine())    // PL
@@ -120,15 +120,18 @@ void EdgeProps::set_parameters(Site* s1, Site* s2, bool sig) {
         sign = !sign;
     } else if (s1->isLine() && s2->isLine())     // LL
         set_ll_parameters(s2,s1);
+    else if (s1->isPoint() && s2->isArc() ) // PA
+        set_pa_parameters(s1,s2);
+    else if (s2->isPoint() && s1->isArc() ) // AP
+        set_pa_parameters(s2,s1);
+    else if (s1->isLine() && s2->isArc() ) // LA
+        set_la_parameters(s1,s2);
+    else if (s2->isLine() && s1->isArc() ) // AL
+        set_la_parameters(s2,s1);
     else
         assert(0);
-        // AP & PA
         // AA
-        // AL & LA
 }
-
-
-
 
 /// assignment of edge-parameters
 EdgeProps& EdgeProps::operator=(const EdgeProps &other) {
@@ -193,32 +196,38 @@ void EdgeProps::set_pl_parameters(Site* s1, Site* s2) {
     assert( s1->isPoint() && s2->isLine() );
     
     type = PARABOLA;
-    double alfa3 = s2->a()*s1->x() + s2->b()*s1->y() + s2->c();
+    double alfa3 = s2->a()*s1->x() + s2->b()*s1->y() + s2->c(); // signed distance to line
+    
     // figure out kk, i.e. offset-direction for LineSite
-    double kk = 1.0;
+    //double kk = 1.0;
+    /*
     if (alfa3>0.0) {
+        std::cout << " alfa3>0 ! \n";
         kk = -1.0;
+        assert(0); // this branch never taken?
     } else {
-        sign = !sign;
-    }
+    */    
+        //std::cout << " alfa3<0 ! \n";
+    //    sign = !sign;
+    //}
     
     x[0]=s1->x();       // xc1
     x[1]=s2->a()*alfa3; // alfa1*alfa3
-    x[2]=s2->a()*kk;    // -alfa1 = - a2 * k2?
+    x[2]=s2->a(); //*kk;    // -alfa1 = - a2 * k2?
     x[3]=s2->b();       // alfa2 = b2
-    x[4]=0;             // alfa4 = r1 
-    x[5]=+1;            // lambda1 (allways positive offset from PointSite?)
+    x[4]=0;             // alfa4 = r1 (PointSite has zero radius)
+    x[5]=+1;            // lambda1 (allways positive offset from PointSite)
     x[6]=alfa3;         // alfa3= a2*xc1+b2*yc1+d2?
-    x[7]=kk;            // -1 = k2 side of line??
+    x[7]=+1; //kk;            // -1 = k2 side of line??
 
     y[0]=s1->y();       // yc1
     y[1]=s2->b()*alfa3; // alfa2*alfa3
-    y[2]=s2->b()*kk;    // -alfa2 = -b2
+    y[2]=s2->b(); //*kk;    // -alfa2 = -b2
     y[3]=s2->a();       // alfa1 = a2
-    y[4]=0;             // alfa4 = r1
-    y[5]=+1;            // lambda1 (allways positive offset from PointSite?)
+    y[4]=0;             // alfa4 = r1 (PointSite has zero radius)
+    y[5]=+1;            // lambda1 (allways positive offset from PointSite)
     y[6]=alfa3;         // alfa3
-    y[7]=kk;            // -1 = k2 side of line??
+    y[7]=+1; //kk;            // -1 = k2 side of line??
 }
 
 /// set ::SEPARATOR edge parameters
@@ -334,60 +343,97 @@ void EdgeProps::set_ll_parameters(Site* s1, Site* s2) {  // Held thesis p96
 }
 
 // point(s1)-arc(s2)
-/*
-void EdgeProps::set_pa_parameters(Site* s1, Site* s2) { 
-    d = sqrt( (xc1 - xc2)^2 + (yc1-yc2)^2 )
-    double alfa1 = (xc2-xc1) / d
-    double alfa2 = (yc2-yc1) / d
-    double alfa3 = ( r2^2 - r1^2 - d^2) / 2d
-    double alfa4 = ( lamb2 * r2 - lamb1 * r1 ) / d
-    x[0] = xc1
-    x[1] = alfa1*alfa3
-    x[2] = alfa1*alfa4
-    x[3] = alfa2
-    x[4] = r1
-    x[5] = lamb1
-    x[6] = alfa3
-    x[7] = alfa4
+
+void EdgeProps::set_pa_parameters(Site* s1, Site* s2) {
+    assert( s1->isPoint() && s2->isArc() );
+    //std::cout << "set_pa_parameters()\n";
     
-    y[0] = yc1
-    y[1] = alfa2*alfa3
-    y[2] = alfa2*alfa4
-    y[3] = alfa1
-    y[4] = r1
-    y[5] = lamb1
-    y[6] = alfa3
-    y[7] = alfa4
+    type = HYPERBOLA; // hyperbola or ellipse?
+    double lamb2;
+    //if (s2->cw())
+    //    lamb2 = +1.0;
+    //else
+    sign=!sign;
+    
+    // distance between centers
+    double d = sqrt( (s1->x() - s2->x())*(s1->x() - s2->x()) + (s1->y()-s2->y())*(s1->y()-s2->y()) );
+    assert( d > 0 );
+    if (d>s2->r())
+        lamb2 = +1.0; // offset towards growing circle
+    else
+        lamb2 = -1.0; // offset towards shrinking circle
+        
+    double alfa1 = ( s2->x() - s1->x() ) / d;
+    double alfa2 = ( s2->y() - s1->y() ) / d;
+    double alfa3 = ( s2->r()*s2->r() -  d*d) / (2*d);
+    double alfa4 = ( lamb2 * s2->r()  ) / d;
+    x[0] = s1->x();
+    x[1] = alfa1*alfa3;
+    x[2] = alfa1*alfa4;
+    x[3] = alfa2;
+    x[4] = 0; //r1;  PointSite has zero radius
+    x[5] = +1; //lamb1; allways outward offset from PointSite
+    x[6] = alfa3;
+    x[7] = alfa4;
+    
+    y[0] = s1->y();
+    y[1] = alfa2*alfa3;
+    y[2] = alfa2*alfa4;
+    y[3] = alfa1;
+    y[4] = 0; //r1;     PointSite has zero radius
+    y[5] = +1; //lamb1; allways outward offset from PointSite
+    y[6] = alfa3;
+    y[7] = alfa4;
+    //print_params();
 }
+
 
 // arc(s1)-line(s2)
 void EdgeProps::set_la_parameters(Site* s1, Site* s2) { 
-    d = sqrt( (xc1 - xc2)^2 + (yc1-yc2)^2 )
-    double alfa1 = a2
-    double alfa2 = b2
-    double alfa3 = ( a2*xc1 + b2*yc1 + c2 )
-    double alfa4 = r1
-    x[0]= xc1
-    x[1] = alfa1*alfa3
-    x[2] = -alfa1
-    x[3] = alfa2
-    x[4] = alfa4
-    x[5] = lamb1
-    x[6] = alfa3
-    x[7] = -1
+    assert( s1->isLine() && s2->isArc() );
+    std::cout << "set_la_parameters() sign= " << sign << " cw= " << s2->cw() << "\n";
+    type = PARABOLA;
+    double lamb2;
+    if (s2->cw())
+        lamb2 = +1.0;
+    else
+        lamb2 = -1.0;
+    double alfa1 = s1->a(); //a2
+    double alfa2 = s1->b(); //b2
+    double alfa3 = ( s1->a()*s2->x() + s1->b()*s2->y() + s1->c() );
+    double alfa4 = s2->r();
+    double kk = +1; // # positive line-offset
+    //if (alfa3 > 0) {
+    //    kk = -1;
+    //    assert(0);
+    //}
+    //sign = false;
+    // figure out sign?
     
-    y[0] = yc1
-    y[1] = alfa2*alfa3
-    y[2] = -alfa2
-    y[3] = alfa1
-    y[4] = alfa4
-    y[5] = lamb1
-    y[6] = alfa3
-    y[7] = -1
+    x[0] = s2->x();
+    x[1] = alfa1*alfa3;
+    x[2] = alfa1*kk;
+    x[3] = alfa2;
+    x[4] = alfa4;
+    x[5] = lamb2;
+    x[6] = alfa3;
+    x[7] = kk;
+    
+    y[0] = s2->y();
+    y[1] = alfa2*alfa3;
+    y[2] = alfa2*kk;
+    y[3] = alfa1;
+    y[4] = alfa4;
+    y[5] = lamb2;
+    y[6] = alfa3;
+    y[7] = kk;
+    print_params();
 }
-*/
+
+
 /// \return minumum t-value for this edge
 /// this function dispatches to a helper-function based on the Site:s \a s1 and \a s2
+// used only for positioning APEX vertices?
 double EdgeProps::minimum_t( Site* s1, Site* s2) {
     if (s1->isPoint() && s2->isPoint())        // PP
         return minimum_pp_t(s1,s2);
@@ -395,8 +441,12 @@ double EdgeProps::minimum_t( Site* s1, Site* s2) {
         return minimum_pl_t(s1,s2);
     else if (s2->isPoint() && s1->isLine())    // LP
         return minimum_pl_t(s2,s1);
-    else if (s1->isLine() && s2->isLine())     // LL
+    else if (s1->isLine() && s2->isLine())     // LL, non-parallel lines allways cross somewhere..
         return 0;
+    else if (s1->isPoint() && s2->isArc() ) // PA
+        return minimum_pa_t(s1,s2);
+    else if (s2->isPoint() && s1->isArc() ) // AP
+        return minimum_pa_t(s2,s1);
     else
         assert(0);
     // todo:  AP, AL, AA
@@ -415,13 +465,21 @@ double EdgeProps::minimum_pl_t(Site* , Site* ) {
     assert( mint >=0 );
     return mint;
 }
-
+/// minimum t-value for edge between PointSite and ArcSite
+double EdgeProps::minimum_pa_t(Site* s1, Site* s2) {
+    assert( s1->isPoint() && s2->isArc() );
+    double p1p2 = (s1->position() - s2->apex_point(s1->position()) ).norm(); // - s2->r() ;
+    assert( p1p2 >=0 );
+    return p1p2/2; // this splits point-point edges at APEX
+}
 /// print out edge parametrization
 void EdgeProps::print_params() const {
     std::cout << "x-params: ";
     for (int m=0;m<8;m++)
         std::cout << x[m] << " ";
+    std::cout << "sign= " << sign;
     std::cout << "\n";
+    
     std::cout << "y-params: ";
     for (int m=0;m<8;m++)
         std::cout << y[m] << " ";

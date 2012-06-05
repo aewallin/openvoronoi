@@ -22,6 +22,7 @@ red= (1,0,0)
 pink = ( float(255)/255,float(192)/255,float(203)/255)
 orange = ( float(255)/255,float(165)/255,float(0)/255)
 yellow= (1,1,0)
+yellow2= ( float(180)/255,float(255)/255,float(0)/255)
 purple=( float(255)/255,float(0)/255,float(176)/255)
 
 green= (0,1,0)
@@ -32,6 +33,7 @@ grass = ( float(182)/255,float(248)/255,float(71)/255)
 blue= (0,0,1)
 lblue= ( float(125)/255,float(191)/255,float(255)/255 )
 blue2= ( float(0)/255,float(188)/255,float(255)/255 )
+blue3= ( float(128)/255,float(0)/255,float(255)/255 )
 cyan=  (0,1,1)
 mag2 =( float(123)/255 , float(35)/255 , float(251)/255  )
 magenta = ( float(153)/255 , float(42)/255 , float(165)/255  )
@@ -40,14 +42,17 @@ magenta = ( float(153)/255 , float(42)/255 , float(165)/255  )
 def drawLine(myscreen, pt1, pt2, lineColor):
     myscreen.addActor( Line(p1=(pt1.x,pt1.y,0),p2=(pt2.x,pt2.y,0),color=lineColor) ) 
 
-def drawArc(myscreen, pt1, pt2, r, cen,cw,arcColor):
+def drawVertex(myscreen, p, r, vcolor):
+    myscreen.addActor( Sphere( center=(p.x,p.y, 0), radius=r, color=vcolor ) )
+
+def drawArc(myscreen, pt1, pt2, r, cen, cw, arcColor, da=0.1):
     # draw arc as many line-segments
     start = pt1-cen
     end = pt2-cen
     theta1 = math.atan2(start.x,start.y)
     theta2 = math.atan2(end.x,end.y)
     alfa=[] # the list of angles
-    da=0.1
+    #da=0.1
     CIRCLE_FUZZ = 1e-9
     # idea from emc2 / cutsim g-code interp G2/G3
     if (cw == False ): 
@@ -59,8 +64,9 @@ def drawArc(myscreen, pt1, pt2, r, cen,cw,arcColor):
     
     dtheta = theta2-theta1
     arclength = r*dtheta
-    dlength = min(0.01, arclength/10)
+    dlength = min(da, arclength/10)
     steps = int( float(arclength) / float(dlength))
+    #print "arc subdivision steps: ",steps
     rsteps = float(1)/float(steps)
     dc = math.cos(-dtheta*rsteps) # delta-cos  
     ds = math.sin(-dtheta*rsteps) # delta-sin
@@ -394,6 +400,7 @@ class VD:
         # go through edges once more and set colors
         m=0
         for e in vd_edges:
+            # e[1]  edgeType
             src_status = e[2] # src status
             trg_status = e[3] # trg status
             ecolor = self.edgeTypeColor( e[1], e[2], e[3] ) 
@@ -453,10 +460,16 @@ class VD:
             return self.edgeStatusColor(src_status,trg_status, mag2)
         if (edgeType == ovd.EdgeType.LINESITE):
             return yellow
+        if (edgeType == ovd.EdgeType.ARCSITE):
+            return yellow2
         if (edgeType == ovd.EdgeType.PARABOLA):
             return self.edgeStatusColor(src_status,trg_status, blue2)
+        if (edgeType == ovd.EdgeType.HYPERBOLA):
+            return self.edgeStatusColor(src_status,trg_status, blue3)
+        if (edgeType == ovd.EdgeType.NULLEDGE):
+            return white
         else:
-            #print "UNKOWN edge type = ", edgeType
+            print "UNKOWN edge type = ", edgeType
             return white
             
     def setEdges(self):
@@ -481,8 +494,7 @@ class VD:
                     actor = Line( p1=( p1.x,p1.y, 0), p2=(p2.x,p2.y, 0), color=ecolor)
                     self.myscreen.addActor(actor)
                     self.edges.append(actor)
-                
-            if (etype == ovd.VoronoiEdgeType.LINE):
+            elif (etype == ovd.VoronoiEdgeType.LINE):
                 ecolor = self.edgeStatusColor(src_status,trg_status,cyan)
                 for n in range( len(epts)-1 ):
                     p1 = self.scale*epts[n]  
@@ -490,22 +502,21 @@ class VD:
                     actor = Line( p1=( p1.x,p1.y, 0), p2=(p2.x,p2.y, 0), color=ecolor)
                     self.myscreen.addActor(actor)
                     self.edges.append(actor)
-
-            if (etype == ovd.VoronoiEdgeType.OUTEDGE):
+            elif (etype == ovd.VoronoiEdgeType.OUTEDGE):
                 ecolor = pink
                 p1 = self.scale*epts[0]  
                 p2 = self.scale*epts[1] 
                 actor = Line( p1=( p1.x,p1.y, 0), p2=(p2.x,p2.y, 0), color=ecolor)
                 self.myscreen.addActor(actor)
                 self.edges.append(actor)
-            if (etype == ovd.VoronoiEdgeType.SEPARATOR):
+            elif (etype == ovd.VoronoiEdgeType.SEPARATOR):
                 ecolor = self.edgeStatusColor(src_status,trg_status, orange)
                 p1 = self.scale*epts[0]  
                 p2 = self.scale*epts[1] 
                 actor = Line( p1=( p1.x,p1.y, 0), p2=(p2.x,p2.y, 0), color=ecolor)
                 self.myscreen.addActor(actor)
                 self.edges.append(actor)
-            if (etype == ovd.VoronoiEdgeType.LINESITE):
+            elif (etype == ovd.VoronoiEdgeType.LINESITE):
                 ecolor = yellow
                 p1 = self.scale*epts[0]  
                 p2 = self.scale*epts[1] 
@@ -514,6 +525,11 @@ class VD:
                 self.edges.append(actor)
             elif (etype == ovd.VoronoiEdgeType.PARABOLA):
                 ecolor = self.edgeStatusColor(src_status,trg_status, blue2)
+                eactor = PolyLine(pointList=epts,color=ecolor)
+                self.myscreen.addActor(eactor)
+                self.edges.append(eactor)
+            elif (etype == ovd.VoronoiEdgeType.ARCSITE):
+                ecolor = yellow #self.edgeStatusColor(src_status,trg_status, blue2)
                 eactor = PolyLine(pointList=epts,color=ecolor)
                 self.myscreen.addActor(eactor)
                 self.edges.append(eactor)

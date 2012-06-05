@@ -52,7 +52,7 @@ svg::Color get_edge_color(ovd::HEGraph& g, ovd::HEEdge e) {
     return svg::Color::Blue;
 }
 
-void write_line_to_svd(ovd::HEGraph& g, svg::Document& doc, ovd::Point src, ovd::Point trg, svg::Color col) {
+void write_line_to_svg(ovd::HEGraph& g, svg::Document& doc, ovd::Point src, ovd::Point trg, svg::Color col) {
     ovd::Point src_p = scale( src );
     ovd::Point trg_p = scale( trg );
     
@@ -61,7 +61,7 @@ void write_line_to_svd(ovd::HEGraph& g, svg::Document& doc, ovd::Point src, ovd:
     doc << polyline;
 }
 
-void write_arc_to_svd(ovd::HEGraph& g, svg::Document& doc, ovd::Point src, ovd::Point trg, double r, ovd::Point ctr, bool cw, svg::Color col) {
+void write_arc_to_svg(ovd::HEGraph& g, svg::Document& doc, ovd::Point src, ovd::Point trg, double r, ovd::Point ctr, bool cw, svg::Color col) {
     ovd::Point src_p = scale( src );
     ovd::Point trg_p = scale( trg );
     double radius = scale( r );

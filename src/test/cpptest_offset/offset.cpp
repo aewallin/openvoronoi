@@ -39,7 +39,7 @@ int main() {
     svg::Dimensions dimensions(1024, 1024);
     svg::Document doc("basic_offset.svg", svg::Layout(dimensions, svg::Layout::BottomLeft));
     BOOST_FOREACH( ovd::HEEdge e, g.edges() ) {
-        write_edge_to_svd(g,doc,e);
+        write_edge_to_svg(g,doc,e);
     }
     
     // draw four offsets.
@@ -58,9 +58,9 @@ int main() {
                   std::cout << "first offset:p:" << lpt.p << std::endl;
                 } else {
                   if (lpt.r == -1.) {
-                      write_line_to_svd(g,doc,previous,lpt.p,line_color);
+                      write_line_to_svg(g,doc,previous,lpt.p,line_color);
                   } else {
-                      write_arc_to_svd(g,doc,previous,lpt.p,lpt.r,lpt.c,lpt.cw,arc_color);
+                      write_arc_to_svg(g,doc,previous,lpt.p,lpt.r,lpt.c,lpt.cw,arc_color);
                   }
                   previous = lpt.p;
                   std::cout << "offset:p:" << lpt.p << ",r:" << lpt.r << ",c:" << lpt.c << ",cw:" << lpt.cw << std::endl;

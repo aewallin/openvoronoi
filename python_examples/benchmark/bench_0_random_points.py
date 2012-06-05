@@ -68,7 +68,8 @@ def circleGenerators(far, Nmax):
     
 if __name__ == "__main__":  
     myscreen = ovdvtk.VTKScreen()
-    ovdvtk.drawOCLtext(myscreen)
+    #ovdvtk.drawOCLtext(myscreen)
+    ovdvtk.drawOCLtext(myscreen, rev_text=ovd.version() )
     
     w2if = vtk.vtkWindowToImageFilter()
     w2if.SetInput(myscreen.renWin)
@@ -116,6 +117,7 @@ if __name__ == "__main__":
     if Nmax==0:
         Nmax=1
     print " VD done in ", calctime," s, ", calctime/Nmax," s per generator"
+    vod.setVDText2([calctime,0])
     vd.check()
     vod.setAll()
     myscreen.render()

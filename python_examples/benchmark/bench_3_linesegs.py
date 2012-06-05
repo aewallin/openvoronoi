@@ -6,15 +6,15 @@ import csv
 import sys
 import gc
 
-import ovdgenerators as gens
-
+import ovdgenerators
+    
 def timeVoronoiPoints(Nmax):
     far = 1
     vd = ovd.VoronoiDiagram(far, int( math.floor( math.sqrt(2)*math.sqrt(Nmax) ) ) )
     print "waiting for {0} random points..".format(Nmax)
     sys.stdout.flush()
     t_before = time.time() 
-    plist = gens.randomGenerators(far, Nmax)
+    plist = ovdgenerators.randomGenerators(far, Nmax)
     t_after = time.time()
     print ".done in ",(t_after - t_before)," seconds"
     #plist = regularGridGenerators(far, Nmax)
@@ -34,9 +34,9 @@ def timeVoronoiSegs(Nmax, segtype=1):
     t_before = time.time() 
     segs=[]
     if segtype==1:
-        segs = gens.randomSegments(far,Nmax,seed=1)
+        segs = ovdgenerators.randomSegments(far,Nmax,seed=1)
     elif segtype==2:
-        segs = gens.randomSegments2(far,Nmax,seed=1)
+        segs = ovdgenerators.randomSegments2(far,Nmax,seed=1)
     t_after = time.time()
     print ".done in {0:.3f} seconds".format( (t_after - t_before) ) 
     #print " first seg is ", segs[0]

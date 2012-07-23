@@ -1,4 +1,21 @@
-
+/*  
+ *  Copyright 2012 Anders E. Wallin (anders.e.e.wallin "at" gmail.com)
+ *  
+ *  This file is part of OpenVoronoi.
+ *
+ *  OpenVoronoi is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  OpenVoronoi is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with OpenVoronoi.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #pragma once
 
@@ -6,32 +23,14 @@
 
 namespace kdtree {
 
-//typedef std::vector<double> pos_type;
-/*
-struct pos_type {
-    pos_type() {
-        x.reserve(3);
-        x[0]=0;x[1]=0;x[2]=0;
-    }
-    pos_type(double xi,double yi, double zi) {
-        x.clear();
-        x.push_back(xi);
-        x.push_back(yi);
-        x.push_back(zi);
-    }
-    double dist(const pos_type& p) const {
-        return (x[0]-p[0])*(x[0]-p[0]) + (x[1]-p[1])*(x[1]-p[1]) + (x[2]-p[2])*(x[2]-p[2]);
-    }
-    double operator[](unsigned int i) const {
-        return x[i];
-    }
-    double& operator[](unsigned int i) { return x[i]; }
-    
-    std::vector<double> x;
-};*/
-
+/// a node in the KD-tree
 template<class point_type>
 struct kd_node {
+    /// create node
+    /// \param p position of node
+    /// \param d direction of cut/split at this node
+    /// \param l left child kd_node
+    /// \param r right child kd_node
     kd_node( point_type p, int d, kd_node* l, kd_node* r) :
         pos(p), dir(d), left(l), right(r) {}
     virtual ~kd_node() {
@@ -40,19 +39,22 @@ struct kd_node {
         if (right)
             delete right;
     }
-    point_type pos;
-    int dir;
-    kd_node *left, *right;    /* negative/positive side */
+    point_type pos; ///< position of the node
+    int dir; ///< direction of cut at this node
+    kd_node *left;     ///< pointer to left child node 
+    kd_node *right;    ///< pointer to right child node 
 };
 
+/// hyper rectangle
 template<class point_type>
 struct  kd_hyperrect {
-    
+    /// ctor
     kd_hyperrect(int dimi, const point_type mini, const point_type maxi) : 
         dim(dimi) {
         min = mini;
         max = maxi;
     }
+    /// extend hyperrectangle to include the given point
     void extend(const point_type& pos ) {
         for (int i=0; i < dim; i++) {
             if (pos[i] < min[i]) {
@@ -64,14 +66,16 @@ struct  kd_hyperrect {
         }
     }
     
-    int dim;
-    point_type min;
-    point_type max;              /* minimum/maximum coords */
+    int dim; ///< number of dimensions
+    point_type min; ///< minimum point (e.g. lower left corner)
+    point_type max; ///< maximum point (e.g. upper right corner)
 };
 
+/// \brief KD-tree for nearest neigbor search
 template<class point_type>
 class KDTree {
 public:
+    /// ctor
     KDTree(int dim = 3) : dim_(dim), root_(0), rect_(0) {
     }
     virtual ~KDTree() {
@@ -80,9 +84,12 @@ public:
         if (root_)
             delete root_;
     }
+    /// insert given point into tree
     int insert( const point_type pos) {
         return insert(root_, pos);
     }
+    /// return a point in the tree that is nearest to the given point
+    /// false is returned if the tree is empty. 
     std::pair<point_type,bool> nearest( const point_type& pos) {
         num_nearest_i_calls=0;
         kd_hyperrect<point_type> rect = *rect_;
@@ -95,12 +102,15 @@ public:
         kd_nearest_i( root_, pos, result, result_dist , rect);
         return std::make_pair( result->pos, true);
     }
+    /// for debug, return the number of function calls made during a search
     int get_num_calls() {return num_nearest_i_calls;}
+    /// print output of tree
     void print_tree() {
         if (root_)
             print_node(root_,0);
     }
 private:
+    /// insert given point into tree
     int insert(kd_node<point_type>* node, const point_type pos ) {
         if ( insert_rec( node, pos,  0) ) {
             return -1; // error (?)
@@ -113,13 +123,13 @@ private:
 
         return 0;
     }
-
+    
+    /// recursive point-insertion function
     int insert_rec( kd_node<point_type>*& node, const point_type pos, int dir) {
         if (node == 0) {
             node = new kd_node<point_type>(pos,dir,0,0);
             if (root_==0) {
                 root_=node;
-                //std::cout << " root "; print_node(node,0);
             }
             return 0;
         } else {
@@ -136,10 +146,13 @@ private:
             }
         }
     }
+    /// square
     double sq(double x) {return x*x;}
     
 
-    void kd_nearest_i(kd_node<point_type> *node, const point_type pos, kd_node<point_type>*& result, double& result_dist_sq , kd_hyperrect<point_type>& rect) {
+    /// find nearest point
+    void kd_nearest_i(kd_node<point_type> *node, const point_type pos, 
+                       kd_node<point_type>*& result, double& result_dist_sq , kd_hyperrect<point_type>& rect) {
         int dir = node->dir;
         num_nearest_i_calls++;
         //int i;
@@ -230,7 +243,7 @@ private:
             //*farther_hyperrect_coord = dummy;
         }
     }
-    
+    /// return distance squared from hyperrect to given point
     double hyperrect_dist_sq(kd_hyperrect<point_type>& rect, const point_type& pos){
         double result = 0;
         for (int i=0; i < dim_; i++) {
@@ -243,7 +256,7 @@ private:
         return result;
     }
 
-
+    /// text output
     void print_node(kd_node<point_type>* n, int d) {
         for(int i=0;i<d;++i)
             std::cout << " ";
@@ -257,10 +270,10 @@ private:
             print_node(n->right,d+1);
     }
 
-    int num_nearest_i_calls;
-    int dim_;
-    kd_node<point_type>* root_;
-    kd_hyperrect<point_type>* rect_;
+    int num_nearest_i_calls; ///< for debug, keep track of function calls
+    int dim_; ///< number of dimensions 
+    kd_node<point_type>* root_; ///< root of the tree
+    kd_hyperrect<point_type>* rect_; ///< hyperrectangle
 };
 
 } // kdtree namespace

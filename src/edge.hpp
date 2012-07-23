@@ -1,5 +1,5 @@
 /* 
- *  Copyright 2011 Anders Wallin (anders.e.e.wallin "at" gmail.com)
+ *  Copyright 2011-2012 Anders Wallin (anders.e.e.wallin "at" gmail.com)
  *  
  *  This file is part of OpenVoronoi.
  *

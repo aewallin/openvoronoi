@@ -19,10 +19,9 @@
 
 #pragma once
 
-// from where is boost::python included?
 #include "voronoidiagram.hpp"
 #include "vertex.hpp"
-//#include "facegrid.hpp"
+
 #include "common/numeric.hpp"
 
 using namespace ovd::numeric;
@@ -196,6 +195,7 @@ public:
         }
         return out;
     }
+    /// rotate input point by cosine (c) and sine (s)
     Point rotate(const Point& tr, double c, double s) {
         double x = tr.x * c - tr.y * s;
         double y = tr.x * s + tr.y * c;

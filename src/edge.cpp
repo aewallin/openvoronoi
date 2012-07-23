@@ -342,8 +342,7 @@ void EdgeProps::set_ll_parameters(Site* s1, Site* s2) {  // Held thesis p96
     y[1]=0;y[3]=0;y[4]=0;y[5]=0;y[6]=0;y[7]=0;
 }
 
-// point(s1)-arc(s2)
-
+/// set edge parameters when s1 is PointSite and s2 is ArcSite
 void EdgeProps::set_pa_parameters(Site* s1, Site* s2) {
     assert( s1->isPoint() && s2->isArc() );
     //std::cout << "set_pa_parameters()\n";
@@ -388,7 +387,7 @@ void EdgeProps::set_pa_parameters(Site* s1, Site* s2) {
 }
 
 
-// arc(s1)-line(s2)
+/// set edge parameters when s1 is ArcSite and s2 is LineSite
 void EdgeProps::set_la_parameters(Site* s1, Site* s2) { 
     assert( s1->isLine() && s2->isArc() );
     std::cout << "set_la_parameters() sign= " << sign << " cw= " << s2->cw() << "\n";

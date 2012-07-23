@@ -58,31 +58,35 @@ namespace ovd
  
  
 class VoronoiDiagramChecker;
-//class FaceGrid;
-//typedef std::pair<Point,HEFace> kd_point;
+
+/// \brief KD-tree for 2D point location
+///
+/// a kd-tree is used for nearest-neighbor search when inserting point sites
 struct kd_point {
-    kd_point() {
-        p.x=0; p.y=0;
-        face = 0;
-    }
-    kd_point(Point pt, HEFace f) : p(pt), face(f) { 
-    }
-    kd_point(Point pt) : p(pt), face(0) { 
-    }
+    /// default ctor
+    kd_point() : p(0,0), face(0) { }
+    /// kd-point with given position and HEFace
+    kd_point(Point pt, HEFace f) : p(pt), face(f) { }
+    /// kd-point at given position
+    kd_point(Point pt) : p(pt), face(0) { }
+    /// distance (suared) to given point
     double dist(const kd_point& pt) const {
         return (p.x-pt.p.x)*(p.x-pt.p.x) + (p.y-pt.p.y)*(p.y-pt.p.y); 
     }
+    /// return x or y coordinate of Point
     double operator[](unsigned int i) const {
         return i == 0 ? p.x : p.y; 
     }
+    /// return x or y coordinate of Point
     double& operator[](unsigned int i) { 
         return i == 0 ? p.x : p.y; 
     }
-    Point p;
-    HEFace face;
-    
+    Point p; ///< position of 2D PointSite
+    HEFace face; ///< the HEFace correspoinding to the PointSite
 };
-typedef kdtree::KDTree<kd_point> kd_type; // fwd decl * kd_tree;
+
+/// type of the KD-tree used for nearest-neighbor search
+typedef kdtree::KDTree<kd_point> kd_type; 
 
 /// \brief Voronoi diagram.
 ///
@@ -94,12 +98,7 @@ typedef kdtree::KDTree<kd_point> kd_type; // fwd decl * kd_tree;
 ///  voronoi-edges are dual to delaunay-edges
 class VoronoiDiagram {
 public:
-    /// \brief create diagram with given far-radius and number of bins
-    ///
-    /// \param far radius of circle centered at (0,0) within which all sites must lie. (use 1.0)
-    /// \param n_bins number of bins used for nearest vd-vertex bucket-search. Use roughly sqrt(N) for a voronoi-diagram with N sites.
     VoronoiDiagram(double far, unsigned int n_bins);
-    /// dtor
     virtual ~VoronoiDiagram();
     int insert_point_site(const Point& p, int step=0);
     bool insert_line_site(int idx1, int idx2, int step=99); // default step should make algorithm run until the end!
@@ -159,18 +158,12 @@ protected:
     /// the new edge.
     struct EdgeData {
         HEEdge v1_prv; ///< edge prior to v1
-        /// NEW edge source 
-        HEVertex v1;
-        /// edge following v1 
-        HEEdge v1_nxt;
-        /// edge propr to v2 
-        HEEdge v2_prv;
-        /// NEW edge target 
-        HEVertex v2;
-        /// edge following v2 
-        HEEdge v2_nxt;
-        /// face of v1 and v2 
-        HEFace f; 
+        HEVertex v1;   ///< NEW edge source 
+        HEEdge v1_nxt; ///< edge following v1 
+        HEEdge v2_prv; ///< edge prior to v2 
+        HEVertex v2;   ///< NEW edge target 
+        HEEdge v2_nxt; ///< edge following v2 
+        HEFace f;      ///< face of v1 and v2 
     };
 
     void initialize();
@@ -208,9 +201,7 @@ protected:
     int num_new_vertices(HEFace f);
 // HELPER-CLASSES
     VoronoiDiagramChecker* vd_checker; ///< sanity-checks on the diagram are done by this helper class
-    //typedef std::pair<Point,HEFace> kd_point;
-    kd_type* kd_tree;
-    //FaceGrid* fgrid; ///< a grid-search algorithm which allows fast nearest-neighbor search
+    kd_type* kd_tree; ///< kd-tree for nearest neighbor search during point Site insertion
     VertexPositioner* vpos; ///< an algorithm for positioning vertices
 // DATA
     typedef std::map<int,HEVertex> VertexMap; ///< type for vertex-index to vertex-descriptor map
@@ -263,14 +254,10 @@ public:
         return sign*dist;
     }
 private:
-    /// reference to vd-graph
-    HEGraph& g;
-    /// the HEEdge on which we position the new SPLIT vertex
-    HEEdge edge;
-    /// first point of the split-line
-    Point p1;
-    /// second point of the split-line
-    Point p2;
+    HEGraph& g;      ///< reference to vd-graph
+    HEEdge edge;     ///< the HEEdge on which we position the new SPLIT vertex
+    Point p1;     ///< first point of the split-line
+    Point p2;    ///< second point of the split-line
 };
 
 } // end ovd namespace

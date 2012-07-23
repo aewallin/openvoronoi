@@ -25,7 +25,7 @@
 #include <boost/assign/list_of.hpp>
 
 #include "voronoidiagram.hpp"
-//#include "facegrid.hpp"
+
 #include "checker.hpp"
 #include "common/numeric.hpp" // for diangle
 
@@ -33,7 +33,8 @@ namespace ovd {
 
 /// \brief create a VoronoiDiagram
 /// \param far is the radius of a circle within which all sites must be located. use far==1.0
-/// \param n_bins is the number of bins for FaceGrid, the bucket-search for nearest-neighbors used in insert_point_site()
+/// \param n_bins is the number of bins for FaceGrid, the bucket-search for nearest-neighbors 
+///        used in insert_point_site(). Use roughly sqrt(N) for a voronoi-diagram with N sites.
 VoronoiDiagram::VoronoiDiagram(double far, unsigned int n_bins) {
     //fgrid = new FaceGrid(far, n_bins); // helper-class for nearest-neighbor search 
     kd_tree = new kdtree::KDTree<kd_point>(2);
@@ -456,6 +457,12 @@ if (step==current_step) return false; current_step++;
     return true; 
 }
 
+/// \brief insert a circular arc Site into the diagram
+/// \param idx1 index of start vertex
+/// \param idx2 index of end vertex
+/// \param center center Point of arc
+/// \param cw bool flag true=CW arc, false=CCW arc
+/// \param step for debug, stop algorithm at this sub-step
 void VoronoiDiagram::insert_arc_site(int idx1, int idx2, const Point& center, bool cw, int step) {
     num_arc_sites++;
     int current_step=1;
@@ -889,6 +896,7 @@ bool VoronoiDiagram::null_vertex_target( HEVertex v , HEVertex& trg) {
 /// \param other  the other end of the new segment
 /// \param left   a point left of the new segment
 /// \param dir    alfa-direction for positioning endpoint vertex on null-face
+/// \param new_site    the new Site we are inserting 
 ///
 /// \return HEVertex ::ENDPOINT-vertex for the new vertex
 /// \return HEFace  null-face at endpoint (new or existing)

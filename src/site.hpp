@@ -321,7 +321,9 @@ public:
     inline virtual bool isPoint() const { return false;}
     /// true for LineSite
     inline virtual bool isLine() const  { return false;}
+    /// true for ArcSite
     inline virtual bool isArc() const  { return false;}
+    /// true for CW oriented ArcSite
     virtual bool cw() {return false;}
     /// is given Point in_region ?
     virtual bool in_region(const Point& ) const =0; 
@@ -487,7 +489,7 @@ public:
 private:
     LineSite() {} // don't use!
     Point _start; ///< start Point of LineSite
-    Point _end; /// end Point of LineSite
+    Point _end; ///< end Point of LineSite
 };
 
 /// circular arc Site
@@ -541,14 +543,20 @@ public:
         return out;
     }
     HEEdge e; ///< edge_descriptor to ::ARCSITE pseudo-edge
+    /// return start Point of ArcSite
     Point start() {return _start;}
+    /// return end Point of ArcSite
     Point end() {return _end;}
+    /// return center Point of ArcSite
     Point center() {return _center;}
+    /// return radius of ArcSite
     double radius() {return _radius;}
+    /// return true for CW ArcSite and false for CCW
     bool cw() {return _dir;}
     inline virtual bool isArc() const  { return true;}
 
 private:
+    /// projection of given Point onto the ArcSite
     Point projection_point(const Point& p) const {
         if ( p == _center ) {
             return _start;
@@ -558,6 +566,7 @@ private:
             return _center + _radius*dir;
         }
     }
+    /// return the end Point (either _start or _end) that is closest to the given Point 
     Point closer_endpoint(const Point& p) const {
         double d_start = (_start-p).norm();
         double d_end = (_end-p).norm();

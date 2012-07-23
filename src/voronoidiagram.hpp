@@ -30,17 +30,32 @@
 
 /*! \mainpage OpenVoronoi
  *
+ * \author Anders E. Wallin (anders.e.e.wallin "at" gmail.com)
  * \section intro_sec Introduction
  *
- * OpenVoronoi is a c++ library with python bindings for calculating 2D voronoi-diagrams of point, 
+ * OpenVoronoi is a c++ library with python bindings (using boost::python) for calculating 2D voronoi-diagrams of point, 
  * line-segment, and circular-arc(not implement yet!) sites.
  * An incremental topology-oriented algorithm is used.
  * 
  * See github for build/install instructions https://github.com/aewallin/openvoronoi
  * 
- * \section Notes on Test Coverage
+ * DEB packages for Ubuntu are available at https://launchpad.net/~anders-e-e-wallin/+archive/cam
+ * 
+ * Output gallery: https://picasaweb.google.com/106188605401091280402/OpenVoronoiExamples
+ * 
+ * \section Utilities
+ * - Offset
+ * - Medial-Axis
+ * - SVG output
+ * 
+ * \section Tests
+ * Tests are written for CTest.
+ * - "ctest -R cpp" runs only the c++ tests (these are fast)
+ * - "ctest" runs all tests (some may be slow)
+ * Some tests use truetype-tracer (font geometry source), and some use CGAL_RPG (random polygon generator). 
+ * \section coverage Code Coverage Testing
  * - compile using CMAKE_BUILD_TYPE=Coverage  (uses "-fprofile-arcs -ftest-coverage" )
- * - There's a custom target "make coverage-report" that runs the following:
+ * - There is a custom target "make coverage-report" that runs the following:
  *  - reset counters "lcov --directory ./ --zerocounters"
  *  - run tests with "ctest -D Experimental -R cpptest_minimal"
  *  - generate an info-file with "lcov --directory ./ --capture --output-file app.info"

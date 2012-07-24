@@ -186,6 +186,10 @@ void VoronoiDiagram::initialize() {
 int VoronoiDiagram::insert_point_site(const Point& p, int step) {
     num_psites++;
     //int current_step=1;
+    if (p.norm() >= far_radius ) {
+        std::cout << "openvoronoi error. All points must lie within unit-circle. You are trying to add p= " << p 
+        << " with p.norm()= " << p.norm() << "\n";
+    } 
     assert( p.norm() < far_radius );     // only add vertices within the far_radius circle
     
     HEVertex new_vert = g.add_vertex( VoronoiVertex(p,OUT,POINTSITE) );

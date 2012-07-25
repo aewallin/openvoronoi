@@ -7,6 +7,8 @@ points = ((-0.7000000000000002, -0.5249999999990376),
         (0.7, -0.5249999999990376),
 )
 
+print "OpenVoronoi version: ",openvoronoi.version()
+
 dia = openvoronoi.VoronoiDiagram(0.972222, 2)
 for p in points:
     ovp = openvoronoi.Point(*p)

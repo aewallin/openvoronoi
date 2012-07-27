@@ -8,6 +8,12 @@ import math
 def drawLine(myscreen, pt1, pt2, lineColor):
     myscreen.addActor( ovdvtk.Line(p1=(pt1.x,pt1.y,0),p2=(pt2.x,pt2.y,0),color=lineColor) ) 
 
+def drawLinesegs(myscreen, points, lines):
+    for l in lines:
+        pt1 = ovd.Point( points[ l[0] ][0] , points[ l[0] ][1] )
+        pt2 = ovd.Point( points[ l[1] ][0] , points[ l[1] ][1] )
+        drawLine(myscreen, pt1, pt2, ovdvtk.yellow)
+        
 # rotate a point in 2D by cos/sin. from emc2 gcodemodule.cc
 def rotate(x, y,  c,  s):
     tx = x * c - y * s;

@@ -94,7 +94,7 @@ def _polygon_model_radius(polygons):
     radius = math.sqrt((maxx - minx) ** 2 + (maxy - miny) ** 2) / 1.8
     return radius
     
-def pocket_model(polygons, first_offset, second_offset=None, interior=True):
+def pocket_model(polygons, first_offset, second_offset=None, interior=True, N_offsets=1):
     _log.info("number of polygons: %d" % len(polygons))
     _log.info("offset distance: %f" % first_offset)
     if second_offset is None:
@@ -113,9 +113,43 @@ def pocket_model(polygons, first_offset, second_offset=None, interior=True):
     _log.info("diagram check: %s" % str(dia.check()))
     offset_dia = openvoronoi.Offset(dia.getGraph())
     _log.info("offset diagram created")
+    
+    offset_loops = []
+    if N_offsets == 1: # one single offset
+        _log.info("generating one offset")
+        offset_loops = offset_dia.offset(first_offset)
+    
+    elif N_offsets == -1: # "complete" offsetting of pocket interior
+        _log.info("generating complete interior offsets" )        
+        offset_loops = []
 
-    offset_loops = offset_dia.offset(first_offset)
+        current_offset = first_offset 
+        offset_loops.extend( offset_dia.offset(current_offset) )
+        N = 0
+        _log.info(" Offset %d at distance: %f" % (N_offsets, current_offset) )        
 
+        while True:
+            N = N + 1
+            current_offset = current_offset + second_offset
+            current_loops = offset_dia.offset(current_offset)
+            if len(current_loops) > 0:
+                _log.info(" Offset %d at distance: %f" % (N, current_offset) )        
+                offset_loops.extend( current_loops )
+            else:
+                break # if offset returns no loops then we are done
+
+    
+    else: # a specified (>= 2) number of offsets
+        _log.info("generating %d offsets" % N_offsets)
+        offset_loops = []
+        current_offset = first_offset
+        while N_offsets > 0:
+            current_loops = offset_dia.offset(current_offset)
+            if len(current_loops) > 0:
+                offset_loops.extend( current_loops )
+            N_offsets = N_offsets - 1
+            current_offset = current_offset + second_offset
+         
     _log.info("got %d loops from openvoronoi" % len(offset_loops))
     return offset_loops
 
@@ -125,8 +159,16 @@ if __name__ == "__main__":
     h=1024
     myscreen = ovdvtk.VTKScreen(width=w, height=h) # a VTK window for drawing 
     ovdvtk.drawOCLtext(myscreen, rev_text=openvoronoi.version() )   # the OpenVoronoi text, revision, and date
-
-
+    
+    # rotate camera for 2D view
+    far = 1
+    camPos = far
+    zmult = 3
+    # camPos/float(1000)
+    myscreen.camera.SetPosition(0, -camPos/float(1000), zmult*camPos) 
+    myscreen.camera.SetClippingRange(-(zmult+1)*camPos,(zmult+1)*camPos)
+    myscreen.camera.SetFocalPoint(0.0, 0, 0)
+    
     import sys
     filename = "star2_scaled.dxf"
     offset_distance = 0.1
@@ -137,8 +179,15 @@ if __name__ == "__main__":
     model = importer.import_model(sys.argv[1])
     model.revise_directions()
 
-    offset = 0.01
-    offset_loops = pocket_model(model.get_polygons(), offset)
+    # draw the input geometry
+    point_set, line_set = _polygons_to_line_set( model.get_polygons() )
+    offset2vtk.drawLinesegs(myscreen, point_set, line_set)
+    
+    first_offset = 0.03
+    second_offset =0.015
+    interior = True
+    N_offsets = -1
+    offset_loops = pocket_model(model.get_polygons(), first_offset,second_offset,interior, N_offsets )
     #offset2vtk.drawOffsets( myscreen, offset_loops)
     
     offset2vtk.drawOffsets2( myscreen, offset_loops)

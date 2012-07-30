@@ -31,16 +31,10 @@ namespace ovd
 ///
 /// \todo this duplicates the idea of the Ofs class. Remove this or Ofs!
 struct OffsetVertex {
-    /// position
-    Point p;
-    // line-vertex is indicated by radius of -1, and c and cw are then ignored.
-    // otherwise this is an arc-vertex.
-    /// arc radius
-    double r;
-    /// arc center 
-    Point c; 
-    /// clockwise (or not)
-    bool cw; 
+    Point p; ///< position
+    double r; ///< arc radius (line-vertex is indicated by radius of -1)
+    Point c; ///< arc center
+    bool cw; ///< clockwise (or not)
     /// ctor
     OffsetVertex(Point pi, double ri, Point ci, bool cwi): p(pi), r(ri), c(ci), cw(cwi) {}
     /// ctor
@@ -83,10 +77,11 @@ public:
         set_flags(t);
         HEFace start;        
         while (find_start_face(start)) { // while there are faces that still require offsets
-            offset_walk(start,t); // start on the face, and do an offset loop
+            offset_loop_walk(start,t); // start on the face, and do an offset loop
         }
         return offset_list;
     }
+protected:
     /// find a suitable start face
     bool find_start_face(HEFace& start) {
         for(HEFace f=0; f<g.num_faces() ; f++) {
@@ -97,40 +92,40 @@ public:
         }
         return false;
     }
-    /// perform an offset walk at given distance \a t
-    void offset_walk(HEFace start,double t) {
+    /// perform an offset walk at given distance \a t,
+    /// starting at the given face
+    void offset_loop_walk(HEFace start, double t) {
         //std::cout << " offset_walk() starting on face " << start << "\n";
         bool out_in_mode= false; 
         HEEdge start_edge =  find_next_offset_edge( g[start].edge , t, out_in_mode); // the first edge on the start-face
         HEEdge current_edge = start_edge;
-        
         OffsetLoop loop; // store the output in this loop
-        
-        // add the first point to the loop.
-        OffsetVertex pt( g[current_edge].point(t) );
+        OffsetVertex pt( g[current_edge].point(t) ); // add the first point to the loop.
         loop.push_back( pt );
-        
         do {
             out_in_mode = edge_mode(current_edge, t);
             // find the next edge
             HEEdge next_edge = find_next_offset_edge( g[current_edge].next, t, out_in_mode); 
             //std::cout << "offset-output: "; print_edge(current_edge); std::cout << " to "; print_edge(next_edge); std::cout << "\n";
             HEFace current_face = g[current_edge].face;
-            { // append the offset-element of current_face to the output
-                Site* s = g[current_face].site;
-                Ofs* o = s->offset( g[current_edge].point(t), g[next_edge].point(t) ); // ask the Site for offset-geometry here.
-                bool cw(true);
-                if (!s->isLine() ) // point and arc-sites produce arc-offsets, for which cw must be set.
-                    cw = find_cw( o->start(), o->center(), o->end() ); // figure out cw or ccw arcs?
-                // add offset to output
-                OffsetVertex lpt( g[next_edge].point(t), o->radius(), o->center(), cw );
-                loop.push_back( lpt );
-            }
+            loop.push_back( offset_element_from_face(current_face, current_edge, next_edge, t) );
             face_done[current_face]=1; // although we may revisit current_face (if it is non-convex), it seems safe to mark it "done" here.
             current_edge = g[next_edge].twin;
         } while (current_edge != start_edge);
         offset_list.push_back( loop ); // append the created loop to the output
     }
+    /// return an offset-element corresponding to the current face
+    OffsetVertex offset_element_from_face(HEFace current_face, HEEdge current_edge, HEEdge next_edge, double t) {
+        Site* s = g[current_face].site;
+        Ofs* o = s->offset( g[current_edge].point(t), g[next_edge].point(t) ); // ask the Site for offset-geometry here.
+        bool cw(true);
+        if (!s->isLine() ) // point and arc-sites produce arc-offsets, for which cw must be set.
+            cw = find_cw( o->start(), o->center(), o->end() ); // figure out cw or ccw arcs?
+        // add offset to output
+        OffsetVertex offset_element( g[next_edge].point(t), o->radius(), o->center(), cw );
+        return offset_element;
+    }
+    
     /// \brief figure out mode (?)
     bool edge_mode(HEEdge e, double t) {
         HEVertex src = g.source(e);
@@ -148,18 +143,15 @@ public:
     }
     /// figure out cw or ccw for an arc
     bool find_cw(Point start, Point center, Point end) {
-        // arc from current to next edge
-        // center at 
-        return center.is_right(start,end); // this only works for arcs smaller than a half-circle !
+        return center.is_right(start,end); // NOTE: this only works for arcs smaller than a half-circle !
     }
     
     /// \brief starting at e, find the next edge on the face that brackets t
     ///
     /// we can be in one of two modes.
-    /// if mode=false then we are looking for an edge where src_t<t<trg_t
-    /// if mode=true we are looning for an edge where trg_t<t<src_t
+    /// if mode==false then we are looking for an edge where src_t < t < trg_t
+    /// if mode==true we are looning for an edge where       trg_t < t < src_t
     HEEdge find_next_offset_edge(HEEdge e, double t, bool mode) {
-        // find the first edge that has an offset
         HEEdge start=e;
         HEEdge current=start;
         HEEdge ofs_edge=e;
@@ -177,7 +169,6 @@ public:
             }
             current =g[current].next;
         } while( current!=start );
-        //std::cout << "offset_edge = "; g.print_edge(ofs_edge);
         return ofs_edge;
     }
 
@@ -199,8 +190,9 @@ public:
             } while ( current!=start );
         }
         
-        // again go through faces again, and set flag=1 in any edge on the face is invalid
-        // this is required because an upstream filter will set valid=false on some edges, but not all, on a face where we do not want offsets.
+        // again go through faces again, and set flag=1 if any edge on the face is invalid
+        // this is required because an upstream filter will set valid=false on some edges, 
+        // but not all, on a face where we do not want offsets.
         for(HEFace f=0; f<g.num_faces() ; f++) {
             HEEdge start = g[f].edge;
             HEEdge current = start;
@@ -226,13 +218,11 @@ public:
         }
         std::cout << "\n";
     }
-protected:
-    /// list of output offsets
-    OffsetLoops offset_list;
+
+    OffsetLoops offset_list; ///< list of output offsets
 private:
     Offset(); // don't use.
-    /// vd-graph
-    HEGraph& g;
+    HEGraph& g; ///< vd-graph
     /// hold a 0/1 flag for each face, indicating if an offset for this face has been produced or not.
     std::vector<unsigned char> face_done;
 };

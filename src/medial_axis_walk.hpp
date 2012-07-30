@@ -45,8 +45,9 @@ typedef std::list<MedialChain> MedialChainList; ///< a list of lists
 
 /// \brief Walk along the medial-axis edges of a voronoi-diagram.
 ///
-/// When we want a toolpath along the medial axis we use this class
-/// to walk along the "valid" edges which are left in the diagram.
+/// When we want a toolpath along the medial axis we first filter down the voronoi-diagram
+/// with to a medial-axis with MedialAxisFilter and then use this class
+/// to walk along the "valid" edges which remain.
 ///
 /// Algorithm:
 /// - first find one valid edge that has a degree-1 vertex (i.e. a suitable start point for the path)
@@ -77,7 +78,7 @@ protected:
 private:
     MedialAxisWalk(); // don't use.
     HEGraph& g; ///< original graph
-    int _edge_points; ///< number of points to subdivide parabolas.
+    int _edge_points; ///< number of points to subdivide parabolas (non-line edges).
 
 };
 

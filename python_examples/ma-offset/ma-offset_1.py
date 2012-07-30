@@ -147,8 +147,14 @@ if __name__ == "__main__":
     vd.filter_graph(pi)
     
     of = ovd.Offset( vd.getGraph() ) # pass the created graph to the Offset class
-    ofs = of.offset(0.001) # generate offsets at the given distance.
-    offset2vtk.drawOffsets(myscreen, ofs) # draw the generated offsets
+    ofs_dist=0.0001
+    ofs = []
+    for n in range(50):
+        ofsx = of.offset(ofs_dist) # generate offsets at the given distance.
+        ofs.extend(ofsx)
+        ofs_dist=ofs_dist+0.0001
+        
+    offset2vtk.drawOffsets2(myscreen, ofs) # draw the generated offsets
     
     
     #ma = ovd.MedialAxis(1)

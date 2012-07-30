@@ -39,6 +39,8 @@ struct medial_axis_filter : public Filter {
     /// \param thr dot-product threshold used to decide whether the segments
     /// that connect to a given Edge are nearly parallel
     medial_axis_filter( double thr=0.8) :  _dot_product_threshold(thr) { }
+    
+    /// predicate that decides if an edge is to be included or not.
     bool operator()(const HEEdge& e) const {
         if ( (*g)[e].type == LINESITE || (*g)[e].type == NULLEDGE) 
             return true; // we keep linesites and nulledges

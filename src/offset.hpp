@@ -41,8 +41,16 @@ struct OffsetVertex {
     /// ctor
     OffsetVertex(Point pi): p(pi), r(-1.), cw(false), f(0) {}
 };
+
 /// a single offset loop
-typedef std::list<OffsetVertex> OffsetLoop;
+struct OffsetLoop {
+    std::list<OffsetVertex> vertices;
+    double offset_distance;
+    void push_back(OffsetVertex v) {
+        vertices.push_back(v);
+    }
+};
+
 /// multiple loops. the output of the algorithm
 typedef std::list<OffsetLoop> OffsetLoops;
 
@@ -74,12 +82,12 @@ public:
     }
     /// create offsets at offset distance \a t
     OffsetLoops offset(double t) {
-        OffsetLoops offset_list; // = OffsetLoops();
+        offset_list.clear();
         set_flags(t);
-        HEFace start;        
-        while (find_start_face(start)) { // while there are faces that still require offsets
+        HEFace start;
+        while (find_start_face(start)) // while there are faces that still require offsets
             offset_loop_walk(start,t); // start on the face, and do an offset loop
-        }
+
         return offset_list;
     }
 protected:
@@ -101,6 +109,7 @@ protected:
         HEEdge start_edge =  find_next_offset_edge( g[start].edge , t, out_in_mode); // the first edge on the start-face
         HEEdge current_edge = start_edge;
         OffsetLoop loop; // store the output in this loop
+        loop.offset_distance = t;
         OffsetVertex pt( g[current_edge].point(t) ); // add the first point to the loop.
         loop.push_back( pt );
         do {

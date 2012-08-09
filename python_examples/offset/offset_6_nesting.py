@@ -83,16 +83,24 @@ if __name__ == "__main__":
         line_time = 1
     times.append( line_time )
     
-    # we now have a VD of the input sites
-    # we can now run downstream algorithms on the VD such as
-    # Offset, MedialAxis, etc.
+    pi = ovd.PolygonInterior(  True )
+    vd.filter_graph(pi)
     
     of = ovd.Offset( vd.getGraph() ) # pass the created graph to the Offset class
     of.str() # text output, for debug
-    ofs = of.offset(0.123) # generate offsets at the given distance.
-    offset2vtk.drawOffsets(myscreen, ofs) # draw the generated offsets
-    for v in ofs:
-        print v
+    dists =[0.1,0.2, 0.21]
+    ofs_loops=[]
+    for d in dists:
+        ofs_loops.extend( of.offset(d) )
+
+    offset2vtk.drawOffsets(myscreen, ofs_loops) # draw the generated offsets
+    print "number of loops= ",len(ofs_loops)
+    for loop in ofs_loops:
+        first_vert=loop[0]
+        print "loop at dist=", first_vert[2], " with ",len(loop)," vertices:"
+        for v in loop[1:]:
+            print " face ",v[4]
+
     vod.setVDText2(times)
     vod.setAll()
     print "PYTHON All DONE."

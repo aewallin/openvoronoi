@@ -30,6 +30,7 @@ class Offset_py : public Offset {
 public:
     /// offset of graph \a gi
     Offset_py(HEGraph& gi): Offset(gi) { }
+    
     /// return list of offsets at given offset distance \a t
     boost::python::list offset_py(double t) {
         offset(t);
@@ -37,18 +38,21 @@ public:
         BOOST_FOREACH( OffsetLoop loop, offset_list ) { // loop through each loop
             boost::python::list py_loop;
             bool first = true;
-            BOOST_FOREACH( OffsetVertex lpt, loop ) { //loop through each line/arc
+            BOOST_FOREACH( OffsetVertex lpt, loop.vertices ) { //loop through each line/arc
                 boost::python::list py_lpt;
+                double offset_distance = loop.offset_distance;
                 if (first) {
                     first = false;
                     py_lpt.append( lpt.p );
                     py_lpt.append( -1 );
+                    py_lpt.append( offset_distance ); // 2
                 } else {
-                    py_lpt.append( lpt.p ); // position
-                    py_lpt.append( lpt.r ); // radius
-                    py_lpt.append( lpt.c ); // center
-                    py_lpt.append( lpt.cw ); // cw or ccw
-                    py_lpt.append( lpt.f ); // face
+                    py_lpt.append( lpt.p ); // 0, position
+                    py_lpt.append( lpt.r ); // 1, radius
+                    py_lpt.append( lpt.c ); // 2, center
+                    py_lpt.append( lpt.cw ); // 3, cw or ccw
+                    py_lpt.append( lpt.f ); // 4, face
+                    py_lpt.append( offset_distance ); // 5
                 }
                 py_loop.append( py_lpt );
             }

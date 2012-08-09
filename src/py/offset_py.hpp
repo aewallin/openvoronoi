@@ -44,10 +44,11 @@ public:
                     py_lpt.append( lpt.p );
                     py_lpt.append( -1 );
                 } else {
-                    py_lpt.append( lpt.p );
-                    py_lpt.append( lpt.r );
-                    py_lpt.append( lpt.c );
-                    py_lpt.append( lpt.cw );
+                    py_lpt.append( lpt.p ); // position
+                    py_lpt.append( lpt.r ); // radius
+                    py_lpt.append( lpt.c ); // center
+                    py_lpt.append( lpt.cw ); // cw or ccw
+                    py_lpt.append( lpt.f ); // face
                 }
                 py_loop.append( py_lpt );
             }

@@ -144,7 +144,7 @@ set( OVD_INCLUDE_FILES
     ${OpenVoronoi_SOURCE_DIR}/kdtree.hpp
     
     ${OpenVoronoi_SOURCE_DIR}/offset.hpp
-    ${OpenVoronoi_SOURCE_DIR}/offset2.hpp
+    #${OpenVoronoi_SOURCE_DIR}/offset2.hpp
     
     ${OpenVoronoi_SOURCE_DIR}/filter.hpp
     ${OpenVoronoi_SOURCE_DIR}/medial_axis_filter.hpp

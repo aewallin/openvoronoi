@@ -31,14 +31,15 @@ namespace ovd
 ///
 /// \todo this duplicates the idea of the Ofs class. Remove this or Ofs!
 struct OffsetVertex {
-    Point p; ///< position
+    Point p;  ///< position (start)
     double r; ///< arc radius (line-vertex is indicated by radius of -1)
-    Point c; ///< arc center
-    bool cw; ///< clockwise (or not)
+    Point c;  ///< arc center
+    bool cw;  ///< clockwise (or not)
+    HEFace f; ///< corresponding face in the vd-graph
     /// ctor
-    OffsetVertex(Point pi, double ri, Point ci, bool cwi): p(pi), r(ri), c(ci), cw(cwi) {}
+    OffsetVertex(Point pi, double ri, Point ci, bool cwi, HEFace fi): p(pi), r(ri), c(ci), cw(cwi), f(fi) {}
     /// ctor
-    OffsetVertex(Point pi): p(pi), r(-1.), cw(false) {}
+    OffsetVertex(Point pi): p(pi), r(-1.), cw(false), f(0) {}
 };
 /// a single offset loop
 typedef std::list<OffsetVertex> OffsetLoop;
@@ -73,7 +74,7 @@ public:
     }
     /// create offsets at offset distance \a t
     OffsetLoops offset(double t) {
-        offset_list = OffsetLoops();
+        OffsetLoops offset_list; // = OffsetLoops();
         set_flags(t);
         HEFace start;        
         while (find_start_face(start)) { // while there are faces that still require offsets
@@ -122,7 +123,7 @@ protected:
         if (!s->isLine() ) // point and arc-sites produce arc-offsets, for which cw must be set.
             cw = find_cw( o->start(), o->center(), o->end() ); // figure out cw or ccw arcs?
         // add offset to output
-        OffsetVertex offset_element( g[next_edge].point(t), o->radius(), o->center(), cw );
+        OffsetVertex offset_element( g[next_edge].point(t), o->radius(), o->center(), cw, current_face );
         return offset_element;
     }
     

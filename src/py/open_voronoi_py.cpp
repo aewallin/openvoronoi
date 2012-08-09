@@ -20,13 +20,9 @@
 #include <boost/python.hpp>
 
 #include "voronoidiagram_py.hpp"  
-
 #include "common/point.hpp"
-#include "face_offset_py.hpp"
-
 #include "medial_axis_walk_py.hpp"
 #include "offset_py.hpp"
-
 #include "utility/vd2svg.hpp"
 #include "version.hpp"
 
@@ -152,11 +148,7 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         .def("str", &Offset_py::print )
         .def("offset", &Offset_py::offset_py )
     ; 
-    bp::class_<FaceOffset_py, boost::noncopyable >("FaceOffset", bp::no_init)
-        .def(bp::init<HEGraph&>())
-        .def("offset", &FaceOffset_py::offset_py )
-        .def("str", &FaceOffset_py::print )
-    ; 
+    
 // Filters
     bp::class_< Filter, boost::noncopyable >(" Filter_base", bp::no_init) // pure virtual base class!
     ;
@@ -190,4 +182,3 @@ BOOST_PYTHON_MODULE(openvoronoi) {
 
 } // pyovd namespace
 } // ovd namespace
-

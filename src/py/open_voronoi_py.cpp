@@ -156,6 +156,7 @@ BOOST_PYTHON_MODULE(openvoronoi) {
     ;  
     bp::class_< OffsetSorter  >("OffsetSorter")
         .def("add_loop", &OffsetSorter::add_loop )
+        .def("sort_loops", &OffsetSorter::sort_loops )
     ;  
   
 // Filters

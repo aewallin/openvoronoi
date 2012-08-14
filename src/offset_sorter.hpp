@@ -52,6 +52,13 @@ struct OffsetLoop {
 
 //typedef std::list<OffsetLoop> OffsetLoops;
 
+class OffsetLoopCompare {
+public:
+    bool operator() (OffsetLoop l1, OffsetLoop l2) {
+        return (l1.offset_distance < l2.offset_distance);
+    }
+};
+
 class OffsetSorter {
 public:
     OffsetSorter() {}
@@ -59,8 +66,15 @@ public:
         all_loops.push_back(l);
     }
     void sort_loops() {
+        BOOST_FOREACH( const OffsetLoop l, all_loops ) {
+            dist_sorted_loops.insert(l);
+        }
+        BOOST_FOREACH( OffsetLoop l, dist_sorted_loops ) {
+            std::cout << "loop at " << l.offset_distance << "\n";
+        }
     }
 protected:
+    std::set<OffsetLoop, OffsetLoopCompare> dist_sorted_loops;
     OffsetLoops all_loops;
 };
 

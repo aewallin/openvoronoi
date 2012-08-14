@@ -88,7 +88,7 @@ if __name__ == "__main__":
     
     of = ovd.Offset( vd.getGraph() ) # pass the created graph to the Offset class
     of.str() # text output, for debug
-    dists =[0.1,0.2, 0.21]
+    dists =[0.1,0.2, 0.21, 0.05, 0.14]
     ofs_loops=[]
     ofsl = []
     for d in dists:
@@ -99,7 +99,9 @@ if __name__ == "__main__":
     sorter = ovd.OffsetSorter()
     for loop in ofsl:
         sorter.add_loop( loop )
-        
+    
+    sorter.sort_loops()
+    
     offset2vtk.drawOffsets(myscreen, ofs_loops) # draw the generated offsets
     print "number of loops= ",len(ofs_loops)
     for loop in ofs_loops:

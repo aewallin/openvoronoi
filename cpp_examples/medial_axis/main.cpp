@@ -50,7 +50,7 @@ int main() {
     svg::Document doc("medial_axis.svg", svg::Layout(dimensions, svg::Layout::BottomLeft));
     ovd::HEGraph& g = vd->get_graph_reference();
     BOOST_FOREACH( ovd::HEEdge e, g.edges() ) {
-        if( g[e].valid ) write_edge_to_svd(g,doc,e);
+        if( g[e].valid ) write_edge_to_svg(g,doc,e);
     }
 
     // walk the medial axis.

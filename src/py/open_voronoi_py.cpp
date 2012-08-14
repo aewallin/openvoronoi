@@ -23,6 +23,8 @@
 #include "common/point.hpp"
 #include "medial_axis_walk_py.hpp"
 #include "offset_py.hpp"
+#include "offset_sorter.hpp"
+
 #include "utility/vd2svg.hpp"
 #include "version.hpp"
 
@@ -143,12 +145,19 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         .def_readwrite("y", &Point::y)
         .def_pickle(point_pickle_suite())
     ;
+// Offsetting
     bp::class_<Offset_py, boost::noncopyable >("Offset", bp::no_init)
         .def(bp::init<HEGraph&>())
         .def("str", &Offset_py::print )
         .def("offset", &Offset_py::offset_py )
+        .def("offset_loop_list", &Offset_py::offset_loop_list )
     ; 
-    
+    bp::class_< OffsetLoop  >("OffsetLoop")
+    ;  
+    bp::class_< OffsetSorter  >("OffsetSorter")
+        .def("add_loop", &OffsetSorter::add_loop )
+    ;  
+  
 // Filters
     bp::class_< Filter, boost::noncopyable >(" Filter_base", bp::no_init) // pure virtual base class!
     ;

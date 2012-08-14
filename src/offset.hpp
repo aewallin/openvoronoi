@@ -52,7 +52,7 @@ struct OffsetLoop {
 };
 
 /// multiple loops. the output of the algorithm
-typedef std::list<OffsetLoop> OffsetLoops;
+typedef std::vector<OffsetLoop> OffsetLoops;
 
 /// \brief From a voronoi-diagram, generate offsets.
 ///

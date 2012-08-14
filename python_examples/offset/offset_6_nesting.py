@@ -90,9 +90,16 @@ if __name__ == "__main__":
     of.str() # text output, for debug
     dists =[0.1,0.2, 0.21]
     ofs_loops=[]
+    ofsl = []
     for d in dists:
         ofs_loops.extend( of.offset(d) )
-
+        ofsl.extend( of.offset_loop_list(d) )
+    print ofsl
+    
+    sorter = ovd.OffsetSorter()
+    for loop in ofsl:
+        sorter.add_loop( loop )
+        
     offset2vtk.drawOffsets(myscreen, ofs_loops) # draw the generated offsets
     print "number of loops= ",len(ofs_loops)
     for loop in ofs_loops:

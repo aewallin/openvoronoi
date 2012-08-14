@@ -51,7 +51,7 @@ int main() {
         BOOST_FOREACH( ovd::OffsetLoop loop, offset_list ) { // loop through each loop
             bool first = true;
             ovd::Point previous;
-            BOOST_FOREACH( ovd::OffsetVertex lpt, loop ) { // loop through each line/arc
+            BOOST_FOREACH( ovd::OffsetVertex lpt, loop.vertices ) { // loop through each line/arc
                 if (first) {
                   first = false;
                   previous = lpt.p;

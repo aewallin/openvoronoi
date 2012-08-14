@@ -77,8 +77,8 @@ endif (CMAKE_BUILD_TYPE MATCHES "Coverage")
 
 option(BUILD_DOC "Build doxygen documentation? " ON)
 
-#set(BUILD_TESTS 1)
-set(BUILD_TESTS 0) # don't build tests
+set(BUILD_TESTS 1)
+#set(BUILD_TESTS 0) # don't build tests
 
 #
 # this figures out the Python include directories and adds them to the
@@ -124,12 +124,12 @@ set(OVD_SRC
     ${OpenVoronoi_SOURCE_DIR}/vertex.cpp
     ${OpenVoronoi_SOURCE_DIR}/edge.cpp
     ${OpenVoronoi_SOURCE_DIR}/checker.cpp
-    #${OpenVoronoi_SOURCE_DIR}/facegrid.cpp
     ${OpenVoronoi_SOURCE_DIR}/common/point.cpp
     ${OpenVoronoi_SOURCE_DIR}/vertex_positioner.cpp
     ${OpenVoronoi_SOURCE_DIR}/common/numeric.cpp
     ${OpenVoronoi_SOURCE_DIR}/medial_axis_pocket.cpp
     ${OpenVoronoi_SOURCE_DIR}/medial_axis_walk.cpp
+    ${OpenVoronoi_SOURCE_DIR}/offset.cpp
 )
 
 set( OVD_INCLUDE_FILES
@@ -140,12 +140,8 @@ set( OVD_INCLUDE_FILES
     ${OpenVoronoi_SOURCE_DIR}/site.hpp
     ${OpenVoronoi_SOURCE_DIR}/checker.hpp
     ${OpenVoronoi_SOURCE_DIR}/vertex_positioner.hpp
-    #${OpenVoronoi_SOURCE_DIR}/facegrid.hpp
     ${OpenVoronoi_SOURCE_DIR}/kdtree.hpp
-    
     ${OpenVoronoi_SOURCE_DIR}/offset.hpp
-    #${OpenVoronoi_SOURCE_DIR}/offset2.hpp
-    
     ${OpenVoronoi_SOURCE_DIR}/filter.hpp
     ${OpenVoronoi_SOURCE_DIR}/medial_axis_filter.hpp
     ${OpenVoronoi_SOURCE_DIR}/medial_axis_walk.hpp

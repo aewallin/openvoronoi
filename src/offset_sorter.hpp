@@ -55,7 +55,7 @@ struct OffsetLoop {
 class OffsetLoopCompare {
 public:
     bool operator() (OffsetLoop l1, OffsetLoop l2) {
-        return (l1.offset_distance < l2.offset_distance);
+        return (l1.offset_distance > l2.offset_distance);
     }
 };
 

@@ -74,6 +74,27 @@ public:
     }
 };
 
+typedef std::pair<Vertex,OffsetLoop> VertexOffsetLoop;
+
+class VertexOffsetLoopCompare {
+public:
+    bool operator() (VertexOffsetLoop l1, VertexOffsetLoop l2) {
+        return (l1.second.offset_distance < l2.second.offset_distance);
+    }
+};
+
+template <class Name>
+class label_writer {
+public:
+    label_writer(Name _name) : name(_name) {}
+    template <class VertexOrEdge>
+    void operator()(std::ostream& out, const VertexOrEdge& v) const {
+      out << "[label=\"" << v << " (t="<< name[v].offset_distance <<")\"]";
+    }
+private:
+    Name name;
+};
+  
 class OffsetSorter {
 public:
     OffsetSorter() {}
@@ -86,6 +107,7 @@ public:
             dist_sorted_loops.insert(l);
         }
         // go through the loops and build the machining graph
+        
         BOOST_FOREACH( OffsetLoop l, dist_sorted_loops ) {
             std::cout << "loop at " << l.offset_distance << "\n";
             Vertex new_vert = boost::add_vertex(g);
@@ -93,24 +115,34 @@ public:
             connect_vertex(new_vert);
         }
         
-        // write graph to file to see it
-        std::filebuf fb;
-        fb.open ("test.dot",std::ios::out);
-        std::ostream out(&fb);
-        boost::write_graphviz( out, g);
+        write_dotfile();
     }
     void connect_vertex(Vertex v) {
         // try to connect the new vertex to existing vertices
         VertexItr it_begin, it_end, itr;
         boost::tie( it_begin, it_end ) = boost::vertices( g );
+        
+        std::set< VertexOffsetLoop, VertexOffsetLoopCompare> outside_loops;
         for ( itr=it_begin ; itr != it_end ; ++itr ) {
             if ( v != *itr ) { // don't connect to self
                 if ( g[v].offset_distance < g[*itr].offset_distance ){ // connect only if v is contained in *itr, based on offset-distance
-                    boost::add_edge(v,*itr,g);
+                    outside_loops.insert( std::make_pair(*itr, g[*itr]) );
                 }
             }
         }
-    
+        if (!outside_loops.empty()) {
+            VertexOffsetLoop trg_pair = *(outside_loops.begin());
+            Vertex trg = trg_pair.first;
+            boost::add_edge(v,trg,g);
+        }
+    }
+    void write_dotfile() {
+        // write graph to file to see it
+        std::filebuf fb;
+        fb.open ("test.dot",std::ios::out);
+        std::ostream out(&fb);
+        label_writer<MachiningGraph> lbl_wrt(g);
+        boost::write_graphviz( out, g, lbl_wrt);
     }
 protected:
     std::set<OffsetLoop, OffsetLoopCompare> dist_sorted_loops; // set of Loops, sorted by decreasing offset-distance

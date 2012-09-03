@@ -45,22 +45,35 @@ public:
     
     /// determine if an edge is valid or not
     virtual bool operator()(const HEEdge& e) const {
+        
         if ( (*g)[e].type == LINESITE || (*g)[e].type == NULLEDGE) 
             return true;
         
         // if polygon inserted ccw  as (id1->id2), then the linesite should occur on valid faces as id1->id2
         // for islands and the outside the edge is id2->id1
+        
         HEFace f = (*g)[e].face;
         Site* s = (*g)[f].site;
         if ( s->isLine() && linesite_ccw(f) ) 
             return true;
         else if ( s->isPoint() ) {
-            // we need to search for an adjacent linesite. (? can we have a situation where this fails?)
+            //HEVertex site_vertex = s->vertex();
+            //std::cout << "PointSite type: " << (*g)[site_vertex].type << "\n";
+            //if ( (*g)[site_vertex].type == OUTER ) {
+            //    std::cout << " OUTER face edge \n";
+            //    return false;
+            //}
+            // we need to search for an adjacent linesite. 
+            // (? can we have a situation where this fails?)
             HEEdge linetwin = find_adjacent_linesite(f);
-            HEEdge twin = (*g)[linetwin].twin;
-            HEFace twin_face = (*g)[twin].face;
-            if (linesite_ccw(twin_face))
-                return true;
+            if (linetwin != HEEdge()) {
+                HEEdge twin = (*g)[linetwin].twin;
+                HEFace twin_face = (*g)[twin].face;
+                if (linesite_ccw(twin_face))
+                    return true;
+            } else {
+                return false;
+            }
         } 
         return false;
     }
@@ -73,12 +86,22 @@ private:
         do {
             HEEdge twin = (*g)[current].twin;
             if (twin != HEEdge() ) {
+                //std::cout << (*g)[ (*g).source(current) ].index << " - " << (*g)[ (*g).target(current) ].index;
+                //std::cout << " tw: " << (*g)[ (*g).source(twin) ].index << " - " << (*g)[ (*g).target(twin) ].index;
+                //std::cout << " t= " << (*g)[ twin ].type << "\n";
+                
                 HEFace twf = (*g)[twin].face;
-                if ( (*g)[twf].site->isLine() )
+                if ( (*g)[twf].site->isLine() ) {
+                    //std::cout << "  returning: " << (*g)[ (*g).source(current) ].index << " - " << (*g)[ (*g).target(current) ].index << "\n";
                     return current;
+                }
+            } else {
+                //std::cout << (*g)[ (*g).source(current) ].index << " - " << (*g)[ (*g).target(current) ].index;
+                //std::cout << " t= " << (*g)[ current ].type << " has no twin!\n";
             }
             current = (*g)[current].next;
         } while(current!=start);
+        
         return HEEdge();
     }
     /// return true if linesite was inserted in the direction indicated by _side

@@ -918,7 +918,7 @@ VoronoiDiagram::find_null_face(HEVertex start, HEVertex other, Point left, Point
     HEFace face_to_null = g.HFace(); // invalid face is default
     
     // this works for LineSite
-    bool k3_sign;
+    bool k3_sign(true);
     if (new_site->isLine() ) {
         k3_sign = left.is_right( g[start].position , g[other].position); 
     } else if (new_site->isArc()) {

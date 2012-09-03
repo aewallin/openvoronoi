@@ -35,6 +35,9 @@ namespace solvers {
 /// The optput is a vector with one or more Solution.
 class Solver {
 public:
+    /// virtual dtor required for correct destruction of derived classes
+    virtual ~Solver() { }
+    
     /// \brief solve for position of VoronoiVertex with given adjacent sites and directions
     ///
     /// \param s1 first adjacent Site

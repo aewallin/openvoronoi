@@ -92,13 +92,13 @@ if __name__ == "__main__":
     
     of = ovd.Offset( vd.getGraph() ) # pass the created graph to the Offset class
     of.str() # text output, for debug
-    dists =[ 0.01*x for x in range(1,30) ]
+    dists =[ 0.005*x for x in range(1,30) ]
     ofs_loops=[]
     ofsl = []
     for d in dists:
         ofs_loops.extend( of.offset(d) )
         ofsl.extend( of.offset_loop_list(d) )
-    print ofsl
+    #print ofsl
     
     sorter = ovd.OffsetSorter()
     for loop in ofsl:

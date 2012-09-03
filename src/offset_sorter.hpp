@@ -145,7 +145,7 @@ public:
         boost::write_graphviz( out, g, lbl_wrt);
     }
 protected:
-    std::set<OffsetLoop, OffsetLoopCompare> dist_sorted_loops; // set of Loops, sorted by decreasing offset-distance
+    std::multiset<OffsetLoop, OffsetLoopCompare> dist_sorted_loops; // set of Loops, sorted by decreasing offset-distance
     OffsetLoops all_loops;
     MachiningGraph g;
 };

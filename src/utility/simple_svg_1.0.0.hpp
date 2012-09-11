@@ -53,15 +53,15 @@ namespace svg
         ss << attribute_name << "=\"" << value << unit << "\" ";
         return ss.str();
     }
-    std::string elemStart(std::string const & element_name)
+    inline std::string elemStart(std::string const & element_name)
     {
         return "\t<" + element_name + " ";
     }
-    std::string elemEnd(std::string const & element_name)
+    inline std::string elemEnd(std::string const & element_name)
     {
         return "</" + element_name + ">\n";
     }
-    std::string emptyElemEnd()
+    inline std::string emptyElemEnd()
     {
         return "/>\n";
     }
@@ -154,7 +154,7 @@ namespace svg
     };
 
     // Convert coordinates in user space to SVG native space.
-    double translateX(double x, Layout const & layout)
+    inline double translateX(double x, Layout const & layout)
     {
         if (layout.origin == Layout::BottomRight || layout.origin == Layout::TopRight)
             return layout.dimensions.width - ((x + layout.origin_offset.x) * layout.scale);
@@ -162,14 +162,14 @@ namespace svg
             return (layout.origin_offset.x + x) * layout.scale;
     }
 
-    double translateY(double y, Layout const & layout)
+    inline double translateY(double y, Layout const & layout)
     {
         if (layout.origin == Layout::BottomLeft || layout.origin == Layout::BottomRight)
             return layout.dimensions.height - ((y + layout.origin_offset.y) * layout.scale);
         else
             return (layout.origin_offset.y + y) * layout.scale;
     }
-    double translateScale(double dimension, Layout const & layout)
+    inline double translateScale(double dimension, Layout const & layout)
     {
         return dimension * layout.scale;
     }

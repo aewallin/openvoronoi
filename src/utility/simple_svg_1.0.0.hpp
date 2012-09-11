@@ -446,7 +446,7 @@ namespace svg
             ss << elemStart("path");
             ss << "d=\"M";
             ss << translateX(start_point.x, layout) << "," << translateY(start_point.y, layout) << " ";
-            ss << "A" << x_radius << "," << y_radius << " ";
+            ss << "A" << translateScale(x_radius, layout) << "," << translateScale(y_radius, layout) << " ";
             ss << x_axis_rotation << " ";
             ss << large_arc_flag << "," << sweep_flag << " ";
             ss << translateX(end_point.x, layout) << "," << translateY(end_point.y, layout) << "\" ";

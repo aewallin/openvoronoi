@@ -53,6 +53,9 @@ endif (CMAKE_BUILD_TOOL MATCHES "make")
 
 option(BUILD_PYTHON_MODULE "Build python-module? " ON) # this should make building the python-module optional
 # when we build only the pure c++ library we should not need boost-ptyhon
+# for a build without boost-python:
+# cmake -DBUILD_PYTHON_MODULE=OFF ../src
+
 
 option(BUILD_DOC "Build doxygen documentation? " ON)
 
@@ -220,15 +223,17 @@ set_target_properties( libopenvoronoi-coverage
     CMAKE_CXX_FLAGS "-O0 -fprofile-arcs -ftest-coverage -fno-inline ${CMAKE_CXX_FLAGS_DEBUG}"
     )
 
-# static library, linked with the python module below
-add_library(
-    openvoronoi_static
-    STATIC
-    ${OVD_SRC}
-)
-
-# this makes the Python module
 IF( ${BUILD_PYTHON_MODULE} MATCHES ON)
+
+	# static library, linked with the python module below
+	add_library(
+		openvoronoi_static
+		STATIC
+		${OVD_SRC}
+	)
+
+	# this makes the Python module
+
 	add_library(
 		openvoronoi
 		MODULE
@@ -311,9 +316,9 @@ ENDIF()
 
 
 # tests
-if( ${BUILD_TESTS} )
+if( ${BUILD_TESTS} MATCHES ON)
     include(${CMAKE_SOURCE_DIR}/test/ovd_tests.cmake)
-endif( ${BUILD_TESTS} )
+endif()
 
 # doxygen documentation
 include(doxygen.cmake)

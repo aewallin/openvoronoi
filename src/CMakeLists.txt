@@ -51,6 +51,14 @@ endif (CMAKE_BUILD_TOOL MATCHES "make")
 # set(CMAKE_BUILD_TYPE Profile)
 # set(CMAKE_BUILD_TYPE Coverage)
 
+option(BUILD_PYTHON_MODULE "Build python-module? " ON) # this should make building the python-module optional
+# when we build only the pure c++ library we should not need boost-ptyhon
+
+option(BUILD_DOC "Build doxygen documentation? " ON)
+
+#set(BUILD_TESTS 1)
+option(BUILD_TESTS "Build tests?" OFF) # don't build tests
+
 MESSAGE(STATUS " CMAKE_BUILD_TYPE  = " ${CMAKE_BUILD_TYPE})
 
 if (CMAKE_BUILD_TYPE MATCHES "Profile")
@@ -75,32 +83,33 @@ if (CMAKE_BUILD_TYPE MATCHES "Coverage")
     MESSAGE(STATUS " CMAKE_CXX_FLAGS = " ${CMAKE_CXX_FLAGS})
 endif (CMAKE_BUILD_TYPE MATCHES "Coverage")
 
-option(BUILD_DOC "Build doxygen documentation? " ON)
 
-#set(BUILD_TESTS 1)
-set(BUILD_TESTS 0) # don't build tests
 
 #
 # this figures out the Python include directories and adds them to the
 # header file search path
 #
-execute_process(
-    COMMAND python-config --includes
-    COMMAND sed -r "s/-I//g; s/ +/;/g"
-    COMMAND tr -d '\n'
-    OUTPUT_VARIABLE Python_Includes
-)
-include_directories(${Python_Includes})
 
-#include_directories(${CMAKE_CURRENT_BINARY_DIR}) # duplicate!
+MESSAGE(STATUS "Your system is: ${CMAKE_SYSTEM_NAME}")
+IF( ${BUILD_PYTHON_MODULE} MATCHES ON)
+	find_package(PythonLibs REQUIRED)
+	include_directories(${PYTHON_INCLUDE_DIRS})
+	MESSAGE(STATUS "Python includes: " ${PYTHON_INCLUDE_DIRS})
+ENDIF()
 
-# find BOOST and boost-python
-find_package( Boost COMPONENTS python REQUIRED)
+# find boost-python
+IF( ${BUILD_PYTHON_MODULE} MATCHES ON)
+	find_package( Boost COMPONENTS python REQUIRED)
+	MESSAGE(STATUS "Boost_PYTHON_LIBRARY is: " ${Boost_PYTHON_LIBRARY})
+ENDIF()
+
+find_package( Boost COMPONENTS graph REQUIRED)
+# find boost
 if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
     MESSAGE(STATUS "Boost_LIB_VERSION: " ${Boost_LIB_VERSION})
     MESSAGE(STATUS "Boost_INCLUDE_DIRS are: " ${Boost_INCLUDE_DIRS})
-    MESSAGE(STATUS "Boost_PYTHON_LIBRARY is: " ${Boost_PYTHON_LIBRARY})
+    
     MESSAGE(STATUS "boost_LIBRARY_DIRS is: " ${Boost_LIBRARY_DIRS})
     MESSAGE(STATUS "Boost_LIBRARIES is: " ${Boost_LIBRARIES})    
 endif()
@@ -219,23 +228,25 @@ add_library(
 )
 
 # this makes the Python module
-add_library(
-    openvoronoi
-    MODULE
-    py/open_voronoi_py.cpp
-)
-target_link_libraries(openvoronoi openvoronoi_static ${Boost_LIBRARIES} ${QD_LIBRARY}) 
-set_target_properties(openvoronoi PROPERTIES PREFIX "") 
-set_target_properties(openvoronoi PROPERTIES VERSION ${MY_VERSION}) 
+IF( ${BUILD_PYTHON_MODULE} MATCHES ON)
+	add_library(
+		openvoronoi
+		MODULE
+		py/open_voronoi_py.cpp
+	)
+	target_link_libraries(openvoronoi openvoronoi_static ${Boost_LIBRARIES} ${QD_LIBRARY}) 
+	set_target_properties(openvoronoi PROPERTIES PREFIX "") 
+	set_target_properties(openvoronoi PROPERTIES VERSION ${MY_VERSION}) 
 
-#
-# this figures out where to install the Python modules
-#
-execute_process(
-    COMMAND python -c "from distutils.sysconfig import get_python_lib; print get_python_lib(0,0,\"/usr/local\")"
-    OUTPUT_VARIABLE Python_site_packages
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-) # on Ubuntu 11.10 this outputs: /usr/local/lib/python2.7/dist-packages
+	#
+	# this figures out where to install the Python modules
+	#
+	execute_process(
+		COMMAND python -c "from distutils.sysconfig import get_python_lib; print get_python_lib(0,0,\"/usr/local\")"
+		OUTPUT_VARIABLE Python_site_packages
+		OUTPUT_STRIP_TRAILING_WHITESPACE
+	) # on Ubuntu 11.10 this outputs: /usr/local/lib/python2.7/dist-packages
+
 
 
 # strip away /usr/local/  because that is what CMAKE_INSTALL_PREFIX is set to
@@ -253,7 +264,9 @@ MESSAGE(STATUS "Python libraries will be installed to: " ${Python_site_packages}
         LIBRARY 
         DESTINATION ${Python_site_packages}
     )
-    
+
+
+
     # this installs the python VTK-visualization helper library
     install(
         FILES ${OpenVoronoi_SOURCE_DIR}/py/ovdvtk.py
@@ -263,6 +276,8 @@ MESSAGE(STATUS "Python libraries will be installed to: " ${Python_site_packages}
         PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
     )
     
+ENDIF()
+ 
 # this installs the c++ library
     install(
         TARGETS libopenvoronoi

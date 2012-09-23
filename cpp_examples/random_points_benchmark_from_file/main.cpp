@@ -39,6 +39,10 @@ int main(int argc,char *argv[]) {
     std::vector<point_type> points;
     {
         std::ifstream input_file(POINT_INPUT_FILE);
+        if (input_file.fail()) {
+            std::cout << "Failed to open input file!\n";
+            exit(-1);
+        }
         int num_points;
         coordinate_type x, y;
         input_file >> num_points;

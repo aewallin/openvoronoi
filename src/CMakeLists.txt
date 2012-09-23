@@ -24,16 +24,10 @@ if(USE_CLANG)
     SET (CMAKE_CXX_FLAGS_MINSIZEREL     "-Os -DNDEBUG")
     SET (CMAKE_CXX_FLAGS_RELEASE        "-DNDEBUG") # -O3 gives "argument unused" ?
     SET (CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g")
-
-    #SET (CMAKE_AR      "/usr/bin/llvm-ar")
-    #SET (CMAKE_LINKER  "/usr/bin/llvm-ld")
-    #SET (CMAKE_NM      "/usr/bin/llvm-nm")
-    #SET (CMAKE_OBJDUMP "/usr/bin/llvm-objdump")
-    #SET (CMAKE_RANLIB  "/usr/bin/llvm-ranlib")
     
     add_definitions(-O3)
     # -Wno-error=uninitialized -Wno-deprecated -Wno-long-long
-    add_definitions(-Werror -Wall -Wundef  -Wshadow    -pedantic -pedantic-errors)
+    add_definitions(-Werror -Wall -Wundef  -Wshadow -pedantic -pedantic-errors)
     add_definitions(-fPIC)
     
 endif()

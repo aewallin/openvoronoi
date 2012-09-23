@@ -33,6 +33,3 @@ add_executable(
     ${OVD_TST_SRC}
 )
 target_link_libraries(ovd_tst ${OVD_LIBRARY} ${Boost_LIBRARIES})
-# ${QD_LIBRARY} )
-
-

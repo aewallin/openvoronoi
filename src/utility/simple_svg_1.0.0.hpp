@@ -178,7 +178,7 @@ namespace svg
     {
     public:
         Serializeable() { }
-        virtual ~Serializeable() { };
+        virtual ~Serializeable() { }
         virtual std::string toString(Layout const & layout) const = 0;
     };
 

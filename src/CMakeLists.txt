@@ -5,6 +5,40 @@ cmake_minimum_required(VERSION 2.4)
 # figure out the gcc version
 INCLUDE(gcc_version.cmake)
 
+option(USE_CLANG "build application with clang" OFF) # OFF is the default
+
+# experimental use of clang, since it detects more warnings/erors than gcc
+# Note: on some install this requires the package: gcc-multilib to work
+if(USE_CLANG)
+    SET (CMAKE_C_COMPILER             "/usr/bin/clang")
+    SET (CMAKE_C_FLAGS                "-Wall -std=c99")
+    SET (CMAKE_C_FLAGS_DEBUG          "-g")
+    SET (CMAKE_C_FLAGS_MINSIZEREL     "-Os -DNDEBUG")
+    SET (CMAKE_C_FLAGS_RELEASE        "-O4 -DNDEBUG")
+    SET (CMAKE_C_FLAGS_RELWITHDEBINFO "-O2 -g")
+
+    SET (CMAKE_CXX_COMPILER             "/usr/bin/clang++")
+    SET (CMAKE_CXX_FLAGS                "-Wall")
+    SET (CMAKE_CXX_FLAGS_DEBUG          "-g")
+    SET (CMAKE_CXX_FLAGS_MINSIZEREL     "-Os -DNDEBUG")
+    SET (CMAKE_CXX_FLAGS_RELEASE        "-DNDEBUG") # -O3 gives "argument unused" ?
+    SET (CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g")
+
+    #SET (CMAKE_AR      "/usr/bin/llvm-ar")
+    #SET (CMAKE_LINKER  "/usr/bin/llvm-ld")
+    #SET (CMAKE_NM      "/usr/bin/llvm-nm")
+    #SET (CMAKE_OBJDUMP "/usr/bin/llvm-objdump")
+    #SET (CMAKE_RANLIB  "/usr/bin/llvm-ranlib")
+    
+    
+    add_definitions(-Werror -Wall -Wundef -Wno-error=uninitialized -Wshadow  -Wno-long-long -Wno-deprecated -pedantic -pedantic-errors)
+    add_definitions(-fPIC)
+    
+endif()
+
+MESSAGE(STATUS " Your compiler is = " ${CMAKE_CXX_COMPILER})
+MESSAGE(STATUS " Your linker is = " ${CMAKE_LINKER})
+
 
 #
 # Turn compiler warnings up to 11, at least with gcc.  I dont know how to
@@ -13,7 +47,7 @@ INCLUDE(gcc_version.cmake)
 # #include'ing the boost graph-library creates deprecated warnings
 # thus we use now use -Wno-deprecated here.
 #
-if (CMAKE_BUILD_TOOL MATCHES "make")
+if (CMAKE_COMPILER_IS_GNUCXX )
     if(GCC_4_6)
         MESSAGE(STATUS "setting strict gcc options: -Wall -Werror etc...")
         add_definitions(-Werror -Wall -Wundef -Wno-error=uninitialized -Wshadow  -Wno-long-long -Wno-deprecated -pedantic -pedantic-errors)
@@ -27,21 +61,8 @@ if (CMAKE_BUILD_TOOL MATCHES "make")
     # -Winline             gives warnings for BGL
     
     add_definitions(-fPIC)
-endif (CMAKE_BUILD_TOOL MATCHES "make")
+endif ()
 
-
-#
-# Turn compiler warnings up to 11, at least with gcc.  I dont know how to
-# do this with other compilers we might support and I'm leaving it up to
-# the relevant platform maintainers...
-# #include'ing the boost graph-library creates deprecated warnings
-# thus we use now use -Wno-deprecated here.
-#
-#if (CMAKE_BUILD_TOOL MATCHES "make")
-#    MESSAGE(STATUS "setting gcc options: -W -Wall -Wundef  -Wshadow -Winline -Wno-long-long -Wno-deprecated -Werror -pedantic-errors")
-    # -pedantic -W -Wall -Wundef -Wfloat-equal -Wshadow -Winline -Wno-long-long
-#    add_definitions( -Werror -Wall -Wundef -Wno-error=uninitialized -Wshadow  -Wno-long-long -Wno-deprecated -pedantic -pedantic-errors)
-#endif (CMAKE_BUILD_TOOL MATCHES "make")
 
 
 # uncomment one of these to change build-type
@@ -50,6 +71,7 @@ endif (CMAKE_BUILD_TOOL MATCHES "make")
 # set(CMAKE_BUILD_TYPE Debug)
 # set(CMAKE_BUILD_TYPE Profile)
 # set(CMAKE_BUILD_TYPE Coverage)
+MESSAGE(STATUS " CMAKE_BUILD_TYPE  = " ${CMAKE_BUILD_TYPE})
 
 option(BUILD_PYTHON_MODULE "Build python-module? " ON) # this should make building the python-module optional
 # when we build only the pure c++ library we should not need boost-ptyhon
@@ -62,7 +84,6 @@ option(BUILD_DOC "Build doxygen documentation? " ON)
 #set(BUILD_TESTS 1)
 option(BUILD_TESTS "Build tests?" OFF) # don't build tests
 
-MESSAGE(STATUS " CMAKE_BUILD_TYPE  = " ${CMAKE_BUILD_TYPE})
 
 if (CMAKE_BUILD_TYPE MATCHES "Profile")
     set(CMAKE_CXX_FLAGS_PROFILE "-p -g -DNDEBUG")
@@ -95,15 +116,15 @@ endif (CMAKE_BUILD_TYPE MATCHES "Coverage")
 
 MESSAGE(STATUS "Your system is: ${CMAKE_SYSTEM_NAME}")
 IF( ${BUILD_PYTHON_MODULE} MATCHES ON)
-	find_package(PythonLibs REQUIRED)
-	include_directories(${PYTHON_INCLUDE_DIRS})
-	MESSAGE(STATUS "Python includes: " ${PYTHON_INCLUDE_DIRS})
+    find_package(PythonLibs REQUIRED)
+    include_directories(${PYTHON_INCLUDE_DIRS})
+    MESSAGE(STATUS "Python includes: " ${PYTHON_INCLUDE_DIRS})
 ENDIF()
 
 # find boost-python
 IF( ${BUILD_PYTHON_MODULE} MATCHES ON)
-	find_package( Boost COMPONENTS python REQUIRED)
-	MESSAGE(STATUS "Boost_PYTHON_LIBRARY is: " ${Boost_PYTHON_LIBRARY})
+    find_package( Boost COMPONENTS python REQUIRED)
+    MESSAGE(STATUS "Boost_PYTHON_LIBRARY is: " ${Boost_PYTHON_LIBRARY})
 ENDIF()
 
 find_package( Boost COMPONENTS graph REQUIRED)

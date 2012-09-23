@@ -121,6 +121,8 @@ set( CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR} ) # Findqd.cmake is in this d
 # find the qd library
 find_package( qd REQUIRED )
 include_directories(${QD_INCLUDE_DIR})
+message( STATUS "libqd include dir = "${QD_INCLUDE_DIR})
+message( STATUS "libqd library = "${QD_LIBRARY})
 
 message( STATUS "build type = " ${CMAKE_BUILD_TYPE})
 
@@ -208,6 +210,7 @@ add_library(
 )
 set_target_properties(libopenvoronoi PROPERTIES PREFIX "")
 set_target_properties(libopenvoronoi PROPERTIES VERSION ${MY_VERSION}) 
+#target_link_libraries(libopenvoronoi ${Boost_LIBRARIES} ${QD_LIBRARY}) 
 
 # c++lib for coverage testing
 add_library(
@@ -252,16 +255,11 @@ IF( ${BUILD_PYTHON_MODULE} MATCHES ON)
 		OUTPUT_STRIP_TRAILING_WHITESPACE
 	) # on Ubuntu 11.10 this outputs: /usr/local/lib/python2.7/dist-packages
 
-
-
-# strip away /usr/local/  because that is what CMAKE_INSTALL_PREFIX is set to
-# also, since there is no leading "/", it makes ${Python_site_packages} a relative path.
-STRING(REGEX REPLACE "/usr/local/(.*)$" "\\1" Python_site_packages "${Python_site_packages}" )
-
-MESSAGE(STATUS "CMAKE_INSTALL_PREFIX is : " ${CMAKE_INSTALL_PREFIX})
-MESSAGE(STATUS "Python libraries will be installed to: " ${Python_site_packages})
-
-
+	# strip away /usr/local/  because that is what CMAKE_INSTALL_PREFIX is set to
+	# also, since there is no leading "/", it makes ${Python_site_packages} a relative path.
+	STRING(REGEX REPLACE "/usr/local/(.*)$" "\\1" Python_site_packages "${Python_site_packages}" )
+	MESSAGE(STATUS "CMAKE_INSTALL_PREFIX is : " ${CMAKE_INSTALL_PREFIX})
+	MESSAGE(STATUS "Python libraries will be installed to: " ${Python_site_packages})
 
     # this installs the python library
     install(
@@ -284,35 +282,35 @@ MESSAGE(STATUS "Python libraries will be installed to: " ${Python_site_packages}
 ENDIF()
  
 # this installs the c++ library
-    install(
-        TARGETS libopenvoronoi
-        LIBRARY 
-        DESTINATION lib/openvoronoi
-        ARCHIVE DESTINATION lib/openvoronoi
-        PERMISSIONS OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
-    )
+install(
+	TARGETS libopenvoronoi
+	LIBRARY 
+	DESTINATION lib/openvoronoi
+	ARCHIVE DESTINATION lib/openvoronoi
+	PERMISSIONS OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+)
 
-    # this installs the c++ include headers
-    install(
-        FILES ${OVD_INCLUDE_FILES}
-        DESTINATION include/openvoronoi
-        PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
-    )
-    install(
-        FILES ${OVD_INCLUDE_COMMON_FILES}
-        DESTINATION include/openvoronoi/common
-        PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
-    )
-    install(
-        FILES ${OVD_INCLUDE_UTIL_FILES}
-        DESTINATION include/openvoronoi/utility
-        PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
-    )
-    install(
-        FILES ${OVD_INCLUDE_SOLVERS_FILES}
-        DESTINATION include/openvoronoi/solvers
-        PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
-    )
+# this installs the c++ include headers
+install(
+	FILES ${OVD_INCLUDE_FILES}
+	DESTINATION include/openvoronoi
+	PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
+)
+install(
+	FILES ${OVD_INCLUDE_COMMON_FILES}
+	DESTINATION include/openvoronoi/common
+	PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
+)
+install(
+	FILES ${OVD_INCLUDE_UTIL_FILES}
+	DESTINATION include/openvoronoi/utility
+	PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
+)
+install(
+	FILES ${OVD_INCLUDE_SOLVERS_FILES}
+	DESTINATION include/openvoronoi/solvers
+	PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
+)
 
 
 # tests

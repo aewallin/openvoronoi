@@ -24,7 +24,7 @@ find_library(QD_LIBRARY
     
 if(QD_LIBRARY)
     set(QD_LIBRARY_ optimized ${QD_LIBRARY} debug ${QD_LIBRARY})
-    set(QD_LIBRART ${QD_LIBRARY_} CACHE FILEPATH "The QD library")
+    set(QD_LIBRARY ${QD_LIBRARY_} CACHE FILEPATH "The QD library")
 endif(QD_LIBRARY)
 
 IF(QD_INCLUDE_DIR AND QD_LIBRARY)

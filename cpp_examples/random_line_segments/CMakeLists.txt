@@ -15,7 +15,6 @@ if(Boost_FOUND)
     MESSAGE(STATUS "linking with boost: " ${Boost_LIBRARIES})
 endif()
 
-
 find_library(OVD_LIBRARY 
             NAMES libopenvoronoi openvoronoi
             PATHS /usr/local/lib/openvoronoi
@@ -25,12 +24,6 @@ find_library(OVD_LIBRARY
 MESSAGE(STATUS "OVD_LIBRARY is now: " ${OVD_LIBRARY})
 include_directories( /usr/local/include/openvoronoi )
 
-set( CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR} ) # Findqd.cmake is in this dir
-# find the qd library
-find_package( qd REQUIRED )
-include_directories(${QD_INCLUDE_DIR})
-
-
 set(OVD_TST_SRC
     ${OVD_TST_SOURCE_DIR}/main.cpp
 )
@@ -39,6 +32,6 @@ add_executable(
     ovd_tst
     ${OVD_TST_SRC}
 )
-target_link_libraries(ovd_tst ${OVD_LIBRARY} ${QD_LIBRARY} ${Boost_LIBRARIES})
+target_link_libraries(ovd_tst ${OVD_LIBRARY} ${Boost_LIBRARIES})
 
 

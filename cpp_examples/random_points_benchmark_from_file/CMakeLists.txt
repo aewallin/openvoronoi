@@ -16,6 +16,12 @@ set( CMAKE_CXX_FLAGS  ${CMAKE_CXX_FLAGS_RELEASE})
 MESSAGE(STATUS " CMAKE_CXX_FLAGS = " ${CMAKE_CXX_FLAGS})
 
 find_package( Boost REQUIRED)
+if(Boost_FOUND)
+    include_directories(${Boost_INCLUDE_DIRS})
+    MESSAGE(STATUS "found Boost: " ${Boost_LIB_VERSION})
+    MESSAGE(STATUS "boost-incude dirs are: " ${Boost_INCLUDE_DIRS})
+    MESSAGE(STATUS "linking with boost: " ${Boost_LIBRARIES})
+endif()
 
 find_library(OVD_LIBRARY 
             NAMES openvoronoi
@@ -26,11 +32,6 @@ find_library(OVD_LIBRARY
 MESSAGE(STATUS "OVD_LIBRARY is now: " ${OVD_LIBRARY})
 include_directories( /usr/local/include/openvoronoi )
 
-set( CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR} ) # Findqd.cmake is in this dir
-# find the qd library
-find_package( qd REQUIRED )
-include_directories(${QD_INCLUDE_DIR})
-
 set(OVD_TST_SRC
     main.cpp
 )
@@ -39,6 +40,4 @@ add_executable(
     random_points_benchmark_fromfile
     ${OVD_TST_SRC}
 )
-target_link_libraries(random_points_benchmark_fromfile ${OVD_LIBRARY} ${QD_LIBRARY} ${Boost_LIBRARIES})
-
-
+target_link_libraries(random_points_benchmark_fromfile ${OVD_LIBRARY} ${Boost_LIBRARIES})

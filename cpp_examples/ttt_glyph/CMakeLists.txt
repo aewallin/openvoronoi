@@ -25,12 +25,9 @@ find_library(OVD_LIBRARY
 MESSAGE(STATUS "OVD_LIBRARY is now: " ${OVD_LIBRARY})
 include_directories( /usr/local/include/openvoronoi )
 
-set( CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR} ) # Findqd.cmake is in this dir
-# find the qd library
-find_package( qd REQUIRED )
-include_directories(${QD_INCLUDE_DIR})
 
 # the ttt lib
+# https://github.com/aewallin/truetype-tracer
 find_library(TTT_LIBRARY 
             NAMES libttt ttt
             PATHS /usr/local/lib/ttt
@@ -41,10 +38,11 @@ include_directories( /usr/local/include/ttt )
 
 find_package(Freetype REQUIRED)
 if( FREETYPE_FOUND )
-   MESSAGE(STATUS "FREETYPE_LIBRARY is: " ${FREETYPE_LIBRARY})
-   MESSAGE(STATUS "FREETYPE_INCLUDE_DIRS is: " ${FREETYPE_INCLUDE_DIRS})
+    MESSAGE(STATUS "FREETYPE_LIBRARY is: " ${FREETYPE_LIBRARY})
+    MESSAGE(STATUS "FREETYPE_INCLUDE_DIRS is: " ${FREETYPE_INCLUDE_DIRS})
+    include_directories(${FREETYPE_INCLUDE_DIRS})
 endif()
-include_directories(${FREETYPE_INCLUDE_DIRS})
+
 
 set(OVD_TST_SRC
     main.cpp
@@ -54,6 +52,6 @@ add_executable(
     ovd_tst
     ${OVD_TST_SRC}
 )
-target_link_libraries(ovd_tst ${OVD_LIBRARY} ${QD_LIBRARY} ${TTT_LIBRARY} ${Boost_LIBRARIES})
+target_link_libraries(ovd_tst ${OVD_LIBRARY} ${TTT_LIBRARY} ${Boost_LIBRARIES})
 
 

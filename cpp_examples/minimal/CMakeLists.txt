@@ -7,13 +7,13 @@ if (CMAKE_BUILD_TOOL MATCHES "make")
 endif (CMAKE_BUILD_TOOL MATCHES "make")
 
 # find BOOST and boost-python
-#find_package( Boost )
-#if(Boost_FOUND)
-#    include_directories(${Boost_INCLUDE_DIRS})
-#    MESSAGE(STATUS "found Boost: " ${Boost_LIB_VERSION})
-#    MESSAGE(STATUS "boost-incude dirs are: " ${Boost_INCLUDE_DIRS})
-#    MESSAGE(STATUS "boost-libraries: " ${Boost_LIBRARIES})
-#endif()
+find_package( Boost )
+if(Boost_FOUND)
+    include_directories(${Boost_INCLUDE_DIRS})
+    MESSAGE(STATUS "found Boost: " ${Boost_LIB_VERSION})
+    MESSAGE(STATUS "boost-incude dirs are: " ${Boost_INCLUDE_DIRS})
+    MESSAGE(STATUS "boost-libraries: " ${Boost_LIBRARIES})
+endif()
 
 
 find_library(OVD_LIBRARY 
@@ -32,7 +32,7 @@ add_executable(
     ovd_tst
     ${OVD_TST_SRC}
 )
-target_link_libraries(ovd_tst ${OVD_LIBRARY})
-# ${QD_LIBRARY} ${Boost_LIBRARIES})
+target_link_libraries(ovd_tst ${OVD_LIBRARY} ${Boost_LIBRARIES})
+# ${QD_LIBRARY} )
 
 

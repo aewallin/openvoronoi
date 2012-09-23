@@ -25,12 +25,8 @@ find_library(OVD_LIBRARY
 MESSAGE(STATUS "OVD_LIBRARY is now: " ${OVD_LIBRARY})
 include_directories( /usr/local/include/openvoronoi )
 
-set( CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR} ) # Findqd.cmake is in this dir
-# find the qd library
-find_package( qd REQUIRED )
-include_directories(${QD_INCLUDE_DIR})
-
 # the rpg lib
+# https://github.com/aewallin/CGAL_RPG
 find_library(RPG_LIBRARY 
             NAMES librpg rpg
             PATHS /usr/local/lib/rpg
@@ -48,6 +44,4 @@ add_executable(
     ovd_tst
     ${OVD_TST_SRC}
 )
-target_link_libraries(ovd_tst ${OVD_LIBRARY} ${QD_LIBRARY} ${RPG_LIBRARY} ${Boost_LIBRARIES})
-
-
+target_link_libraries(ovd_tst ${OVD_LIBRARY} ${RPG_LIBRARY} ${Boost_LIBRARIES})

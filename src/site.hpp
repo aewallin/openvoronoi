@@ -544,9 +544,9 @@ public:
     }
     HEEdge e; ///< edge_descriptor to ::ARCSITE pseudo-edge
     /// return start Point of ArcSite
-    Point start() {return _start;}
+    const Point start() const {return _start;}
     /// return end Point of ArcSite
-    Point end() {return _end;}
+    const Point end() const {return _end;}
     /// return center Point of ArcSite
     Point center() {return _center;}
     /// return radius of ArcSite

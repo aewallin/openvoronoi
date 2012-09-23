@@ -1983,7 +1983,7 @@ void VoronoiDiagram::repair_face( HEFace f, std::pair<HEVertex,HEVertex> segment
                     
                 // the next vertex should not where we came from
                 // and it should be on the same face.
-                if (  (g[e].face == f) ) {  
+                if ( g[e].face == f ) {  
                     g[current_edge].next = e; // this is the edge we want to take
                     #ifndef NDEBUG
                     found_next_edge = true;

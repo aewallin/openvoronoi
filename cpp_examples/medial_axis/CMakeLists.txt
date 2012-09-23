@@ -6,6 +6,15 @@ if (CMAKE_BUILD_TOOL MATCHES "make")
     add_definitions(-Wall -Werror -Wno-deprecated -pedantic-errors)
 endif (CMAKE_BUILD_TOOL MATCHES "make")
 
+# find BOOST
+find_package( Boost REQUIRED )
+if(Boost_FOUND)
+    include_directories(${Boost_INCLUDE_DIRS})
+    MESSAGE(STATUS "found Boost: " ${Boost_LIB_VERSION})
+    MESSAGE(STATUS "boost-incude dirs are: " ${Boost_INCLUDE_DIRS})
+    include_directories(${Boost_INCLUDE_DIRS})
+endif()
+
 find_library(OVD_LIBRARY 
             NAMES openvoronoi
             PATHS /usr/local/lib/openvoronoi

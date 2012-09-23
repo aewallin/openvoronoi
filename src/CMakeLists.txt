@@ -107,6 +107,7 @@ IF( ${BUILD_PYTHON_MODULE} MATCHES ON)
 ENDIF()
 
 find_package( Boost COMPONENTS graph REQUIRED)
+# alternative: find_package(Boost REQUIRED)
 # find boost
 if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
@@ -195,8 +196,6 @@ set( OVD_INCLUDE_SOLVERS_FILES
     
     ${OpenVoronoi_SOURCE_DIR}/solvers/solver_sep.hpp
     ${OpenVoronoi_SOURCE_DIR}/solvers/solver_alt_sep.hpp
-
-
 )
 
 # include directories
@@ -210,7 +209,8 @@ add_library(
 )
 set_target_properties(libopenvoronoi PROPERTIES PREFIX "")
 set_target_properties(libopenvoronoi PROPERTIES VERSION ${MY_VERSION}) 
-#target_link_libraries(libopenvoronoi ${Boost_LIBRARIES} ${QD_LIBRARY}) 
+# uncomment to link against libqd here. an alternative is to link libqd when an application using openvoronoi is built.
+target_link_libraries(libopenvoronoi ${Boost_LIBRARIES} ${QD_LIBRARY}) 
 
 # c++lib for coverage testing
 add_library(

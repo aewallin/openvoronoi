@@ -3,16 +3,8 @@ SET(test_name "cpptest_ttt_glyph" )
 MESSAGE(STATUS "configuring c++ test: " ${test_name})
 set(SOURCE_FILES ttt_glyph.cpp)
 add_executable(${test_name} ${SOURCE_FILES})
+add_dependencies(${test_name}  libopenvoronoi)
 
-find_library(OVD2_LIBRARY 
-            NAMES openvoronoi
-            PATHS /usr/local/lib/openvoronoi
-            DOC "openvoronoi"
-            REQUIRED
-)
-# find the qd library
-find_package( qd REQUIRED )
-include_directories(${QD_INCLUDE_DIR})
 unset(Boost_LIBRARIES) # required because this contains boost-python when we come here
 find_package( Boost COMPONENTS program_options REQUIRED)
 
@@ -33,7 +25,7 @@ if( FREETYPE_FOUND )
 endif()
 include_directories(${FREETYPE_INCLUDE_DIRS})
 
-target_link_libraries(${test_name} ${OVD2_LIBRARY} ${TTT_LIBRARY} ${QD_LIBRARY} ${Boost_LIBRARIES})
+target_link_libraries(${test_name} libopenvoronoi ${TTT_LIBRARY} ${Boost_LIBRARIES})
 
 ADD_TEST(${test_name} ${test_name})
 

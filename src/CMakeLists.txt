@@ -8,7 +8,8 @@ INCLUDE(gcc_version.cmake)
 option(USE_CLANG "build application with clang" OFF) # OFF is the default
 
 # experimental use of clang, since it detects more warnings/erors than gcc
-# Note: on some install this requires the package: gcc-multilib to work
+# Note: useful packages: clang, llvm, gcc-multilib
+# see: http://stackoverflow.com/questions/7031126/switching-between-gcc-and-clang-llvm-using-cmake
 if(USE_CLANG)
     SET (CMAKE_C_COMPILER             "/usr/bin/clang")
     SET (CMAKE_C_FLAGS                "-Wall -std=c99")
@@ -30,8 +31,9 @@ if(USE_CLANG)
     #SET (CMAKE_OBJDUMP "/usr/bin/llvm-objdump")
     #SET (CMAKE_RANLIB  "/usr/bin/llvm-ranlib")
     
-    
-    add_definitions(-Werror -Wall -Wundef -Wno-error=uninitialized -Wshadow  -Wno-long-long -Wno-deprecated -pedantic -pedantic-errors)
+    add_definitions(-O3)
+    # -Wno-error=uninitialized -Wno-deprecated -Wno-long-long
+    add_definitions(-Werror -Wall -Wundef  -Wshadow    -pedantic -pedantic-errors)
     add_definitions(-fPIC)
     
 endif()

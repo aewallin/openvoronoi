@@ -285,7 +285,7 @@ public:
                     }
                     point_list.append( g[v1].position + v1_offset*null_edge_offset );
                     point_list.append( g[v2].position + v2_offset*null_edge_offset );
-                } else if ((g[edge].type == NULLEDGE)) {
+                } else if (g[edge].type == NULLEDGE) {
                     //int nmax=20;
                     double dalfa = 0.1;
                     if ( g[v1].alfa < g[v2].alfa ) {// the normal case

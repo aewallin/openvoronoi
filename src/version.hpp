@@ -11,4 +11,16 @@ std::string build_type() {
     return BUILDTYPE_STRING;
 }
 
+std::string compiler() {
+    return COMPILER_STRING;
+}
+
+std::string system() {
+    return SYSTEM_STRING;
+}
+
+std::string processor() {
+    return PROCESSOR_STRING;
+}
+
 }

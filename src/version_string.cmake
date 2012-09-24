@@ -32,6 +32,22 @@ else()
     #message( WARNING "Git not found. Reading tag from git-tag.txt instead: " ${GIT_COMMIT_ID})
 endif()
 
+# get the compiler and its version
+exec_program(
+  ${CMAKE_CXX_COMPILER}
+  ARGS                    --version
+  OUTPUT_VARIABLE _compiler_output
+)
+# we want only the first line of output
+string(REGEX MATCH "^([^\n]+)" 
+  compiler_version 
+  "${_compiler_output}"
+)
+
+message(STATUS "version_string.cmake: C++ compiler: ${CMAKE_CXX_COMPILER}" )
+message(STATUS "version_string.cmake: C++ compiler version: ${compiler_version}")
+  
+
 set( vstring "//version_string.hpp - written by cmake. changes will be lost!\n"
              "#ifndef VERSION_STRING\n"
              "#define VERSION_STRING \"${GIT_COMMIT_ID}\"\n"
@@ -39,6 +55,18 @@ set( vstring "//version_string.hpp - written by cmake. changes will be lost!\n"
              " \n"
              "#ifndef BUILDTYPE_STRING\n"
              "#define BUILDTYPE_STRING \"${CMAKE_BUILD_TYPE}\"\n"
+             "#endif\n"
+             " \n"
+             "#ifndef COMPILER_STRING\n"
+             "#define COMPILER_STRING \"${compiler_version}\"\n"
+             "#endif\n"
+             " \n"
+             "#ifndef SYSTEM_STRING\n"
+             "#define SYSTEM_STRING \"${CMAKE_SYSTEM}\"\n"
+             "#endif\n"
+             " \n"
+             "#ifndef PROCESSOR_STRING\n"
+             "#define PROCESSOR_STRING \"${CMAKE_SYSTEM_PROCESSOR}\"\n"
              "#endif\n"
 )
 

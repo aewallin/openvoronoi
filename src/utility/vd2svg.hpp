@@ -32,17 +32,17 @@
 #define PI 3.1415926535897932384626433832795
 #define CIRCLE_FUZZ 1.e-9
 
-ovd::Point scale(ovd::Point p) {
+inline ovd::Point scale(ovd::Point p) {
     double s = 500;
     return s*p+s*ovd::Point(1,1);
 }
 
-double scale(double d) {
+inline double scale(double d) {
     double s = 500;
     return s*d;
 }
 
-svg::Color get_edge_color(ovd::HEGraph& g, ovd::HEEdge e) {
+inline svg::Color get_edge_color(ovd::HEGraph& g, ovd::HEEdge e) {
     if ( g[e].type == ovd::LINESITE )
         return svg::Color::Yellow;
     if ( g[e].type == ovd::PARABOLA )
@@ -52,7 +52,7 @@ svg::Color get_edge_color(ovd::HEGraph& g, ovd::HEEdge e) {
     return svg::Color::Blue;
 }
 
-void write_line_to_svg(ovd::HEGraph& g, svg::Document& doc, ovd::Point src, ovd::Point trg, svg::Color col) {
+inline void write_line_to_svg(ovd::HEGraph& g, svg::Document& doc, ovd::Point src, ovd::Point trg, svg::Color col) {
     ovd::Point src_p = scale( src );
     ovd::Point trg_p = scale( trg );
     
@@ -61,7 +61,7 @@ void write_line_to_svg(ovd::HEGraph& g, svg::Document& doc, ovd::Point src, ovd:
     doc << polyline;
 }
 
-void write_arc_to_svg(ovd::HEGraph& g, svg::Document& doc, ovd::Point src, ovd::Point trg, double r, ovd::Point ctr, bool cw, svg::Color col) {
+inline void write_arc_to_svg(ovd::HEGraph& g, svg::Document& doc, ovd::Point src, ovd::Point trg, double r, ovd::Point ctr, bool cw, svg::Color col) {
     ovd::Point src_p = scale( src );
     ovd::Point trg_p = scale( trg );
     double radius = scale( r );
@@ -94,7 +94,7 @@ void write_arc_to_svg(ovd::HEGraph& g, svg::Document& doc, ovd::Point src, ovd::
     doc << arc;
 }
 
-void write_edge_to_svg(ovd::HEGraph& g, svg::Document& doc, ovd::HEEdge e) {
+inline void write_edge_to_svg(ovd::HEGraph& g, svg::Document& doc, ovd::HEEdge e) {
     ovd::HEVertex src = g.source(e);
     ovd::HEVertex trg = g.target(e);
     ovd::Point src_p = scale( g[src].position );
@@ -123,7 +123,7 @@ void write_edge_to_svg(ovd::HEGraph& g, svg::Document& doc, ovd::HEEdge e) {
     doc << polyline;
 }
 
-void write_pointsite_to_svg(ovd::HEGraph& g, svg::Document& doc, ovd::HEVertex v) {
+inline void write_pointsite_to_svg(ovd::HEGraph& g, svg::Document& doc, ovd::HEVertex v) {
     if ( g[v].type == ovd::POINTSITE ) {
         ovd::Point p = scale( g[v].position );
         doc << svg::Circle( svg::Point(p.x, p.y), 0.1, 
@@ -132,7 +132,7 @@ void write_pointsite_to_svg(ovd::HEGraph& g, svg::Document& doc, ovd::HEVertex v
     }
 }
 
-void vd2svg(std::string filename, ovd::VoronoiDiagram* vd) {
+inline void vd2svg(std::string filename, ovd::VoronoiDiagram* vd) {
     svg::Dimensions dimensions(1024, 1024);
     svg::Document doc(filename, svg::Layout(dimensions, svg::Layout::BottomLeft));
     

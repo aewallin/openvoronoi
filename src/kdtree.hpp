@@ -91,10 +91,10 @@ public:
     /// return a point in the tree that is nearest to the given point
     /// false is returned if the tree is empty. 
     std::pair<point_type,bool> nearest( const point_type& pos) {
+        if (!root_) return std::make_pair(pos,false);
         num_nearest_i_calls=0;
         kd_hyperrect<point_type> rect = *rect_;
         kd_node<point_type>* result;
-        if (!root_) return std::make_pair(pos,false);
         /* Our first guesstimate is the root node */
         result = root_;
         /* Search for the nearest neighbour recursively */

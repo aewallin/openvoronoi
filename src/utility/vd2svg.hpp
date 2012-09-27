@@ -49,6 +49,12 @@ inline svg::Color get_edge_color(ovd::HEGraph& g, ovd::HEEdge e) {
         return svg::Color::Cyan;
     if ( g[e].type == ovd::SEPARATOR )
         return svg::Color::Magenta;
+    if ( g[e].type == ovd::LINELINE )
+        return svg::Color::Green;
+    if ( g[e].type == ovd::PARA_LINELINE )
+        return svg::Color::Lime;
+    if ( g[e].type == ovd::OUTEDGE)
+         return svg::Color::Orange;
     return svg::Color::Blue;
 }
 

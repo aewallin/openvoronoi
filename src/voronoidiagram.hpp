@@ -55,9 +55,10 @@
  * Some tests use truetype-tracer (font geometry source), and some use CGAL_RPG (random polygon generator). 
  * \section coverage Code Coverage Testing
  * - compile using CMAKE_BUILD_TYPE=Coverage  (uses "-fprofile-arcs -ftest-coverage" )
- * - There is a custom target "make coverage-report" that runs the following:
- *  - reset counters "lcov --directory ./ --zerocounters"
- *  - run tests with "ctest -D Experimental -R cpptest_minimal"
+ * - install the library "sudo make install"
+ * - Run the custom target coverage-report with "make coverage-report". It will do the following:
+ *  - reset lcov counters "lcov --directory ./ --zerocounters"
+ *  - run CTest c++ tests with "ctest -R cpptest"
  *  - generate an info-file with "lcov --directory ./ --capture --output-file app.info"
  *  - generate html output with "genhtml --output-directory coverage --title OpenVoronoi Test Coverage app.info"
  * - point your browser to build/doc/index.html to see the output

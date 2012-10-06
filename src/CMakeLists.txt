@@ -63,10 +63,10 @@ endif ()
 
 # uncomment one of these to change build-type
 
-set(CMAKE_BUILD_TYPE Release)
+# set(CMAKE_BUILD_TYPE Release)
 # set(CMAKE_BUILD_TYPE Debug)
 # set(CMAKE_BUILD_TYPE Profile)
-# set(CMAKE_BUILD_TYPE Coverage)
+set(CMAKE_BUILD_TYPE Coverage)
 MESSAGE(STATUS " CMAKE_BUILD_TYPE  = " ${CMAKE_BUILD_TYPE})
 
 option(BUILD_PYTHON_MODULE "Build python-module? " ON) # this should make building the python-module optional
@@ -84,6 +84,7 @@ option(BUILD_PY_TESTS "Build/configure Python tests?" OFF)
 if (CMAKE_BUILD_TYPE MATCHES "Profile")
     set(CMAKE_CXX_FLAGS_PROFILE "-p -g -DNDEBUG")
     MESSAGE(STATUS " CMAKE_CXX_FLAGS_PROFILE = " ${CMAKE_CXX_FLAGS_PROFILE})
+    set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS_PROFILE})
 endif (CMAKE_BUILD_TYPE MATCHES "Profile")
 
 
@@ -347,6 +348,7 @@ message(STATUS "lcov cmake src dir ${CMAKE_SOURCE_DIR}")
 add_custom_target(coverage-report
     COMMAND lcov --directory ./ --zerocounters
     # COMMAND make ExperimentalCoverage
+    # COMMAND ctest -D Experimental Coverage -R cpptest
     COMMAND ctest -R cpptest
     COMMAND lcov --directory ./ --capture  --output-file testcoverage.info # --base-directory ${CMAKE_SOURCE_DIR}
     COMMAND lcov --directory ./ --extract testcoverage.info \"*/openvoronoi*\" --output-file testcoverage_ext.info

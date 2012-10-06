@@ -1,7 +1,7 @@
 
 # message(STATUS " called with SRC_DIR is = " ${SRC_DIR})
 # message(STATUS " called with version  = " ${MY_VERSION})
-message(STATUS "Configuring debian package.")
+message(STATUS "package_details.cmake: Configuring debian package details.")
 
 set(CPACK_GENERATOR "DEB" CACHE string "generator" )
 set(CPACK_PACKAGE_CONTACT "Anders Wallin <anders.e.e.wallin@gmail.com>" CACHE STRING "email")

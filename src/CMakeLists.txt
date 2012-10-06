@@ -63,10 +63,10 @@ endif ()
 
 # uncomment one of these to change build-type
 
-# set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Release)
 # set(CMAKE_BUILD_TYPE Debug)
 # set(CMAKE_BUILD_TYPE Profile)
-set(CMAKE_BUILD_TYPE Coverage)
+# set(CMAKE_BUILD_TYPE Coverage)
 MESSAGE(STATUS " CMAKE_BUILD_TYPE  = " ${CMAKE_BUILD_TYPE})
 
 option(BUILD_PYTHON_MODULE "Build python-module? " ON) # this should make building the python-module optional
@@ -364,15 +364,16 @@ execute_process(
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
-include(package_details.cmake)
+# include(package_details.cmake)
 
 # run the source package generation as a target, so we don't have to do it every time
 add_custom_target(spackage 
-              ${CMAKE_COMMAND} -D SRC_DIR:STRING=${CMAKE_SOURCE_DIR} -D MY_VERSION:STRING=${MY_VERSION} -C ${CMAKE_SOURCE_DIR}/package_details.cmake
-              -P ${CMAKE_CURRENT_SOURCE_DIR}/deb/DebSourcePPA.cmake 
-              #ERROR_QUIET # WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-            ) # get the changes file as an output from here?
-# -C ${CMAKE_BINARY_DIR}/CMakeCache.txt
-
+              ${CMAKE_COMMAND} -D SRC_DIR:STRING=${CMAKE_SOURCE_DIR} 
+              -D MY_VERSION:STRING=${MY_VERSION} 
+              -C ${CMAKE_SOURCE_DIR}/deb/package_details.cmake # a lot of variables etc. defined here
+              -P ${CMAKE_CURRENT_SOURCE_DIR}/deb/DebSourcePPA.cmake # the script that builds a debian package
+            ) 
+# "make package" will build a binary package
+# "make spackage" will build a source-package (for uploading to the PPA)
 
 include(CPack) # this should be last

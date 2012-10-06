@@ -42,5 +42,5 @@ with "cpptest_", which should contain a CMakeLists.txt that calls
   ADD_TEST( <test name> )
 
 The easiest way to add a C++ test is to make a copy of the template
-"test_minimal" subdirectory
+"cpptest_minimal" subdirectory
 

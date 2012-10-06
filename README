@@ -15,6 +15,7 @@ https://github.com/aewallin/openvoronoi
 
 Build, Test, and Code-coverage dashboard:
 http://my.cdash.org/index.php?project=OpenVoronoi
+(not updated regularly! ToDo: set up continous build/test server + website)
 
 The mailing-list for OpenVoronoi is at
 https://groups.google.com/forum/?hl=en#!forum/opencamlib
@@ -32,12 +33,12 @@ git            (required only for the version-string)
 python         (if python bindings are built/used)
 Boost python   (if python bindings are built)
 doxygen        (for building documentation)
-asymptote      (white-paper figures)
-lyx            (white-paper)
+asymptote      (to build white-paper figures)
+lyx            (to build white-paper)
 libvtk         (many python-scripts use VTK for visualization)
 python-vtk     (VTK python bindings)
-ttt            https://github.com/aewallin/truetype-tracer
-rpg            https://github.com/aewallin/CGAL_RPG
+ttt            https://github.com/aewallin/truetype-tracer (some tests/examples use ttt)
+rpg            https://github.com/aewallin/CGAL_RPG (some tests use rpg)
 
 Build/Install instructions
 
@@ -57,14 +58,16 @@ $ sudo make install
 
 Documentation
 Doxygen documentation can be built with "make doc"
-A white-paper on the algorithm/solvers in Lyx format is located in /doc
+A white-paper on the algorithm and solvers in LyX format is located in /doc. 
+It has its own CMakeLists.txt file which builds a PDF file.
 
 Tests
-There are a few python-scrits in src/test/ that can be run with CTest.
+Voth c++ and python tests in src/test/. These are run with CTest.
 In the build-directory either "make test" or "ctest" will run all tests. 
 You can run only tests that have e.g. "ttt" in the test-name with
 "ctest -R ttt"
 Currently the tests do not produce any output (png or svg output could be an option?)
+The cmake option CM
 
 Organization
 doc/        has documentation in lyx format, with figures in asymptote format. 

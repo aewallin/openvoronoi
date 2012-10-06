@@ -63,7 +63,7 @@ endif ()
 
 # uncomment one of these to change build-type
 
- set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Release)
 # set(CMAKE_BUILD_TYPE Debug)
 # set(CMAKE_BUILD_TYPE Profile)
 # set(CMAKE_BUILD_TYPE Coverage)
@@ -77,8 +77,8 @@ option(BUILD_PYTHON_MODULE "Build python-module? " ON) # this should make buildi
 
 option(BUILD_DOC "Build doxygen documentation? " ON)
 
-#set(BUILD_TESTS 1)
-option(BUILD_TESTS "Build tests?" OFF) # don't build tests
+option(BUILD_CPP_TESTS "Build c++ tests?" ON) 
+option(BUILD_PY_TESTS "Build/configure Python tests?" OFF) 
 
 
 if (CMAKE_BUILD_TYPE MATCHES "Profile")
@@ -331,8 +331,12 @@ install(
 
 
 # tests
-if( ${BUILD_TESTS} MATCHES ON)
-    include(${CMAKE_SOURCE_DIR}/test/ovd_tests.cmake)
+if( ${BUILD_CPP_TESTS} MATCHES ON)
+
+    include(${CMAKE_SOURCE_DIR}/test/ovd_cpp_tests.cmake)
+endif()
+if( ${BUILD_PY_TESTS} MATCHES ON)
+    include(${CMAKE_SOURCE_DIR}/test/ovd_py_tests.cmake)
 endif()
 
 # doxygen documentation

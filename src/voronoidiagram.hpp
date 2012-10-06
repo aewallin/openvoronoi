@@ -53,6 +53,7 @@
  * - "ctest -R cpp" runs only the c++ tests (these are fast)
  * - "ctest" runs all tests (some may be slow)
  * Some tests use truetype-tracer (font geometry source), and some use CGAL_RPG (random polygon generator). 
+ * 
  * \section coverage Code Coverage Testing
  * - compile using CMAKE_BUILD_TYPE=Coverage  (uses "-fprofile-arcs -ftest-coverage" )
  * - install the library "sudo make install"
@@ -62,6 +63,13 @@
  *  - generate an info-file with "lcov --directory ./ --capture --output-file app.info"
  *  - generate html output with "genhtml --output-directory coverage --title OpenVoronoi Test Coverage app.info"
  * - point your browser to build/doc/index.html to see the output
+ * 
+ * \section debian Debian source package
+ * - A debian source package is built with the spackage target, run with "make spackage"
+ * - The source-package can be tested with pbuilder
+ *  - TODO: describe here!
+ * - The source-package can be uploaded to the PPA
+ *  - TODO: describe here!
  */
  
 

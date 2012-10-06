@@ -77,7 +77,7 @@ option(BUILD_PYTHON_MODULE "Build python-module? " ON) # this should make buildi
 
 option(BUILD_DOC "Build doxygen documentation? " ON)
 
-option(BUILD_CPP_TESTS "Build c++ tests?" ON) 
+option(BUILD_CPP_TESTS "Build c++ tests?" OFF) 
 option(BUILD_PY_TESTS "Build/configure Python tests?" OFF) 
 
 
@@ -118,13 +118,9 @@ IF( ${BUILD_PYTHON_MODULE} MATCHES ON)
     MESSAGE(STATUS "Python includes: " ${PYTHON_INCLUDE_DIRS})
 ENDIF()
 
-# find boost-python
-IF( ${BUILD_PYTHON_MODULE} MATCHES ON)
-    find_package( Boost COMPONENTS python REQUIRED)
-    MESSAGE(STATUS "Boost_PYTHON_LIBRARY is: " ${Boost_PYTHON_LIBRARY})
-ENDIF()
 
-find_package( Boost COMPONENTS graph REQUIRED)
+
+find_package( Boost REQUIRED)
 # alternative: find_package(Boost REQUIRED)
 # find boost
 if(Boost_FOUND)
@@ -135,6 +131,12 @@ if(Boost_FOUND)
     MESSAGE(STATUS "boost_LIBRARY_DIRS is: " ${Boost_LIBRARY_DIRS})
     MESSAGE(STATUS "Boost_LIBRARIES is: " ${Boost_LIBRARIES})    
 endif()
+
+# find boost-python
+IF( ${BUILD_PYTHON_MODULE} MATCHES ON)
+    find_package( Boost COMPONENTS python REQUIRED)
+    MESSAGE(STATUS "Boost_PYTHON_LIBRARY is: " ${Boost_PYTHON_LIBRARY})
+ENDIF()
 
 set( CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR} ) # Findqd.cmake is in this dir
 # find the qd library
@@ -355,16 +357,7 @@ add_custom_target(coverage-report
     COMMAND genhtml --show-details --prefix \"${CMAKE_SOURCE_DIR}\" --output-directory coverage-report --title OpenVoronoi testcoverage_ext.info
 )
 
-
-
-# "make package" stuff
-execute_process(
-    COMMAND dpkg --print-architecture
-    OUTPUT_VARIABLE DEB_ARCHITECTURE
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-
-# include(package_details.cmake)
+include(deb/package_details.cmake)
 
 # run the source package generation as a target, so we don't have to do it every time
 add_custom_target(spackage 

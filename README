@@ -13,6 +13,9 @@ approximate medial-axis filter (medial_axis.hpp) has been added.
 The OpenVoronoi project is at 
 https://github.com/aewallin/openvoronoi
 
+Launchpad PPA
+https://launchpad.net/~anders-e-e-wallin/+archive/cam
+
 Build, Test, and Code-coverage dashboard:
 http://my.cdash.org/index.php?project=OpenVoronoi
 (not updated regularly! ToDo: set up continous build/test server + website)

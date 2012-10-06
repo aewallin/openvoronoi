@@ -33,6 +33,14 @@ foreach(DEP ${DEBSRC_BUILD_DEPENDS})
     set(CPACK_DEBIAN_BUILD_DEPENDS "${CPACK_DEBIAN_BUILD_DEPENDS}, ${DEP}")
 endforeach(DEP ${DEBSRC_BUILD_DEPENDS})  
 
+# find out and set DEB_ARCHITECTURE
+execute_process(
+    COMMAND dpkg --print-architecture
+    OUTPUT_VARIABLE DEB_ARCHITECTURE
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    
+)
+message(STATUS "package_details.cmake: your architecture is ${DEB_ARCHITECTURE}")
 
 set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE ${DEB_ARCHITECTURE} CACHE STRING "name6")
 set(CPACK_DEBIAN_PACKAGE_PRIORITY optional CACHE STRING "name7")

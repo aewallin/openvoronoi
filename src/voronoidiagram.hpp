@@ -65,11 +65,14 @@
  * - point your browser to build/doc/index.html to see the output
  * 
  * \section debian Debian source package
- * - A debian source package is built with the spackage target, run with "make spackage"
+ * - See the files in src/deb for more information. 
+ * - A debian source package in <build>/Debian is built with the spackage target, run with "make spackage"
+ *  - remember to set the "Release" build-type
+ *  - disable building of tests (these require ttt and rpg which pbuilder/PPA does not find)
  * - The source-package can be tested with pbuilder
- *  - TODO: describe here!
- * - The source-package can be uploaded to the PPA
- *  - TODO: describe here!
+ *  - to test-build the package run e.g. "sudo pbuilder build openvoronoi_12.02.257-ubuntu1~precise1.dsc" (this may take some time)
+ * - The source-package can be uploaded to the Launchpad PPA with dput (this requires that you have write-access to the PPA)
+ *  - "dput ppa:anders-e-e-wallin/cam *.changes"
  */
  
 

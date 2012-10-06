@@ -70,8 +70,10 @@
  *  - remember to set the "Release" build-type
  *  - disable building of tests (these require ttt and rpg which pbuilder/PPA does not find)
  * - The source-package can be tested with pbuilder
- *  - to test-build the package run e.g. "sudo pbuilder build openvoronoi_12.02.257-ubuntu1~precise1.dsc" (this may take some time)
- * - The source-package can be uploaded to the Launchpad PPA with dput (this requires that you have write-access to the PPA)
+ *  - to test-build the package (assuming you are on a precise distribution) run e.g. "sudo pbuilder build openvoronoi_12.02.257-ubuntu1~precise1.dsc" (this may take some time)
+ *  - to test-build for other distributions:
+ *   - "sudo pbuilder build --distribution lucid openvoronoi_12.02.257-ubuntu1~lucid1.dsc"
+ * - The source-package(s) can be uploaded to the Launchpad PPA with dput (this requires that you have write-access to the PPA)
  *  - "dput ppa:anders-e-e-wallin/cam *.changes"
  */
  

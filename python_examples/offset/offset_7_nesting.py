@@ -105,7 +105,10 @@ if __name__ == "__main__":
         sorter.add_loop( loop )
     
     sorter.sort_loops()
-    
+    # this generates a graph test.dot
+    # to generate a png image run
+    #  dot -Tpng test.dot > test.png
+
     offset2vtk.drawOffsets(myscreen, ofs_loops) # draw the generated offsets
     print "number of loops= ",len(ofs_loops)
     for loop in ofs_loops:

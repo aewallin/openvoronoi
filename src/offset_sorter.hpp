@@ -70,12 +70,13 @@ typedef boost::graph_traits<MachiningGraph>::vertex_iterator   VertexItr;
 class OffsetLoopCompare {
 public:
     bool operator() (OffsetLoop l1, OffsetLoop l2) {
-        return (l1.offset_distance > l2.offset_distance);
+        return (l1.offset_distance < l2.offset_distance);
     }
 };
 
 typedef std::pair<Vertex,OffsetLoop> VertexOffsetLoop;
 
+/// predicate for sorting loops by offset-distance
 class VertexOffsetLoopCompare {
 public:
     bool operator() (VertexOffsetLoop l1, VertexOffsetLoop l2) {
@@ -89,12 +90,14 @@ public:
     label_writer(Name _name) : name(_name) {}
     template <class VertexOrEdge>
     void operator()(std::ostream& out, const VertexOrEdge& v) const {
-      out << "[label=\"" << v << " (t="<< name[v].offset_distance <<")\"]";
+      out << "[label=\"" << v  << " (t="<< name[v].offset_distance <<")\"]";
     }
 private:
     Name name;
 };
-  
+
+/// this class sorts offset-loops into DAG (directed acyclic graph) which should
+/// contain the loops in a sensible order for pocket machining
 class OffsetSorter {
 public:
     OffsetSorter() {}
@@ -104,40 +107,87 @@ public:
     void sort_loops() {
         // push loops to a set, so they come out in decreasing offset-distance order, i.e. max offset-distance (innermost) loop first.
         BOOST_FOREACH( const OffsetLoop l, all_loops ) {
-            dist_sorted_loops.insert(l);
+            distance_sorted_loops.insert(l);
+
         }
-        // go through the loops and build the machining graph
         
-        BOOST_FOREACH( OffsetLoop l, dist_sorted_loops ) {
-            std::cout << "loop at " << l.offset_distance << "\n";
-            Vertex new_vert = boost::add_vertex(g);
+        // go through the loops, in distance order, and add vertices
+        BOOST_FOREACH( OffsetLoop l, distance_sorted_loops ) {
+            std::cout << "adding loop at " << l.offset_distance << "\n";
+            Vertex new_vert = boost::add_vertex(g); // each offset loop corresponds to a vertex in the machining-graph
             g[new_vert] = l;
-            connect_vertex(new_vert);
+            vertex_order.push_back( new_vert );
         }
         
+        // now add edges
+        BOOST_FOREACH( Vertex v, vertex_order) {
+			std::cout << "connecting loop at " << g[v].offset_distance << "\n";
+			connect_vertex(v); // attempt to connect the new vertex to existing vertices in the graph
+        }
         write_dotfile();
     }
     void connect_vertex(Vertex v) {
         // try to connect the new vertex to existing vertices
-        VertexItr it_begin, it_end, itr;
-        boost::tie( it_begin, it_end ) = boost::vertices( g );
+        //VertexItr it_begin, it_end, itr;
+        //boost::tie( it_begin, it_end ) = boost::vertices( g );
+
+        std::vector< Vertex > interior_loops;
+        double current_offset=0;
+        bool first = true;
         
-        std::set< VertexOffsetLoop, VertexOffsetLoopCompare> outside_loops;
-        for ( itr=it_begin ; itr != it_end ; ++itr ) {
-            if ( v != *itr ) { // don't connect to self
-                if ( g[v].offset_distance < g[*itr].offset_distance ){ // connect only if v is contained in *itr, based on offset-distance
-                    outside_loops.insert( std::make_pair(*itr, g[*itr]) );
+        BOOST_FOREACH( Vertex trg, vertex_order ) {
+            if ( (v != trg) && (g[v].offset_distance < g[trg].offset_distance) ) { // don't connect to self, or to outside loops
+            	if (first ) {
+					current_offset = g[trg].offset_distance;
+					first = false;
+					std::cout << " first loop inside " << g[v].offset_distance << " is "  << current_offset << "\n";
+				}
+                if ( g[trg].offset_distance == current_offset ) {
+					if ( inside(trg,v) ) {
+						std::cout << "   adding loop inside " << g[trg].offset_distance  << "\n";
+						interior_loops.push_back( trg );
+					}
                 }
             }
         }
-        if (!outside_loops.empty()) {
-            VertexOffsetLoop trg_pair = *(outside_loops.begin());
-            Vertex trg = trg_pair.first;
-            boost::add_edge(v,trg,g);
+        // go through the outside loops and connect 
+
+        BOOST_FOREACH( Vertex trg, interior_loops ) {
+			boost::add_edge(v,trg,g);
         }
     }
+    
+    /// return true if the in Vertex is interior to the out Vertex
+    bool inside(Vertex in, Vertex out) {
+		OffsetLoop in_loop = g[in];
+		OffsetLoop out_loop = g[out];
+		
+		std::cout << " " << in_loop.offset_distance << " in_loop faces: ";
+		BOOST_FOREACH( OffsetVertex in_ofs_vert, in_loop.vertices ) {
+			std::cout << in_ofs_vert.f << " ";
+		}
+		std::cout << "\n";
+		std::cout << " " << out_loop.offset_distance << " out_loop faces: ";
+		BOOST_FOREACH( OffsetVertex out_ofs_vert, out_loop.vertices ) {
+			std::cout << out_ofs_vert.f << " ";
+		}
+		std::cout << "\n";
+		
+		BOOST_FOREACH( OffsetVertex in_ofs_vert, in_loop.vertices ) {
+			BOOST_FOREACH( OffsetVertex out_ofs_vert, out_loop.vertices ) {
+				if (in_ofs_vert.f!=0 && out_ofs_vert.f!=0 && in_ofs_vert.f == out_ofs_vert.f) {
+					std::cout << "  Match!\n";
+					return true;
+				}
+			}
+		} 
+		std::cout << "  NO Match!\n";
+		return false;
+	}
+    
+    /// write the machining graph to a .dot file for visualization
     void write_dotfile() {
-        // write graph to file to see it
+        
         std::filebuf fb;
         fb.open ("test.dot",std::ios::out);
         std::ostream out(&fb);
@@ -145,7 +195,8 @@ public:
         boost::write_graphviz( out, g, lbl_wrt);
     }
 protected:
-    std::multiset<OffsetLoop, OffsetLoopCompare> dist_sorted_loops; // set of Loops, sorted by decreasing offset-distance
+    std::multiset<OffsetLoop, OffsetLoopCompare> distance_sorted_loops; ///< set of Loops, sorted by decreasing offset-distance
+    std::vector<Vertex> vertex_order;
     OffsetLoops all_loops;
     MachiningGraph g;
 };

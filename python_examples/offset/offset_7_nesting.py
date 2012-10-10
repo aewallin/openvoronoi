@@ -100,7 +100,7 @@ if __name__ == "__main__":
         ofsl.extend( of.offset_loop_list(d) )
     #print ofsl
     
-    sorter = ovd.OffsetSorter()
+    sorter = ovd.OffsetSorter(vd.getGraph())
     for loop in ofsl:
         sorter.add_loop( loop )
     

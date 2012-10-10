@@ -100,7 +100,7 @@ private:
 /// contain the loops in a sensible order for pocket machining
 class OffsetSorter {
 public:
-    OffsetSorter() {}
+    OffsetSorter(HEGraph& gi): vdg(gi) {}
     void add_loop(OffsetLoop l) {
         all_loops.push_back(l);
     }
@@ -121,8 +121,8 @@ public:
         
         // now add edges
         BOOST_FOREACH( Vertex v, vertex_order) {
-			std::cout << "connecting loop at " << g[v].offset_distance << "\n";
-			connect_vertex(v); // attempt to connect the new vertex to existing vertices in the graph
+            std::cout << "connecting loop at " << g[v].offset_distance << "\n";
+            connect_vertex(v); // attempt to connect the new vertex to existing vertices in the graph
         }
         write_dotfile();
     }
@@ -137,54 +137,129 @@ public:
         
         BOOST_FOREACH( Vertex trg, vertex_order ) {
             if ( (v != trg) && (g[v].offset_distance < g[trg].offset_distance) ) { // don't connect to self, or to outside loops
-            	if (first ) {
-					current_offset = g[trg].offset_distance;
-					first = false;
-					std::cout << " first loop inside " << g[v].offset_distance << " is "  << current_offset << "\n";
-				}
+                if (first ) {
+                    current_offset = g[trg].offset_distance;
+                    first = false;
+                    std::cout << " first loop inside " << g[v].offset_distance << " is "  << current_offset << "\n";
+                }
                 if ( g[trg].offset_distance == current_offset ) {
-					if ( inside(trg,v) ) {
-						std::cout << "   adding loop inside " << g[trg].offset_distance  << "\n";
-						interior_loops.push_back( trg );
-					}
+                    if ( inside(trg,v) ) {
+                        std::cout << "   adding loop inside " << g[trg].offset_distance  << "\n";
+                        interior_loops.push_back( trg );
+                    }
                 }
             }
         }
         // go through the outside loops and connect 
 
         BOOST_FOREACH( Vertex trg, interior_loops ) {
-			boost::add_edge(v,trg,g);
+            boost::add_edge(v,trg,g);
         }
     }
     
     /// return true if the in Vertex is interior to the out Vertex
     bool inside(Vertex in, Vertex out) {
-		OffsetLoop in_loop = g[in];
-		OffsetLoop out_loop = g[out];
-		
-		std::cout << " " << in_loop.offset_distance << " in_loop faces: ";
-		BOOST_FOREACH( OffsetVertex in_ofs_vert, in_loop.vertices ) {
-			std::cout << in_ofs_vert.f << " ";
-		}
-		std::cout << "\n";
-		std::cout << " " << out_loop.offset_distance << " out_loop faces: ";
-		BOOST_FOREACH( OffsetVertex out_ofs_vert, out_loop.vertices ) {
-			std::cout << out_ofs_vert.f << " ";
-		}
-		std::cout << "\n";
-		
-		BOOST_FOREACH( OffsetVertex in_ofs_vert, in_loop.vertices ) {
-			BOOST_FOREACH( OffsetVertex out_ofs_vert, out_loop.vertices ) {
-				if (in_ofs_vert.f!=0 && out_ofs_vert.f!=0 && in_ofs_vert.f == out_ofs_vert.f) {
-					std::cout << "  Match!\n";
-					return true;
-				}
-			}
-		} 
-		std::cout << "  NO Match!\n";
-		return false;
-	}
-    
+        OffsetLoop in_loop = g[in];
+        OffsetLoop out_loop = g[out];
+        
+        std::vector<HEFace> in_loop_faces;
+        std::vector<HEFace> out_loop_faces;
+        
+        std::cout << " " << in_loop.offset_distance << " in_loop faces: ";
+        bool first = true;
+        BOOST_FOREACH( OffsetVertex in_ofs_vert, in_loop.vertices ) {
+            if (first) {
+                first = false;
+            } else {
+                std::cout << in_ofs_vert.f << " ";
+                in_loop_faces.push_back( in_ofs_vert.f );
+            }
+        }
+        std::cout << "\n";
+        std::cout << " " << out_loop.offset_distance << " out_loop faces: ";
+        first = true;
+        BOOST_FOREACH( OffsetVertex out_ofs_vert, out_loop.vertices ) {
+            if (first) {
+                first = false;
+            } else {
+                std::cout << out_ofs_vert.f << " ";
+                out_loop_faces.push_back( out_ofs_vert.f );
+            }
+        }
+        std::cout << "\n";
+        
+        std::set<HEVertex> in_enclosed = loop_enclosed_vertices(in_loop_faces);
+        
+        std::set<HEVertex> out_enclosed = loop_enclosed_vertices(out_loop_faces);
+        
+        BOOST_FOREACH( HEVertex inv, in_enclosed) {
+            if ( out_enclosed.find( inv ) != out_enclosed.end() )
+                return true;
+        }
+        /*
+        BOOST_FOREACH( OffsetVertex in_ofs_vert, in_loop.vertices ) {
+            BOOST_FOREACH( OffsetVertex out_ofs_vert, out_loop.vertices ) {
+                if (in_ofs_vert.f!=0 && out_ofs_vert.f!=0 && in_ofs_vert.f == out_ofs_vert.f) {
+                    std::cout << "  Match!\n";
+                    return true;
+                }
+            }
+        } 
+        std::cout << "  NO Match!\n";
+        */
+        return false;
+    }
+
+std::set<HEVertex> loop_enclosed_vertices( std::vector<HEFace> in_loop_faces) {
+        std::vector< VertexVector > in_loop_vertices;
+        // now go through each in_loop face, and collect all interior vd-vertices
+        BOOST_FOREACH(HEFace f, in_loop_faces) {
+            VertexVector in_vertices = vdg.face_vertices(f);
+            in_loop_vertices.push_back(in_vertices);
+            //std::cout << " face " << f << " has " << in_vertices.size() << " vertices\n";
+        }
+        
+        std::set< HEVertex > in_loop_enclosed_vertices;
+        // now figure out which of the vertices are enclosed
+        for(unsigned int i=0;i<in_loop_vertices.size();++i) {
+            // i chooses the face we work on
+            // now choose a vertex
+            VertexVector test_face_verts = in_loop_vertices[i];
+            for (unsigned int iv=0;iv<in_loop_vertices[i].size();++iv) { 
+                HEVertex test_vert = test_face_verts[iv];
+                for(unsigned int j=0;j<in_loop_vertices.size();++j) { // choose first comp-face
+                    if ( j!=i ) {
+                        VertexVector comp1_face_verts = in_loop_vertices[j];
+                        for(unsigned int k=0;k<in_loop_vertices.size();++k) { // second comp-face
+                            if ( j!=k && i!=k ) {
+                                VertexVector comp2_face_verts = in_loop_vertices[k];
+                                // if we have three faces that each contains a Vertex then it is interior.
+                                bool comp1_ok=false;
+                                bool comp2_ok=false;
+                                BOOST_FOREACH(HEVertex comp1_vert, comp1_face_verts) {
+                                    if (test_vert == comp1_vert)
+                                        comp1_ok = true;
+                                }
+                                BOOST_FOREACH(HEVertex comp2_vert, comp2_face_verts) {
+                                    if (test_vert == comp2_vert)
+                                        comp2_ok = true;
+                                }
+                                if (comp1_ok && comp2_ok)
+                                    in_loop_enclosed_vertices.insert(test_vert);
+                            }
+                        }   
+                    }
+                }
+            }
+        }
+        
+        std::cout << "enclosed vertices: ";
+        BOOST_FOREACH(HEVertex tv, in_loop_enclosed_vertices) {
+            std::cout << vdg[tv].index << " ";
+        }
+        std::cout << "\n";
+    return in_loop_enclosed_vertices;
+}    
     /// write the machining graph to a .dot file for visualization
     void write_dotfile() {
         
@@ -199,6 +274,7 @@ protected:
     std::vector<Vertex> vertex_order;
     OffsetLoops all_loops;
     MachiningGraph g;
+    HEGraph& vdg; ///< vd-graph
 };
 
 

@@ -154,7 +154,8 @@ BOOST_PYTHON_MODULE(openvoronoi) {
     ; 
     bp::class_< OffsetLoop  >("OffsetLoop")
     ;  
-    bp::class_< OffsetSorter  >("OffsetSorter")
+    bp::class_< OffsetSorter , boost::noncopyable  >("OffsetSorter", bp::no_init)
+        .def(bp::init<HEGraph&>())
         .def("add_loop", &OffsetSorter::add_loop )
         .def("sort_loops", &OffsetSorter::sort_loops )
     ;  

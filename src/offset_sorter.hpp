@@ -165,28 +165,28 @@ public:
         std::vector<HEFace> in_loop_faces;
         std::vector<HEFace> out_loop_faces;
         
-        std::cout << " " << in_loop.offset_distance << " in_loop faces: ";
+        //std::cout << " " << in_loop.offset_distance << " in_loop faces: ";
         bool first = true;
         BOOST_FOREACH( OffsetVertex in_ofs_vert, in_loop.vertices ) {
             if (first) {
                 first = false;
             } else {
-                std::cout << in_ofs_vert.f << " ";
+                //std::cout << in_ofs_vert.f << " ";
                 in_loop_faces.push_back( in_ofs_vert.f );
             }
         }
-        std::cout << "\n";
-        std::cout << " " << out_loop.offset_distance << " out_loop faces: ";
+        //std::cout << "\n";
+        //std::cout << " " << out_loop.offset_distance << " out_loop faces: ";
         first = true;
         BOOST_FOREACH( OffsetVertex out_ofs_vert, out_loop.vertices ) {
             if (first) {
                 first = false;
             } else {
-                std::cout << out_ofs_vert.f << " ";
+                //std::cout << out_ofs_vert.f << " ";
                 out_loop_faces.push_back( out_ofs_vert.f );
             }
         }
-        std::cout << "\n";
+        //std::cout << "\n";
         
         std::set<HEVertex> in_enclosed = loop_enclosed_vertices(in_loop_faces);
         

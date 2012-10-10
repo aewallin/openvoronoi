@@ -1,13 +1,11 @@
 import openvoronoi as ovd
 import ovdvtk
-import ttt   # https://github.com/aewallin/truetype-tracer
-
-import offset2vtk
-
 import time
 import vtk
 import math
 
+import offset2vtk
+import ttt   # https://github.com/aewallin/truetype-tracer
 
 def insert_polygon_points(vd, polygon):
     pts=[]
@@ -93,16 +91,15 @@ def modify_segments(segs):
     return segs_mod
 
 if __name__ == "__main__":  
-    #print ocl.revision()
-    #w=2500
+    #w=2500 # screen resolution for big screens
     #h=1500
     
-    w=1920
-    h=1080
-    #w=1024
-    #h=1024
-    myscreen = ovdvtk.VTKScreen(width=w, height=h) 
-    ovdvtk.drawOCLtext(myscreen, rev_text=ovd.version() )   
+    #w=1920
+    #h=1080
+    w=1024
+    h=1024
+    myscreen = ovdvtk.VTKScreen(width=w, height=h) # a VTK window for drawing 
+    ovdvtk.drawOCLtext(myscreen, rev_text=ovd.version() )   # the OpenVoronoi text, revision, and date
     
     scale=1
     myscreen.render()
@@ -120,55 +117,68 @@ if __name__ == "__main__":
     
     # for vtk visualization
     vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
+    # these actions on the vod object control how the VD is drawn using VTK
     vod.drawFarCircle()
-
     vod.textScale = 0.02
     vod.vertexRadius = 0.0031
     vod.drawVertices=0
     vod.drawVertexIndex=0
     vod.drawGenerators=0
-    vod.offsetEdges = 0
-    vd.setEdgeOffset(0.05)
-
-    # segments from ttt
-    segs = ttt_segments(  "LinuxCNC", 40000)
-    segs = translate(segs, -0.06, 0.05)
-    segs = modify_segments(segs)
+    vod.offsetEdges = 0 # for debug. a bool flag to set null-edge drawing on/off. use together with setEdgeOffset()
+    vd.setEdgeOffset(0.05) # for debug. a non-zero value will draw null-edges as circular arcs
+    # null-edges are an internal openvoronoi construction to avoid high-degree vertices in the VD-graph
+    # they are not relevant for upstream or downstream algorithms
     
-    
-    times = insert_many_polygons(vd,segs)
     print "all sites inserted. "
     print "VD check: ", vd.check()
     
-    pi = ovd.PolygonInterior( False )
+    # segments from ttt
+    segs = ttt_segments(  "H", 30000)
+    segs = translate(segs, -0.06, -0.05)
+    segs = modify_segments(segs)
+    
+    # a box around the character
+    box = 0.1
+    p0 = [-box,-box]
+    p1 = [box,-box]
+    p2 = [box,box]
+    p3 = [-box,box]
+    seg0 = [p3,p2,p1,p0]
+    segs.append(seg0)
+    
+    times = insert_many_polygons(vd,segs)
+    
+    pi = ovd.PolygonInterior(  False )
     vd.filter_graph(pi)
     
+    
     of = ovd.Offset( vd.getGraph() ) # pass the created graph to the Offset class
-    ofs_list=[]
-    t_before = time.time()
-    for t in [0.002*x for x in range(1,20)]:
-        ofs = of.offset(t)
-        ofs_list.append(ofs)
+    of.str() # text output, for debug
+    dists =[ 0.002*x for x in range(1,30) ]
+    ofs_loops=[]
+    ofsl = []
+    for d in dists:
+        ofs_loops.extend( of.offset(d) )
+        ofsl.extend( of.offset_loop_list(d) )
+    #print ofsl
+    
+    sorter = ovd.OffsetSorter(vd.getGraph())
+    for loop in ofsl:
+        sorter.add_loop( loop )
+    
+    sorter.sort_loops()
+    # this generates a graph test.dot
+    # to generate a png image run
+    #  dot -Tpng test.dot > test.png
 
-    t_after = time.time()
-    oftime = t_after-t_before
-    print len(ofs_list)," offsets to draw:"
-    m=0
-    for ofs in ofs_list:
-        print m," / ",len(ofs_list)
-        offset2vtk.drawOffsets2(myscreen, ofs)
-        m=m+1
-
-    oftext  = ovdvtk.Text()
-    oftext.SetPos( (50, 100) )
-    oftext_text = "Offset in {0:.3f} s CPU time.".format( oftime )
-    oftext.SetText( oftext_text )
-    myscreen.addActor(oftext)
-
-    # turn off the whole VD so we can more clearly see the offsets
-    pi = ovd.PolygonInterior(  True )
-    vd.filter_graph(pi)
-
+    offset2vtk.drawOffsets(myscreen, ofs_loops) # draw the generated offsets
+    print "number of loops= ",len(ofs_loops)
+    for loop in ofs_loops:
+        first_vert=loop[0]
+        print "loop at dist=", first_vert[2], " with ",len(loop)," vertices:"
+        for v in loop[1:]:
+            print " face ",v[4]
+    
     vod.setVDText2(times)
     vod.setAll()
     print "PYTHON All DONE."

@@ -122,9 +122,11 @@ void EdgeProps::set_parameters(Site* s1, Site* s2, bool sig) {
         set_ll_parameters(s2,s1);
     else if (s1->isPoint() && s2->isArc() ) // PA
         set_pa_parameters(s1,s2);
-    else if (s2->isPoint() && s1->isArc() ) // AP
+    else if (s2->isPoint() && s1->isArc() ) { // AP
+        //sign = !sign;
         set_pa_parameters(s2,s1);
-    else if (s1->isLine() && s2->isArc() ) // LA
+        
+    } else if (s1->isLine() && s2->isArc() ) // LA
         set_la_parameters(s1,s2);
     else if (s2->isLine() && s1->isArc() ) // AL
         set_la_parameters(s2,s1);
@@ -250,21 +252,6 @@ void EdgeProps::set_sep_parameters(Point& endp, Point& p) {
 void EdgeProps::set_ll_para_parameters(Site* s1, Site* s2) {
     assert( s1->isLine() && s2->isLine() );
     type = PARA_LINELINE;
-    // a1*b2 - b1*a2 = 0
-    // a1*b2 = b1*a2
-    // distance between parallel lines is
-    // d = fabs( c2-c1 ) / sqrt( a*a + b*b ) = fabs(c2-c1)
-    /*
-    double d = fabs( s2->c() - s1->c() );
-    if (d <=0 ) {
-        std::cout << " s1->a() = " << s1->a() << "\n";
-        std::cout << " s1->b() = " << s1->b() << "\n";
-        std::cout << " s1->c() = " << s1->c() << "\n";
-        
-        std::cout << " s2->a() = " << s2->a() << "\n";
-        std::cout << " s2->b() = " << s2->b() << "\n";
-        std::cout << " s2->c() = " << s2->c() << "\n";
-    }*/
     
     // find a point (x1,y1) on the line s1
     // ax+by+c=0
@@ -348,20 +335,22 @@ void EdgeProps::set_pa_parameters(Site* s1, Site* s2) {
     //std::cout << "set_pa_parameters()\n";
     
     type = HYPERBOLA; // hyperbola or ellipse?
-    double lamb2;
+    double lamb2(1.0);
     //if (s2->cw())
     //    lamb2 = +1.0;
     //else
-    sign=!sign;
     
+    sign=!sign;
     // distance between centers
     double d = sqrt( (s1->x() - s2->x())*(s1->x() - s2->x()) + (s1->y()-s2->y())*(s1->y()-s2->y()) );
     assert( d > 0 );
-    if (d>s2->r())
-        lamb2 = +1.0; // offset towards growing circle
-    else
-        lamb2 = -1.0; // offset towards shrinking circle
-        
+    
+    if (s2->cw()) {
+        lamb2 = +1.0;
+    } else {
+        lamb2 = -1.0;
+    }
+    
     double alfa1 = ( s2->x() - s1->x() ) / d;
     double alfa2 = ( s2->y() - s1->y() ) / d;
     double alfa3 = ( s2->r()*s2->r() -  d*d) / (2*d);

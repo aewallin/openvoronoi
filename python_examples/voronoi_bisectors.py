@@ -180,10 +180,10 @@ class CircleCircle:
             self.alfa1 = (c2.c.x-c1.c.x)/self.d
             self.alfa2 = (c2.c.y-c1.c.y)/self.d
             self.alfa3 = (c2.r*c2.r-c1.r*c1.r-self.d*self.d)/(2*self.d)
-            self.alfa4 = (c2.cw*c2.r-c1.cw*c1.r)/self.d
+            self.alfa4 = (c2.cw*c2.r-c1.cw*c1.r)/self.d # k1 k2 (expand/contract??)
         self.c1 = c1 # store all of c1 also??
         #print " alfa4:",self.alfa4
-        self.tmin = ((c1.c-c2.c).norm()-c2.r) / 2 
+        self.tmin = ((c1.c-c2.c).norm()-c2.r-c1.r) / 2 
         self.tmax = 100
         
     def getX(self):
@@ -193,7 +193,7 @@ class CircleCircle:
         x.append( self.alfa1*self.alfa4 )
         x.append( self.alfa2 )
         x.append( self.c1.r  )
-        x.append( self.c1.cw )
+        x.append( self.c1.cw ) # expand/contract?
         x.append( self.alfa3 )
         x.append( self.alfa4 )
         return x
@@ -424,10 +424,10 @@ def drawPointArcTest():
     myscreen.camera.SetFocalPoint(0, 0, 0)
     myscreen.camera.SetClippingRange(-100,3000)
     
-    c1 = Circle(c=ovd.Point(-10,20), r=0, cw=+1) # first site
+    c1 = Circle(c=ovd.Point(-20,20), r=0, cw=+1) # first site
     drawVertex(myscreen, c1.c, ovdvtk.yellow)
     
-    c2 = Circle(c=ovd.Point(30,50), r=20, cw=+1) # first site
+    c2 = Circle(c=ovd.Point(30,50), r=20, cw=+1) # second site
     drawVertex(myscreen, c1.c, ovdvtk.orange)
     drawCircle(myscreen, c2.c, c2.r, ovdvtk.orange)
     #myscreen.addActor( ovdvtk.Circle( center=(c.c.x,c.c.y,c.c.z), radius=c.r, color=circleColor ) )
@@ -435,9 +435,9 @@ def drawPointArcTest():
     c1c2 = CircleCircle( c1, c2 ) # bisectors
     
     b1= Bisector( c1c2 )
-    #b2= Bisector( l2l1 )
+    
     drawBisector( myscreen, b1 )
-    #drawBisector( myscreen, b2 )
+    
     myscreen.render()
     myscreen.iren.Start()
 
@@ -452,17 +452,16 @@ def drawPointArcTest2():
     
 
     
-    c2 = Circle(c=ovd.Point(30,50), r=20, cw=+1) # first site
+    c2 = Circle(c=ovd.Point(30,50), r=20, cw=+1) # second site
     drawVertex(myscreen, c1.c, ovdvtk.orange)
     drawCircle(myscreen, c2.c, c2.r, ovdvtk.orange)
-    #myscreen.addActor( ovdvtk.Circle( center=(c.c.x,c.c.y,c.c.z), radius=c.r, color=circleColor ) )
-        
-    c1c2 = CircleCircle( c1, c2 ) # bisectors
+    
+    c1c2 = CircleCircle( c2, c1 ) # bisectors
     
     b1= Bisector( c1c2 )
-    #b2= Bisector( l2l1 )
+
     drawBisector( myscreen, b1 )
-    #drawBisector( myscreen, b2 )
+
     myscreen.render()
     myscreen.iren.Start()
 
@@ -850,5 +849,5 @@ if __name__ == "__main__":
     #drawSeparatorSolver2(4.3)
     #drawBitangents2()
     #drawPointArcTest()
-    #drawPointArcTest2()
-    drawLineArcTest()
+    drawPointArcTest2()
+    #drawLineArcTest()

@@ -49,7 +49,7 @@ if __name__ == "__main__":
     vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
     vod.drawFarCircle()
     
-    vod.textScale = 0.005
+    vod.textScale = 0.0005
     vod.vertexRadius = 0.00031
     vod.drawVertices=1
     vod.drawVertexIndex=1
@@ -101,14 +101,15 @@ if __name__ == "__main__":
     #print "add segment ",id1, " to ", id2
     vd.debug_on()
     c1 = ovd.Point(0.1-d,0.1-d)
-    vd.addArcSite( id_list[1], id_list[2] , c1, False  ,7) 
+    #vd.addArcSite( id_list[1], id_list[2] , c1, False  ,12) 
+    vd.addArcSite( id_list[2], id_list[1] , c1, True  ,12) 
     
     #vd.addArcSite( id2, id1 , c1, False , 14) # left-to-right arc
     
     # 1 lookup vertex descriptors
     # 2 create Sites
     # 3 find seed vertex
-    # 4 find dlete-tree
+    # 4 find delete-tree
     # 5 process null-faces
     # 6 add pseudo-edges
     # 7 NEW vertices

@@ -563,7 +563,7 @@ private:
         } else {
             Point dir = (p-_center);
             dir.normalize();
-            return _center + _radius*dir;
+            return _center + _radius*dir; // this point should lie on the arc
         }
     }
     /// return the end Point (either _start or _end) that is closest to the given Point 

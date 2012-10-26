@@ -3,14 +3,11 @@ SET(test_name "cpptest_random_linesegs" )
 MESSAGE(STATUS "configuring c++ test: " ${test_name})
 set(SOURCE_FILES random_linesegs.cpp)
 add_executable(${test_name} ${SOURCE_FILES})
-#add_dependencies(${test_name}  libopenvoronoi)
+add_dependencies(${test_name}  libopenvoronoi)
 
 set(Boost_LIBRARIES) # required because this contains boost-python when we come here
-#MESSAGE(STATUS "Boost_LIBRARIES: " ${Boost_LIBRARIES})
 find_package( Boost COMPONENTS program_options REQUIRED)
-#MESSAGE(STATUS "Boost_LIBRARIES: " ${Boost_LIBRARIES})
 target_link_libraries(${test_name} libopenvoronoi ${Boost_LIBRARIES})
-#MESSAGE(STATUS "Boost_LIBRARIES: " ${Boost_LIBRARIES})
 
 ADD_TEST(${test_name} ${test_name}) # must provide --n option!
 set_property(

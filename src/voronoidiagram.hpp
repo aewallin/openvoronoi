@@ -140,6 +140,8 @@ public:
     int num_point_sites() const {return num_psites-3;} // the three initial vertices don't count
     /// return number of line-segments sites in diagram
     int num_line_sites() const {return num_lsites;}
+    /// return number of arc-sites in diagram
+    int num_arc_sites() const {return num_asites;}
     /// return number of voronoi-vertices
     int num_vertices() const { return g.num_vertices()-num_point_sites(); }
     /// return number of faces in graph
@@ -243,7 +245,7 @@ protected:
     double far_radius; ///< sites must fall within a circle with radius far_radius
     int num_psites; ///< the number of point sites
     int num_lsites; ///< the number of line-segment sites
-    int num_arc_sites; ///< the number of arc-sites
+    int num_asites; ///< the number of arc-sites
     FaceVector incident_faces; ///< temporary variable for ::INCIDENT faces, will be reset to ::NONINCIDENT after a site has been inserted
     std::set<HEVertex> modified_vertices; ///< temporary variable for in-vertices, out-vertices that need to be reset after a site has been inserted
     VertexVector v0; ///< IN-vertices, i.e. to-be-deleted

@@ -1,8 +1,8 @@
 """@camvtk docstring
 This module provides classes for visualizing CAD/CAM algorithms using VTK.
-This module is part of OpenCAMLib (ocl), a toolpath-generation library.
+This module is part of OpenVoronoi.
 
-Copyright 2010-2011 Anders Wallin (anders.e.e.wallin "at" gmail.com)
+Copyright 2010-2012 Anders Wallin (anders.e.e.wallin "at" gmail.com)
 Published under the GNU General Public License, see http://www.gnu.org/licenses/
 """
 
@@ -200,11 +200,13 @@ class VD:
     def setVDText(self):
         self.N_pointgen = self.vd.numPointSites()
         self.N_linegen = self.vd.numLineSites()
-
+        self.N_arcgen = self.vd.numArcSites()
+        
         #self.vdtext_text = " "
         self.vdtext_text = "Voronoi-Diagram with :\n"
         self.vdtext_text += str(self.N_pointgen) + " point-sites.\n"
         self.vdtext_text += str(self.N_linegen) + " line-sites.\n"
+        self.vdtext_text += str(self.N_arcgen) + " arc-sites.\n"
         #self.vdtext_text += "YELLOW = New point-generator/site\n"
         #self.vdtext_text += "PINK = Seed vertex\n"
         #self.vdtext_text += "RED = Delete vertices/edges\n"

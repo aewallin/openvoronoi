@@ -46,7 +46,7 @@ VoronoiDiagram::VoronoiDiagram(double far, unsigned int n_bins) {
     initialize();
     num_psites=3;
     num_lsites=0;
-    num_arc_sites=0;
+    num_asites=0;
     reset_vertex_count();
     debug = false;
 }
@@ -468,7 +468,7 @@ if (step==current_step) return false; current_step++;
 /// \param cw bool flag true=CW arc, false=CCW arc
 /// \param step for debug, stop algorithm at this sub-step
 void VoronoiDiagram::insert_arc_site(int idx1, int idx2, const Point& center, bool cw, int step) {
-    num_arc_sites++;
+    num_asites++;
     int current_step=1;
     // find the vertices corresponding to idx1 and idx2
     HEVertex start=HEVertex(), end=HEVertex();

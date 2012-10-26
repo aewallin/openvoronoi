@@ -60,16 +60,14 @@ if __name__ == "__main__":
 
     plist = []
     d=0.02
-    plist.append( ovd.Point( -0.1+d, 0.1) )
-    plist.append( ovd.Point( 0.1-d,  0.1) )
-    plist.append( ovd.Point( 0.1, 0.1-d) )
-    plist.append( ovd.Point( 0.1,-0.1+d) )
-    
-    plist.append( ovd.Point( 0.1-d,-0.1) )
-    plist.append( ovd.Point( -0.1+d,-0.1) )
-
-    plist.append( ovd.Point( -0.1,-0.1+d) )
-    plist.append( ovd.Point( -0.1, 0.1-d) )
+    plist.append( ovd.Point( -0.1+d, 0.1) ) # 0
+    plist.append( ovd.Point( 0.1-d,  0.1) ) # 1
+    plist.append( ovd.Point( 0.1, 0.1-d) )  # 2
+    plist.append( ovd.Point( 0.1,-0.1+d) )  # 3
+    plist.append( ovd.Point( 0.1-d,-0.1) )  # 4
+    plist.append( ovd.Point( -0.1+d,-0.1) ) # 5
+    plist.append( ovd.Point( -0.1,-0.1+d) ) # 6
+    plist.append( ovd.Point( -0.1, 0.1-d) ) # 7
     
     #plist.append( ovd.Point(-0.03,-0.03) )
     #plist.append( ovd.Point(-0.15, -0.15) )
@@ -101,8 +99,10 @@ if __name__ == "__main__":
     #print "add segment ",id1, " to ", id2
     vd.debug_on()
     c1 = ovd.Point(0.1-d,0.1-d)
-    #vd.addArcSite( id_list[1], id_list[2] , c1, False  ,12) 
-    vd.addArcSite( id_list[2], id_list[1] , c1, True  ,12) 
+    #vd.addArcSite( id_list[1], id_list[2] , c1, False  ) 
+    vd.addArcSite( id_list[2], id_list[1] , c1, True , 13) 
+    #vd.check()
+    
     
     #vd.addArcSite( id2, id1 , c1, False , 14) # left-to-right arc
     

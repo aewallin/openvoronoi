@@ -1,11 +1,11 @@
 /*  
  *  Copyright 2010-2011 Anders Wallin (anders.e.e.wallin "at" gmail.com)
+ *
+ *  This file is part of OpenVoronoi.
  * 
- *  Idea and code for point/line/arc voronoi-vertex positioning code by
+ *  Idea and C code for point/line/arc voronoi-vertex positioning code by
  *  Andy Payne, andy "at" payne "dot" org, November, 2010
  *  see: http://www.payne.org/index.php/Calculating_Voronoi_Nodes
- * 
- *  This file is part of OpenVoronoi.
  *
  *  OpenVoronoi is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by

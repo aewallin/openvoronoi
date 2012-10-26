@@ -123,7 +123,7 @@ void EdgeProps::set_parameters(Site* s1, Site* s2, bool sig) {
     else if (s1->isPoint() && s2->isArc() ) // PA
         set_pa_parameters(s1,s2);
     else if (s2->isPoint() && s1->isArc() ) { // AP
-        //sign = !sign;
+        sign = !sign;
         set_pa_parameters(s2,s1);
         
     } else if (s1->isLine() && s2->isArc() ) // LA
@@ -340,16 +340,20 @@ void EdgeProps::set_pa_parameters(Site* s1, Site* s2) {
     //    lamb2 = +1.0;
     //else
     
-    sign=!sign;
+    //sign=!sign;
     // distance between centers
     double d = sqrt( (s1->x() - s2->x())*(s1->x() - s2->x()) + (s1->y()-s2->y())*(s1->y()-s2->y()) );
     assert( d > 0 );
-    
-    if (s2->cw()) {
-        lamb2 = +1.0;
-    } else {
-        lamb2 = -1.0;
+    if (d<=s2->r()) {
+        lamb2=-1.0;
+        sign=!sign;
     }
+        
+    //if (s2->cw()) {
+    //    lamb2 = +1.0;
+    //} else {
+    //    lamb2 = -1.0;
+    //}
     
     double alfa1 = ( s2->x() - s1->x() ) / d;
     double alfa2 = ( s2->y() - s1->y() ) / d;

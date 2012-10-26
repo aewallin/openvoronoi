@@ -334,7 +334,7 @@ public:
     /// is given Point in region?
     virtual double in_region_t(const Point& ) const { std::cout << " WARNING: never call Site !\n"; return 0; } 
     /// in-region t-valye
-    virtual double in_region_t_raw(const Point&) const { return -99; }
+    virtual double in_region_t_raw(const Point&) const { assert(0); return -99; }
     /// return edge (if this is a LineSite or ArcSite
     virtual HEEdge edge() {return HEEdge();}
     /// return vertex, if this is a PointSite
@@ -510,11 +510,72 @@ public:
     virtual Ofs* offset(Point p1,Point p2) {return new ArcOfs(p1,p2,_center,-1); } //FIXME: radius
     
     virtual bool in_region(const Point& p) const {
+        /*
         if (_dir) {
             return p.is_right(_center,_start) && !p.is_right(_center,_end);
         } else {
             return !p.is_right(_center,_start) && p.is_right(_center,_end);
         }
+        */
+        if (p==_center)
+            return true;
+            
+        double t = in_region_t(p);
+        return ( (t>=0) && (t<=1) );
+        
+    }
+    
+    /// \todo fix arc-site in_region_t test!!
+    virtual double in_region_t(const Point& pt) const {
+        // projection onto circle
+        /*
+        Point cen_start = _start - _center;
+        Point cen_end   = _end - _center;
+        Point cen_pt = pt - _center;
+        Point proj = _center + ( _radius/cen_pt.norm())*cen_pt;
+        
+        double diangle_min,diangle_max;
+        if (!_dir) {
+            diangle_min = numeric::diangle( cen_start.x, cen_start.y );
+            diangle_max = numeric::diangle( cen_end.x, cen_end.y );
+        } else {
+            diangle_max = numeric::diangle( cen_start.x, cen_start.y );
+            diangle_min = numeric::diangle( cen_end.x, cen_end.y );
+        }
+        //double fuzz(0.01);
+        double diangle_pt = numeric::diangle(cen_pt.x, cen_pt.y);
+        */
+        double t = in_region_t_raw(pt); //(diangle_pt - diangle_min) / (diangle_max-diangle_min);
+        double eps = 1e-7;
+        if (fabs(t) < eps)  // rounding... UGLY
+            t = 0.0;
+        else if ( fabs(t-1.0) < eps )
+            t = 1.0;
+        return t;
+        
+        /// find t-value along arc
+        //return 0.5; // FIXME
+    }
+    virtual double in_region_t_raw(const Point& pt) const {
+        // projection onto circle
+        Point cen_start = _start - _center;
+        Point cen_end   = _end - _center;
+        Point cen_pt = pt - _center;
+        Point proj = _center + ( _radius/cen_pt.norm())*cen_pt;
+        
+        double diangle_min,diangle_max;
+        if (!_dir) {
+            diangle_min = numeric::diangle( cen_start.x, cen_start.y );
+            diangle_max = numeric::diangle( cen_end.x, cen_end.y );
+        } else {
+            diangle_max = numeric::diangle( cen_start.x, cen_start.y );
+            diangle_min = numeric::diangle( cen_end.x, cen_end.y );
+        }
+        //double fuzz(0.01);
+        double diangle_pt = numeric::diangle(cen_pt.x, cen_pt.y);
+        
+        double t = (diangle_pt - diangle_min) / (diangle_max-diangle_min);
+        return t;
     }
     Point apex_point(const Point& p) {
         if (in_region(p))

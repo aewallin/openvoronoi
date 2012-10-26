@@ -1092,13 +1092,19 @@ void VoronoiDiagram::add_separator(HEFace f, HEFace null_face,
     HEEdge v_previous = boost::get<0>(target);
     HEVertex v_target = boost::get<1>(target);
     HEEdge    v_next  = boost::get<2>(target);
-    bool out_new_in   = boost::get<3>(target);
+    bool    out_new_in = boost::get<3>(target);
     if (debug) {
         std::cout << "  add_separator() v_previous="; g.print_edge(v_previous) ;
         std::cout << "  add_separator() v_target="<< g[v_target].index <<"\n";
     }
     assert( (g[v_target].k3==1) || (g[v_target].k3==-1) );    
     assert( g[sep_endp].k3 == g[v_target].k3 );
+    if (!s1->in_region( g[v_target].position ) ) {
+        std::cout << " Error separator endpoint not in region of site " << s1->str() << "\n";
+        std::cout << " site in_region_t = " << s1->in_region_t(  g[v_target].position ) << "\n";
+        std::cout << " site in_region_raw = " << s1->in_region_t_raw(  g[v_target].position ) << "\n";
+        
+    }
     assert( s1->in_region( g[v_target].position ) ); // v1 and v2 should be in the region of the line-site
     assert( s2->in_region( g[v_target].position ) );
     
@@ -1517,7 +1523,8 @@ void VoronoiDiagram::add_vertices( Site* new_site ) {
         if (debug) {
             HEVertex src = g.source(q_edges[m]);
             HEVertex trg = g.target(q_edges[m]);
-            std::cout << " NEW vertex " << g[q].index << " on edge " << g[src].index << " - " << g[trg].index << "\n";
+            std::cout << " NEW vertex " << g[q].index << " k3= "<< g[q].k3 << " on edge " << g[src].index << " - " << g[trg].index << "\n";
+            assert( (g[q].k3==1) || (g[q].k3==-1) );
         }
     }
     if (debug) std::cout << "add_vertices() done.\n";
@@ -1603,17 +1610,24 @@ void VoronoiDiagram::add_edge(EdgeData ed, HEFace newface, HEFace newface2) {
     // we need an apex-vertex if the source and target are on different branches of the new quadratic edge
     // we can set the src_sign and trg_sign with is_right where we compare to a line through the apex 
     bool src_sign=true, trg_sign=true;
-    if (f_site->isPoint()  && ( new_site->isLine() || new_site->isArc() ) ) { // PL or PA
+    if (f_site->isPoint()  &&  new_site->isLine()  ) { // PL or PA
         Point pt2 = f_site->position();
-        Point pt1 = new_site->apex_point(pt2); // projection of pt1 onto LineSite or ArcSite
+        Point pt1 = new_site->apex_point(pt2); // projection of pt2 onto LineSite or ArcSite
         src_sign = g[new_source].position.is_right( pt1, pt2 );
         trg_sign = g[new_target].position.is_right( pt1, pt2 );
+    } else if (f_site->isPoint()  &&   new_site->isArc()  ) {
+        Point pt2 = f_site->position();
+        // project p2 onto circle
+        Point cen = Point( new_site->x(), new_site->y() );
+        Point cen_pt2 = pt2 - cen;
+        Point pt1 = cen + (new_site->r()/cen_pt2.norm())*cen_pt2;
+        src_sign = g[new_source].position.is_right( pt1, pt2 );
+        trg_sign = g[new_target].position.is_right( pt1, pt2 );        
     } else if (f_site->isPoint() && new_site->isPoint() ) { // PP
         src_sign = g[new_source].position.is_right( f_site->position(), new_site->position() );
         trg_sign = g[new_target].position.is_right( f_site->position(), new_site->position() );
     } else if (f_site->isLine() && new_site->isLine() )  { // LL
         //  a line-line bisector, sign should not matter because there is no sqrt()
-        
         /*
         std::cout << "add_edge() LL-edge " << g[new_source].index << " - " << g[new_target].index ;
         std::cout << " f_site->k()= " << f_site->k() << " new_site->k()= "<< new_site->k() << "\n";
@@ -1782,9 +1796,13 @@ boost::tuple<HEEdge,HEVertex,HEEdge,bool> VoronoiDiagram::find_separator_target(
         HEVertex previous_vertex = g.source( current_edge );
         HEVertex current_vertex  = g.target( current_edge );
         HEVertex next_vertex     = g.target( next_edge );
-        bool out_new_in = ( g[previous_vertex].status == OUT && g[current_vertex].status == NEW && g[next_vertex].status == IN );
-        bool in_new_out = ( g[previous_vertex].status == IN  && g[current_vertex].status == NEW && g[next_vertex].status == OUT); 
-        if ( out_new_in || in_new_out   ) {
+        bool out_new_in = ( ((g[previous_vertex].status == OUT) || (g[previous_vertex].status == UNDECIDED)) && 
+                             g[current_vertex].status == NEW && 
+                             g[next_vertex].status == IN );
+        bool in_new_out = ( g[previous_vertex].status == IN && 
+                            g[current_vertex].status == NEW && 
+                            (g[next_vertex].status == OUT || (g[next_vertex].status == UNDECIDED)) ); 
+        if ( out_new_in || in_new_out ) {
             if (debug) {
                 std::cout << "potential OUT/IN-NEW-IN/OUT: " << g[previous_vertex].index << "-" << g[current_vertex].index;
                 std::cout << "-" << g[next_vertex].index << "\n";
@@ -1853,7 +1871,8 @@ VoronoiDiagram::EdgeData VoronoiDiagram::find_edge_data(HEFace f, VertexVector s
         bool next_is_endpoint = (next_vertex==segment.first || next_vertex==segment.second);
         
         if ( (g[current_vertex].status==NEW) && (g[current_vertex].type != SEPPOINT) &&
-             (  ((g[previous_vertex].status==OUT || g[previous_vertex].status==UNDECIDED)  &&  previous_not_endpoint ) 
+             (  ( (g[previous_vertex].status==OUT || g[previous_vertex].status==UNDECIDED)  &&  
+                     previous_not_endpoint ) 
                    ||
                 ( next_is_endpoint )
              )

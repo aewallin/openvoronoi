@@ -1,6 +1,6 @@
 The OpenVoronoi project aims to produce an algorithm for calculating
 the 2D voronoi-diagram for point, line-segment, and circular-arc sites.
-Currently point-sites work well and line-segment sites are being worked
+Currently point-sites and line-segment sites work. Arc-sites are being worked
 on. The incremental topology-oriented algorithm is used (see References).
 OpenVoronoi is written by Anders Wallin (anders.e.e.wallin "at" gmail.com)
 and released under GPLv3 (see COPYING).
@@ -41,7 +41,7 @@ lyx            (to build white-paper)
 libvtk         (many python-scripts use VTK for visualization)
 python-vtk     (VTK python bindings)
 ttt            https://github.com/aewallin/truetype-tracer (some tests/examples use ttt)
-rpg            https://github.com/aewallin/CGAL_RPG (some tests use rpg)
+randompolygon  https://github.com/aewallin/randompolygon (some tests use randompolygon)
 
 Build/Install instructions
 
@@ -65,12 +65,12 @@ A white-paper on the algorithm and solvers in LyX format is located in /doc.
 It has its own CMakeLists.txt file which builds a PDF file.
 
 Tests
-Voth c++ and python tests in src/test/. These are run with CTest.
+Both c++ and python tests are found in src/test/. These are run with CTest.
 In the build-directory either "make test" or "ctest" will run all tests. 
 You can run only tests that have e.g. "ttt" in the test-name with
 "ctest -R ttt"
 Currently the tests do not produce any output (png or svg output could be an option?)
-The cmake option CM
+
 
 Organization
 doc/        has documentation in lyx format, with figures in asymptote format. 
@@ -87,7 +87,8 @@ Contributing
 See the TODO file. Fork the github repo, create a feature branch, commit yor 
 changes, test. Make a short description of your changes and create a pull request.
 Follow the coding-style of the existing code. One fix/feature per pull request.
-Contributed code must comply with the GPL. Provide short doxygen-formatted documentation in the code.
+Contributed code must comply with the GPL. Provide short doxygen-formatted 
+documentation in the code.
 
 Other voronoi-diagram codes
 

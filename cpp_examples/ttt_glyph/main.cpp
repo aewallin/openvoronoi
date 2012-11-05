@@ -21,7 +21,7 @@
 
 Loops get_ttt_loops(int char_index=0) {
     SEG_Writer my_writer; // this Writer writes G-code
-    my_writer.set_scale(  2.5095362377e-4 );
+    my_writer.set_scale(  1e-4 );
     
     std::string all_glyphs = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     char c = all_glyphs.at(char_index);
@@ -56,6 +56,7 @@ int main(int argc,char *argv[]) {
     desc.add_options()
         ("help", "produce help message")
         ("c", po::value<int>(), "set character, an int in [0,51] ")
+        ("d", "run in debug mode")
     ;
 
     po::variables_map vm;
@@ -65,6 +66,12 @@ int main(int argc,char *argv[]) {
     if (vm.count("help")) {
         std::cout << desc << "\n";
         return 1;
+    }
+    
+    bool debug=false;
+    if (vm.count("d")) {
+        std::cout << "Debug mode!" << "\n";
+        debug = true;
     }
     
     int char_index = 0;
@@ -94,6 +101,9 @@ int main(int argc,char *argv[]) {
     } 
     
     ovd::VoronoiDiagram* vd = new ovd::VoronoiDiagram(1,50);
+    if (debug)
+		vd->debug_on();
+		
     std::cout << "OpenVoronoi version: " << ovd::version() << "\n";
     
     // store the verted IDs here, for later inserting line-segments

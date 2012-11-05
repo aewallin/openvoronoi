@@ -1827,15 +1827,16 @@ boost::tuple<HEEdge,HEVertex,HEEdge,bool> VoronoiDiagram::find_separator_target(
         //count++;
         //assert(count<10000); // some reasonable max number of edges in face, to avoid infinite loop
     } while (current_edge!=start_edge && !found);
+    if (!found) {
+        std::cout << "find_separator_target() FATAL ERROR\n";
+        std::cout << " find_separator_target Unable to find target vertex on face f=" << f << " endp= " << g[endp].index << "\n";
+        std::cout << " looking for OUT-NEW-IN: " << OUT << " - " << NEW << " - " << IN << "\n";
+        std::cout << " looking for IN-NEW-OUT: " << IN << " - " << NEW << " - " << OUT << "\n";
+        g.print_face(f);
+        exit(-1);
+    }
     assert(found);
-    //if (!found) {
-    //    std::cout << "find_separator_target() FATAL ERROR\n";
-    //    std::cout << " find_separator_target Unable to find target vertex on face f=" << f << " endp= " << g[endp].index << "\n";
-    //    std::cout << " looking for OUT-NEW-IN: " << OUT << " - " << NEW << " - " << IN << "\n";
-    //    std::cout << " looking for IN-NEW-OUT: " << IN << " - " << NEW << " - " << OUT << "\n";
-    //    g.print_face(f);
-    //    exit(-1);
-    //}
+
     return boost::make_tuple(v_previous, v_target, v_next, flag);
 }
 

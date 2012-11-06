@@ -10,12 +10,12 @@ unset(Boost_LIBRARIES) # required because this contains boost-python when we com
 find_package( Boost COMPONENTS program_options REQUIRED)
 # the rpg lib
 find_library(RPG_LIBRARY 
-            NAMES librpg rpg
-            PATHS /usr/local/lib/rpg
+            NAMES randompolygon
+            PATHS /usr/local/lib/randompolygon
             DOC "rpg"
             REQUIRED
 )
-include_directories( /usr/local/include/rpg )
+include_directories( /usr/local/include/randompolygon )
 target_link_libraries(${test_name} libopenvoronoi ${RPG_LIBRARY} ${Boost_LIBRARIES})
 
 ADD_TEST(${test_name} ${test_name}) # must provide --n option!

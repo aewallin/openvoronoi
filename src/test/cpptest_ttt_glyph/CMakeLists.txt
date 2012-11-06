@@ -10,12 +10,12 @@ find_package( Boost COMPONENTS program_options REQUIRED)
 
 # the ttt lib
 find_library(TTT_LIBRARY 
-            NAMES libttt ttt
-            PATHS /usr/local/lib/ttt
+            NAMES truetypetracer
+            PATHS /usr/local/lib/truetypetracer
             DOC "ttt"
             REQUIRED
 )
-include_directories( /usr/local/include/rpg )
+include_directories( /usr/local/include/truetypetracer )
 
 # freetype
 find_package(Freetype REQUIRED)

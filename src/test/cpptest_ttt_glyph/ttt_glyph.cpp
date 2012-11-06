@@ -14,8 +14,8 @@
 #include "common/point.hpp"
 #include "utility/vd2svg.hpp"
 
-#include <ttt/ttt.hpp>
-#include <ttt/segment_writer.hpp>
+#include <truetypetracer/ttt.hpp>
+#include <truetypetracer/segment_writer.hpp>
 
 #define TTFONT "/usr/share/fonts/truetype/freefont/FreeSerif.ttf"
 

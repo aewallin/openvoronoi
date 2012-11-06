@@ -28,12 +28,12 @@ include_directories( /usr/local/include/openvoronoi )
 # the rpg lib
 # https://github.com/aewallin/CGAL_RPG
 find_library(RPG_LIBRARY 
-            NAMES librpg rpg
-            PATHS /usr/local/lib/rpg
+            NAMES randompolygon
+            PATHS /usr/local/lib/randompolygon /usr/local/lib/
             DOC "rpg"
             REQUIRED
 )
-include_directories( /usr/local/include/rpg )
+include_directories( /usr/local/include/randompolygon )
 
 
 set(OVD_TST_SRC

@@ -16,7 +16,7 @@
 #include <boost/foreach.hpp>
 #include <boost/program_options.hpp>
 
-#include <rpg/rpg.hpp>
+#include <randompolygon/rpg.hpp>
 
 namespace po = boost::program_options;
 

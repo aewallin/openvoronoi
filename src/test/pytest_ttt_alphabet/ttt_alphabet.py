@@ -1,4 +1,4 @@
-import ttt
+import truetypetracer as ttt
 import openvoronoi as ovd
 import time
 import sys

@@ -1,4 +1,4 @@
-import ttt                 # https://github.com/aewallin/truetype-tracer
+import truetypetracer as ttt                 # https://github.com/aewallin/truetype-tracer
 import openvoronoi as ovd  # https://github.com/aewallin/openvoronoi
 import ovdvtk
 import time

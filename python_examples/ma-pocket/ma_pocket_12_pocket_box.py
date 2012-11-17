@@ -1,6 +1,6 @@
 import openvoronoi as ovd
 import ovdvtk
-import ttt
+import truetypetracer as ttt
 
 import time
 import vtk
@@ -766,12 +766,12 @@ if __name__ == "__main__":
     myscreen.render()   
     #myscreen.iren.Start()
     
-    cut_width = 0.002
+    cut_width = 0.02
     mapocket = ovd.MedialAxisPocket(vd3.getGraph())
     mapocket.setWidth( cut_width )
     mapocket.debug(True)
     t_before = time.time()
-    mapocket.run2()
+    mapocket.run()
     t_after = time.time()
     #print "( MA-pocket done in %.3f s. Got %d MICs )" % ((t_after-t_before),len(mic_list) )
     

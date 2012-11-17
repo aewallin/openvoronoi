@@ -10,7 +10,7 @@ import os
 import sys
 import pickle
 import gzip
-import ttt
+import truetypetracer as ttt
 
 def drawCircle(myscreen, c, r, circlecolor):
     ca = ovdvtk.Circle(center=(c.x,c.y,0) , radius=r, color=circlecolor, resolution=50 )

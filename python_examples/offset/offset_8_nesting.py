@@ -5,7 +5,7 @@ import vtk
 import math
 
 import offset2vtk
-import ttt   # https://github.com/aewallin/truetype-tracer
+import truetypetracer as ttt   # https://github.com/aewallin/truetype-tracer
 
 def insert_polygon_points(vd, polygon):
     pts=[]

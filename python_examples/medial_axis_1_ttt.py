@@ -1,6 +1,6 @@
 import openvoronoi as ovd
 import ovdvtk
-import ttt   # https://github.com/aewallin/truetype-tracer
+import truetypetracer as ttt   # https://github.com/aewallin/truetype-tracer
 
 import time
 import vtk

@@ -1,4 +1,4 @@
-import ttt                 # https://github.com/aewallin/truetype-tracer
+import truetypetracer as ttt                 # https://github.com/aewallin/truetype-tracer
 import openvoronoi as ovd  # https://github.com/aewallin/openvoronoi
 import ovdvtk
 import time
@@ -33,29 +33,39 @@ def drawLoops(myscreen,loops,loopColor):
         N = len(lop)
         first_point=[]
         previous=[]
+        n_lines=0
+        n_arcs=0
         for p in lop:
-            # x, y, r, cw, cx, cy
-            #if p[2] > 0:
-            #    print "arc: ",p
-            #else:
-            #    print "line: ",p
+            # p = [x, y, r, cw, cx, cy]
             if n==0: # don't draw anything on the first iteration
                 previous=p 
                 first_point = p
             elif n== (N-1): # the last point
                 drawSeg(myscreen,previous,p)
-                #drawLine(myscreen, previous, p, loopColor)
-                #myscreen.addActor( ovdvtk.Line(p1=(previous[0],previous[1],0),p2=(p[0],p[1],0),color=loopColor) ) # the normal line
-                # and a line from p to the first point
-                #myscreen.addActor( ovdvtk.Line(p1=(p[0],p[1],0),p2=(first_point[0],first_point[1],0),color=loopColor) )
+                if p[2]==-1:
+                    n_lines+=1                    
+                else:
+                    n_arcs+=1
+                    
                 drawSeg(myscreen,p, first_point)
-                #drawLine(myscreen, p, first_point, loopColor)
-            else:
+                if first_point[2]==-1:
+                    n_lines+=1                    
+                else:
+                    n_arcs+=1
+
+            else: # normal segment
                 drawSeg(myscreen,previous,p)
-                #myscreen.addActor( ovdvtk.Line(p1=(previous[0],previous[1],0),p2=(p[0],p[1],0),color=loopColor) )
+                if p[2]==-1:
+                    n_lines+=1                    
+                else:
+                    n_arcs+=1
+
                 previous=p
             n=n+1
         print "rendered loop ",nloop, " with ", len(lop), " points"
+        print "   n_lines = ",n_lines
+        print "   n_arcs  = ",n_arcs
+
         nloop = nloop+1
 
 def translate(segs,x,y):
@@ -105,12 +115,13 @@ def draw_ttt(myscreen, text, x,y,scale):
     print "number of polygons: ", len(segs)
     np = 0
     sum_pts=0
+
+    segs = modify_segments(segs)
     for s in segs:
         sum_pts+=len(s)
         print " polygon ",np," has ",len(s)," points"
         np=np+1
     print "total points: ",sum_pts
-    segs = modify_segments(segs)
     drawLoops(myscreen, segs, ovdvtk.yellow )
     
 # this script only draws geometry from ttt

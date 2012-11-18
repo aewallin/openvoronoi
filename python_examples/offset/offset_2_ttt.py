@@ -1,6 +1,6 @@
 import openvoronoi as ovd # https://github.com/aewallin/openvoronoi
 import ovdvtk             # for VTK visualization, https://github.com/aewallin/openvoronoi
-import ttt   			  # https://github.com/aewallin/truetype-tracer
+import truetypetracer as ttt     # https://github.com/aewallin/truetype-tracer
 
 import offset2vtk         # vtk visualization helper https://github.com/aewallin/openvoronoi
 

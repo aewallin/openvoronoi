@@ -99,6 +99,7 @@ if (CMAKE_BUILD_TYPE MATCHES "Debug")
 endif (CMAKE_BUILD_TYPE MATCHES "Debug")
 MESSAGE(STATUS " CMAKE_CXX_FLAGS = " ${CMAKE_CXX_FLAGS})
 
+# build the library for code-coverage testing
 if (CMAKE_BUILD_TYPE MATCHES "Coverage")
     set(CMAKE_CXX_FLAGS "-O0 -fprofile-arcs -ftest-coverage -fno-inline ${CMAKE_CXX_FLAGS_DEBUG}")
     MESSAGE(STATUS " CMAKE_CXX_FLAGS = " ${CMAKE_CXX_FLAGS})

@@ -56,6 +56,9 @@ struct OffsetLoop {
 
 //typedef std::list<OffsetLoop> OffsetLoops;
 
+/// a graph for holding pocketing-loops.
+/// each vertex in this graph corresponds to an offset loop
+/// each edge corresponds a possible link between two loops
 typedef boost::adjacency_list< boost::vecS,            // out-edge storage
                                 boost::vecS,            // vertex set storage
                                 boost::directedS,       // directed tag
@@ -64,46 +67,53 @@ typedef boost::adjacency_list< boost::vecS,            // out-edge storage
                                 boost::no_property,     // graph-properties 
                                 boost::listS            // edge storage
                            > MachiningGraph;
+/// vertices in MachiningGraph
 typedef boost::graph_traits<MachiningGraph>::vertex_descriptor Vertex;
+/// vertex iterator for MachiningGraph
 typedef boost::graph_traits<MachiningGraph>::vertex_iterator   VertexItr;
 
+/// sort-predicate for sorting offset loops by offset distance
 class OffsetLoopCompare {
 public:
+    /// sort predicate
     bool operator() (OffsetLoop l1, OffsetLoop l2) {
         return (l1.offset_distance < l2.offset_distance);
     }
 };
 
+/// pair offsetloop with the corresponding MachininGraph Vertex
 typedef std::pair<Vertex,OffsetLoop> VertexOffsetLoop;
 
 /// predicate for sorting loops by offset-distance
 class VertexOffsetLoopCompare {
 public:
+    /// sort predicate
     bool operator() (VertexOffsetLoop l1, VertexOffsetLoop l2) {
         return (l1.second.offset_distance < l2.second.offset_distance);
     }
 };
 
+/// for writing labels in graphviz-files
 template <class Name>
 class label_writer {
 public:
-    label_writer(Name _name) : name(_name) {}
+    label_writer(Name _name) : name(_name) {}     ///< ctor
+    /// called by graphviz file-output
     template <class VertexOrEdge>
     void operator()(std::ostream& out, const VertexOrEdge& v) const {
       out << "[label=\"" << v  << " (t="<< name[v].offset_distance <<")\"]";
     }
 private:
-    Name name;
+    Name name; ///< graph that is written to file
 };
 
 /// this class sorts offset-loops into DAG (directed acyclic graph) which should
 /// contain the loops in a sensible order for pocket machining
 class OffsetSorter {
 public:
-    OffsetSorter(HEGraph& gi): vdg(gi) {}
-    void add_loop(OffsetLoop l) {
-        all_loops.push_back(l);
-    }
+    OffsetSorter(HEGraph& gi): vdg(gi) {} ///< ctor
+    void add_loop(OffsetLoop l) { all_loops.push_back(l); } ///< add an OffsetLoop
+    /// sort offset loops
     void sort_loops() {
         // push loops to a set, so they come out in decreasing offset-distance order, i.e. max offset-distance (innermost) loop first.
         BOOST_FOREACH( const OffsetLoop l, all_loops ) {
@@ -126,8 +136,9 @@ public:
         }
         write_dotfile();
     }
+    
+    /// try to connect the new vertex to existing vertices    
     void connect_vertex(Vertex v) {
-        // try to connect the new vertex to existing vertices
         //VertexItr it_begin, it_end, itr;
         //boost::tie( it_begin, it_end ) = boost::vertices( g );
 
@@ -210,6 +221,7 @@ public:
         return false;
     }
 
+/// find the vd-vertices enclosed by the current offset loop
 std::set<HEVertex> loop_enclosed_vertices( std::vector<HEFace> in_loop_faces) {
         std::vector< VertexVector > in_loop_vertices;
         // now go through each in_loop face, and collect all interior vd-vertices
@@ -260,9 +272,8 @@ std::set<HEVertex> loop_enclosed_vertices( std::vector<HEFace> in_loop_faces) {
         std::cout << "\n";
     return in_loop_enclosed_vertices;
 }    
-    /// write the machining graph to a .dot file for visualization
-    void write_dotfile() {
-        
+    /// write the MachiningGraph to a .dot file for visualization
+    void write_dotfile() {        
         std::filebuf fb;
         fb.open ("test.dot",std::ios::out);
         std::ostream out(&fb);
@@ -271,9 +282,9 @@ std::set<HEVertex> loop_enclosed_vertices( std::vector<HEFace> in_loop_faces) {
     }
 protected:
     std::multiset<OffsetLoop, OffsetLoopCompare> distance_sorted_loops; ///< set of Loops, sorted by decreasing offset-distance
-    std::vector<Vertex> vertex_order;
-    OffsetLoops all_loops;
-    MachiningGraph g;
+    std::vector<Vertex> vertex_order; ///< the output of this algorithm, vertices in sorted order
+    OffsetLoops all_loops; ///< all loops we deal with
+    MachiningGraph g; ///< machining-graph constructed when this algorithm runs
     HEGraph& vdg; ///< vd-graph
 };
 

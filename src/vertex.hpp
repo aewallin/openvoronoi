@@ -28,7 +28,8 @@
 
 namespace ovd {
 
-/// As we incrementally construct the diagram voronoi-vertices can have one of these four different states. 
+/// As we incrementally construct the diagram voronoi-vertices 
+/// can have one of these four different states. 
 enum VertexStatus {
     OUT,          /*!< OUT-vertices will not be deleted */
     IN,           /*!< IN-vertices will be deleted */

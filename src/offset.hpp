@@ -44,11 +44,10 @@ struct OffsetVertex {
 
 /// a single offset loop
 struct OffsetLoop {
-    std::list<OffsetVertex> vertices;
-    double offset_distance;
-    void push_back(OffsetVertex v) {
-        vertices.push_back(v);
-    }
+    std::list<OffsetVertex> vertices;   ///< list of offsetvertices in this loop
+    double offset_distance;             ///< offset distance for this loop
+    /// add an offsetvertex to this loop
+    void push_back(OffsetVertex v) { vertices.push_back(v); }
 };
 
 /// multiple loops. the output of the algorithm

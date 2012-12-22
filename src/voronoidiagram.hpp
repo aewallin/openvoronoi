@@ -66,9 +66,9 @@
  * 
  * \section debian Debian source package
  * - See the files in src/deb for more information. 
- * - A debian source package in <build>/Debian is built with the spackage target, run with "make spackage"
- *  - remember to set the "Release" build-type
- *  - disable building of tests (these require ttt and rpg which pbuilder/PPA does not find)
+ * - A debian source package in build/Debian is built with the spackage target, run with "make spackage"
+ *  - remember to set the "Release" build-type in CMakeLists.txt
+ *  - disable building of tests (these require truetypetracer(ttt) and randompolygon(rpg) which pbuilder/PPA does not find
  * - The source-package can be tested with pbuilder
  *  - To test-build the package (assuming you are on a precise distribution). This will take a long time.
  *   - "sudo pbuilder build openvoronoi_12.02.257-ubuntu1~precise1.dsc" 

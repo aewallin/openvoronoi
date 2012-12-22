@@ -60,7 +60,7 @@ public:
         }
         return py_offsets;
     }
-    // return a python-list of OffsetLoop objects
+    /// return a python-list of OffsetLoop objects
     boost::python::list offset_loop_list(double t) {
         offset(t);
         boost::python::list out;

@@ -154,12 +154,14 @@ if __name__ == "__main__":
     
     of = ovd.Offset( vd.getGraph() ) # pass the created graph to the Offset class
     of.str() # text output, for debug
-    dists =[ 0.002*x for x in range(1,30) ]
+    dists =[ 0.004*x for x in range(1,15) ]
     ofs_loops=[]
     ofsl = []
     for d in dists:
-        ofs_loops.extend( of.offset(d) )
-        ofsl.extend( of.offset_loop_list(d) )
+        d_offsets = of.offset(d)
+        if len(d_offsets) != 0:
+            ofs_loops.extend( d_offsets ) # compute offset at d, and add to loop-list
+            ofsl.extend( of.offset_loop_list(d) )
     #print ofsl
     
     sorter = ovd.OffsetSorter(vd.getGraph())
@@ -170,15 +172,18 @@ if __name__ == "__main__":
     # this generates a graph test.dot
     # to generate a png image run
     #  dot -Tpng test.dot > test.png
-
-    offset2vtk.drawOffsets(myscreen, ofs_loops) # draw the generated offsets
-    print "number of loops= ",len(ofs_loops)
+    ofs_loops2 = sorter.get_loops()
+    print "number of loops= ",len(ofs_loops2)
+    
+    offset2vtk.drawOffsets(myscreen, ofs_loops2) # draw the generated offsets
+    
+    """
     for loop in ofs_loops:
         first_vert=loop[0]
         print "loop at dist=", first_vert[2], " with ",len(loop)," vertices:"
         for v in loop[1:]:
             print " face ",v[4]
-    
+    """
     vod.setVDText2(times)
     vod.setAll()
     print "PYTHON All DONE."

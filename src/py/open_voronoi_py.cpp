@@ -159,6 +159,7 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         .def(bp::init<HEGraph&>())
         .def("add_loop", &OffsetSorter::add_loop )
         .def("sort_loops", &OffsetSorter::sort_loops )
+        .def("get_loops", &OffsetSorter::offset_list_py )
     ;  
   
 // Filters

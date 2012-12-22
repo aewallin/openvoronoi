@@ -62,8 +62,7 @@ def drawArc(myscreen, pt1, pt2, r, cen,cw,arcColor):
 def drawOffsets(myscreen, ofs):
     # draw loops
     nloop = 0
-    lineColor = ovdvtk.green
-    arcColor = ovdvtk.grass
+
     for lop in ofs:
         n = 0
         N = len(lop)
@@ -78,12 +77,20 @@ def drawOffsets(myscreen, ofs):
                 cw=p[3]
                 cen=p[2]
                 r=p[1]
-                p=p[0]
-                if r==-1: # this offset element is a line
-                    drawLine(myscreen, previous, p, lineColor)
+                pt=p[0]
+                
+                lineColor = ovdvtk.green
+                arcColor = ovdvtk.grass
+                if len(p)==7:
+                    if p[6]==0:
+                        lineColor = ovdvtk.red
+                        arcColor = ovdvtk.red
+                        
+                if r==-1: # this offset element is a line                            
+                    drawLine(myscreen, previous, pt, lineColor)
                 else: # this offset element is an arc
-                    drawArc(myscreen, previous, p, r,cen,cw, arcColor)
-                previous=p
+                    drawArc(myscreen, previous, pt, r,cen,cw, arcColor)
+                previous=pt
             n=n+1
         print "rendered loop ",nloop, " with ", len(lop), " points"
         nloop = nloop+1

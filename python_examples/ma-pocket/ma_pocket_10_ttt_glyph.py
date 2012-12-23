@@ -4,23 +4,13 @@ import truetypetracer as ttt
 
 import time
 import vtk
-import datetime
 import math
-#import random
-import os
 import sys
-#import pickle
-#import gzip
 import ngc_writer
 
-def drawCircle(myscreen, c, r, circlecolor):
-    ca = ovdvtk.Circle(center=(c.x,c.y,0) , radius=r, color=circlecolor, resolution=50 )
-    myscreen.addActor(ca)
-    
 def drawPoint( myscreen, c, pcolor , rad = 0.002):
     ca = ovdvtk.Sphere(center=(c.x,c.y,0) , radius=rad, color=pcolor)
     myscreen.addActor(ca)
-
 
 # rotate by cos/sin. from emc2 gcodemodule.cc
 def rotate(x, y,  c,  s):
@@ -722,7 +712,7 @@ if __name__ == "__main__":
     cl = ovd.Point(0,0)
     
     # the initial largest MIC. to be cleared with a spiral-path
-    drawCircle( myscreen, maxmic[0], maxmic[1] , ovdvtk.red )
+    ovdvtk.drawCircle( myscreen, maxmic[0], maxmic[1] , ovdvtk.red )
     
     myscreen.render()
     #myscreen.iren.Start()
@@ -802,13 +792,10 @@ if __name__ == "__main__":
 
         nframe = nframe+1
         #myscreen.render()
-        
+
     #print "mic-pocket done."
-    
     #print "PYTHON All DONE."
-    
     ngc_writer.postamble()
-    
     sys.stdout = sys.__stdout__              # remember to reset sys.stdout!
     
     f = open('output.nc', 'w')
@@ -818,8 +805,5 @@ if __name__ == "__main__":
     f.close()
     
     print "python done."
-    
     myscreen.render()   
-
-     
     myscreen.iren.Start()

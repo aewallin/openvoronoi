@@ -1,20 +1,21 @@
 import openvoronoi as ovd
 import ovdvtk
+import truetypetracer as ttt # https://github.com/aewallin/truetype-tracer
 
 import time
 import vtk
-import datetime
-import math
-import random
-import os
-import sys
-import pickle
-import gzip
-import truetypetracer as ttt
+#import datetime
+#import math
+#import random
+#import os
+#import sys
+#import pickle
+#import gzip
 
-def drawCircle(myscreen, c, r, circlecolor):
-    ca = ovdvtk.Circle(center=(c.x,c.y,0) , radius=r, color=circlecolor, resolution=50 )
-    myscreen.addActor(ca)
+
+#def drawCircle(myscreen, c, r, circlecolor):
+#    ca = ovdvtk.Circle(center=(c.x,c.y,0) , radius=r, color=circlecolor, resolution=50 )
+#    myscreen.addActor(ca)
 
 
 def translate(segs,x,y):
@@ -176,7 +177,6 @@ if __name__ == "__main__":
     
     scale=1
     myscreen.render()
-    random.seed(42)
     far = 1
     camPos = far
     zmult = 1.8
@@ -191,8 +191,6 @@ if __name__ == "__main__":
     # for vtk visualization
     vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
     vod.drawFarCircle()
-
-    
     vod.textScale = 0.02
     vod.vertexRadius = 0.0031
     vod.drawVertices=0
@@ -219,60 +217,31 @@ if __name__ == "__main__":
     vod.setVDText2(times)
     
     vod.setAll()
-    
-    #myscreen.render()        
-    #myscreen.iren.Start()
 
-    
     mapocket = ovd.MedialAxisPocket(vd.getGraph())
     mapocket.debug(True)
     mapocket.setWidth(0.005)
-    
     mapocket.run()
-    
-    #drawCircle( myscreen, maxmic[0], maxmic[1] , ovdvtk.red )
+
     mic_components = mapocket.get_mic_components()
     for mic_list in mic_components:
-        
         nframe=0
-        
         for n in range( len(mic_list) ):
             mic = mic_list[n]
             if n == 0:
-                print "maxmic at ", mic[0]," r = ",mic[1]
-                drawCircle( myscreen, mic[0], mic[1] , ovdvtk.red )
+                print "First MIC = ", mic[0]," r = ",mic[1]
+                ovdvtk.drawCircle( myscreen, mic[0], mic[1] , ovdvtk.red )
             else:
-                drawCircle( myscreen, mic[0], mic[1] , ovdvtk.green )
+                print "MIC = ", mic[0]," r = ",mic[1]
+                ovdvtk.drawCircle( myscreen, mic[0], mic[1] , ovdvtk.green )
             w2if.Modified()
             lwr.SetFileName("frames/%06d.png" % ( nframe ) )
             #lwr.Write()
             time.sleep(0.1)
             myscreen.render()
-        print "mic done."
-        
-    """
-    nframe=0
-    while True:
-        mic = mapocket.nxtMic()
-        if nframe > 0:
-            break
-        if len(mic) == 2:
-            drawCircle( myscreen, mic[0], mic[1] , ovdvtk.green )
-            #w2if.Modified()
-            #lwr.SetFileName("frames/%06d.png" % ( nframe ) )
-            #lwr.Write()
-        else:
-            break # end operation when we don't get a valid MIC
-        nframe = nframe+1
-        
-    print "mic done."
-    """
-    
 
-        
+    print "maxpocket done."
+
     print "PYTHON All DONE."
-
     myscreen.render()   
-
-     
     myscreen.iren.Start()

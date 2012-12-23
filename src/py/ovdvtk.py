@@ -120,7 +120,10 @@ def drawOffsets(myscreen, ofs):
             n=n+1
         print "rendered loop ",nloop, " with ", len(lop), " points"
         nloop = nloop+1
-        
+
+def drawCircle(myscreen, c, r, circlecolor, res=50):
+    ca = Circle(center=(c.x,c.y,0) , radius=r, color=circlecolor, resolution=res )
+    myscreen.addActor(ca)
 
 class VD:
     def __init__(self, myscreen, vd, scale=1, textscale=0.06, vertexradius=0.04):

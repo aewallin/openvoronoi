@@ -4,10 +4,6 @@ import ovdvtk
 import time
 import vtk
 
-def drawCircle(myscreen, c, r, circlecolor):
-    ca = ovdvtk.Circle(center=(c.x,c.y,0) , radius=r, color=circlecolor, resolution=50 )
-    myscreen.addActor(ca)
-    
 if __name__ == "__main__":  
     #w=2500
     #h=1500
@@ -71,15 +67,10 @@ if __name__ == "__main__":
     t_after = time.time()
     times.append( t_after-t_before )
     
-    #print "   ",2*Nmax," point-sites sites took {0:.3f}".format(times[0])," seconds, {0:.2f}".format( 1e6*float( times[0] )/(float(2*Nmax)*float(math.log10(2*Nmax))) ) ,"us/n*log(n)"
-    print "all point sites inserted. "
+    print "all Point sites inserted. "
     vd.check()
     
-    #nsegs = Nmax
-    #nsegs = 5 #Nmax
-    #n=1
-    t_before = time.time()
-    
+    t_before = time.time()    
     vd.addLineSite( id_list[0], id_list[1])
     vd.check()
     vd.addLineSite( id_list[1], id_list[2])
@@ -90,6 +81,7 @@ if __name__ == "__main__":
     vd.check()
     vd.addLineSite( id_list[4], id_list[0])
     vd.check()
+    print "all Line sites inserted. "
     
     t_after = time.time()
     line_time = t_after-t_before
@@ -111,21 +103,17 @@ if __name__ == "__main__":
         for n in range( len(mic_list) ):
             mic = mic_list[n]
             if n == 0:
-                print "hello", mic[0]," r = ",mic[1]
-                drawCircle( myscreen, mic[0], mic[1] , ovdvtk.red )
+                print "First MIC = ", mic[0]," r = ",mic[1]
+                ovdvtk.drawCircle( myscreen, mic[0], mic[1] , ovdvtk.red )
             else:
-                drawCircle( myscreen, mic[0], mic[1] , ovdvtk.green )
-    print "mic done."
+                print "MIC = ", mic[0]," r = ",mic[1]
+                ovdvtk.drawCircle( myscreen, mic[0], mic[1] , ovdvtk.green )
+    print "maxpocket done."
     vod.setVDText2(times)
-
-    
     vod.setAll()
-        
     print "PYTHON All DONE."
-
     myscreen.render()   
     #w2if.Modified()
     #lwr.SetFileName("{0}.png".format(Nmax))
     #lwr.Write()
-     
     myscreen.iren.Start()

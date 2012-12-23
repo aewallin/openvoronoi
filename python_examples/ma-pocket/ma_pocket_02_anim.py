@@ -3,18 +3,7 @@ import ovdvtk
 
 import time
 import vtk
-import datetime
-import math
-import random
-import os
-import sys
-import pickle
-import gzip
 
-def drawCircle(myscreen, c, r, circlecolor):
-    ca = ovdvtk.Circle(center=(c.x,c.y,0) , radius=r, color=circlecolor, resolution=50 )
-    myscreen.addActor(ca)
-    
 if __name__ == "__main__":  
     #w=2500
     #h=1500
@@ -35,7 +24,6 @@ if __name__ == "__main__":
     
     scale=1
     myscreen.render()
-    random.seed(42)
     far = 1
     camPos = far
     zmult = 1.8
@@ -65,26 +53,19 @@ if __name__ == "__main__":
     
     segs = []
     #ovd.Point(1,1)
-    eps=0.9
+    #eps=0.9
     p1=ovd.Point(-0.1,-0.2)
     p2=ovd.Point(0.2,0.1)
     p3=ovd.Point(0.4,0.2)
     p4=ovd.Point(0.6,0.6)
     p5=ovd.Point(-0.6,0.3)
-
     pts = [p1,p2,p3,p4,p5]
     
-    #t_after = time.time()
-    #print ".done in {0:.3f} s.".format( t_after-t_before )
     times=[]
     id_list = []
-    m=0
     t_before = time.time()
     for p in pts:
-        
         id_list.append( vd.addVertexSite( p ) )
-        #print m," added vertex", seg_id[0]
-        m=m+1
    
     t_after = time.time()
     times.append( t_after-t_before )
@@ -101,6 +82,7 @@ if __name__ == "__main__":
     t_after = time.time()
     times.append( t_after-t_before )
     vd.check()
+    print "all line sites inserted. "
     
     pi = ovd.PolygonInterior(True)
     vd.filter_graph(pi)
@@ -111,34 +93,28 @@ if __name__ == "__main__":
     
     vod.setAll()
     
-    mapocket = ovd.MedialAxisPocket(vd.getGraph())
-    mapocket.setWidth(0.005)
-    
-    
-    
-    mapocket.run()
+    maxpocket = ovd.MedialAxisPocket(vd.getGraph())
+    maxpocket.setWidth(0.005)
+    maxpocket.run()
 
-    mic_components = mapocket.get_mic_components()
+    mic_components = maxpocket.get_mic_components()
     for mic_list in mic_components:
         nframe=0
         
         for n in range( len(mic_list) ):
             mic = mic_list[n]
             if n == 0:
-                print "hello", mic[0]," r = ",mic[1]
-                drawCircle( myscreen, mic[0], mic[1] , ovdvtk.red )
+                print "First MIC = ", mic[0]," r = ",mic[1]
+                ovdvtk.drawCircle( myscreen, mic[0], mic[1] , ovdvtk.red )
             else:
-                drawCircle( myscreen, mic[0], mic[1] , ovdvtk.green )
+                print "MIC = ", mic[0]," r = ",mic[1]
+                ovdvtk.drawCircle( myscreen, mic[0], mic[1] , ovdvtk.green )
             w2if.Modified()
             lwr.SetFileName("frames/%06d.png" % ( nframe ) )
             #lwr.Write()
             time.sleep(0.1)
             myscreen.render()
-        print "mic done."
     
     print "PYTHON All DONE."
-
     myscreen.render()   
-
-     
     myscreen.iren.Start()

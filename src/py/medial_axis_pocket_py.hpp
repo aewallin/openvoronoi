@@ -27,10 +27,10 @@ namespace ovd {
 namespace pyovd {
     
 /// python wrapper for medial_axis_pocket
-class medial_axis_pocket_py : public medial_axis_pocket {
+class medial_axis_pocket_py : public maxpocket::medial_axis_pocket {
 public:
     /// create medial_axis_pocket object
-    medial_axis_pocket_py(HEGraph& gi): medial_axis_pocket(gi) {}
+    medial_axis_pocket_py(HEGraph& gi): maxpocket::medial_axis_pocket(gi) {}
     /// return list of MICs \todo replaced by get_mic_components()
     boost::python::list py_get_mic_list() {
         boost::python::list out;

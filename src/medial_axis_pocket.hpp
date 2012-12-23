@@ -31,12 +31,9 @@
 
 namespace ovd {
 
+namespace maxpocket {
 
-
-
-
-
-/// experimental medial-axis pocketing
+/// medial-axis pocketing
 class medial_axis_pocket {
 public:
     medial_axis_pocket(HEGraph& gi);
@@ -126,6 +123,8 @@ protected:
     MICList mic_list; ///< the result of the operation is a list of MICs 
     std::vector<MICList> ma_components; ///< algorithm output
 };
+
+} // end maxpocket namespace
 
 } // end ovd namespace
 // end file 

@@ -19,8 +19,9 @@
 
 #include "medial_axis_pocket.hpp"
 
-namespace ovd
-{
+namespace ovd {
+
+namespace maxpocket {
 
 /// the input graph should be a voronoi diagram passed through medial_axis_filter
 medial_axis_pocket::medial_axis_pocket(HEGraph& gi): g(gi) {
@@ -518,6 +519,8 @@ double medial_axis_pocket::CutWidthError::operator()(const double x) {
 
 medial_axis_pocket::edata::edata() { done = false; }
 
-} // end namespace
+} // end maxpocket namespace
+
+} // end ovd namespace
 
 // end file 

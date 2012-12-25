@@ -24,10 +24,10 @@ def xy_rapid_to(x,y):
     print "G0 X% 8.4f Y% 8.4f " % (scale*x, scale*y)
 
 def pen_up():
-    print "G0Z% 8.4f " % (clearance_height)
+    print "G0 Z%8.4f " % (clearance_height)
 
 def pen_down(z=0):
-    print "G0Z% 8.4f" % (feed_height)
+    print "G0 Z%8.4f" % (feed_height)
     plunge(z)
 
 def plunge(z):

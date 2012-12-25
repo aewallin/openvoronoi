@@ -584,7 +584,7 @@ if __name__ == "__main__":
     
     toolRadius = 0.002
     
-    [segs, extents, scale] = get_scaled_segs( "P", 0.3) # geometry from ttt
+    [segs, extents, scale] = get_scaled_segs( "A", 0.3) # geometry from ttt
     dx = -0.3
     dy = 0
     segs = translate(segs, dx, dy )
@@ -630,7 +630,8 @@ if __name__ == "__main__":
     #myscreen.iren.Start()
     
     mapocket = ovd.MedialAxisPocket(vd.getGraph())
-    mapocket.setWidth(5*toolRadius) # 0.3*toolRadius
+    mapocket.setCutterRadius( toolRadius )
+    mapocket.setCutWidth(5*toolRadius) # 0.3*toolRadius
     mapocket.debug(True)
     t_before = time.time()
     mapocket.run()

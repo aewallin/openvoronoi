@@ -37,9 +37,10 @@ namespace maxpocket {
 class medial_axis_pocket {
 public:
     medial_axis_pocket(HEGraph& gi);
-    void set_width(double w);
+    void set_cut_width(double w);
+    void set_cutter_radius(double r);
     void run();
-    //void run2();
+
     void set_debug(bool b);
     /// \brief Maximal Inscribed Circle. A combination of a Point and a clearance-disk radius.
     ///
@@ -70,15 +71,16 @@ protected:
     /// \brief error-functor for find_next_u()
     /// \sa medial_axis_pocket
     class CutWidthError  {
-    public:
-        CutWidthError(medial_axis_pocket* ma, HEEdge ed, double wmax, Point cen1, double rad1);
-        double operator()(const double x);
-    private:
-        medial_axis_pocket* m; ///< calling class
-        HEEdge e;     ///< current edge
-        double w_max; ///< desired cut-width
-        Point c1;     ///< previous MIC center
-        double r1;    ///< previous MIC radius
+        public:
+            CutWidthError(medial_axis_pocket* ma, HEEdge ed, double wmax, Point cen1, double rad1, double cutrad);
+            double operator()(const double u);
+        private:
+            medial_axis_pocket* m; ///< calling class
+            HEEdge e;     ///< current edge
+            double w_max; ///< desired cut-width
+            Point c1;     ///< previous MIC center
+            double r1;    ///< previous MIC radius
+            double cutter_radius;
     };
 
     /// keep track of bool done true/false flag for each edge
@@ -87,7 +89,7 @@ protected:
         bool done; ///< is edge done?
     };
 
-    /// branch-data when we backtrack to machine an un-machined branch
+    /// for storing branch-data when we backtrack to machine an un-machined branch
     struct branch_point {
         branch_point(Point p, double r, HEEdge e);
         Point current_center;  ///< current center
@@ -103,25 +105,26 @@ protected:
     void mark_done(HEEdge e);
     bool has_next_radius(HEEdge e); 
     std::pair<double,double> find_next_u();
-    void output_next_mic(double next_u, double next_radius, bool branch);
+    void output_next_mic(double next_u,  bool branch);
     std::vector<Point> bitangent_points(Point c1, double r1, Point c2, double r2);
     double cut_width(Point c1, double r1, Point c2, double r2);
 //DATA
-    bool debug; ///< debug output flag
-    std::vector<HEEdge> ma_edges; ///< the edges of the medial-axis
-    std::map<HEEdge, edata> edge_data; ///< map from edge-descriptor to bool-flag
-    HEGraph& g; ///< VD graph
-    std::stack<branch_point> unvisited; ///< stack of unvisited branch_point:s
-    HEEdge current_edge; ///< the current edge
-    double current_radius; ///< current clearance-disk radius
-    double current_u; ///< current position along edge. u is in [0,1]
-    Point current_center; ///< current position
-    bool new_branch;     ///< flag for indicating new branch
-    Point previous_branch_center; ///< prev branch position
-    double previous_branch_radius; ///< prev branch radius
-    double max_width; ///< the max cutting-width
-    MICList mic_list; ///< the result of the operation is a list of MICs 
-    std::vector<MICList> ma_components; ///< algorithm output
+    bool debug;                             ///< debug output flag
+    std::vector<HEEdge> ma_edges;           ///< the edges of the medial-axis
+    std::map<HEEdge, edata> edge_data;      ///< map from edge-descriptor to bool-flag
+    HEGraph& g;                             ///< VD graph
+    std::stack<branch_point> unvisited;     ///< stack of unvisited branch_point:s
+    HEEdge current_edge;                    ///< the current edge
+    double current_radius;                  ///< current clearance-disk radius
+    double current_u;                       ///< current position along edge. u is in [0,1]
+    Point current_center;                   ///< current position
+    bool new_branch;                        ///< flag for indicating new branch
+    Point previous_branch_center;           ///< prev branch position
+    double previous_branch_radius;          ///< prev branch radius
+    double max_width;                       ///< the max cutting-width
+    double cutter_radius;                   ///< cutter radius
+    MICList mic_list;                       ///< the result of the operation is a list of MICs 
+    std::vector<MICList> ma_components;     ///< algorithm output, many (1 or more) MICLists
 };
 
 } // end maxpocket namespace

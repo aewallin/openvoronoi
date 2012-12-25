@@ -188,7 +188,8 @@ BOOST_PYTHON_MODULE(openvoronoi) {
         //.def("run2", &medial_axis_pocket_py::run2) 
         //.def("get_mic_list", &medial_axis_pocket_py::py_get_mic_list)
         .def("get_mic_components", &medial_axis_pocket_py::py_get_mic_components)
-        .def("setWidth", &medial_axis_pocket_py::set_width)
+        .def("setCutterRadius", &medial_axis_pocket_py::set_cutter_radius)
+        .def("setCutWidth", &medial_axis_pocket_py::set_cut_width)
         .def("debug", &medial_axis_pocket_py::set_debug)
     ;
 }

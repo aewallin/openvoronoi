@@ -54,7 +54,7 @@ def drawArc(myscreen, pt1, pt2, r, cen,cw,arcColor):
         y = cen.y + tr[1] 
         current = ovd.Point(x,y)
         myscreen.addActor( ovdvtk.Line(p1=(previous.x,previous.y,0),p2=(current.x,current.y,0),color=arcColor) )
-        ngc_writer.xy_line_to(current.x,current.y)
+        #ngc_writer.xy_line_to(current.x,current.y)
         previous = current 
 
 def rapid_to_next(myscreen, prv_tang, nxt_tang, c1, r1, c2, r2, prv, nxt):
@@ -80,11 +80,13 @@ def rapid_to_next(myscreen, prv_tang, nxt_tang, c1, r1, c2, r2, prv, nxt):
     src2 = cen2 + rad* rapid_tang.xy_perp() 
 
     drawArc(myscreen, prv, trg1, rad, cen1, True, ovdvtk.blue) # lead-out arc
+    ngc_writer.xy_arc_to(trg1.x, trg1.y, rad, cen1.x, cen1.y, True)
     
     ovdvtk.drawLine(myscreen, trg1, src2, ovdvtk.cyan) # rapid
-    ngc_writer.xy_line_to(src2.x,src2.y)
+    ngc_writer.xy_rapid_to(src2.x,src2.y)
     
     drawArc(myscreen, src2, nxt, rad, cen2, True, ovdvtk.lblue) # lead-in arc
+    ngc_writer.xy_arc_to(nxt.x, nxt.y, rad, cen2.x, cen2.y, True)
     
 
 def rapid_to_new_branch(myscreen, prv_tang, nxt_tang, c1, r1, c2, r2, prv, nxt):
@@ -112,7 +114,7 @@ def rapid_to_new_branch(myscreen, prv_tang, nxt_tang, c1, r1, c2, r2, prv, nxt):
     drawArc(myscreen, prv, trg1, rad1, cen1, True, ovdvtk.orange) # lead-out arc
     ngc_writer.pen_up()
     ovdvtk.drawLine(myscreen, trg1, src2, ovdvtk.magenta) # rapid
-    ngc_writer.xy_line_to(src2.x,src2.y)
+    ngc_writer.xy_rapid_to(src2.x,src2.y)
     ngc_writer.pen_down()
     drawArc(myscreen, src2, nxt, rad2, cen2, True, ovdvtk.mag2) # lead-in arc
 
@@ -129,14 +131,14 @@ def final_lead_out(myscreen, prv_tang, nxt_tang, c1, r1, c2, r2, prv, nxt):
 # clear out initial MIC of a component
 def spiral_clear(myscreen, out_tangent, in_tangent, c1, r1, c2, r2, out1, in1):
     # MIC: center= c1, radius=r1
-    print "( spiral clear! )"
+    print "( spiral clear )"
     ngc_writer.pen_up()
     # end spiral at in1
     # archimedean spiral
     # r = a + b theta
     in1_dir = in1-c1
     in1_theta = math.atan2(in1_dir.y,in1_dir.x)
-    drawPoint( myscreen, c1, ovdvtk.red ) # red dot at center of MIC
+    drawPoint( myscreen, c1, ovdvtk.red, 0.002 ) # red dot at center of MIC
     #drawPoint( myscreen, in1, ovdvtk.blue, 0.006 )
     # width = 2*pi*b
     # => b = width/(2*pi)
@@ -669,6 +671,7 @@ if __name__ == "__main__":
     #myscreen.iren.Start()
     ngc_writer.scale = 10/0.03
     ngc_writer.preamble()
+    ngc_writer.feed = 2000
     
     # the rest of the MICs are then cleared
     nframe=0
@@ -700,7 +703,7 @@ if __name__ == "__main__":
         # the current MIC
         if first:
             # spiral-clear the start-MIC. The spiral should end at in1
-            #spiral_clear(myscreen, out_tangent, in_tangent, previous_center, previous_radius, cen2, r2, previous_out1, in1)
+            spiral_clear(myscreen, out_tangent, in_tangent, previous_center, previous_radius, cen2, r2, previous_out1, in1)
             #print "No rapid-move on first-iteration."
             first = False
         else:
@@ -714,9 +717,20 @@ if __name__ == "__main__":
         # actual cutting of current MIC
         ovdvtk.drawLine(myscreen, in1, in2, ovdvtk.green)         # in bi-tangent
         ngc_writer.xy_line_to(in2.x,in2.y)
-
+        digits = 4
+        
+        #print "( lineto in2x %f, %f )" % ( round(ngc_writer.scale*in2.x, digits), round(ngc_writer.scale*in2.y, digits) )
+        #print "( out2:  %f, %f )" % ( round(ngc_writer.scale*out2.x, digits), round(ngc_writer.scale*out2.y, digits) )
         drawArc(myscreen, in2, out2, r2, cen2, True, ovdvtk.green)  # arc-cut
-        ngc_writer.xy_arc_to( out2.x, out2.y, r2, cen2.x, cen2.y, True )
+        #print "( out2:  %f, %f )" % ( round(ngc_writer.scale*out2.x, digits), round(ngc_writer.scale*out2.y, digits) )
+        
+        if ((round(ngc_writer.scale*in2.x, digits) != round(ngc_writer.scale*out2.x, digits)) or (round(ngc_writer.scale*in2.y, digits) != round(ngc_writer.scale*out2.y, digits) ) ):
+            # print "in2x", round(ngc_writer.scale*in2.x, digits)
+            # print "out2x", round(ngc_writer.scale*out2.x, digits) 
+            #print "( ARC to %f, %f )" % ( round(ngc_writer.scale*out2.x, digits), round(ngc_writer.scale*out2.y, digits) )
+            ngc_writer.xy_arc_to( out2.x, out2.y, r2, cen2.x, cen2.y, True )
+        else:
+            print "( NO arc to %f, %f )" % ( round(ngc_writer.scale*out2.x, digits), round(ngc_writer.scale*out2.y, digits) )
 
         ovdvtk.drawLine(myscreen, out2, out1, ovdvtk.green)  # out bi-tangent
         ngc_writer.xy_line_to(out1.x,out1.y)

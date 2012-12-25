@@ -13,11 +13,11 @@ def xy_line_to(x,y):
     print "G1 X% 8.4f Y% 8.4f " % (scale*x, scale*y)
 
 # (endpoint, radius, center, cw?)
-def xy_arc_to( x,y, r, cx,cy, cw ):
+def xy_arc_to( x, y, r, cx, cy, cw ):
     if (cw):
-        print "G2 X% 8.5f Y% 8.5f R% 8.5f" % (scale*x, scale*y, r)
+        print "G2 X% 8.4f Y% 8.4f R% 8.4f" % (scale*x, scale*y, scale*r)
     else:
-        print "G3 X% 8.5f Y% 8.5f R% 8.5f" % (scale*x, scale*y, r)
+        print "G3 X% 8.4f Y% 8.4f R% 8.4f" % (scale*x, scale*y, scale*r)
     # FIXME: optional IJK format arcs
     
 def xy_rapid_to(x,y):
@@ -39,7 +39,8 @@ def preamble():
     else:
         print "G20 F% 8.0f" % (feed) # G20 F6 for inch
         
-    print "G64 P0.001"
+    print "G64 P0.001" # tolerance mode
+    print "G90" # absolute distance
     pen_up()
     print "G0 X0 Y0"
 

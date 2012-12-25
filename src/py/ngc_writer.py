@@ -1,3 +1,8 @@
+# Simple functions for writing G-code
+#
+# This file is part of OpenVoronoi
+# Released under GNU General Public License, version 3 or later.
+# Copyright 2012, Anders Wallin, anders.e.e.wallin (at) gmail.com
 
 clearance_height= 20
 feed_height = 10
@@ -7,7 +12,7 @@ metric = True
 scale = 1
 
 def line_to(x,y,z):
-    print "G1 X% 8.6f Y% 8.6f Z% 8.6f F%.0f" % (x, y, z, feed)
+    print "G1 X% 8.6f Y% 8.6f Z% 8.6f F%.0f" % (scale*x, scale*y, scale*z, feed)
 
 def xy_line_to(x,y):
     print "G1 X% 8.4f Y% 8.4f " % (scale*x, scale*y)
@@ -24,11 +29,12 @@ def xy_rapid_to(x,y):
     print "G0 X% 8.4f Y% 8.4f " % (scale*x, scale*y)
 
 def pen_up():
-    print "G0 Z%8.4f " % (clearance_height)
+    plunge(feed_height) # up to feed height, at plunge_feed
+    print "G0 Z%8.4f " % (clearance_height) # rapid up to clearance height
 
 def pen_down(z=0):
-    print "G0 Z%8.4f" % (feed_height)
-    plunge(z)
+    print "G0 Z%8.4f" % (feed_height) # rapid down to feed_height
+    plunge(z) # down to specified height at plunge_feed
 
 def plunge(z):
     print "G1 Z% 8.4f F% 8.0f" % (z, plunge_feed)

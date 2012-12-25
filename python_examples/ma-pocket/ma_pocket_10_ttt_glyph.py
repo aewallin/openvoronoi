@@ -132,7 +132,7 @@ def final_lead_out(myscreen, prv_tang, nxt_tang, c1, r1, c2, r2, prv, nxt):
 def spiral_clear(myscreen, out_tangent, in_tangent, c1, r1, c2, r2, out1, in1):
     # MIC: center= c1, radius=r1
     print "( spiral clear )"
-    ngc_writer.pen_up()
+    #ngc_writer.pen_up()
     # end spiral at in1
     # archimedean spiral
     # r = a + b theta
@@ -542,6 +542,11 @@ def insert_many_polygons(vd,segs):
     seg_time = t_after-t_before
     
     return [pt_time, seg_time]
+
+# does point c lie left or right of the a->b line?
+def is_right(a,b,c):
+    det = (a.x-c.x)*(b.y-c.y) - (b.x-c.x)*(a.y-c.y)
+    return det>0
     
 if __name__ == "__main__":  
     #w=2500
@@ -572,9 +577,10 @@ if __name__ == "__main__":
     print "( Medial-Axis pocketing. )"
     print "( %s )" % (datetime.datetime.now())
     print "( OpenVoronoi %s  )" % (ovd.version())
-    print "( TOOL/MILL,10,0,50 ) "
-    print "( COLOR,0,255,255 ) "
-    print "( STOCK/BLOCK,700.0000,400.0000,10.0000,350.0000,160.0000,5.0000 ) "
+    print "( TOOL/MILL,10,0,50 ) " # for cutsim
+    print "( COLOR,0,255,255 ) " # for cutsim
+    print "( STOCK/BLOCK,700.0000,400.0000,10.0000,350.0000,160.0000,5.0000 ) " # for cutsim
+    
     
     toolRadius = 0.002
     
@@ -598,35 +604,12 @@ if __name__ == "__main__":
     ofs = of.offset(toolRadius) 
     t_after = time.time()
     print "( OFFSET in %.3f ms.  )" % (1e3*(t_after-t_before))
-    drawOffsets2(myscreen, ofs)
     
+    
+    
+    drawOffsets2(myscreen, ofs)
     myscreen.render()
     #myscreen.iren.Start()
-
-    # now create a new VD from the offset
-    #vd2 = ovd.VoronoiDiagram(1,120)
-    #tim2 = insert_offset_loop(vd2,ofs)
-    #print "( VD2 done in   %.3f s.  )" % (sum(tim2))
-
-    # now offset outward
-    #pi = ovd.PolygonInterior(True)
-    #vd2.filter_graph(pi)
-    #of = ovd.Offset( vd2.getGraph() ) # pass the created graph to the Offset class
-    #t_before = time.time()
-    #ofs2 = of.offset(0.0015)
-    #t_after = time.time()
-    #print "( VD2 OFFSET in ", 1e3*(t_after-t_before)," milliseconds.  )"
-    #print "( VD2 OFFSET in %.3f s.  )" % (1e3*(t_after-t_before))
-    #drawOffsets2(myscreen, ofs2)
-    
-    #myscreen.render()   
-    #myscreen.iren.Start()
-    
-    # now create the VD for pocketing
-    #vd3 = ovd.VoronoiDiagram(1,120)
-    #times = insert_offset_loop(vd3,ofs)
-    #print "( VD3 done in ", 1e3*(sum(times))," milliseconds.  )"
-    #print "( VD3 done in   %.3f s.  )" % (sum(times))
     
     # visualization of the VD
     vod3 = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
@@ -647,7 +630,7 @@ if __name__ == "__main__":
     #myscreen.iren.Start()
     
     mapocket = ovd.MedialAxisPocket(vd.getGraph())
-    mapocket.setWidth(toolRadius) # 0.3*toolRadius
+    mapocket.setWidth(5*toolRadius) # 0.3*toolRadius
     mapocket.debug(True)
     t_before = time.time()
     mapocket.run()
@@ -672,6 +655,7 @@ if __name__ == "__main__":
     ngc_writer.scale = 10/0.03
     ngc_writer.preamble()
     ngc_writer.feed = 2000
+    print "T1 M6" # change to tool 1
     
     # the rest of the MICs are then cleared
     nframe=0
@@ -719,18 +703,49 @@ if __name__ == "__main__":
         ngc_writer.xy_line_to(in2.x,in2.y)
         digits = 4
         
-        #print "( lineto in2x %f, %f )" % ( round(ngc_writer.scale*in2.x, digits), round(ngc_writer.scale*in2.y, digits) )
-        #print "( out2:  %f, %f )" % ( round(ngc_writer.scale*out2.x, digits), round(ngc_writer.scale*out2.y, digits) )
+        # arc-cut
+        # in2: start point
+        # out2: end point
+        # r2: radius
+        # cen2: center
+        # True: CW arc
         drawArc(myscreen, in2, out2, r2, cen2, True, ovdvtk.green)  # arc-cut
-        #print "( out2:  %f, %f )" % ( round(ngc_writer.scale*out2.x, digits), round(ngc_writer.scale*out2.y, digits) )
-        
-        if ((round(ngc_writer.scale*in2.x, digits) != round(ngc_writer.scale*out2.x, digits)) or (round(ngc_writer.scale*in2.y, digits) != round(ngc_writer.scale*out2.y, digits) ) ):
-            # print "in2x", round(ngc_writer.scale*in2.x, digits)
-            # print "out2x", round(ngc_writer.scale*out2.x, digits) 
-            #print "( ARC to %f, %f )" % ( round(ngc_writer.scale*out2.x, digits), round(ngc_writer.scale*out2.y, digits) )
+        #if (r2 > math.sqrt( math.pow(in2.x-out2.x,2) + math.pow(in2.y-out2.y,2) ) ):
+        if is_right(in2,out2,cen2):
+            # more than a half-circle, handle with two separate arc-moves
+            print "(warning circle ambiguous)"
+            startvector = in2-cen2
+            endvector = out2-cen2
+            theta1 = math.atan2(startvector.x,startvector.y)
+            theta2 = math.atan2(endvector.x,endvector.y)
+            CIRCLE_FUZZ = 1e-9
+            
+            # FIXME: this would allow CCW cutting also
+            #if (cw == False ): 
+            #    while ( (theta2 - theta1) > -CIRCLE_FUZZ): 
+            #        theta2 -= 2*math.pi
+            #else:
+            while( (theta2 - theta1) < CIRCLE_FUZZ): 
+                theta2 += 2*math.pi
+            dtheta = theta2-theta1
+            theta_half = dtheta/2.0
+            # create a point rotated from start by theta_half
+            midvector = rotate(startvector.x, startvector.y, math.cos(-theta_half), math.sin(-theta_half))
+            midpt = ovd.Point()
+            midpt.x = cen2.x + midvector[0]
+            midpt.y = cen2.y + midvector[1]
+            #output two circles
+            print "( ambiguous arc to %.4f, %.4f )" % ( ngc_writer.scale*out2.x, ngc_writer.scale*out2.y)
+            print "( arcing via midpt %.4f, %.4f )" % ( ngc_writer.scale*midpt.x, ngc_writer.scale*midpt.y)
+            print "( two circle output )"
+            assert( not is_right(in2,midpt,cen2) ) # first arc OK
+            assert( not is_right(midpt,out2,cen2) ) # second arc OK
+            
+            ngc_writer.xy_arc_to( midpt.x, midpt.y, r2, cen2.x, cen2.y, True )
             ngc_writer.xy_arc_to( out2.x, out2.y, r2, cen2.x, cen2.y, True )
         else:
-            print "( NO arc to %f, %f )" % ( round(ngc_writer.scale*out2.x, digits), round(ngc_writer.scale*out2.y, digits) )
+            # a normal case where one G2/3 move is sufficient
+            ngc_writer.xy_arc_to( out2.x, out2.y, r2, cen2.x, cen2.y, True )
 
         ovdvtk.drawLine(myscreen, out2, out1, ovdvtk.green)  # out bi-tangent
         ngc_writer.xy_line_to(out1.x,out1.y)
@@ -745,14 +760,12 @@ if __name__ == "__main__":
         nframe = nframe+1
         #myscreen.render()
     # end MIC-loop
-    
-    #print "mic-pocket done."
-    #print "PYTHON All DONE."
+
     ngc_writer.postamble()
     sys.stdout = sys.__stdout__              # remember to reset sys.stdout!
     
-    # fix linebreaks (?)
-    f = open('output.nc', 'w')
+    # write foo out to a file
+    f = open('output.ngc', 'w')
     for item in foo.content:
         if item != '\n':
             print>>f, item

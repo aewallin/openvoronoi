@@ -39,7 +39,7 @@ def drawArc(myscreen, pt1, pt2, r, cen,cw,arcColor):
     
     dtheta = theta2-theta1
     arclength = r*dtheta
-    dlength = max(0.001, arclength/10)
+    dlength = max(0.0001, arclength/50)
     steps = int( float(arclength) / float(dlength))
     if steps==0: steps=1
     rsteps = float(1)/float(steps)
@@ -200,6 +200,7 @@ def spiral_clear(myscreen, out_tangent, in_tangent, c1, r1, c2, r2, out1, in1):
         p = trg
         #if n == Npts-2:
         #    break
+    print "( spiral clear done. )"
 
 # return a list of points corresponding to an arc
 def arc_pts(  pt1, pt2, r, cen,cw): # (start, end, radius, center, cw )
@@ -582,9 +583,9 @@ if __name__ == "__main__":
     print "( STOCK/BLOCK,700.0000,400.0000,10.0000,350.0000,160.0000,5.0000 ) " # for cutsim
     
     
-    toolRadius = 0.002
+    toolRadius = 0.004
     
-    [segs, extents, scale] = get_scaled_segs( "A", 0.3) # geometry from ttt
+    [segs, extents, scale] = get_scaled_segs( "P", 0.3) # geometry from ttt
     dx = -0.3
     dy = 0
     segs = translate(segs, dx, dy )
@@ -631,7 +632,7 @@ if __name__ == "__main__":
     
     mapocket = ovd.MedialAxisPocket(vd.getGraph())
     mapocket.setCutterRadius( toolRadius )
-    mapocket.setCutWidth(5*toolRadius) # 0.3*toolRadius
+    mapocket.setCutWidth(toolRadius) # 0.3*toolRadius
     mapocket.debug(True)
     t_before = time.time()
     mapocket.run()
@@ -649,7 +650,7 @@ if __name__ == "__main__":
     cl = ovd.Point(0,0)
     
     # draw the initial MIC. to be cleared with a spiral-path
-    ovdvtk.drawCircle( myscreen, maxmic[0], maxmic[1] , ovdvtk.red )
+    #ovdvtk.drawCircle( myscreen, maxmic[0], maxmic[1] , ovdvtk.red )
     
     myscreen.render()
     #myscreen.iren.Start()
@@ -701,8 +702,8 @@ if __name__ == "__main__":
         
         # actual cutting of current MIC
         ovdvtk.drawLine(myscreen, in1, in2, ovdvtk.green)         # in bi-tangent
-        ngc_writer.xy_line_to(in2.x,in2.y)
-        digits = 4
+        ngc_writer.xy_line_to(in2.x,in2.y) # this bitangent is wrong just after spiral_clear!!
+        #digits = 4
         
         # arc-cut
         # in2: start point
@@ -715,6 +716,7 @@ if __name__ == "__main__":
         if is_right(in2,out2,cen2):
             # more than a half-circle, handle with two separate arc-moves
             print "(warning circle ambiguous)"
+            """
             startvector = in2-cen2
             endvector = out2-cen2
             theta1 = math.atan2(startvector.x,startvector.y)
@@ -741,9 +743,9 @@ if __name__ == "__main__":
             print "( two circle output )"
             assert( not is_right(in2,midpt,cen2) ) # first arc OK
             assert( not is_right(midpt,out2,cen2) ) # second arc OK
-            
-            ngc_writer.xy_arc_to( midpt.x, midpt.y, r2, cen2.x, cen2.y, True )
-            ngc_writer.xy_arc_to( out2.x, out2.y, r2, cen2.x, cen2.y, True )
+            """
+            #ngc_writer.xy_arc_to( midpt.x, midpt.y, r2, cen2.x, cen2.y, True )
+            ngc_writer.xy_arc_to( out2.x, out2.y, -r2, cen2.x, cen2.y, True )
         else:
             # a normal case where one G2/3 move is sufficient
             ngc_writer.xy_arc_to( out2.x, out2.y, r2, cen2.x, cen2.y, True )

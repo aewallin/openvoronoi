@@ -163,12 +163,12 @@ bool medial_axis_pocket::find_next_mic() {
     double w_target = cut_width(current_center, current_radius, c2, r2 - cutter_radius);
     if ( w_target > max_width ) { // since moving to the target vertex would give too large cut-width
         // we search on the current edge for the next MIC
-        if (debug) {  std::cout << " searching on the current edge "; g.print_edge(current_edge); }
+        //if (debug) {  std::cout << " searching on the current edge "; g.print_edge(current_edge); }
         // find a point on the current edge
         double next_u;
         double next_radius; // = find_next_radius();
         boost::tie(next_u,next_radius) = find_next_u();
-        if (debug) {  std::cout << " next_radius = " << next_radius << "\n"; }
+        //if (debug) {  std::cout << " next_radius = " << next_radius << "\n"; }
         output_next_mic(next_u,  new_branch);
         return true;
     } else {
@@ -177,7 +177,7 @@ bool medial_axis_pocket::find_next_mic() {
         
         // mark edge DONE. this means we have machined all MICs on this edge.
         mark_done(current_edge);
-        if (debug) std::cout << "find_next_mic() Finding new edge !\n";
+        //if (debug) std::cout << "find_next_mic() Finding new edge !\n";
         
         bool end_branch_mic;
         boost::tie( current_edge, end_branch_mic) = find_next_edge(); // move to the next edge
@@ -277,7 +277,7 @@ std::pair<HEEdge,bool> medial_axis_pocket::find_next_edge() {
             current_u = 0;
             return std::make_pair(out_edges[0],false);
         } else {
-            if (debug) std::cout << "find_next_edge(): one out-edge, but not valid\n"; 
+            // if (debug) std::cout << "find_next_edge(): one out-edge, but not valid\n"; 
             mark_done( out_edges[0] );
             current_edge = out_edges[0]; // jump to the next edge
             return find_next_edge(); // and try to see if that edge is valid.
@@ -317,12 +317,14 @@ bool medial_axis_pocket::has_next_radius(HEEdge e) {
     boost::tie(c2,r2) = edge_point(e,1.0);
 
     double w_target = cut_width(current_center, current_radius, c2, r2-cutter_radius);
+    /*
     if (debug) {
         CutWidthError t(this, e,max_width, current_center, current_radius, cutter_radius);
         std::cout << "has_next_radius() ?"<< ( w_target > max_width ) <<" "; g.print_edge(e);
         std::cout << "has_next_radius() err src "<< t(0) <<"\n";
         std::cout << "has_next_radius() err trg "<< t(1) <<"\n";
     }
+    */
     if (w_target<=0)
         return false;
         
@@ -340,7 +342,7 @@ std::pair<double,double> medial_axis_pocket::find_next_u() {
     boost::math::tools::eps_tolerance<double> tol(30);
     double trg_err = t(1.0);
     double cur_err = t(current_u);
-    if ( debug ||  ( !(trg_err*cur_err < 0) ) ) {
+    if (   ( !(trg_err*cur_err < 0) ) ) { // debug ||
         std::cout << "find_next_u():\n";
         std::cout << " current edge: "; g.print_edge(current_edge);// << current_radius << "\n";
         std::cout << "    edge type: " << g[current_edge].type_str() << "\n";
@@ -373,9 +375,8 @@ void medial_axis_pocket::output_next_mic(double next_u,  bool branch) {
     boost::tie(c2,r2) = edge_point(current_edge, next_u); //g[current_edge].point(next_radius);
     r2 = r2-cutter_radius;
     if (debug) {
-        std::cout << "output_next_mic(): \n";
-        std::cout << " next_u = " << next_u << "\n";
-        //std::cout << " next_radius = " << next_radius << "\n";
+        std::cout << "output_next_mic(): ";
+        std::cout << " u = " << next_u;
         std::cout << " c= " << c2 << " r= " << r2 << "\n";
     }
     
@@ -395,15 +396,18 @@ void medial_axis_pocket::output_next_mic(double next_u,  bool branch) {
     mic.c_prev = previous_branch_center;
     mic.r_prev = previous_branch_radius;
     mic_list.push_back(mic);
-    current_radius = r2; //next_radius;
-    current_center = c2; //g[current_edge].point(next_radius);
+    
+    // this moves everything to the next MIC
+    current_radius = r2;
+    current_center = c2;
     current_u = next_u;
 }
 
 /// bi-tangent points to c1-c2
+/// these can be used to connect the previous MIC to the next MIC, in some but not all cases
 std::vector<Point> medial_axis_pocket::bitangent_points(Point c1, double r1, Point c2, double r2) {
     std::vector<Point> out;
-    Point bd1,bd2;
+    Point bd1,bd2; // normalized bitangent direction-vectors, from the center of the MIC
     if ( r1 == r2 ) {
         Point c1c2 = c2-c1;
         c1c2.normalize();
@@ -478,10 +482,10 @@ std::pair<Point,double> medial_axis_pocket::edge_point(HEEdge e, double u) {
         {
         Point src = g[ g.source(e) ].position;
         Point trg = g[ g.target(e) ].position;
-        p = src + u * (trg-src);
+        p = src + u * (trg-src); // line-parametrization
         HEFace f = g[e].face;
         Site* s = g[f].site;
-        Point pa = s->apex_point(p);
+        Point pa = s->apex_point(p); // point on edge that is closest to p
         r = (p-pa).norm();
     } else if ( g[e].type == PARABOLA ) {
         // use the existing t-parametrisation (?)

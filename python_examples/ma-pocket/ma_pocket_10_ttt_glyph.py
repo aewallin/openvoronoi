@@ -9,6 +9,9 @@ import sys
 import datetime
 import ngc_writer
 
+import ma_pocket_helper as maxh
+
+
 def drawPoint( myscreen, c, pcolor , rad = 0.02):
     ca = ovdvtk.Sphere(center=(c.x,c.y,0) , radius=rad, color=pcolor)
     myscreen.addActor(ca)
@@ -285,7 +288,7 @@ def arc_pts2(  pt1, pt2, r, cen,cw): # (start, end, radius, center, cw )
         pts.append(current)
         previous = current 
     return pts
-    
+
 # faster drawing of offsets using vtkPolyData
 def drawOffsets2(myscreen, ofs):
     # draw loops
@@ -608,7 +611,7 @@ if __name__ == "__main__":
     
     
     
-    drawOffsets2(myscreen, ofs)
+    maxh.drawOffsets2(myscreen, ofs)
     myscreen.render()
     #myscreen.iren.Start()
     

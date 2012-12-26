@@ -1,5 +1,6 @@
 import openvoronoi as ovd
 import ovdvtk
+import ma_pocket_helper as maxh
 
 import time
 import vtk
@@ -38,7 +39,7 @@ if __name__ == "__main__":
     # for vtk visualization
     vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
     vod.drawFarCircle()
-
+    vod.setVDText2([1, 1])
     vod.textScale = 0.02
     vod.vertexRadius = 0.0031
     vod.drawVertices=0
@@ -72,17 +73,14 @@ if __name__ == "__main__":
     
     t_before = time.time()    
     vd.addLineSite( id_list[0], id_list[1])
-    vd.check()
     vd.addLineSite( id_list[1], id_list[2])
-    vd.check()
     vd.addLineSite( id_list[2], id_list[3])
-    vd.check()
     vd.addLineSite( id_list[3], id_list[4])
-    vd.check()
     vd.addLineSite( id_list[4], id_list[0])
     vd.check()
     print "all Line sites inserted. "
     
+    toolRadius = 0.01
     t_after = time.time()
     line_time = t_after-t_before
     if line_time < 1e-3:
@@ -91,25 +89,40 @@ if __name__ == "__main__":
 
     pi = ovd.PolygonInterior(True)
     vd.filter_graph(pi)
+    
+    # an interior offset, just for visualization
+    of = ovd.Offset( vd.getGraph() ) 
+    t_before = time.time()
+    ofs = of.offset(toolRadius) 
+    t_after = time.time()
+    print "( OFFSET in %.3f ms.  )" % (1e3*(t_after-t_before))
+    maxh.drawOffsets2(myscreen, ofs)
+    myscreen.render()
+    
+    
     ma = ovd.MedialAxis()
     vd.filter_graph(ma)
     
     mapocket = ovd.MedialAxisPocket(vd.getGraph())
     mapocket.setCutWidth(0.01)
+    mapocket.setCutterRadius(toolRadius)
     
     mapocket.run()
     mic_components = mapocket.get_mic_components()
     for mic_list in mic_components:
         for n in range( len(mic_list) ):
             mic = mic_list[n]
+            mic_center = mic[0]
+            mic_radius = mic[1]
+            #assert( mic_radius > 0)
             if n == 0:
-                print "First MIC = ", mic[0]," r = ",mic[1]
-                ovdvtk.drawCircle( myscreen, mic[0], mic[1] , ovdvtk.red )
+                print "First MIC = ", mic_center," r = ",mic_radius
+                ovdvtk.drawCircle( myscreen, mic_center, mic_radius , ovdvtk.red )
             else:
-                print "MIC = ", mic[0]," r = ",mic[1]
-                ovdvtk.drawCircle( myscreen, mic[0], mic[1] , ovdvtk.green )
+                print "MIC = ", mic_center," r = ",mic_radius
+                ovdvtk.drawCircle( myscreen, mic_center, mic_radius , ovdvtk.green )
     print "maxpocket done."
-    vod.setVDText2(times)
+    
     vod.setAll()
     print "PYTHON All DONE."
     myscreen.render()   

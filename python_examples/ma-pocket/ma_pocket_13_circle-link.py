@@ -104,7 +104,7 @@ if __name__ == "__main__":
     vd.filter_graph(ma)
     
     mapocket = ovd.MedialAxisPocket(vd.getGraph())
-    mapocket.setCutWidth(0.01)
+    mapocket.setCutWidth(0.03)
     mapocket.setCutterRadius(toolRadius)
     mapocket.debug(True)
     mapocket.run()

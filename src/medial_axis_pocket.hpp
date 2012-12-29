@@ -120,11 +120,11 @@ protected:
     bool find_next_mic();
     HEEdge find_next_branch();
     EdgeVector find_out_edges();
-    std::pair<HEEdge,bool> find_next_edge();
+    HEEdge find_next_edge();
     void mark_done(HEEdge e);
     bool has_next_radius(HEEdge e); 
-    std::pair<double,double> find_next_u();
-    void output_next_mic(double next_u,  bool branch);
+    double find_next_u();
+    void output_next_mic(double next_u);
     std::vector<Point> bitangent_points(Point c1, double r1, Point c2, double r2);
     double cut_width(Point c1, double r1, Point c2, double r2);
 //DATA

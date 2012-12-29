@@ -348,10 +348,12 @@ bool medial_axis_pocket::has_next_radius(HEEdge e) {
 
     double u_end = 1.0;
     boost::tie(c2,r2) = edge_point(e, u_end ); // end-point 
-    //boost::tie(c0,r0) = edge_point(e, 0.0 ); // start-point 
+    double r0;
+    Point  c0;
+    boost::tie(c0,r0) = edge_point(e, 0.0 ); // start-point 
     
-    //if ( (r0 - cutter_radius) < 0)
-    //    return false;
+    if ( ((r0 - cutter_radius) < 0) && ((r2 - cutter_radius) < 0) )
+        return false;
         
     if ( (r2 - cutter_radius) < 0 ) { // but if we cannot machine until the end-point:
         //std::cout << "has_next_radius() Warning (r2 - cutter_radius) = " << (r2 - cutter_radius) << "\n";

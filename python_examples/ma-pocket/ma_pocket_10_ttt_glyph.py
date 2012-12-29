@@ -42,7 +42,7 @@ def drawArc(myscreen, pt1, pt2, r, cen,cw,arcColor):
     
     dtheta = theta2-theta1
     arclength = r*dtheta
-    dlength = max(0.0001, arclength/50)
+    dlength = min(0.01, arclength/10)
     steps = int( float(arclength) / float(dlength))
     if steps==0: steps=1
     rsteps = float(1)/float(steps)
@@ -586,7 +586,8 @@ if __name__ == "__main__":
     print "( STOCK/BLOCK,700.0000,400.0000,10.0000,350.0000,160.0000,5.0000 ) " # for cutsim
     
     
-    toolRadius = 0.004
+    toolRadius = 0.008
+    cutWidth = toolRadius
     
     [segs, extents, scale] = get_scaled_segs( "P", 0.3) # geometry from ttt
     dx = -0.3
@@ -626,7 +627,7 @@ if __name__ == "__main__":
     vod3.setVDText2(times)
     
     # ma filter
-    ma = ovd.MedialAxis()
+    ma = ovd.MedialAxis(1.0)
     vd.filter_graph(ma)
     
     vod3.setAll()
@@ -635,7 +636,7 @@ if __name__ == "__main__":
     
     mapocket = ovd.MedialAxisPocket(vd.getGraph())
     mapocket.setCutterRadius( toolRadius )
-    mapocket.setCutWidth(toolRadius) # 0.3*toolRadius
+    mapocket.setCutWidth( cutWidth ) # 0.3*toolRadius
     mapocket.debug(True)
     t_before = time.time()
     mapocket.run()
@@ -647,10 +648,8 @@ if __name__ == "__main__":
     print "( MA-pocket done in %.3f s. Got %d MICs )" % ((t_after-t_before),len(mic_list) )
     
     maxmic = mic_list[0] # first MIC
-    #print maxmic
     previous_center = maxmic[0]
     previous_radius = maxmic[1]
-    cl = ovd.Point(0,0)
     
     # draw the initial MIC. to be cleared with a spiral-path
     #ovdvtk.drawCircle( myscreen, maxmic[0], maxmic[1] , ovdvtk.red )

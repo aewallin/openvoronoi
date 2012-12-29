@@ -40,8 +40,10 @@ public:
     void set_cut_width(double w);
     void set_cutter_radius(double r);
     void run();
-
+    
+    
     void set_debug(bool b);
+    
     /// \brief Maximal Inscribed Circle. A combination of a Point and a clearance-disk radius.
     ///
     /// it is the responsibility of a downstream algorithm to lay down a toolpath
@@ -49,23 +51,21 @@ public:
     /// c1 is the circle that is assumed already cut
     /// c2 is the new circle
     struct MIC {
-        Point c1;       ///< center
-        Point c2;       ///< center
-        double r1;      ///< radius
-        double r2;      ///< radius
-        Point t1;       ///< bi-tangent point
-        Point t2;       ///< bi-tangent point
-        Point t3;       ///< bi-tangent point
-        Point t4;       ///< bi-tangent point
-        bool new_branch;   ///< is this a new branch?
-        Point c_prev;      ///< for a new branch, the previous center
-        double r_prev;     ///< for a new branch, the previous radius
+        Point c1;           ///< center
+        Point c2;           ///< center
+        double r1;          ///< radius
+        double r2;          ///< radius
+        Point t1;           ///< bi-tangent point
+        Point t2;           ///< bi-tangent point
+        Point t3;           ///< bi-tangent point
+        Point t4;           ///< bi-tangent point
+        bool new_branch;    ///< is c1 on a new branch?
+        Point c_prev;       ///< for a new branch, the previous center
+        double r_prev;      ///< for a new branch, the previous radius
     };
-    typedef std::vector<MIC> MICList; ///< the list of MIC.s from one connected component of the medial-axis
-    //MICList get_mic_list();
-    std::vector<MICList> get_mic_components(); // {return ma_components;}
-    std::pair<Point,double> edge_point(HEEdge e, double u); // used by the error-functor also. move somewhere else?
-    
+    typedef std::vector<MIC> MICList; ///< the list of MICs from one connected component of the medial-axis
+    std::pair<Point,double> edge_point(HEEdge e, double u); 
+    std::vector<MICList> get_mic_components();  // return results
     
 protected:
     /// \brief error-functor for find_next_u()
@@ -85,26 +85,25 @@ protected:
 
     class RadiusError  {
         public:
-            RadiusError(medial_axis_pocket* ma, HEEdge ed,  Point cen1, double rad1, double cutrad): 
-                m(ma), e(ed),   c1(cen1), r1(rad1), cutter_radius(cutrad) {}
+            RadiusError(medial_axis_pocket* ma, HEEdge ed,   double cutrad): 
+                m(ma), e(ed), cutter_radius(cutrad) {}
             double operator()(const double u) {
-                Point c2; // = m->edge_point(x); //g[e].point(x); // current MIC center
-                double r2; // = x; // current MIC radius
+                Point c2;
+                double r2;
                 boost::tie(c2,r2) = m->edge_point(e,u);
-                //double w = (c2-c1).norm() + (r2-cutter_radius) - r1; // this is the cut-width
-                return r2-cutter_radius; // error compared to desired cut-width
+                return r2-cutter_radius; // error compared to desired radius
             }
         private:
             medial_axis_pocket* m; ///< calling class
             HEEdge e;     ///< current edge
-            Point c1;     ///< previous MIC center
-            double r1;    ///< previous MIC radius
+            //Point c1;     ///< previous MIC center
+            //double r1;    ///< previous MIC radius
             double cutter_radius;
     };
     
     /// keep track of bool done true/false flag for each edge
     struct edata {
-        edata();// { done = false; }
+        edata();
         bool done; ///< is edge done?
     };
 
@@ -140,7 +139,7 @@ protected:
     Point   current_center;                   ///< current position
     
     bool new_branch;                        ///< flag for indicating new branch
-    Point previous_branch_center;           ///< prev branch position
+    Point previous_branch_center;            ///< prev branch position
     double previous_branch_radius;          ///< prev branch radius
     double max_width;                       ///< the max cutting-width
     double cutter_radius;                   ///< cutter radius

@@ -133,6 +133,8 @@ bool medial_axis_pocket::find_initial_mic() {
     BOOST_FOREACH( HEEdge e, g.out_edge_itr(max_mic_vertex) ) {
         if ( e != current_edge ) {
             unvisited.push( branch_point(current_center, current_radius, e ) );
+            if (debug) { std::cout << "find_initial_mic() pushing edge: "; g.print_edge(e); }
+
         }
     }
     if (debug) { std::cout << "find_initial_mic() start edge is: "; g.print_edge(current_edge); }
@@ -157,32 +159,50 @@ bool medial_axis_pocket::find_next_mic() {
         return false; 
     }
     
-    // find a MIC on current-edge to get the desired cut-width    
+    // find a MIC on current_edge to get the desired cut-width    
     Point c2;
     double r2;
-    boost::tie(c2,r2) = edge_point(current_edge, 1.0 ); // end-point of current_edge
+    double u_end = 1.0;
+    boost::tie(c2,r2) = edge_point(current_edge, u_end ); // end-point of current_edge
+    
+    if ( (r2 - cutter_radius) < 0 ) { // but if we cannot machine until the end-point:
+        // search on current_edge for a point where r2==cutter_radius
+        {
+            RadiusError t(this, current_edge, current_center, current_radius, cutter_radius);
+            boost::uintmax_t max_iter=500;
+            boost::math::tools::eps_tolerance<double> tol(30);
+            double cur_err = t(current_u);
+            double trg_err = t(1.0);
+            if (   ( !(trg_err*cur_err < 0) ) ) { // must bracket root!
+                std::cout << "error root not bracketed\n";
+            }
+            std::pair<double, double>  r1 = boost::math::tools::toms748_solve(t, current_u, 1.0, tol, max_iter);
+            u_end = r1.first;
+        }
+        boost::tie(c2,r2) = edge_point(current_edge, u_end ); // revised end-point of current_edge
+    }
+    
     double w_target = cut_width(current_center, current_radius, c2, r2 - cutter_radius);
-    if ( w_target > max_width ) { // since moving to the target vertex would give too large cut-width
+    if ( w_target > max_width ) { 
+        // since moving to the target vertex would give too large cut-width
         // we search on the current edge for the next MIC
-        //if (debug) {  std::cout << " searching on the current edge "; g.print_edge(current_edge); }
-        // find a point on the current edge
-        double next_u;
-        double next_radius; // = find_next_radius();
-        boost::tie(next_u,next_radius) = find_next_u();
-        //if (debug) 
-        {  std::cout << " next_radius = " << next_radius << "\n"; }
-        //edge_point(current_edge, next_u)
-        
 
-            output_next_mic(next_u,  new_branch);
-            return true;
-        //} else {
-        //    return false;
-        //}
+        double next_u;
+        double next_radius;
+        boost::tie(next_u,next_radius) = find_next_u();
+        if (debug) {  
+            std::cout << "find_next_mic(): SAME EDGE r = " << next_radius << "\n"; 
+        }
+        output_next_mic(next_u,  new_branch);
+        return true;
     } else {
         // moving to the end of current_edge does not give a cut-width that is large enough
         // we need to find a new edge for the next MIC
         
+        if (debug)  {
+            std::cout << "find_next_mic() no MIC on ";
+            g.print_edge(current_edge);
+        }
         // mark edge DONE. this means we have machined all MICs on this edge.
         mark_done(current_edge);
         //if (debug) std::cout << "find_next_mic() Finding new edge !\n";
@@ -192,6 +212,12 @@ bool medial_axis_pocket::find_next_mic() {
         if ( current_edge == HEEdge() ) { // invalid edge marks end of operation
             if (debug)  std::cout << "find_next_mic() end of operation.\n";
             return false;
+        } else {
+            if (debug)  {
+                std::cout << "find_next_mic() NEW edge is ";
+                g.print_edge(current_edge);
+            }
+
         }
         
         /*
@@ -206,9 +232,19 @@ bool medial_axis_pocket::find_next_mic() {
         double next_radius;
         boost::tie(next_u,next_radius) = find_next_u();
         if (new_branch) { // global variable set by find_next_branch()
+            if (debug)  {
+                std::cout << "find_next_mic() NEW edge NEW branch u= " << next_u << " ";
+                g.print_edge(current_edge);
+            }
+
             new_branch=false;
             output_next_mic(next_u,  true); // this is a new branch
         } else {
+            if (debug)  {
+                std::cout << "find_next_mic() NEW edge u= " << next_u << " ";
+                g.print_edge(current_edge);
+            }
+
             output_next_mic(next_u,  false); // not a new branch
         }
         return true;
@@ -256,13 +292,16 @@ EdgeVector medial_axis_pocket::find_out_edges() {
 std::pair<HEEdge,bool> medial_axis_pocket::find_next_edge() {
     EdgeVector out_edges = find_out_edges();
     if (out_edges.empty() ) {
-        if (debug) std::cout << "find_next_edge(): no out_edges. end of branch.\n";
-        
+        if (debug) {
+            std::cout << "find_next_edge(): " << g[ g.target(current_edge) ].index ;
+            std::cout << " has no out_edges. end of branch.\n";
+        }
+        /*
         if ( current_radius > g[ g.target(current_edge) ].dist() ) {
             current_radius = g[ g.target(current_edge) ].dist();
             current_center = g[ g.target(current_edge) ].position; //point(current_radius);
             return std::make_pair(current_edge,true); // this outputs a final MIC at the end of a branch
-        }
+        }*/
         
         HEEdge e = find_next_branch();
         if (e==HEEdge())
@@ -365,7 +404,7 @@ std::pair<double,double> medial_axis_pocket::find_next_u() {
     double rnext;
     Point pnext;
     boost::tie( pnext, rnext ) = edge_point( current_edge, r1.first );
-    return std::make_pair( r1.first, rnext-cutter_radius );
+    return std::make_pair( r1.first, rnext-cutter_radius ); // !!! cutter_radius
 }
     
 /// \brief output the next MIC
@@ -382,12 +421,13 @@ void medial_axis_pocket::output_next_mic(double next_u,  bool branch) {
     r2 = r2-cutter_radius;
     if (r2<0)
         std::cout << "ERROR outputting negative-r MIC: " << r2 << "\n";
-        
+    
+    /*
     if (debug) {
         std::cout << "output_next_mic(): ";
         std::cout << " u = " << next_u;
         std::cout << " c= " << c2 << " r= " << r2 << "\n";
-    }
+    }*/
     
     mic.c1 = c1;
     mic.r1 = r1;

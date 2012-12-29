@@ -83,6 +83,25 @@ protected:
             double cutter_radius;
     };
 
+    class RadiusError  {
+        public:
+            RadiusError(medial_axis_pocket* ma, HEEdge ed,  Point cen1, double rad1, double cutrad): 
+                m(ma), e(ed),   c1(cen1), r1(rad1), cutter_radius(cutrad) {}
+            double operator()(const double u) {
+                Point c2; // = m->edge_point(x); //g[e].point(x); // current MIC center
+                double r2; // = x; // current MIC radius
+                boost::tie(c2,r2) = m->edge_point(e,u);
+                //double w = (c2-c1).norm() + (r2-cutter_radius) - r1; // this is the cut-width
+                return r2-cutter_radius; // error compared to desired cut-width
+            }
+        private:
+            medial_axis_pocket* m; ///< calling class
+            HEEdge e;     ///< current edge
+            Point c1;     ///< previous MIC center
+            double r1;    ///< previous MIC radius
+            double cutter_radius;
+    };
+    
     /// keep track of bool done true/false flag for each edge
     struct edata {
         edata();// { done = false; }
@@ -114,10 +133,12 @@ protected:
     std::map<HEEdge, edata> edge_data;      ///< map from edge-descriptor to bool-flag
     HEGraph& g;                             ///< VD graph
     std::stack<branch_point> unvisited;     ///< stack of unvisited branch_point:s
-    HEEdge current_edge;                    ///< the current edge
+    
+    HEEdge  current_edge;                    ///< the current edge
     double current_radius;                  ///< current clearance-disk radius
     double current_u;                       ///< current position along edge. u is in [0,1]
-    Point current_center;                   ///< current position
+    Point   current_center;                   ///< current position
+    
     bool new_branch;                        ///< flag for indicating new branch
     Point previous_branch_center;           ///< prev branch position
     double previous_branch_radius;          ///< prev branch radius

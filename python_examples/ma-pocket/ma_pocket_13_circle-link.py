@@ -106,20 +106,21 @@ if __name__ == "__main__":
     mapocket = ovd.MedialAxisPocket(vd.getGraph())
     mapocket.setCutWidth(0.01)
     mapocket.setCutterRadius(toolRadius)
-    
+    mapocket.debug(True)
     mapocket.run()
     mic_components = mapocket.get_mic_components()
+    print "python processing of MICs:"
     for mic_list in mic_components:
         for n in range( len(mic_list) ):
             mic = mic_list[n]
             mic_center = mic[0]
             mic_radius = mic[1]
-            #assert( mic_radius > 0)
+            assert( mic_radius > 0)
             if n == 0:
-                print "First MIC = ", mic_center," r = ",mic_radius
+                #print "First MIC = ", mic_center," r = ",mic_radius
                 ovdvtk.drawCircle( myscreen, mic_center, mic_radius , ovdvtk.red )
             else:
-                print "MIC = ", mic_center," r = ",mic_radius
+                #print "MIC = ", mic_center," r = ",mic_radius
                 ovdvtk.drawCircle( myscreen, mic_center, mic_radius , ovdvtk.green )
     print "maxpocket done."
     

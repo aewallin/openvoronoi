@@ -1,30 +1,35 @@
-import openvoronoi as ovd # https://github.com/aewallin/openvoronoi
-import ovdvtk             # for VTK visualization, https://github.com/aewallin/openvoronoi
-import truetypetracer as ttt     # https://github.com/aewallin/truetype-tracer
-
-import offset2vtk         # vtk visualization helper https://github.com/aewallin/openvoronoi
+import openvoronoi as ovd       # https://github.com/aewallin/openvoronoi
+import ovdvtk                   # for VTK visualization, https://github.com/aewallin/openvoronoi
+import truetypetracer as ttt    # https://github.com/aewallin/truetype-tracer
+import offset2vtk               # vtk visualization helper https://github.com/aewallin/openvoronoi
 
 import time
 import vtk
 import math
 
-# insert points into diagram, return list of point IDs
+# insert points into VoronoiDiagram, return list of point IDs
+# polygon = [p1,p2,p3,p4,p5]
+# where we assume the polygon is closed, e.g. p5 connects to p1
+# each point is a 2D point (p[0], p[1])
 def insert_polygon_points(vd, polygon):
     pts=[]
     for p in polygon:
-        pts.append( ovd.Point( p[0], p[1] ) )
+        pts.append( ovd.Point( p[0], p[1] ) ) # this just converts (p[0], p[1]) format points intot ovd.Point
     id_list = []
     print "inserting ",len(pts)," point-sites:"
     m=0
+    # pts = [pt1, pt2, pt3, pt4, pt5]  where each pt is of class ovd.Point
     for p in pts:
-        id_list.append( vd.addVertexSite( p ) )
+        id_list.append( vd.addVertexSite( p ) ) # note we store and return the Point ID returned here!
         print " ",m," added vertex ", id_list[ len(id_list) -1 ]
         m=m+1    
     return id_list
 
-# insert polygon line-segments based on a list of IDs
-# [0, 1, 2, 3, 4, 5] defines a closed polygon
+# insert polygon line-segments based on a list of IDs returned by insert_polygon_points()
+# id_list = [0, 1, 2, 3, 4, 5] defines a closed polygon. the
 # 0->1->2->3->4->5->0 
+# the IDs _must_ refer to points that have been previously inserted with vd.addVertexSite()
+#
 def insert_polygon_segments(vd,id_list):
     j=0
     print "inserting ",len(id_list)," line-segments:"
@@ -33,15 +38,17 @@ def insert_polygon_segments(vd,id_list):
         if n==(len(id_list)-1):
             n_nxt=0
         print " ",j,"inserting segement ",id_list[n]," - ",id_list[n_nxt]
-        vd.addLineSite( id_list[n], id_list[n_nxt])
+        # this inserts a line-segment id_list[n] -> id_list[n_nxt] into the VoronoiDiagram
+        vd.addLineSite( id_list[n], id_list[n_nxt]) 
         j=j+1
 
 # insert many polygons into vd
-# segs is a list of polygons
-# segs = [poly1, poly2, poly3, ...]
+# segs is a list of polygons:
+#   segs = [poly1, poly2, poly3, ...]
 # poly defines a closed polygon as a a list of points
-# [ [x1,y1], [x2,y2], [x3,y3], ... ]
-# where the last point in the list connects to the first
+#   poly1 = [ [x1,y1], [x2,y2], [x3,y3], ..., [xN,yN] ]
+# where the last point [xN,yN] in the list connects to the first [x1,y1]
+# 
 def insert_many_polygons(vd,segs):
     polygon_ids =[]
     t_before = time.time()
@@ -60,7 +67,7 @@ def insert_many_polygons(vd,segs):
     t_after = time.time()
     seg_time = t_after-t_before
     
-    return [pt_time, seg_time]
+    return [pt_time, seg_time] # return timing-info, for benchmarking
 
 # translate all segments by x,y
 def translate(segs,x,y):
@@ -76,8 +83,20 @@ def translate(segs,x,y):
     return out
 
 # call truetype-tracer to get font input geometry
-# text is the text-string we want
-# scale is used to scale the geometry to fit within a unit-circle
+#   text = the text-string we want
+#  scale = used to scale the geometry to fit within a unit-circle
+#
+# output is a list of lists:
+# [ [p1,p2,p3,p4,p5,p1] ,
+#   [p6,p7,p8,p9,p10, ... ,pN, p6],
+#   ...
+# ]
+# each point is a 2D point ( p[0], p[1] )
+# each sub-list corresponds to a closed loop of line-segments 
+#   e.g. p1->p2->p3->p4->p5->p1
+#
+# If the main(outer) geometry is given in e.g. CW orientation, then
+# islands (closed loops within the main geometry) are given in CCW orientation
 def ttt_segments(text,scale):
     wr = ttt.SEG_Writer()
     wr.arc = False
@@ -98,6 +117,17 @@ def ttt_segments(text,scale):
 # the segments come out of truetype-tracer in a slightly wrong format
 # truetype-tracer outputs closed polygons with identical points
 # at the start and end of the point-list. here we get rid of this repetition.
+# input:
+# [ [p1,p2,p3,p4,p5,p1] ,
+#   [p6,p7,p8,p9,p10, ... ,pN, p6],
+#   ...
+# ]
+# this functions simply removes the repeated end-point from each segment
+# output:
+# [ [p1,p2,p3,p4,p5] ,
+#   [p6,p7,p8,p9,p10, ... ,pN],
+#   ...
+# ]
 def modify_segments(segs):
     segs_mod =[]
     for seg in segs:
@@ -111,33 +141,31 @@ def modify_segments(segs):
     return segs_mod
 
 if __name__ == "__main__":  
-    #w=2500
-    #h=1500
     
+    # this sets up a VTK viewport where we can draw in 3D
     w=1920 # width and height of VTK viewport
     h=1080
     #w=1024
     #h=1024
     myscreen = ovdvtk.VTKScreen(width=w, height=h) 
     ovdvtk.drawOCLtext(myscreen, rev_text=ovd.version() )   
-    
-    scale=1
     myscreen.render()
-
+    scale=1
     far = 1
     camPos = far
     zmult = 3
-    # camPos/float(1000)
     myscreen.camera.SetPosition(0, -camPos/float(1000), zmult*camPos) 
     myscreen.camera.SetClippingRange(-(zmult+1)*camPos,(zmult+1)*camPos)
     myscreen.camera.SetFocalPoint(0.0, 0, 0)
     
-    # use far==1 for now. This means all input geometry should fit within a unit circle!
-    # 120 is a binning-parameter for nearest neighbor search. sqrt(n) where we have n points should be ok (?)
+    # craete a VoronoiDiagram
+    # use far=1.0 for now. This means all input geometry should fit within a unit circle!
+    # 120 is a binning-parameter for nearest neighbor search. sqrt(n) where we have n points should be optimal
     vd = ovd.VoronoiDiagram(far,120)
-    print ovd.version()
     
-    # for vtk visualization
+    
+    # for vtk visualization of the VoronoiDiagram
+    # (not required for offsetting or drawing offsets)
     vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
     vod.drawFarCircle()
     vod.textScale = 0.02
@@ -148,23 +176,25 @@ if __name__ == "__main__":
     vod.offsetEdges = 0
     vd.setEdgeOffset(0.05) # for visualization only. NOT offsetting!
 
-    # segments from ttt
+    # get segments from ttt
+    # this is the input geometry to VoronoiDiagram. It could also come from a text-file
+    # see the description of each function for details on the format
     segs = ttt_segments(  "LinuxCNC", 40000)
     segs = translate(segs, -0.06, 0.05)
     segs = modify_segments(segs)
     
-	# build a VD from the input geometry
+    # build a VD from the input geometry
     times = insert_many_polygons(vd,segs)
     print "all sites inserted. "
     print "VD check: ", vd.check() # sanity check
     
     # this filters the diagram so we are left with only the interior or the exterior
-    # of the polygon
+    # of the polygon. If the filtering is omitted we get offsets on both sides of the input geometry.
     # try True/False here and see what happens
     pi = ovd.PolygonInterior( False )
     vd.filter_graph(pi)
     
-    # the Offset class outputs 2D offsets given a VD
+    # Create an Offset class, for offsetting.
     of = ovd.Offset( vd.getGraph() ) # pass the created graph to the Offset class
     ofs_list=[]
     t_before = time.time()
@@ -181,11 +211,11 @@ if __name__ == "__main__":
     # loop1 = [ofs1, ofs2, ofs3, ...]
     # offset elements can be either lines or arcs
     # an offset element is a list:
-    # ofs1 = [p, r, cen, cw]
-    #  p = the end-point of the offset-element
-    #  r = the radius if it is an arc, -1 for lines
-    # cen= the center-point if it is an arc
-    #  cw= clockwise/anticlockwise flag for arcs
+    #  ofs1 = [p, r, cen, cw]
+    #     p = the end-point of the offset-element
+    #     r = the radius if it is an arc, -1 for lines
+    #   cen = the center-point if it is an arc
+    #    cw = clockwise/anticlockwise True/False flag for arcs
     
     
     # now we draw the offsets in VTK
@@ -196,7 +226,7 @@ if __name__ == "__main__":
         offset2vtk.drawOffsets2(myscreen, ofs)
         m=m+1
 
-	# some text on how long Offset ran
+    # draw some text on how long Offset ran
     oftext  = ovdvtk.Text()
     oftext.SetPos( (50, 100) )
     oftext_text = "Offset in {0:.3f} s CPU time.".format( oftime )
@@ -208,7 +238,7 @@ if __name__ == "__main__":
     pi = ovd.PolygonInterior(  True )
     vd.filter_graph(pi)
 
-	# display timing-info on how long the VD build took
+    # display timing-info on how long the VD build took
     vod.setVDText2(times)
     vod.setAll()
     print "PYTHON All DONE."

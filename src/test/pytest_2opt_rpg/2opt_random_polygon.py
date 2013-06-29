@@ -2,7 +2,7 @@ import openvoronoi as ovd
 import math
 import sys
 
-import rpg # random polygon generator see https://github.com/aewallin/CGAL_RPG
+import randompolygon as rpg # random polygon generator see https://github.com/aewallin/CGAL_RPG
 
 
 def rpg_vd(Npts, seed, debug):

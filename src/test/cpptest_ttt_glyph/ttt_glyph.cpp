@@ -96,9 +96,8 @@ int main(int argc,char *argv[]) {
     ovd::VoronoiDiagram* vd = new ovd::VoronoiDiagram(1,50);
     std::cout << "OpenVoronoi version: " << ovd::version() << "\n";
     
-    // store the verted IDs here, for later inserting line-segments
+    // store the verted IDs in loop_id, for later inserting line-segments
     std::vector< std::vector<int> > loops_id;
-    ///typedef std::pair<double,double> ttt_pt;
     boost::timer tmr;
     int n_points=0;
     BOOST_FOREACH(Loop loop, all_loops) {
@@ -119,6 +118,7 @@ int main(int argc,char *argv[]) {
             int next = n+1;
             if (n==loop_id.size()-1)
                 next = 0;
+            std::cout << "Inserting LineSite: " << loop_id[n] << " - " << loop_id[next] << "\n" << std::flush;
             vd->insert_line_site( loop_id[n], loop_id[next]); 
             n_linesites++;
         }

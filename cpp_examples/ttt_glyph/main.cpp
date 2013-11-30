@@ -14,8 +14,8 @@
 #include <openvoronoi/common/point.hpp>
 #include <openvoronoi/utility/vd2svg.hpp>
 
-#include <ttt/ttt.hpp>
-#include <ttt/segment_writer.hpp>
+#include <truetypetracer/ttt.hpp>
+#include <truetypetracer/segment_writer.hpp>
 
 #define TTFONT "/usr/share/fonts/truetype/freefont/FreeSerif.ttf"
 
@@ -115,6 +115,7 @@ int main(int argc,char *argv[]) {
         std::vector<int> loop_id;
         BOOST_FOREACH( Point pt, loop) {
             loop_id.push_back( vd->insert_point_site( ovd::Point(pt.x,pt.y)) ); 
+            std::cout << "Inserted PointSite: id=" << loop_id.back() << "  (" << pt.x << ", "<< pt.y << ")" << "\n" << std::flush;
             n_points++;
         }
         loops_id.push_back(loop_id);
@@ -129,6 +130,9 @@ int main(int argc,char *argv[]) {
             int next = n+1;
             if (n==loop_id.size()-1)
                 next = 0;
+            
+            std::cout << "Inserting LineSite: " << loop_id[n] << " - " << loop_id[next] << "\n" << std::flush;
+
             vd->insert_line_site( loop_id[n], loop_id[next]); 
             n_linesites++;
         }

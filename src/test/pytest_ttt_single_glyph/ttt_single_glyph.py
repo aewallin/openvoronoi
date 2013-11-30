@@ -87,7 +87,7 @@ def ttt_segments(text,scale):
     return segs
     
     
-if __name__ == "__main__":  
+if __name__ == "__main__":
     n = int(sys.argv[1])
     
     alphabet = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"]

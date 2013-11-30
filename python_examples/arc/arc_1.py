@@ -95,9 +95,9 @@ if __name__ == "__main__":
     #print "add segment ",id1, " to ", id2
     vd.debug_on()
     c1 = ovd.Point(0,0)
-    #vd.addArcSite( id1, id2 , c1, True , 14 ) # right-to-left arc
+    vd.addArcSite( id1, id2 , c1, True  ) # right-to-left arc
     
-    vd.addArcSite( id2, id1 , c1, False , 14) # left-to-right arc
+    #vd.addArcSite( id2, id1 , c1, False ) # left-to-right arc
     
     # 1 lookup vertex descriptors
     # 2 create Sites

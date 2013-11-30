@@ -3,7 +3,7 @@ import openvoronoi as ovd # https://github.com/aewallin/openvoronoi
 #import ovdvtk 
 
 import time
-import vtk
+#import vtk
 import random
 import string
 import sys

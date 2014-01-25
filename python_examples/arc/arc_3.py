@@ -101,7 +101,7 @@ if __name__ == "__main__":
     c1 = ovd.Point(0.1-d,0.1-d)
     #vd.addArcSite( id_list[1], id_list[2] , c1, False  ) 
     vd.addArcSite( id_list[2], id_list[1] , c1, True , 13) 
-    #vd.check()
+    vd.check()
     
     
     #vd.addArcSite( id2, id1 , c1, False , 14) # left-to-right arc

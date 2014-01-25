@@ -51,7 +51,7 @@ def insert_polygon_points(vd, polygon):
     m=0
     for p in pts:
         id_list.append( vd.addVertexSite( p ) )
-        print " ",m," added vertex ", id_list[ len(id_list) -1 ]
+        print " ",m," added vertex ", id_list[ len(id_list) -1 ], " ({0}, {1})".format(p.x,p.y) 
         m=m+1   
     print vd.numFaces()," faces after all points inserted"
     return id_list

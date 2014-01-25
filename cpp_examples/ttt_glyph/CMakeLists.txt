@@ -15,7 +15,7 @@ if(Boost_FOUND)
     MESSAGE(STATUS "linking with boost: " ${Boost_LIBRARIES})
 endif()
 
-
+# openvoronoi library
 find_library(OVD_LIBRARY 
             NAMES libopenvoronoi openvoronoi
             PATHS /usr/local/lib/openvoronoi
@@ -26,11 +26,11 @@ MESSAGE(STATUS "OVD_LIBRARY is now: " ${OVD_LIBRARY})
 include_directories( /usr/local/include/openvoronoi )
 
 
-# the ttt lib
+# the treutype-tracer library - provides font input geometry
 # https://github.com/aewallin/truetype-tracer
 find_library(TTT_LIBRARY 
-            NAMES libttt ttt
-            PATHS /usr/local/lib/ttt
+            NAMES libtruetypetracer truetypetracer
+            PATHS /usr/local/lib/truetypetracer
             DOC "rpg"
             REQUIRED
 )

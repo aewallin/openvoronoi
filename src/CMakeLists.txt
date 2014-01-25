@@ -5,9 +5,9 @@ cmake_minimum_required(VERSION 2.4)
 # figure out the gcc version
 INCLUDE(gcc_version.cmake)
 
-option(USE_CLANG "build application with clang" OFF) # OFF is the default
 
 # experimental use of clang, since it detects more warnings/erors than gcc
+option(USE_CLANG "build application with clang" OFF) # OFF is the default
 # Note: useful packages: clang, llvm, gcc-multilib
 # see: http://stackoverflow.com/questions/7031126/switching-between-gcc-and-clang-llvm-using-cmake
 if(USE_CLANG)
@@ -258,7 +258,6 @@ IF( ${BUILD_PYTHON_MODULE} MATCHES ON)
     target_link_libraries(openvoronoi openvoronoi_static ${Boost_LIBRARIES} ${QD_LIBRARY}) 
     set_target_properties(openvoronoi PROPERTIES PREFIX "") 
     set_target_properties(openvoronoi PROPERTIES VERSION ${MY_VERSION}) 
-
 
     # this figures out where to install the Python modules
     execute_process(

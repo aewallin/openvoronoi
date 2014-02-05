@@ -307,11 +307,16 @@ void EdgeProps::set_ll_para_parameters(Site* s1, Site* s2) {
 void EdgeProps::set_ll_parameters(Site* s1, Site* s2) {  // Held thesis p96
     assert( s1->isLine() && s2->isLine() );
     type = LINELINE;
-    double delta =  s1->a()*s2->b() - s1->b()*s2->a() ;
-    if ( delta==0 ) { // parallel line segments
+    double delta = s1->a()*s2->b() - s1->b()*s2->a() ;
+
+    // (numerically) parallel line segments - the generic LLL solver
+    // is numerically unstable for parallel cases
+    if (std::abs(delta) <= 1024.0*std::numeric_limits<double>::epsilon())
+    {
         set_ll_para_parameters(s1,s2);
         return;
     }
+   
     assert( delta != 0 );       
     double alfa1 = ( s1->b()*s2->c()-s2->b()*s1->c() ) / delta;
     double alfa2 = ( s2->a()*s1->c()-s1->a()*s2->c() ) / delta;

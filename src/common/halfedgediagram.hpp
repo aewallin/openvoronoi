@@ -333,7 +333,7 @@ VertexVector vertices()  const {
 }
 
 /// return all vertices adjecent to given vertex
-VertexVector adjacent_vertices(  Vertex v) {
+VertexVector adjacent_vertices(  Vertex v) const {
     VertexVector vv;
     BOOST_FOREACH( Edge e, out_edges( v ) ) {
         vv.push_back( target( e ) );
@@ -375,7 +375,7 @@ VertexVector face_vertices(Face face_idx) const {
 
 /// return edges of face f as a vector
 /// NOTE: it is faster to write a do-while loop in client code than to call this function!
-EdgeVector face_edges( Face f) {
+EdgeVector face_edges( Face f) const {
     Edge start_edge = faces[f].edge;
     Edge current_edge = start_edge;
     EdgeVector out;
@@ -392,7 +392,7 @@ EdgeVector face_edges( Face f) {
 }
 
 /// return out_edges of given vertex
-EdgeVector out_edges( Vertex v) { 
+EdgeVector out_edges( Vertex v) const { 
     EdgeVector ev;
     OutEdgeItr it, it_end;
     boost::tie( it, it_end ) = boost::out_edges( v, g );
@@ -404,7 +404,7 @@ EdgeVector out_edges( Vertex v) {
 
 /// return all edges as a vector
 // FIXME: provide std::pair<edge_iterator,edge_iterator> version of this function also?
-EdgeVector edges() {
+EdgeVector edges() const {
     EdgeVector ev;
     EdgeItr it, it_end;
     boost::tie( it, it_end ) = boost::edges( g );
@@ -415,7 +415,7 @@ EdgeVector edges() {
 }
 
 /// return the previous edge. traverses all edges in face until previous found.
-Edge previous_edge( Edge e ) {
+Edge previous_edge( Edge e ) const {
     Edge previous = g[e].next;
     while ( g[previous].next != e ) {
         previous = g[previous].next;
@@ -424,7 +424,7 @@ Edge previous_edge( Edge e ) {
 }
 
 /// return adjacent faces to the given vertex
-FaceVector adjacent_faces( Vertex q ) {
+FaceVector adjacent_faces( Vertex q ) const {
     std::set<Face> face_set;
     OutEdgeItr itr, itr_end;
     boost::tie( itr, itr_end) = boost::out_edges(q, g);

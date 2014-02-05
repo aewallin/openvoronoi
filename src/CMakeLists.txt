@@ -65,7 +65,7 @@ endif ()
 # Release runs much faster than the others
 # Debug/Profile/Coverage run slower but are useful for testing
 
-set(CMAKE_BUILD_TYPE Release)
+# set(CMAKE_BUILD_TYPE Release)
 # set(CMAKE_BUILD_TYPE Debug)
 # set(CMAKE_BUILD_TYPE Profile)
 # set(CMAKE_BUILD_TYPE Coverage)
@@ -136,9 +136,10 @@ ENDIF()
 set( CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR} ) # Findqd.cmake is in this dir
 find_package( qd REQUIRED ) 
 include_directories(${QD_INCLUDE_DIR})
-message( STATUS "libqd include dir = "${QD_INCLUDE_DIR})
-message( STATUS "libqd library = "${QD_LIBRARY})
 
+message( STATUS "libqd include dir = ${QD_INCLUDE_DIR}")
+message( STATUS "libqd library = ${QD_LIBRARY}")
+message( STATUS "build type = ${CMAKE_BUILD_TYPE}")
 
 ################ create version_string.hpp, http://stackoverflow.com/questions/3780667
 INCLUDE(version_string.cmake)

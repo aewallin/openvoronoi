@@ -74,7 +74,7 @@ private:
         HEEdge e2 = find_segment(endp2);
         e2 = (*g)[e2].twin; // this makes the edges oriented in the same direction 
         double dotprod = edge_dotprod(e1,e2);
-        return fabs(dotprod)>_dot_product_threshold;
+        return dotprod >_dot_product_threshold;
     }
     
     /// \brief calculate the dot-product between unit vectors aligned along edges e1->e2

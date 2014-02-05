@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include "solvers/solver_lll_para.hpp"
+
 #include "common/point.hpp"
 #include "common/numeric.hpp"
 
@@ -87,6 +89,25 @@ int solve( Site* s1, double k1,
             return 1;
         }
     } else {
+        // Try parallel solver as fallback, if the small determinant is due to nearly parallel edges
+        for (i = 0; i < 3; i++)
+        {
+            j = (i+1)%3;
+            double delta = to_double(fabs(eq[i].a*eq[j].b - eq[j].a*eq[i].b));
+            if (delta <= 1024.0*std::numeric_limits<double>::epsilon())
+            {
+                s1 = sites[i];
+                k1 = kvals[i];
+                s2 = sites[j];
+                k2 = kvals[j];
+                s3 = sites[(i+2)%3];
+                k3 = kvals[(i+2)%3];
+                LLLPARASolver para_solver;
+                para_solver.set_debug(true);
+                para_solver.set_silent(false);
+                return para_solver.solve(s1, k1, s2, k2, s3, k3, slns);
+            }
+        }
         if (debug && !silent) {
             std::cout << "WARNING: LLLSolver small determinant! no solutions. d= " << d <<"\n";
             std::cout << " s1 : " << eq[0].a << " " << eq[0].b << " " << eq[0].c << " " << eq[0].k << "\n";

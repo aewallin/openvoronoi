@@ -65,7 +65,7 @@ endif ()
 # Release runs much faster than the others
 # Debug/Profile/Coverage run slower but are useful for testing
 
-set(CMAKE_BUILD_TYPE Release)
+# set(CMAKE_BUILD_TYPE Release)
 # set(CMAKE_BUILD_TYPE Debug)
 # set(CMAKE_BUILD_TYPE Profile)
 # set(CMAKE_BUILD_TYPE Coverage)

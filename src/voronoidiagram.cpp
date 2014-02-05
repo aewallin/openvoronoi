@@ -1517,7 +1517,6 @@ void VoronoiDiagram::add_vertices( Site* new_site ) {
         }
         HEVertex q = g.add_vertex( VoronoiVertex( sl.p, NEW, NORMAL, new_site->apex_point( sl.p ), sl.k3 ) );
         modified_vertices.insert(q);
-        g.add_vertex_in_edge( q, q_edges[m] );
         g[q].max_error = vpos->dist_error( q_edges[m], sl, new_site);
         if (debug) {
             HEVertex src = g.source(q_edges[m]);
@@ -1525,6 +1524,7 @@ void VoronoiDiagram::add_vertices( Site* new_site ) {
             std::cout << " NEW vertex " << g[q].index << " k3= "<< g[q].k3 << " on edge " << g[src].index << " - " << g[trg].index << "\n";
             assert( (g[q].k3==1) || (g[q].k3==-1) );
         }
+        g.add_vertex_in_edge( q, q_edges[m] );
     }
     if (debug) std::cout << "add_vertices() done.\n";
 }

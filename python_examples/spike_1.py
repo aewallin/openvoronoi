@@ -113,7 +113,7 @@ if __name__ == "__main__":
     #vd.addLineSite( id_list[3], id_list[4])
     #vd.check()
     vd.debug_on()
-    vd.addLineSite( id_list[4], id_list[1],9)
+    vd.addLineSite( id_list[4], id_list[1],10) # FIXME spikes are not allowed, so this does not complete OK
     #vd.check()
     
     t_after = time.time()

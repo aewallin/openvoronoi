@@ -1,4 +1,4 @@
-import ttt                # https://github.com/aewallin/truetype-tracer
+import truetypetracer as ttt                # https://github.com/aewallin/truetype-tracer
 import openvoronoi as ovd # https://github.com/aewallin/openvoronoi
 import time
 
@@ -24,7 +24,7 @@ def insert_polygon_points(vd, polygon):
     m=0
     for p in pts:
         id_list.append( vd.addVertexSite( p ) )
-        print " ",m," added vertex ", id_list[ len(id_list) -1 ]
+        #print " ",m," added vertex ", id_list[ len(id_list) -1 ]
         m=m+1   
     print vd.numFaces()," faces after all points inserted"
     return id_list
@@ -39,7 +39,7 @@ def insert_polygon_segments(vd,id_list):
             n_nxt=0
         
             #vd.debug_on()
-        print " inserting segement ",id_list[n]," - ",id_list[n_nxt]
+        #print " inserting segement ",id_list[n]," - ",id_list[n_nxt]
         vd.addLineSite( id_list[n], id_list[n_nxt])
         #j=j+1
 
@@ -97,5 +97,7 @@ if __name__ == "__main__":
     segs = modify_segments(segs)
     vd = ovd.VoronoiDiagram(1,120)
     insert_many_polygons(vd,segs)
-    ovd.vd2svg("svg_test.svg",vd)
+    filename = "svg_test.svg"
+    ovd.vd2svg(filename,vd)
+    print "wrote to file %s" % filename
     print "PYTHON All DONE."

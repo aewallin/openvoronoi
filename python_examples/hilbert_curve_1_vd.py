@@ -58,7 +58,7 @@ def insert_curve(vd,curve):
     for p in curve:
         pts.append( ovd.Point( p[0], p[1] ) )
     id_list = []
-    #print "inserting ",len(pts)," point-sites:"
+    print "inserting ",len(pts)," point-sites...",
     m=0
     t_before = time.time()
     for p in pts:
@@ -67,10 +67,10 @@ def insert_curve(vd,curve):
         m=m+1
     t_after = time.time()
     pt_time = t_after-t_before
-    
+    print "done."
     j=0
     t_before = time.time()
-    #print "inserting ",len(id_list)," line-segments:"
+    print "inserting ",len(id_list)," line-segments..."
     for n in range( len(id_list)-1 ):
         n_nxt = n+1
         #if n==(len(id_list)-1):
@@ -80,6 +80,7 @@ def insert_curve(vd,curve):
         j=j+1
     t_after = time.time()
     seg_time = t_after-t_before
+    print "done."
     return [pt_time, seg_time]
     
 if __name__ == "__main__":
@@ -113,11 +114,11 @@ if __name__ == "__main__":
     """
     
     startpt = [-size/2,-size/2]
-    level = 6
+    level = 2
     step = size / math.pow(2, level)
 
     Hilbert( 0, level, 90, step, startpt)
-    
+    print "Generated hilbert curve, level= ", level
     
     vd = ovd.VoronoiDiagram(far,120)
     print ovd.version()
@@ -135,6 +136,7 @@ if __name__ == "__main__":
     vd.setEdgeOffset(0.05)
     
     times = insert_curve(vd,pts)
+    
     vd.check()
     #print pts
     #drawCurve2(myscreen,pts,ovdvtk.yellow)

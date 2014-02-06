@@ -64,7 +64,7 @@ if __name__ == "__main__":
     
     plist.append( ovd.Point(0.1,-0.1) )
     plist.append( ovd.Point(-0.1,-0.1) )
-    plist.append( ovd.Point(-0.03,-0.03) )
+    #plist.append( ovd.Point(-0.03,-0.03) )
     #plist.append( ovd.Point(-0.15, -0.15) )
     #+ regularGridGenerators(far, Nmax) + circleGenerators(far, Nmax)
 
@@ -95,8 +95,9 @@ if __name__ == "__main__":
     #print "add segment ",id1, " to ", id2
     vd.debug_on()
     c1 = ovd.Point(0,0)
-
-    vd.addArcSite( id1, id2 , c1, True , 14 ) # right-to-left arc
+    
+    # 2014-02-06: this runs through step 7, but fails at step 8
+    vd.addArcSite( id1, id2 , c1, True , 8 ) # right-to-left arc
     
     #vd.addArcSite( id2, id1 , c1, False , 14) # left-to-right arc
 

@@ -114,7 +114,7 @@ if __name__ == "__main__":
     """
     
     startpt = [-size/2,-size/2]
-    level = 2
+    level = 3
     step = size / math.pow(2, level)
 
     Hilbert( 0, level, 90, step, startpt)

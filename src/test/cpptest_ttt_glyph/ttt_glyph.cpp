@@ -3,6 +3,7 @@
 
 #include <string>
 #include <iostream>
+#include <algorithm>
 
 #include <boost/foreach.hpp>
 #include <boost/timer.hpp>
@@ -25,10 +26,10 @@ Loops get_ttt_loops(int char_index=0) {
     
     std::string all_glyphs = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     char c = all_glyphs.at(char_index);
-    std::string glyph(&c,1); //all_glyphs.at(char_index);
+    std::string glyph(&c,1);
     std::cout << " ttt glyph is " << glyph << "\n";
     
-    Ttt t( &my_writer, glyph, false , TTFONT ); // ( Writer*, text, unicode?, path-to-font )
+    Ttt t( &my_writer, glyph, false , TTFONT ); // Ttt( Writer*, text, unicode?, path-to-font )
     
     Loops all_loops = my_writer.get_loops();
     
@@ -40,6 +41,7 @@ Loops get_ttt_loops(int char_index=0) {
     // ttt returns loops with duplicate start/endpoints
     // to avoid duplicates, remove the first point from each loop
     BOOST_FOREACH(Loop l, all_loops) {
+        std::reverse(l.begin(), l.end());
         l.erase(l.begin()); // remove first element of loop
         mod_loops.push_back(l);
     }

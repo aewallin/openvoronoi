@@ -3,6 +3,7 @@
 
 #include <string>
 #include <iostream>
+#include <algorithm>
 
 #include <boost/foreach.hpp>
 #include <boost/timer.hpp>
@@ -41,9 +42,23 @@ Loops get_ttt_loops(int char_index=0) {
     // ttt returns loops with duplicate start/endpoints
     // to avoid duplicates, remove the first point from each loop
     BOOST_FOREACH(Loop l, all_loops) {
+        std::reverse(l.begin(), l.end());
         l.erase(l.begin()); // remove first element of loop
         mod_loops.push_back(l);
     }
+/*
+def modify_segments(segs):
+    segs_mod =[]
+    for seg in segs:
+        first = seg[0]
+        last = seg[ len(seg)-1 ]
+        assert( first[0]==last[0] and first[1]==last[1] )
+        seg.pop()
+        seg.reverse()
+        segs_mod.append(seg)
+        #drawSegment(myscreen, seg)
+    return segs_mod
+*/
 
     // print out the points
     int nloop =0;
@@ -103,8 +118,8 @@ int main(int argc,char *argv[]) {
         
     ovd::VoronoiDiagram* vd = new ovd::VoronoiDiagram(1,50);
     if (debug)
-		vd->debug_on();
-		
+        vd->debug_on();
+
     std::cout << "OpenVoronoi version: " << ovd::version() << "\n";
     
     // store the verted IDs here, for later inserting line-segments

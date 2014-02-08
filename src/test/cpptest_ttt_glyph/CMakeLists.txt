@@ -41,12 +41,21 @@ set_property(
     PROPERTY WILL_FAIL TRUE
 )
 
+# --c options sets the glyph
+# 0,1,2,3...51  corresponds to "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+set( CHARS   0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25) #  
+set( CHARS2 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51) # 35
 
-set( TTT_CASES   0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25) #  
-set( TTT2_CASES 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51) # 35
-foreach( CASE ${TTT_CASES} )
-    ADD_TEST(${test_name}_big_${CASE} ${test_name} --c ${CASE})
+# --s option sets the scale. 3e-4 is a big character, 1e-6 is tiny
+#
+
+set( SCALES 0 1 2 3 4 )
+
+foreach( CASE ${CHARS} )
+    foreach( SCALE ${SCALES} )
+        ADD_TEST(${test_name}_g${CASE}_s${SCALE} ${test_name} --c ${CASE} --s ${SCALE})
+    endforeach()
 endforeach()
-foreach( CASE ${TTT2_CASES} )
+foreach( CASE ${CHARS2} )
     ADD_TEST(${test_name}_small_${CASE} ${test_name} --c ${CASE})
 endforeach()

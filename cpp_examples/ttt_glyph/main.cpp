@@ -26,16 +26,17 @@ Loops get_ttt_loops(int char_index=0) {
     std::string all_glyphs = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     char c = all_glyphs.at(char_index);
     std::string glyph(&c,1); //all_glyphs.at(char_index);
-    std::cout << " ttt glyph is " << glyph << "\n";
+    
     
     Ttt t( &my_writer, glyph, false , TTFONT ); // ( Writer*, text, unicode?, path-to-font )
     
     Loops all_loops = my_writer.get_loops();
     
     extents ext = my_writer.get_extents();
-    std::cout << " x-range : " << ext.minx << " - " << ext.maxx << "\n";
-    std::cout << " y-range : " << ext.miny << " - " << ext.maxy << "\n";  
-    
+    std::cout << "ttt glyph: " << glyph << "\n";
+    std::cout << "    x-range : " << ext.minx << " - " << ext.maxx << "\n";
+    std::cout << "    y-range : " << ext.miny << " - " << ext.maxy << "\n";  
+    std::cout << "    Loops   : " << all_loops.size() << "\n";
     Loops mod_loops;
     // ttt returns loops with duplicate start/endpoints
     // to avoid duplicates, remove the first point from each loop
@@ -44,6 +45,19 @@ Loops get_ttt_loops(int char_index=0) {
         mod_loops.push_back(l);
     }
 
+    // print out the points
+    int nloop =0;
+    BOOST_FOREACH(Loop l, mod_loops) {
+        std::cout << "Loop " << nloop << " has " << l.size() << " points:\n";
+        int npoint=0;
+        BOOST_FOREACH(Point pt, l) {
+            std::cout << "    Point " << npoint << " x= " << pt.x << " y= " << pt.y << "\n";
+            npoint++;
+        }
+        std::cout << "End Loop " << nloop << "\n";
+        nloop++;
+    } 
+    
     return mod_loops;
 }
 
@@ -86,20 +100,7 @@ int main(int argc,char *argv[]) {
         }
     }
     Loops all_loops = get_ttt_loops(char_index);
-    
-    // print out the points
-    int nloop =0;
-    BOOST_FOREACH(Loop l, all_loops) {
-        std::cout << "Loop " << nloop << " has " << l.size() << " points:\n";
-        int npoint=0;
-        BOOST_FOREACH(Point pt, l) {
-            std::cout << " Point " << npoint << " x= " << pt.x << " y= " << pt.y << "\n";
-            npoint++;
-        }
-        std::cout << "End Loop " << nloop << "\n";
-        nloop++;
-    } 
-    
+        
     ovd::VoronoiDiagram* vd = new ovd::VoronoiDiagram(1,50);
     if (debug)
 		vd->debug_on();
@@ -113,25 +114,27 @@ int main(int argc,char *argv[]) {
     int n_points=0;
     BOOST_FOREACH(Loop loop, all_loops) {
         std::vector<int> loop_id;
+        std::cout << " Inserting " << loop.size() << " PointSites \n" << std::flush;
         BOOST_FOREACH( Point pt, loop) {
             loop_id.push_back( vd->insert_point_site( ovd::Point(pt.x,pt.y)) ); 
-            std::cout << "Inserted PointSite: id=" << loop_id.back() << "  (" << pt.x << ", "<< pt.y << ")" << "\n" << std::flush;
+            std::cout << "    Inserted PointSite: id=" << loop_id.back() << "  (" << pt.x << ", "<< pt.y << ")" << "\n" << std::flush;
             n_points++;
         }
         loops_id.push_back(loop_id);
     }
-    std::cout << n_points << " PointSite:s inserted in  " << tmr.elapsed() << " seconds\n" << std::flush;
+    std::cout << n_points << " PointSites inserted in  " << tmr.elapsed() << " seconds\n" << std::flush;
     
     // now we insert LineSite:s
     tmr.restart();
     int n_linesites=0;
     BOOST_FOREACH( std::vector<int> loop_id, loops_id) {
+        std::cout << " Inserting " << loop_id.size() << " LineSites \n" << std::flush;
         for( unsigned int n=0; n<loop_id.size();n++) {
             int next = n+1;
             if (n==loop_id.size()-1)
                 next = 0;
             
-            std::cout << "Inserting LineSite: " << loop_id[n] << " - " << loop_id[next] << "\n" << std::flush;
+            std::cout << "    Inserting LineSite: " << loop_id[n] << " - " << loop_id[next] << "\n" << std::flush;
 
             vd->insert_line_site( loop_id[n], loop_id[next]); 
             n_linesites++;

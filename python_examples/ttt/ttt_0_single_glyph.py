@@ -2,6 +2,7 @@ import truetypetracer as ttt                # https://github.com/aewallin/truety
 import openvoronoi as ovd # https://github.com/aewallin/openvoronoi
 import ovdvtk 
 
+import math
 import time
 import vtk
 
@@ -41,6 +42,28 @@ def translate(segs,x,y):
         out.append(seg2)
     return out
 
+def rotate(segs,angle):
+	theta = 2*math.pi*angle/float(360)
+	out = []
+	for seg in segs:
+		seg2 = []
+		for p in seg:
+			p2 = []
+			p2.append(p[0]*math.cos(theta)-p[1]*math.sin(theta) )
+			p2.append(p[0]*math.sin(theta)+p[1]*math.cos(theta))
+			seg2.append(p2)
+		out.append(seg2)
+	return out
+    
+def center(segs, exts, tscale):
+	minx = tscale*exts.minx
+	maxx = tscale*exts.maxx
+	miny = tscale*exts.miny
+	maxy = tscale*exts.maxy
+	meanx = minx+0.5*(maxx-minx)
+	meany = miny+0.5*(maxy-miny)
+	out = translate(segs, -meanx, -meany)
+	return out
 
 def insert_polygon_points(vd, polygon):
     pts=[]
@@ -120,7 +143,7 @@ def insert_many_polygons(vd,segs):
     
     return [pt_time, seg_time]
     
-def ttt_segments(text,scale, subdivision=50):
+def ttt_segments(text,scale, subdivision=100):
     wr = ttt.SEG_Writer()
 
     # wr.scale = 3
@@ -141,9 +164,11 @@ def ttt_segments(text,scale, subdivision=50):
     #wr.cubic_biarc_subdivision = 10 # no effect?
     #wr.cubic_line_subdivision = 10 # no effect?
     #wr.setFont(0)
-    s3 = ttt.ttt(text,wr) 
+    s3 = ttt.ttt(text,wr)
+    exts = wr.extents
+    #print exts
     segs = wr.get_segments()
-    return segs
+    return (segs,exts)
     
 
 if __name__ == "__main__":  
@@ -168,8 +193,11 @@ if __name__ == "__main__":
     myscreen.camera.SetFocalPoint(0.0, 0, 0)
 
     tscale = 2e-4
-    segs = ttt_segments(  "C", tscale) # 25000
-    #segs = translate(segs, -0.5, -0.5)
+    (segs, exts) = ttt_segments(  "P", tscale) # 25000
+
+    
+    segs = center(segs, exts, tscale)
+    segs = rotate(segs, 130)
     segs = modify_segments(segs)
     vd = ovd.VoronoiDiagram(far,120)
     

@@ -2,7 +2,7 @@ import openvoronoi as ovd
 import ovdvtk
 import time
 import vtk
-import ttt
+import truetypetracer as ttt
 import math
 
 def drawLine(myscreen, pt1, pt2, lineColor):

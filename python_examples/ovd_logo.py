@@ -154,7 +154,7 @@ def insert_polygon_points(vd, polygon):
     m=0
     for p in pts:
         id_list.append( vd.addVertexSite( p ) )
-        print " ",m," added vertex ", id_list[ len(id_list) -1 ]
+        #print " ",m," added vertex ", id_list[ len(id_list) -1 ]
         m=m+1   
     print vd.numFaces()," faces after all points inserted"
     return id_list
@@ -170,7 +170,7 @@ def insert_polygon_segments(vd,id_list):
         
         if (j<jmax):
             #vd.debug_on()
-            print " ",j,"inserting segement ",id_list[n]," - ",id_list[n_nxt]
+            #print " ",j,"inserting segement ",id_list[n]," - ",id_list[n_nxt]
             vd.addLineSite( id_list[n], id_list[n_nxt])
         j=j+1
 

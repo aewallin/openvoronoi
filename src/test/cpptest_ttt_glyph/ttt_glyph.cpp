@@ -3,6 +3,7 @@
 
 #include <string>
 #include <iostream>
+#include <algorithm>
 
 #include <boost/foreach.hpp>
 #include <boost/timer.hpp>
@@ -19,16 +20,17 @@
 
 #define TTFONT "/usr/share/fonts/truetype/freefont/FreeSerif.ttf"
 
-Loops get_ttt_loops(int char_index=0) {
+Loops get_ttt_loops(int char_index=0, double ttt_scale=1e-4, int subdivision=50) {
     SEG_Writer my_writer; // this Writer writes G-code
-    my_writer.set_scale(  1e-4 );
+    my_writer.set_scale( ttt_scale  ); // was 1e-4
+    my_writer.set_conic_line_subdiv( subdivision );
     
     std::string all_glyphs = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     char c = all_glyphs.at(char_index);
-    std::string glyph(&c,1); //all_glyphs.at(char_index);
+    std::string glyph(&c,1);
     std::cout << " ttt glyph is " << glyph << "\n";
     
-    Ttt t( &my_writer, glyph, false , TTFONT ); // ( Writer*, text, unicode?, path-to-font )
+    Ttt t( &my_writer, glyph, false , TTFONT ); // Ttt( Writer*, text, unicode?, path-to-font )
     
     Loops all_loops = my_writer.get_loops();
     
@@ -40,6 +42,7 @@ Loops get_ttt_loops(int char_index=0) {
     // ttt returns loops with duplicate start/endpoints
     // to avoid duplicates, remove the first point from each loop
     BOOST_FOREACH(Loop l, all_loops) {
+        std::reverse(l.begin(), l.end());
         l.erase(l.begin()); // remove first element of loop
         mod_loops.push_back(l);
     }
@@ -49,6 +52,8 @@ Loops get_ttt_loops(int char_index=0) {
 
 namespace po = boost::program_options;
 
+
+
 // ttt example program
 int main(int argc,char *argv[]) {
     // Declare the supported options.
@@ -56,6 +61,8 @@ int main(int argc,char *argv[]) {
     desc.add_options()
         ("help", "produce help message")
         ("c", po::value<int>(), "set character, an int in [0,51] ")
+        ("s", po::value<int>(), "set scale (int), [0,5]. ")
+        ("d", po::value<int>(), "subdivision (int), 50 ")
     ;
 
     po::variables_map vm;
@@ -78,7 +85,34 @@ int main(int argc,char *argv[]) {
             return 1;
         }
     }
-    Loops all_loops = get_ttt_loops(char_index);
+    
+    int subdivision = 50;
+    if (vm.count("d")) {
+        int d = vm["d"].as<int>();
+        if ( 1<=d && d<= 100 )
+            subdivision = d;
+        else {
+            std::cout << "--d option out of range!\n";
+            return 1;
+        }
+    }
+    
+    // the different scales
+    double scales[5] = {2e-4, 1e-4, 2e-5, 1e-5, 2e-6};
+    const std::vector<double> scalevector(scales, scales+5);
+
+    double scale = scalevector[0];
+    if (vm.count("s")) {
+        unsigned int s = vm["s"].as<int>();
+        if ( 0<=s && s< scalevector.size() )
+            scale = scalevector[s];
+        else {
+            std::cout << "--s option out of range!\n";
+            return 1;
+        }
+    }
+    
+    Loops all_loops = get_ttt_loops(char_index, scale, subdivision);
     
     // print out the points
     int nloop =0;

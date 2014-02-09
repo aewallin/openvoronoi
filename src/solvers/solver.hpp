@@ -35,6 +35,8 @@ namespace solvers {
 /// The optput is a vector with one or more Solution.
 class Solver {
 public:
+    Solver() { debug = false; type = 0; silent = true; }
+
     /// virtual dtor required for correct destruction of derived classes
     virtual ~Solver() { }
     

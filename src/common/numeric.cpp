@@ -51,7 +51,7 @@ namespace numeric {
             return val;
     }
     qd_real chop(qd_real val) {
-        qd_real _epsilon = 1e-10;
+        qd_real _epsilon = 1e-20; // should leave 47bits of precision
         if (fabs(val) < _epsilon) 
             return qd_real(0);
         else

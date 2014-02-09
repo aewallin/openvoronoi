@@ -608,7 +608,7 @@ double VertexPositioner::dist_error(HEEdge e, const solvers::Solution& sl, Site*
 
 /// are \a d1 and \a d2 roughly equal?
 bool VertexPositioner::equal(double d1, double d2) {
-    bool tol = 1e-3;
+    double tol = 1e-3;
     if ( fabs(d1-d2) < 1e-15 )
         return true;
     if ( fabs(d1-d2) > tol*std::max(d1,d2) )

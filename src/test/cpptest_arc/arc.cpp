@@ -46,11 +46,20 @@ int main(int argc,char *argv[]) {
 
     std::vector<int> id;
     std::vector<ovd::Point> vertices;
-    vertices.push_back( ovd::Point(0.1,0.1) );
-    vertices.push_back( ovd::Point(-0.1,0.1) );
-    vertices.push_back( ovd::Point(0.1,-0.1) );
-    vertices.push_back( ovd::Point(-0.1,-0.1) );
-    vertices.push_back( ovd::Point(-0.03,-0.03) );
+    /*       -----------------
+     *      /      arc        \
+     *     1                   0
+     *     |                   |
+     *     l3                  l1
+     *     |                   |
+     *     3-------l2----------2
+     * */
+    vertices.push_back( ovd::Point(0.1,0.1) );  // 0
+    vertices.push_back( ovd::Point(-0.1,0.1) ); // 1
+    vertices.push_back( ovd::Point(0.1,-0.1) ); // 2
+    vertices.push_back( ovd::Point(-0.1,-0.1) ); // 3
+    
+    //vertices.push_back( ovd::Point(-0.03,-0.03) ); // 4?
     
     // point-sites must be inserted first.
     // insert_point_site() returns an int-handle that is used when inserting line-segments
@@ -60,16 +69,16 @@ int main(int argc,char *argv[]) {
     if (!vd->check()) return -1;
     
     // now we insert line-segments
-    vd->insert_line_site(id[0],id[2]);
+    vd->insert_line_site(id[0],id[2]); // l1
     if (!vd->check()) return -1;
-    vd->insert_line_site(id[3],id[2]);
+    vd->insert_line_site(id[3],id[2]); // l2
     if (!vd->check()) return -1;
     vd->insert_line_site(id[3],id[1]);
     if (!vd->check()) return -1;
     
     // then the arc
     ovd::Point center(0,0);
-    if (vm.count("r"))
+    if (vm.count("r")) // command line option --r
         vd->insert_arc_site( id[1], id[0] , center, false ); // ccw arc
     else 
         vd->insert_arc_site( id[0], id[1] , center, true ); // cw arc 

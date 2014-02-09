@@ -99,6 +99,7 @@ if __name__ == "__main__":
     #print "add segment ",id1, " to ", id2
     vd.debug_on()
     c1 = ovd.Point(0.1-d,0.1-d)
+
     vd.addArcSite( id_list[1], id_list[2] , c1, False  ) 
     #vd.addArcSite( id_list[2], id_list[1] , c1, True ) 
 

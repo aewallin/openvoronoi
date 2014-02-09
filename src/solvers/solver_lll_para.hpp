@@ -71,28 +71,32 @@ int solve( Site* s1, double k1,
         std::cout << "LLLPARASolver.\n";    
     assert( s1->isLine() && s2->isLine() && s3->isLine() );
     
-    Eq<double> bis;
-    bis.a = s1->a();
-    bis.b = s1->b();
+    Eq<double> bisector;
+    bisector.a = s1->a();
+    bisector.b = s1->b();
     double s2c = s2->c();
+
     // if s1 and s2 have opposite (a,b) normals, flip the sign of s2c
-    if ( Point(s1->a(),s1->b()) == -1*Point(s2->a(),s2->b()) ) {
+    Point n0(s1->a(), s1->b());
+    Point n1(s2->a(), s2->b());
+    if (n0.dot(n1) < 0.f) 
+	{
         s2c = -s2c;
     }
     
-    bis.c = (s1->c() + s2c)/2;
-    double tb = fabs( (s1->c() - s2c )/2 ); // bisector offset distance
+    bisector.c = (s1->c() + s2c)*0.5;
+    double tb = 0.5*fabs(s1->c() - s2c); // bisector offset distance
     
     if (debug) {
         std::cout << " s1 : " << s1->a() << " " << s1->b() << " " << s1->c() << " " << s1->k() << "\n";
         std::cout << " s2 : " << s2->a() << " " << s2->b() << " " << s2->c() << " " << s2->k() << "\n";
         if ( s3->isLine() )
             std::cout << " s3 : " << s3->a() << " " << s3->b() << " " << s3->c() << " " << s3->k() << "\n";
-        std::cout << " bis: " << bis.a << " " << bis.b << " " << bis.c << " \n";
+        std::cout << " bisector: " << bisector.a << " " << bisector.b << " " << bisector.c << " \n";
     }
     //if ( s3->isLine() ) {
         double x,y;
-        if ( two_by_two_solver(bis.a, bis.b, s3->a(), s3->b(), -bis.c, -s3->c()-k3*tb, x,y) ) {
+        if ( two_by_two_solver(bisector.a, bisector.b, s3->a(), s3->b(), -bisector.c, -s3->c()-k3*tb, x,y) ) {
             if (debug) std::cout << " Solution: t=" << tb << " " << Point( x, y ) << " k3=" << k3 << " \n";
             slns.push_back( Solution( Point( x, y ) , tb, k3 ) ); 
             return 1;

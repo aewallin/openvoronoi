@@ -1,7 +1,7 @@
 import openvoronoi as ovd
 import ovdvtk
 import ovdgenerators as gens
-import rpg  # random polygon generator see https://github.com/aewallin/CGAL_RPG
+import randompolygon as rpg  # random polygon generator see https://github.com/aewallin/CGAL_RPG
 
 import time
 import vtk
@@ -80,7 +80,7 @@ if __name__ == "__main__":
         m=m+1
     print "polygon is: "
     for idx in id_list:
-        print idx," ",
+        print idx,"-",
     print "."
     
     t_after = time.time()

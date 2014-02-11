@@ -63,7 +63,7 @@ def insert_curve(vd,curve):
     t_before = time.time()
     for p in pts:
         id_list.append( vd.addVertexSite( p ) )
-        #rint " ",m," added vertex ", id_list[ len(id_list) -1 ]
+        print " ",m," added vertex ", id_list[ len(id_list) -1 ]
         m=m+1
     t_after = time.time()
     pt_time = t_after-t_before
@@ -75,7 +75,7 @@ def insert_curve(vd,curve):
         n_nxt = n+1
         #if n==(len(id_list)-1):
         #    n_nxt=0
-        #print " ",j,"inserting segement ",id_list[n]," - ",id_list[n_nxt]
+        print " ",j,"inserting segement ",id_list[n]," - ",id_list[n_nxt]
         vd.addLineSite( id_list[n], id_list[n_nxt])
         j=j+1
     t_after = time.time()
@@ -114,7 +114,7 @@ if __name__ == "__main__":
     """
     
     startpt = [-size/2,-size/2]
-    level = 3
+    level = 2
     step = size / math.pow(2, level)
 
     Hilbert( 0, level, 90, step, startpt)
@@ -124,14 +124,14 @@ if __name__ == "__main__":
     print ovd.version()
     
     # for vtk visualization
-    vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
+    vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.03)
     vod.drawFarCircle()
 
     vod.textScale = 0.02
     vod.vertexRadius = 0.0031
     vod.drawVertices=0
-    vod.drawVertexIndex=0
-    vod.drawGenerators=0
+    vod.drawVertexIndex=1
+    vod.drawGenerators=1
     vod.offsetEdges = 0
     vd.setEdgeOffset(0.05)
     

@@ -123,13 +123,13 @@ if __name__ == "__main__":
     size = 1.1
     
     # bounding-box
-    myscreen.addActor( ovdvtk.Line(p1=(-size/2,-size/2,0),p2=(-size/2,size/2,0),color=ovdvtk.orange) )
-    myscreen.addActor( ovdvtk.Line(p1=(-size/2,size/2,0),p2=(size/2,size/2,0),color=ovdvtk.orange) )
-    myscreen.addActor( ovdvtk.Line(p1=(size/2,size/2,0),p2=(size/2,-size/2,0),color=ovdvtk.orange) )
-    myscreen.addActor( ovdvtk.Line(p1=(size/2,-size/2,0),p2=(-size/2,-size/2,0),color=ovdvtk.orange) )
+    #myscreen.addActor( ovdvtk.Line(p1=(-size/2,-size/2,0),p2=(-size/2,size/2,0),color=ovdvtk.orange) )
+    #myscreen.addActor( ovdvtk.Line(p1=(-size/2,size/2,0),p2=(size/2,size/2,0),color=ovdvtk.orange) )
+    #myscreen.addActor( ovdvtk.Line(p1=(size/2,size/2,0),p2=(size/2,-size/2,0),color=ovdvtk.orange) )
+    #myscreen.addActor( ovdvtk.Line(p1=(size/2,-size/2,0),p2=(-size/2,-size/2,0),color=ovdvtk.orange) )
     
     startpt = [-size/2,-size/2]
-    level = 5
+    level = 1
     step = size / math.pow(2, level)
 
     Hilbert( 0, level, 90, step, startpt)

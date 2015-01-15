@@ -5,6 +5,14 @@ cmake_minimum_required(VERSION 2.4)
 # figure out the gcc version
 INCLUDE(gcc_version.cmake)
 
+# uninstall target
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
+    IMMEDIATE @ONLY)
+
+add_custom_target(uninstall
+    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
 
 # experimental use of clang, since it detects more warnings/erors than gcc
 option(USE_CLANG "build application with clang" OFF) # OFF is the default

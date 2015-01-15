@@ -230,7 +230,9 @@ add_library(
     ${OVD_SRC}
 )
 set_target_properties(libopenvoronoi PROPERTIES PREFIX "")
-set_target_properties(libopenvoronoi PROPERTIES VERSION ${MY_VERSION}) 
+if (NOT APPLE)
+	set_target_properties(libopenvoronoi PROPERTIES VERSION ${MY_VERSION}) 
+endif (NOT APPLE)
 # link against libqd here. 
 # an alternative is to link libqd when an application using openvoronoi is built.
 target_link_libraries(libopenvoronoi ${Boost_LIBRARIES} ${QD_LIBRARY}) 
@@ -266,8 +268,9 @@ IF( ${BUILD_PYTHON_MODULE} MATCHES ON)
     )
     target_link_libraries(openvoronoi openvoronoi_static ${Boost_LIBRARIES} ${QD_LIBRARY}) 
     set_target_properties(openvoronoi PROPERTIES PREFIX "") 
-    set_target_properties(openvoronoi PROPERTIES VERSION ${MY_VERSION}) 
-
+    if (NOT APPLE)
+    	set_target_properties(openvoronoi PROPERTIES VERSION ${MY_VERSION}) 
+	endif (NOT APPLE)
     # this figures out where to install the Python modules
     execute_process(
         COMMAND python -c "from distutils.sysconfig import get_python_lib; print get_python_lib()"
@@ -349,7 +352,7 @@ add_custom_target(coverage-report
     COMMAND lcov --directory ./ --zerocounters
     # COMMAND make ExperimentalCoverage
     # COMMAND ctest -D Experimental Coverage -R cpptest
-    COMMAND ctest -R cpptest -E "cpptest_arc\|cpptest_ttt_glyph_big_7\|cpptest_ttt_glyph_small_35" # exclude failing tests!
+    COMMAND ctest -R cpptest -E "cpptest_arc\\|cpptest_ttt_glyph_big_7\\|cpptest_ttt_glyph_small_35" # exclude failing tests!
     COMMAND lcov --directory ./ --capture  --output-file testcoverage.info # --base-directory ${CMAKE_SOURCE_DIR}
     COMMAND lcov --directory ./ --extract testcoverage.info \"*/openvoronoi*\" --output-file testcoverage_ext.info
     COMMAND genhtml --show-details --prefix \"${CMAKE_SOURCE_DIR}\" --output-directory coverage-report --title OpenVoronoi testcoverage_ext.info

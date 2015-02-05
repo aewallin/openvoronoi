@@ -68,8 +68,8 @@ int solve( Site* s1, double k1,
     
     unsigned int i = 0, j=1, k=2;
     qd_real d = chop( determinant( eq[i].a, eq[i].b, eq[i].k, 
-                                            eq[j].a, eq[j].b, eq[j].k, 
-                                            eq[k].a, eq[k].b, eq[k].k ) ); 
+                                   eq[j].a, eq[j].b, eq[j].k, 
+                                   eq[k].a, eq[k].b, eq[k].k ) ); 
     double det_eps = 1e-6;
     if ( fabs(d) > det_eps ) {
         qd_real t = determinant(  eq[i].a, eq[i].b, -eq[i].c, 
@@ -103,8 +103,8 @@ int solve( Site* s1, double k1,
                 s3 = sites[(i+2)%3];
                 k3 = kvals[(i+2)%3];
                 LLLPARASolver para_solver;
-                para_solver.set_debug(true);
-                para_solver.set_silent(false);
+                para_solver.set_debug(false);
+                para_solver.set_silent(true);
                 return para_solver.solve(s1, k1, s2, k2, s3, k3, slns);
             }
         }

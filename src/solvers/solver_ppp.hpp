@@ -100,12 +100,21 @@ int solve( Site* s1, double, Site* s2, double, Site* s3, double, std::vector<Sol
         std::swap(pi,pj);
     assert( !pi.is_right(pj,pk) );
     // 2) point pk should have the largest angle. largest angle is opposite longest side.
-    double longest_side = (pi - pj).norm();
-    while (  ((pj - pk).norm() > longest_side) || (((pi - pk).norm() > longest_side)) ) { 
-        std::swap(pi,pj); // cyclic rotation of points until pk is opposite the longest side pi-pj
-        std::swap(pi,pk);  
-        longest_side = (pi - pj).norm();
+
+    double l[3] = {(pi - pj).norm(), (pj-pk).norm(), (pk-pi).norm()};
+    int longest_side = 0;
+    if (l[1] > l[0])            longest_side = 1;
+    if (l[2] > l[longest_side]) longest_side = 2;
+
+    if (longest_side == 1) {
+        std::swap(pi, pk);
+        std::swap(pi, pj);  	
     }
+    else if (longest_side == 2) {
+        std::swap(pi, pj); 
+        std::swap(pi, pk);  
+    }
+ 
     assert( !pi.is_right(pj,pk) );
     assert( (pi - pj).norm() >=  (pj - pk).norm() );
     assert( (pi - pj).norm() >=  (pk - pi).norm() );

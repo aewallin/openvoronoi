@@ -349,7 +349,7 @@ add_custom_target(coverage-report
     COMMAND lcov --directory ./ --zerocounters
     # COMMAND make ExperimentalCoverage
     # COMMAND ctest -D Experimental Coverage -R cpptest
-    COMMAND ctest -R cpptest -E "cpptest_arc\|cpptest_ttt_glyph_big_7\|cpptest_ttt_glyph_small_35" # exclude failing tests!
+    COMMAND ctest -R cpptest -E "cpptest_arc|cpptest_ttt_glyph_big_7|cpptest_ttt_glyph_small_35" # exclude failing tests!
     COMMAND lcov --directory ./ --capture  --output-file testcoverage.info # --base-directory ${CMAKE_SOURCE_DIR}
     COMMAND lcov --directory ./ --extract testcoverage.info \"*/openvoronoi*\" --output-file testcoverage_ext.info
     COMMAND genhtml --show-details --prefix \"${CMAKE_SOURCE_DIR}\" --output-directory coverage-report --title OpenVoronoi testcoverage_ext.info

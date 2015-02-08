@@ -47,10 +47,12 @@ set( CHARS   0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22
 set( CHARS2 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51) # 35
 
 # --s option sets the scale. 3e-4 is a big character, 1e-6 is tiny
-set( SCALES 0 1 2 3 4 )
+#set( SCALES 0 1 2 3 4 )
+set( SCALES 0 ) # faster
 
 # --d option sets subdivision of glyph, 50 is normal, 10 gives more segments
-set( SUBS 60 50 40 30 20 10 )
+#set( SUBS 60 50 40 30 20 10 )
+set( SUBS 50 ) # faster
 
 foreach( CASE ${CHARS} )
     foreach( SCALE ${SCALES} )

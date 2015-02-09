@@ -159,7 +159,33 @@ solvers::Solution VertexPositioner::position(Site* s1, double k1, Site* s2, doub
 
     if ( solutions.size() == 1) // if only one solution is found, return that.
         return solutions[0];
-    else if (solutions.size()>1) {
+    
+    if (solutions.size()>1) {
+        std::vector<solvers::Solution> equidistant_solutions;
+        // If s3 is a linesite or arcsite, we look for a solution in both halfspaces delimited by s3
+        // Usually, the t_min / t_max should take care of filtering out the invalid solution, but in some
+        // cases, t remains nearly constant (e.g. if s1 and s2 are nearly parallel) and the out-of-region solution slips through. 
+        // Therefore, we remove any solutions which deviate from the equidistance constraint by more than 1%.
+        for (std::size_t i = 0; i < solutions.size(); i++) {
+            const solvers::Solution& s = solutions[i];
+            double d1 = (s.p - s1->apex_point(s.p)).norm();
+            double d2 = (s.p - s2->apex_point(s.p)).norm();
+            double d3 = (s.p - s3->apex_point(s.p)).norm();
+            double err = std::max(std::abs(d1-d2), std::max(std::abs(d2-d3), std::abs(d3-d1)));
+            double mindist = std::min(d1, std::min(d2, d3));
+            if (err/mindist > 0.01) {
+                std::cout << "Solution "<<i<<" violates equidistance constraint. Distances of solution were: "<<sqrt(d1)<<", "<<sqrt(d2)<<", "<<sqrt(d3)<<std::endl;
+            }
+            else {
+                equidistant_solutions.push_back(s);
+            }
+        }
+        solutions = equidistant_solutions;
+    }
+    if ( solutions.size() == 1) // if only one solution is found, return that.
+        return solutions[0];
+
+    if (solutions.size()>1) {
         // two or more points remain so we must further filter here!
         // filter further using edge_error
         double min_error=100;

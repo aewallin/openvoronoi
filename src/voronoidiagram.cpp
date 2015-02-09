@@ -72,6 +72,7 @@ void VoronoiDiagram::initialize() {
     Point gen1 = Point( 0, 3.0*far_radius );
     Point gen2 = Point( -3.0*sqrt(3.0)*far_radius/2.0, -3.0*far_radius/2.0 );
     Point gen3 = Point( +3.0*sqrt(3.0)*far_radius/2.0, -3.0*far_radius/2.0 );
+
     // initial vd-vertices
     Point vd1 = Point(            0                 , -3.0*far_radius*far_multiplier    );
     Point vd2 = Point( +3.0*sqrt(3.0)*far_radius*far_multiplier/2.0, +3.0*far_radius*far_multiplier/2.0);

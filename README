@@ -9,7 +9,7 @@ algorithm is used (see References).
 The core algorithm is in C++ with python bindings using Boost Python. 
 There are many python examples that use VTK for visualization.
 The tests use a random polygon generator (https://github.com/aewallin/randompolygon) and a 
-font-geometry generator based on freetyoe (https://github.com/aewallin/truetype-tracer)
+font-geometry generator based on FreeType (https://github.com/aewallin/truetype-tracer)
 
 OpenVoronoi is written by Anders Wallin (anders.e.e.wallin "at" gmail.com)
 and released under GPLv3 (see COPYING).

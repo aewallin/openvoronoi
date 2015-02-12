@@ -1,9 +1,20 @@
+OpenVoronoi README. Last update 2015-02-12.
+
 The OpenVoronoi project aims to produce an algorithm for calculating
 the 2D voronoi-diagram for point, line-segment, and circular-arc sites.
 Currently point-sites and line-segment sites work. Arc-sites are being worked
-on. The incremental topology-oriented algorithm is used (see References).
+on. The incremental topology-oriented (Sugihara-Iri and/or Held) 
+algorithm is used (see References).
+
+The core algorithm is in C++ with python bindings using Boost Python. 
+There are many python examples that use VTK for visualization.
+The tests use a random polygon generator (https://github.com/aewallin/randompolygon) and a 
+font-geometry generator based on freetyoe (https://github.com/aewallin/truetype-tracer)
+
 OpenVoronoi is written by Anders Wallin (anders.e.e.wallin "at" gmail.com)
 and released under GPLv3 (see COPYING).
+
+In February 2015 Rogach published a Java port called jopenvoronoi (https://github.com/Rogach/jopenvoronoi)
 
 Voronoi diagrams are used for many purposes in computational geometry,
 but the motivation for OpenVoronoi has mainly been 2D offset-generation
@@ -13,7 +24,7 @@ approximate medial-axis filter (medial_axis.hpp) has been added.
 The OpenVoronoi project is at 
 https://github.com/aewallin/openvoronoi
 
-Launchpad PPA
+Launchpad PPA (not updated regularly)
 https://launchpad.net/~anders-e-e-wallin/+archive/cam
 
 Build, Test, and Code-coverage dashboard:
@@ -26,12 +37,12 @@ https://groups.google.com/forum/?hl=en#!forum/opencamlib
 There is a gallery of voronoi diagrams produced with OpenVoronoi at
 https://picasaweb.google.com/106188605401091280402/OpenVoronoiExamples
 
-Required Dependencies
+Required Dependencies:
 cmake
 libqd-dev             http://crd.lbl.gov/~dhbailey/mpdist/
 Boost graph library   
 
-Optional Dependencies
+Optional Dependencies:
 git            (required only for the version-string)
 python         (if python bindings are built/used)
 Boost python   (if python bindings are built)
@@ -40,8 +51,8 @@ asymptote      (to build white-paper figures)
 lyx            (to build white-paper)
 libvtk         (many python-scripts use VTK for visualization)
 python-vtk     (VTK python bindings)
-ttt            https://github.com/aewallin/truetype-tracer (some tests/examples use ttt)
-randompolygon  https://github.com/aewallin/randompolygon (some tests use randompolygon)
+truetype-tracer https://github.com/aewallin/truetype-tracer (some tests)
+randompolygon   https://github.com/aewallin/randompolygon (some tests)
 
 Build/Install instructions
 

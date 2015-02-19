@@ -97,9 +97,17 @@ int solve( Site* s1, double k1,
     //if ( s3->isLine() ) {
         double x,y;
         if ( two_by_two_solver(bisector.a, bisector.b, s3->a(), s3->b(), -bisector.c, -s3->c()-k3*tb, x,y) ) {
-            if (debug) std::cout << " Solution: t=" << tb << " " << Point( x, y ) << " k3=" << k3 << " \n";
-            slns.push_back( Solution( Point( x, y ) , tb, k3 ) ); 
-            return 1;
+            Point psln(x, y);
+            if (debug) std::cout << " Solution: t=" << tb << " " << psln << " k3=" << k3 << " \n";
+            if ((s1->end() - s1->start()).cross(psln - s1->start()) * k1 < 0 ||
+                (s2->end() - s2->start()).cross(psln - s2->start()) * k2 < 0 ||
+                (s3->end() - s3->start()).cross(psln - s3->start()) * k3 < 0) {
+                // solution lies on the wrong side from one of the lines
+                return 0;
+            } else {
+                slns.push_back( Solution( Point( x, y ) , tb, k3 ) ); 
+                return 1;
+            }
         } else {
             if (debug) std::cout << "LLLPARASolver. NO Solution!\n";    
             return 0;

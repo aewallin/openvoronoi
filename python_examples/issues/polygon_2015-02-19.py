@@ -127,9 +127,11 @@ if __name__ == "__main__":
     t_before = time.time()
     for n in [0]: #range(len(id_list)):
         if n == len(id_list)-1:
+            print n," trying ", n," to ",n+1
             vd.addLineSite( id_list[n], id_list[n+1])
             print n," added segment", n," to ",n+1
         else:
+            print n," trying ", n," to ",n+1
             vd.addLineSite( id_list[n], id_list[0])
             print n," added final segment", n," to ",0
     

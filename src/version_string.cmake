@@ -13,6 +13,7 @@ if(GIT_FOUND)
         COMMAND ${GIT_EXECUTABLE} describe --tags 
         RESULT_VARIABLE res_var 
         OUTPUT_VARIABLE GIT_COM_ID 
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     )
     if( NOT ${res_var} EQUAL 0 )
         message( WARNING "Git failed (not a repo, or no tags)." )

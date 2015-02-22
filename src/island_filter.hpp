@@ -22,7 +22,9 @@
 #include <string>
 #include <iostream>
 
+#ifdef BUILD_PYTHON_LIB
 #include <boost/python.hpp>
+#endif
 
 #include "graph.hpp"
 #include "site.hpp"

@@ -25,7 +25,9 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/graphviz.hpp>
 
+#ifdef BUILD_PYTHON_LIB
 #include <boost/python.hpp>
+#endif
 
 #include "graph.hpp"
 #include "site.hpp"
@@ -292,6 +294,7 @@ std::set<HEVertex> loop_enclosed_vertices( std::vector<HEFace> in_loop_faces) {
         boost::write_graphviz( out, g, lbl_wrt);
     }
     
+#ifdef BUILD_PYTHON_LIB
     /// return list of offsets 
     boost::python::list offset_list_py() {
         boost::python::list py_offsets;
@@ -329,6 +332,7 @@ std::set<HEVertex> loop_enclosed_vertices( std::vector<HEFace> in_loop_faces) {
         }
         return py_offsets;
     }
+#endif
     
 protected:
     /// set of Loops, sorted by decreasing offset-distance

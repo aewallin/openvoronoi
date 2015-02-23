@@ -41,6 +41,7 @@ Required Dependencies:
 cmake
 libqd-dev             http://crd.lbl.gov/~dhbailey/mpdist/
 Boost graph library   
+graphviz  (visualization for graph algorithms)
 
 Optional Dependencies:
 git            (required only for the version-string)

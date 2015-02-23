@@ -23,7 +23,7 @@
 #include "common/point.hpp"
 #include "medial_axis_walk_py.hpp"
 #include "offset_py.hpp"
-#include "offset_sorter.hpp"
+#include "offset_sorter_py.hpp"
 
 #include "utility/vd2svg.hpp"
 #include "version.hpp"
@@ -155,11 +155,11 @@ BOOST_PYTHON_MODULE(openvoronoi) {
     ; 
     bp::class_< OffsetLoop  >("OffsetLoop")
     ;  
-    bp::class_< OffsetSorter , boost::noncopyable  >("OffsetSorter", bp::no_init)
+    bp::class_< OffsetSorter_py , boost::noncopyable  >("OffsetSorter", bp::no_init)
         .def(bp::init<HEGraph&>())
-        .def("add_loop", &OffsetSorter::add_loop )
-        .def("sort_loops", &OffsetSorter::sort_loops )
-        .def("get_loops", &OffsetSorter::offset_list_py )
+        .def("add_loop", &OffsetSorter_py::add_loop )
+        .def("sort_loops", &OffsetSorter_py::sort_loops )
+        .def("get_loops", &OffsetSorter_py::offset_list_py )
     ;  
   
 // Filters

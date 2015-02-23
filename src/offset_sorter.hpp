@@ -25,10 +25,6 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/graphviz.hpp>
 
-#ifdef BUILD_PYTHON_LIB
-#include <boost/python.hpp>
-#endif
-
 #include "graph.hpp"
 #include "site.hpp"
 #include "offset.hpp"
@@ -293,47 +289,7 @@ std::set<HEVertex> loop_enclosed_vertices( std::vector<HEFace> in_loop_faces) {
         label_writer<MachiningGraph> lbl_wrt(g);
         boost::write_graphviz( out, g, lbl_wrt);
     }
-    
-#ifdef BUILD_PYTHON_LIB
-    /// return list of offsets 
-    boost::python::list offset_list_py() {
-        boost::python::list py_offsets;
-        BOOST_FOREACH( MGVertex v, boost::vertices(g) ) { // loop through each loop
-            boost::python::list py_loop;
-            bool first = true;
-            int vdeg =boost::out_degree( v, g );
-            /*
-            BOOST_FOREACH( Edge e, boost::out_edges( v, g ) ) {
-                vdeg++;
-            }*/
-            
-            
-            BOOST_FOREACH( OffsetVertex lpt, g[v].vertices ) { //loop through each line/arc
-                boost::python::list py_lpt;
-                double offset_distance = g[v].offset_distance;
-                if (first) {
-                    first = false;
-                    py_lpt.append( lpt.p ); // 0
-                    py_lpt.append( -1 ); // 1
-                    py_lpt.append( offset_distance ); // 2
-                    py_lpt.append( vdeg ); // 3
-                } else {
-                    py_lpt.append( lpt.p ); // 0, position
-                    py_lpt.append( lpt.r ); // 1, radius
-                    py_lpt.append( lpt.c ); // 2, center
-                    py_lpt.append( lpt.cw ); // 3, cw or ccw
-                    py_lpt.append( lpt.f ); // 4, face
-                    py_lpt.append( offset_distance ); // 5
-                    py_lpt.append( vdeg ); // 6
-                }
-                py_loop.append( py_lpt );
-            }
-            py_offsets.append( py_loop );
-        }
-        return py_offsets;
-    }
-#endif
-    
+       
 protected:
     /// set of Loops, sorted by decreasing offset-distance
     std::multiset<OffsetLoop, OffsetLoopCompare> distance_sorted_loops; 

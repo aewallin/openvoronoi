@@ -217,7 +217,7 @@ namespace svg
         {
             std::stringstream ss;
             if (transparent)
-                ss << "transparent";
+                ss << "none";
             else
                 ss << "rgb(" << red << "," << green << "," << blue << ")";
             return ss.str();

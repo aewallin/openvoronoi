@@ -38,7 +38,9 @@ namespace solvers {
 /// solves 3x3 system.
 class LLLSolver : public Solver {
 public:
-
+// distance from the sought point (x,y) to the line
+// sites is t
+// this gives three equations
 //  a1 x + b1 y + c1 + k1 t = 0
 //  a2 x + b2 y + c2 + k2 t = 0
 //  a3 x + b3 y + c3 + k3 t = 0
@@ -67,25 +69,25 @@ int solve( Site* s1, double k1,
         eq.push_back( sites[i]->eqp_qd( kvals[i] ) );
     
     unsigned int i = 0, j=1, k=2;
-    qd_real d = chop( determinant( eq[i].a, eq[i].b, eq[i].k, 
-                                   eq[j].a, eq[j].b, eq[j].k, 
-                                   eq[k].a, eq[k].b, eq[k].k ) ); 
+    qd_real detA = chop( determinant( eq[i].a, eq[i].b, eq[i].k, 
+                                      eq[j].a, eq[j].b, eq[j].k, 
+                                      eq[k].a, eq[k].b, eq[k].k ) ); 
     double det_eps = 1e-6;
-    if ( fabs(d) > det_eps ) {
-        qd_real t = determinant(  eq[i].a, eq[i].b, -eq[i].c, 
-                                  eq[j].a, eq[j].b, -eq[j].c, 
-                                  eq[k].a, eq[k].b, -eq[k].c ) / d ; 
-        if (t >= 0) {
+    if ( fabs(detA) > det_eps ) {
+        qd_real sol_t = determinant(  eq[i].a, eq[i].b, -eq[i].c, 
+                                      eq[j].a, eq[j].b, -eq[j].c, 
+                                      eq[k].a, eq[k].b, -eq[k].c ) / detA ; 
+        if (sol_t >= 0) {
             qd_real sol_x = determinant(  -eq[i].c, eq[i].b, eq[i].k, 
                                           -eq[j].c, eq[j].b, eq[j].k, 
-                                          -eq[k].c, eq[k].b, eq[k].k ) / d ; 
+                                          -eq[k].c, eq[k].b, eq[k].k ) / detA ; 
             qd_real sol_y = determinant(  eq[i].a, -eq[i].c, eq[i].k, 
                                           eq[j].a, -eq[j].c, eq[j].k, 
-                                          eq[k].a, -eq[k].c, eq[k].k ) / d ; 
+                                          eq[k].a, -eq[k].c, eq[k].k ) / detA ; 
             if (debug && !silent ) 
-                std::cout << " solution: " << Point( to_double(sol_x), to_double(sol_y) ) << " t=" << to_double(t) << " k3=" << k3 << " det=" << to_double(d) << "\n";
+                std::cout << " solution: " << Point( to_double(sol_x), to_double(sol_y) ) << " t=" << to_double(sol_t) << " k3=" << k3 << " detA=" << to_double(detA) << "\n";
             
-            slns.push_back( Solution( Point( to_double(sol_x), to_double(sol_y) ), to_double(t), k3 ) ); // kk3 just passes through without any effect!?
+            slns.push_back( Solution( Point( to_double(sol_x), to_double(sol_y) ), to_double(sol_t), k3 ) ); // k3 just passes through without any effect!?
             return 1;
         }
     } else {
@@ -109,14 +111,10 @@ int solve( Site* s1, double k1,
             }
         }
         if (debug && !silent) {
-            std::cout << "WARNING: LLLSolver small determinant! no solutions. d= " << d <<"\n";
+            std::cout << "WARNING: LLLSolver small determinant! no solutions. detA= " << detA <<"\n";
             std::cout << " s1 : " << eq[0].a << " " << eq[0].b << " " << eq[0].c << " " << eq[0].k << "\n";
             std::cout << " s2 : " << eq[1].a << " " << eq[1].b << " " << eq[1].c << " " << eq[1].k << "\n";
             std::cout << " s3 : " << eq[2].a << " " << eq[2].b << " " << eq[2].c << " " << eq[2].k << "\n";
-            //std::cout << " 0==1? " << (eq[0]==eq[1]) << "\n";
-            //std::cout << "da = " << (eq[0].a-eq[1].a) << "\n";
-            //std::cout << "db = " << (eq[0].b-eq[1].b) << "\n";
-            //std::cout << "dc = " << (eq[0].c-eq[1].c) << "\n";
         }
         
     }

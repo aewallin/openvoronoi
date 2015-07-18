@@ -35,7 +35,7 @@
  *
  * OpenVoronoi is a c++ library with python bindings (using boost::python) for calculating 2D voronoi-diagrams of point, 
  * line-segment, and circular-arc(not implement yet!) sites.
- * An incremental topology-oriented algorithm is used.
+ * An incremental topology-oriented algorithm based on the papers by Sugihara & Irii and Held is used.
  * 
  * See github for build/install instructions https://github.com/aewallin/openvoronoi
  * 
@@ -92,6 +92,7 @@ class VoronoiDiagramChecker;
 /// \brief KD-tree for 2D point location
 ///
 /// a kd-tree is used for nearest-neighbor search when inserting point sites
+/// this kd_point class represents a point-site in the KDTree
 struct kd_point {
     /// default ctor
     kd_point() : p(0,0), face(0) { }
@@ -152,7 +153,7 @@ public:
     
     std::string print() const;
     /// reset vertex index count \todo not very elegant...
-    static void reset_vertex_count() { VoronoiVertex::reset_count(); }
+    static void reset_vertex_count() { VoronoiVertex::reset_count(); } // why do we need this?
     /// turn on debug output
     void debug_on() {debug=true;} 
     /// set silent mode on/off
@@ -164,7 +165,8 @@ public:
     void filter( Filter* flt);
     void filter_reset();
 protected:
-    /// type for item in VertexQueue. pair of vertex-desxriptor and in_circle predicate
+    /// type for item in VertexQueue. pair of vertex-descriptor and
+    /// the value of the in_circle predicate
     typedef std::pair<HEVertex, double> VertexDetPair;
     /// \brief comparison-predicate for VertexQueue
     ///
@@ -180,8 +182,9 @@ protected:
       }
     };
 
-    /// priority_queue for vertex for processing 
-    // sorted by decreasing fabs() of in_circle-predicate, so that the vertices whose IN/OUT status we are 'most certain' about are processed first
+    /// std::priority_queue for vertex for processing 
+    /// sorted by decreasing fabs() of in_circle-predicate, so that the vertices 
+    /// whose IN/OUT status we are 'most certain' about are processed first
     typedef std::priority_queue< VertexDetPair , std::vector<VertexDetPair>, abs_comparison > VertexQueue;
     
     /// \brief data required for adding a new edge
@@ -252,12 +255,12 @@ protected:
     bool debug; ///< turn debug output on/off
     bool silent; ///< no warnings emitted when silent==true
 private:
-    VoronoiDiagram(); // don't use.
+    VoronoiDiagram(); // don't use default ctor.
 };
 
 /// \brief error-functor to locate ::SPLIT vertices
 ///
-/// for passing to numerical boost::toms748 root-finding algorithm
+/// error-functor for passing to numerical boost::toms748 root-finding algorithm
 class SplitPointError {
 public:
     /// \param gi graph

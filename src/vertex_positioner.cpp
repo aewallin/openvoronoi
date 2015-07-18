@@ -54,7 +54,6 @@ VertexPositioner::VertexPositioner(HEGraph& gi): g(gi) {
 
 /// delete all solvers
 VertexPositioner::~VertexPositioner() {
-    //std::cout << "~VertexPositioner()..";
     delete ppp_solver;
     delete lll_solver;
     delete qll_solver;
@@ -63,7 +62,6 @@ VertexPositioner::~VertexPositioner() {
     delete lll_para_solver;
 
     errstat.clear();
-    //std::cout << "DONE.\n";
 }
 
 /// \brief position a new vertex on given HEEdge \a e when inserting the new Site \a s3
@@ -71,12 +69,12 @@ VertexPositioner::~VertexPositioner() {
 /// calculate the position of a new voronoi-vertex lying on the given edge.
 /// The new vertex is equidistant to the two sites that defined the edge
 /// and to the new site. 
-// the edge e holds information about which face it belongs to.
-// each face holds information about which site created it
-// so the three sites defining the position of the vertex are:
-// - site to the left of HEEdge e
-// - site to the right of HEEdge e
-// - given new Site s
+/// The HEEdge e holds information about which HEFace it belongs to.
+/// each HEFace holds information about which Site created it
+/// so the three sites defining the position of the vertex are:
+/// - site to the left of HEEdge e
+/// - site to the right of HEEdge e
+/// - the given new Site s
 solvers::Solution VertexPositioner::position(HEEdge e, Site* s3) {
     edge = e;
     HEFace face = g[e].face;     
@@ -90,7 +88,7 @@ solvers::Solution VertexPositioner::position(HEEdge e, Site* s3) {
     t_min = std::min( t_src, t_trg ); // the solution we seek must have t_min<t<t_max
     t_max = std::max( t_src, t_trg );
 
-    Site* s1 =  g[face].site;
+    Site* s1 = g[face     ].site;
     Site* s2 = g[twin_face].site;
 
     solvers::Solution sl = position(  s1 , g[e].k, s2, g[twin].k, s3 );
@@ -126,10 +124,10 @@ solvers::Solution VertexPositioner::position(HEEdge e, Site* s3) {
     return sl;
 }
 
-/// position new vertex
-// find vertex that is equidistant from s1, s2, s3
-// should lie on the k1 side of s1, k2 side of s2
-// we try both k3=-1 and k3=+1 for s3
+/// position a new voronoi vertex
+/// find vertex that is equidistant from s1, s2, s3
+/// should lie on the k1 side of s1, k2 side of s2
+/// we try both k3=-1 and k3=+1 for s3
 solvers::Solution VertexPositioner::position(Site* s1, double k1, Site* s2, double k2, Site* s3) {
     assert( (k1==1) || (k1 == -1) );
     assert( (k2==1) || (k2 == -1) );
@@ -174,7 +172,11 @@ solvers::Solution VertexPositioner::position(Site* s1, double k1, Site* s2, doub
             double err = std::max(std::abs(d1-d2), std::max(std::abs(d2-d3), std::abs(d3-d1)));
             double mindist = std::min(d1, std::min(d2, d3));
             if (err/mindist > 0.01) {
-                std::cout << "Solution "<<i<<" violates equidistance constraint. Distances of solution were: "<<sqrt(d1)<<", "<<sqrt(d2)<<", "<<sqrt(d3)<<std::endl;
+                std::cout << "VertexPositioner::position() Warning:\n";
+                std::cout << " Solution "<<i<<" violates equidistance constraint. Distances of solution were:\n";
+                std::cout << "  p-s1: "<<sqrt(d1)<<"\n";
+                std::cout << "  p-s2: "<<sqrt(d2)<<"\n";
+                std::cout << "  p-s3: "<<sqrt(d3)<<"\n";
             }
             else {
                 equidistant_solutions.push_back(s);
@@ -362,8 +364,10 @@ void VertexPositioner::set_silent(bool b) {
 }
     
 /// dispatch to the correct solver based on the sites
-int VertexPositioner::solver_dispatch(Site* s1, double k1, Site* s2, double k2, Site* s3, double k3, 
-                                        std::vector<solvers::Solution>& solns) {
+int VertexPositioner::solver_dispatch(Site* s1, double k1, 
+                                      Site* s2, double k2, 
+                                      Site* s3, double k3, 
+                    std::vector<solvers::Solution>& solns) {
 
 
     if ( g[edge].type == SEPARATOR ) {

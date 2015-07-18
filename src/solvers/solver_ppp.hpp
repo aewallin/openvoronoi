@@ -85,7 +85,10 @@ struct scalar_pt<qd_real> {
 };
 
 
-/// point-point-point Solver (based on Sugihara & Iri paper)
+/// point-point-point Solver, based on Sugihara & Iri paper
+/// Construction of the Voronoi Diagram for “One Million’’ Generators in
+/// Single-Precision Arithmetic, PROCEEDINGS OF THE IEEE, VOL. 80, NO. 9, SEPTEMBER 1992
+///
 template<class Scalar>
 class PPPSolver : public solvers::Solver {
 public:
@@ -101,14 +104,14 @@ int solve( Site* s1, double, Site* s2, double, Site* s3, double, std::vector<Sol
     assert( !pi.is_right(pj,pk) );
     // 2) point pk should have the largest angle. largest angle is opposite longest side.
 
-    double l[3] = {(pi - pj).norm(), (pj-pk).norm(), (pk-pi).norm()};
+    double l[3] = {(pi-pj).norm(), (pj-pk).norm(), (pk-pi).norm()};
     int longest_side = 0;
     if (l[1] > l[0])            longest_side = 1;
     if (l[2] > l[longest_side]) longest_side = 2;
 
     if (longest_side == 1) {
         std::swap(pi, pk);
-        std::swap(pi, pj);  	
+        std::swap(pi, pj);
     }
     else if (longest_side == 2) {
         std::swap(pi, pj); 
@@ -138,7 +141,7 @@ int solve( Site* s1, double, Site* s2, double, Site* s3, double, std::vector<Sol
         exit(-1);
     }
     scalar_pt<Scalar> pt( -J2/J4 + spk.x, J3/J4 + spk.y );
-    Point sln_pt = Point( pt.getx(), pt.gety());
+    Point sln_pt = Point( pt.getx(), pt.gety()); // convert back to double coordinate type
     double dist = (sln_pt-pi).norm();
     slns.push_back( Solution(  sln_pt , dist , +1) );
     return 1;

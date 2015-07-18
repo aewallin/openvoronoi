@@ -1,5 +1,5 @@
 import openvoronoi as ovd
-import ovdvtk
+import ovdvtk # helper library for visualization using vtk
 
 import time
 import vtk
@@ -12,17 +12,19 @@ import pickle
 import gzip
 
 if __name__ == "__main__":  
+    # size of viewport in pixels
     #w=2500
     #h=1500
     
     #w=1920
     #h=1080
     w=1024
-    h=1024
+    h=800
+    
     myscreen = ovdvtk.VTKScreen(width=w, height=h) 
     ovdvtk.drawOCLtext(myscreen, rev_text=ovd.version() )
     
-    w2if = vtk.vtkWindowToImageFilter()
+    w2if = vtk.vtkWindowToImageFilter() # for screenshots
     w2if.SetInput(myscreen.renWin)
     lwr = vtk.vtkPNGWriter()
     lwr.SetInput( w2if.GetOutput() )
@@ -46,7 +48,6 @@ if __name__ == "__main__":
     # for vtk visualization
     vod = ovdvtk.VD(myscreen,vd,float(scale), textscale=0.01, vertexradius=0.003)
     vod.drawFarCircle()
-
     
     vod.textScale = 0.02
     vod.vertexRadius = 0.0031
@@ -55,7 +56,6 @@ if __name__ == "__main__":
     vod.drawGenerators=0
     vod.offsetEdges = 1
     vd.setEdgeOffset(0.05)
-    
     
     linesegs = 1 # switch to turn on/off line-segments
     
@@ -76,44 +76,28 @@ if __name__ == "__main__":
     id_list = []
     m=0
     t_before = time.time()
+    print "inserting %d VertexSites one by one: " % len(pts)
     for p in pts:
         
         id_list.append( vd.addVertexSite( p ) )
-        print m," added vertex", id_list[m]
+        print "  %02d added vertex %3d at ( %1.3f, %1.3f )" % (m, id_list[m], p.x, p.y )
         m=m+1
    
     t_after = time.time()
     times.append( t_after-t_before )
-    #exit()
-    
-    #print "   ",2*Nmax," point-sites sites took {0:.3f}".format(times[0])," seconds, {0:.2f}".format( 1e6*float( times[0] )/(float(2*Nmax)*float(math.log10(2*Nmax))) ) ,"us/n*log(n)"
-    print "all point sites inserted. ",
+    print "all VertexSites inserted."
+
     vd.check()
     
-    #nsegs = Nmax
-    #nsegs = 5 #Nmax
-    #n=1
     t_before = time.time()
     
     #vd.debug_on()
-    vd.addLineSite( id_list[0], id_list[1])
-    
-    
-    vd.check()
-    
-    #vd.debug_on()
-    vd.addLineSite( id_list[1], id_list[2])
-    vd.check()
-    
-    vd.addLineSite( id_list[2], id_list[3])
-    vd.check()
-    
-    #vd.debug_on()
-    
-    vd.addLineSite( id_list[3], id_list[4])
-    vd.check()
-    
-    vd.addLineSite( id_list[4], id_list[0])
+    print "inserting %d LineSites one by one: " % (len(id_list))
+
+    for n in range(len(id_list)):
+        print "  %02d source - target = %02d - %02d " % (n, id_list[n-1], id_list[n] )
+        vd.addLineSite( id_list[n-1], id_list[n])
+    print "all LineSites inserted."
     vd.check()
     
     t_after = time.time()
@@ -121,38 +105,20 @@ if __name__ == "__main__":
     if line_time < 1e-3:
         line_time = 1
     times.append( line_time )
-    
-    #s = id_list[nsegs]
-    #vd.debug_on()
-    #vd.addLineSite( s[0], s[1], 10) 
-    #seg = id_list[nsegs]
-    #vd.addLineSite(seg[0],seg[1],10)
-    # 1 identify start/endvert
-    # 2 add line-segment edges/sites to graph
-    # 3 identify seed-vertex
-    # 4 create delete-tree
-    # 5 create new vertices
-    # 6 add startpoint pos separator
-    # 7 add startoiubt neg separator
-    # 8 add end-point pos separator
-    # 9 add end-point neg separator
-    # 10 add new edges
-    # 11 delete delete-tree edges
-    # 12 reset status
-            
+                
     vod.setVDText2(times)
     
     err = vd.getStat()
-    #print err 
-    print "got errorstats for ",len(err)," points"
+
+    print "getStat() got errorstats for ",len(err)," points"
     if len(err)>1:
         minerr = min(err)
         maxerr = max(err)
-        print "min error= ",minerr
-        print "max error= ",maxerr
+        print "  min error= ",minerr
+        print "  max error= ",maxerr
     
-    print "num vertices: ",vd.numVertices() 
-    print "num SPLIT vertices: ",vd.numSplitVertices() 
+    print "  num vertices: ",vd.numVertices() 
+    print "  num SPLIT vertices: ",vd.numSplitVertices() 
         
     calctime = t_after-t_before
     
@@ -163,6 +129,6 @@ if __name__ == "__main__":
     myscreen.render()   
     #w2if.Modified()
     #lwr.SetFileName("{0}.png".format(Nmax))
-    #lwr.Write()
+    #lwr.Write() # write screenshot to file
      
     myscreen.iren.Start()

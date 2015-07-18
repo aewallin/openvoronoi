@@ -60,7 +60,7 @@ BOOST_PYTHON_MODULE(openvoronoi) {
     bp::class_< VoronoiDiagram_py, boost::noncopyable, bp::bases<VoronoiDiagram> >("VoronoiDiagram", bp::no_init)
         .def(bp::init<double, unsigned int>())
         .def("addVertexSite",  &VoronoiDiagram_py::insert_point_site1 ) // (point)
-        .def("addVertexSite",  &VoronoiDiagram_py::insert_point_site2 ) // (point, step)
+        //.def("addVertexSite",  &VoronoiDiagram_py::insert_point_site2 ) // (point, step)
         .def("addLineSite",  &VoronoiDiagram_py::insert_line_site2 ) // takes two arguments
         .def("addLineSite",  &VoronoiDiagram_py::insert_line_site3 ) // takes three arguments (idx1, idx2, step)
         .def("addArcSite",  &VoronoiDiagram_py::insert_arc_site ) // arc-site (idx1,idx2, center, cw?, step) 

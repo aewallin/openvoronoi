@@ -51,9 +51,10 @@ public:
         return insert_point_site(p);
     }
     /// 2-parameter point-insert
-    int insert_point_site2(const Point& p, int step) {
-        return insert_point_site(p,step);
-    }
+    //int insert_point_site2(const Point& p, int step) {
+    //    return insert_point_site(p,step);
+    //}
+    
     /// 3-parameter line-insert
     bool insert_line_site2(int idx1, int idx2) {
         return insert_line_site( idx1, idx2);

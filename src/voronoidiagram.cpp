@@ -36,12 +36,10 @@ namespace ovd {
 /// \param n_bins is the number of bins for FaceGrid, the bucket-search for nearest-neighbors 
 ///        used in insert_point_site(). Use roughly sqrt(N) for a voronoi-diagram with N sites.
 VoronoiDiagram::VoronoiDiagram(double far, unsigned int n_bins) {
-    //fgrid = new FaceGrid(far, n_bins); // helper-class for nearest-neighbor search 
-    kd_tree = new kdtree::KDTree<kd_point>(2);
-    
+    kd_tree = new kdtree::KDTree<kd_point>(2); // kd-tree with dimension 2    
     vd_checker = new VoronoiDiagramChecker( g ); // helper-class that checks topology/geometry
-     
     vpos = new VertexPositioner( g ); // helper-class that positions vertices
+    
     far_radius=far;
     initialize();
     num_psites=3;
@@ -51,14 +49,12 @@ VoronoiDiagram::VoronoiDiagram(double far, unsigned int n_bins) {
     debug = false;
 }
 
-/// \brief delete allocated resources: FaceGrid, checker, positioner
+/// \brief delete allocated resources.
 VoronoiDiagram::~VoronoiDiagram() { 
     //std::cout << "~VoronoiDiagram()\n";
-    //delete fgrid; 
     delete kd_tree;
     delete vpos;
     delete vd_checker;
-    
     //std::cout << "~VoronoiDiagram() DONE.\n";
 }
 
@@ -176,17 +172,16 @@ void VoronoiDiagram::initialize() {
 /// All PointSite:s must be inserted before any LineSite:s or ArcSite:s are inserted.
 /// This is roughly "algorithm A" from the Sugihara-Iri 1994 paper, page 15/50
 ///
-/// -# find the face that is closest to the new site, see FaceGrid
-/// -# among the vertices on the closest face, find the seed vertex, see find_seed_vertex()
-/// -# grow the tree of IN-vertices, see augment_vertex_set()
-/// -# add new voronoi-vertices on all IN-OUT edges so they becone IN-NEW-OUT, see add_vertices()
-/// -# add new face by splitting each INCIDENT face into two parts by inserting a NEW-NEW edge. see add_edges()
-/// -# repair the next-pointers of faces that have been modified. see repair_face()
-/// -# remove IN-IN edges and IN-NEW edges, see remove_vertex_set()
-/// -# reset vertex/face status to be ready for next incremental operation, see reset_status()
-int VoronoiDiagram::insert_point_site(const Point& p, int step) {
+/// step-1 find the face that is closest to the new site, see kd_tree.nearest()
+/// step-2 among the vertices on the closest face, find the seed vertex, see find_seed_vertex()
+/// step-3 grow the tree of IN-vertices, see augment_vertex_set()
+/// step-4 add new voronoi-vertices on all IN-OUT edges so they becone IN-NEW-OUT, see add_vertices()
+/// step-5 add new face by splitting each INCIDENT face into two parts by inserting a NEW-NEW edge. see add_face() and add_edges()
+/// step-6 repair the next-pointers of faces that have been modified. see repair_face()
+/// step-7 remove IN-IN edges and IN-NEW edges, see remove_vertex_set()
+/// step-8 reset vertex/face status to be ready for next incremental operation, see reset_status()
+int VoronoiDiagram::insert_point_site(const Point& p) {
     num_psites++;
-    //int current_step=1;
     if (p.norm() >= far_radius ) {
         std::cout << "openvoronoi error. All points must lie within unit-circle. You are trying to add p= " << p 
         << " with p.norm()= " << p.norm() << "\n";
@@ -197,31 +192,34 @@ int VoronoiDiagram::insert_point_site(const Point& p, int step) {
     PointSite* new_site =  new PointSite(p);
     new_site->v = new_vert;
     vertex_map.insert( VertexMapPair(g[new_vert].index,new_vert) ); // so that we can find the descriptor later based on its index
-    std::pair<kd_point,bool> nearest = kd_tree->nearest( kd_point(p) );
+// step-1
+    std::pair<kd_point,bool> nearest = kd_tree->nearest( kd_point(p) ); 
     assert( nearest.second );
+// step-2
     HEVertex v_seed = find_seed_vertex( nearest.first.face , new_site);
     mark_vertex( v_seed, new_site );
-//if (step==current_step) return -1; current_step++;
+// step-3
     augment_vertex_set( new_site ); // grow the tree to maximum size
-//if (step==current_step) return -1; current_step++;
-    add_vertices( new_site );  // insert new vertices on IN-OUT edges
-//if (step==current_step) return -1; current_step++;
+// step-4
+    add_vertices( new_site );  // insert NEW vertices on IN-OUT edges so they becobe IN-NEW-OUT edges
+// step-5
     HEFace newface = add_face( new_site );
     g[new_vert].face = newface; // Vertices that correspond to point-sites have their .face property set!
     BOOST_FOREACH( HEFace f, incident_faces ) { // add NEW-NEW edges on all INCIDENT faces
         add_edges(newface, f);
     }
-//if (step==current_step) return -1; current_step++;
+// step-6
     repair_face( newface  );
     if (debug) { std::cout << " new face: "; g.print_face( newface ); }
+// step-7
     remove_vertex_set(); // remove all IN vertices and adjacent edges
-//if (step==current_step) return -1; current_step++;
+// step-8
     reset_status(); // reset all vertices to UNDECIDED
  
     assert( vd_checker->face_ok( newface ) );
     assert( vd_checker->is_valid() );
  
-    return g[new_vert].index;
+    return g[new_vert].index; // return index to user for later use e.g. inserting LineSite
 }
 
 /// \brief insert a LineSite into the diagram

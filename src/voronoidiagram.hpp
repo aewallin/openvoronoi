@@ -131,7 +131,7 @@ class VoronoiDiagram {
 public:
     VoronoiDiagram(double far, unsigned int n_bins);
     virtual ~VoronoiDiagram();
-    int insert_point_site(const Point& p, int step=0);
+    int insert_point_site(const Point& p);
     bool insert_line_site(int idx1, int idx2, int step=99); // default step should make algorithm run until the end!
     void insert_arc_site(int idx1, int idx2, const Point& c, bool cw, int step=99);
     

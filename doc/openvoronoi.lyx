@@ -182,7 +182,18 @@ name "fig:Point-site"
 
 \end_inset
 
-Point site.
+Point site with offset 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "fig:Point-site"
+
+\end_inset
+
+ at distance 
+\begin_inset Formula $t$
+\end_inset
+
+.
 \end_layout
 
 \end_inset
@@ -216,9 +227,9 @@ reference "fig:Line-site"
 
 \begin_layout Standard
 \begin_inset Formula 
-\[
+\begin{equation}
 ax+by+c=0
-\]
+\end{equation}
 
 \end_inset
 
@@ -231,7 +242,7 @@ with the normalization
 \end_inset
 
 .
- The offset of a line is a line
+ The offset of a line is another line
 \end_layout
 
 \begin_layout Standard
@@ -286,15 +297,26 @@ name "fig:Line-site"
 
 \end_inset
 
-Line site
+Line site with offsets 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:lineOffset"
+
+\end_inset
+
+ corresponding to 
+\begin_inset Formula $k=+1$
+\end_inset
+
+ (top) and 
+\begin_inset Formula $k=-1$
+\end_inset
+
+ (bottom).
 \end_layout
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Plain Layout
 
 \end_layout
 
@@ -309,13 +331,10 @@ Arc site
 
 \begin_layout Standard
 Arc(circle) sites (FIXME: add figure) are defined by
-\end_layout
-
-\begin_layout Standard
 \begin_inset Formula 
-\[
+\begin{equation}
 (x-x_{C})^{2}+(y-y_{C})^{2}=r^{2}
-\]
+\end{equation}
 
 \end_inset
 
@@ -351,7 +370,7 @@ where
 \begin_inset Formula $k=\left\{ +1,-1\right\} $
 \end_inset
 
- is the offset direction, correspondinto a growing or shirnking radius,
+ is the offset direction, correspondin to a growing or shirnking radius,
  and 
 \begin_inset Formula $t$
 \end_inset
@@ -750,8 +769,8 @@ Solvers
 
 \begin_layout Standard
 Solvers calculate the position of a new vertex in the diagram.
- The input for a solver consist the three sites that are adjacent to the
- new vertex, and the three offset-directions from the sites.
+ The input for a solver consists of the three sites that are adjacent to
+ the new vertex, and the three offset-directions from the sites.
  The new vertex should be positioned so that it is equidistant from all
  three sites.
 \end_layout
@@ -807,18 +826,30 @@ The intersection point between the offsets of three line sites
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula $\left\{ \begin{array}{c}
+\begin_inset Formula 
+\begin{equation}
+\left\{ \begin{array}{c}
 a_{1}x+b_{1}y+c_{1}+k_{1}t=0\\
 a_{2}x+b_{2}y+c_{2}+k_{2}t=0\\
 a_{3}x+b_{3}y+c_{3}+k_{3}t=0
-\end{array}\right.$
+\end{array}\right.
+\end{equation}
+
 \end_inset
 
-,
+
 \end_layout
 
 \begin_layout Standard
-which can be written in matrix-form as 
+where each line corresponds to 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:lineOffset"
+
+\end_inset
+
+.
+ This can be written in matrix-form as 
 \begin_inset Formula $Ax=b$
 \end_inset
 
@@ -826,27 +857,23 @@ which can be written in matrix-form as
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula $A=\left[\begin{array}{ccc}
+\begin_inset Formula 
+\begin{equation}
+A=\left[\begin{array}{ccc}
 a_{1} & b_{1} & k_{1}\\
 a_{2} & b_{2} & k_{2}\\
 a_{3} & b_{3} & k_{3}
-\end{array}\right]$
-\end_inset
-
-, 
-\begin_inset Formula $b=\left[\begin{array}{c}
+\end{array}\right],b=\left[\begin{array}{c}
 -c_{1}\\
 -c_{2}\\
 -c_{3}
-\end{array}\right]$
-\end_inset
-
-, 
-\begin_inset Formula $x=\left[\begin{array}{c}
+\end{array}\right],x=\left[\begin{array}{c}
 x\\
 y\\
 t
-\end{array}\right]$
+\end{array}\right]
+\end{equation}
+
 \end_inset
 
 .
@@ -860,9 +887,9 @@ x_{1} & x_{2} & x_{3}\end{array}\right]^{T}$
 
  are given by Cramer's rule as 
 \begin_inset Formula 
-\[
+\begin{equation}
 x_{i}=\frac{\det(A_{i})}{\det(A)}
-\]
+\end{equation}
 
 \end_inset
 
@@ -900,6 +927,12 @@ Separator Solver
 \end_layout
 
 \begin_layout Standard
+See 
+\family typewriter
+solver_sep.hpp
+\end_layout
+
+\begin_layout Standard
 This solver is used when the input sites consist of a line-site 
 \begin_inset Formula $l_{1}$
 \end_inset
@@ -908,19 +941,102 @@ This solver is used when the input sites consist of a line-site
 \begin_inset Formula $p_{2}$
 \end_inset
 
- which is either end-point of the line-site.
- This configuration forces the solution to lie on the separator between
- the line-site and the point-site, and we may look for a point on the separator
- which is equidistant to the third input site.
- The separator is a line perpendicular to 
-\begin_inset Formula $l_{1}$
-\end_inset
-
- passing through 
+ where 
 \begin_inset Formula $p_{2}$
 \end_inset
 
-:
+ is either end-point of the line-site 
+\begin_inset Formula $l_{1}$
+\end_inset
+
+.
+ This configuration forces the solution to lie on the separator (a line
+ through 
+\begin_inset Formula $p_{2}$
+\end_inset
+
+ and perpendicular to 
+\begin_inset Formula $l_{1}$
+\end_inset
+
+) between the line-site and the point-site.
+ We can then look for a point on the separator which is equidistant to the
+ third input site (a Line site or an Arc site, by design of the higher level
+ algorithm).
+ Points on the separator are located at
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+p_{separator}=p_{2}+v_{separator}t
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where the separator direction is give by
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\begin{cases}
+\begin{array}{c}
+v_{separator}=(-a_{1},-b_{1})\\
+v_{separator}=(a_{1},b_{1})
+\end{array} & \begin{array}{c}
+k_{1}=-1\\
+k_{1}=+1
+\end{array}\end{cases}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+When the third site is a Line site this leads to
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\begin{cases}
+\begin{array}{c}
+x=x_{2}+v_{x}t\\
+y=x_{2}+v_{y}t\\
+a_{3}x+b_{3}y+c_{3}+k_{3}t=0
+\end{array}\end{cases}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+with the solution
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+t=-(a_{3}x_{2}+b_{3}y_{2}+c_{3})/(v_{x}a_{3}+v_{y}b_{3}+k_{3})
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+FIXME: what happens if we get divide by zero? this corresponds to the new
+ line site l3 being parallell to the separator??
 \end_layout
 
 \begin_layout Section

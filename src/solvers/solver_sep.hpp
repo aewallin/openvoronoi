@@ -41,10 +41,10 @@ namespace solvers {
 // 
 // This configuration constrains the solution to lie on the separator edge.
 // The separator is given by
-// SEP = p2 + t* sv
+// SEP = p2 + t*sv
 // where p2 is the location of s2, and the separator direction sv is 
-// sv = (-a1,-b1)   if k1=-1
-// sv = (a1,b1)   if k1=-1 
+// sv = (-a1,-b1)  if k1=-1
+// sv = (a1,b1)    if k1=+1 
 // thus points on the separator are located at:
 //
 //  x_sep = x2 + t*sv.x
@@ -75,7 +75,9 @@ int solve( Site* s1, double k1,
            Site* s2, double k2, 
            Site* s3, double k3, std::vector<Solution>& slns ) {
     assert( s1->isLine() && s2->isPoint() );
-    assert(s3->isLine());
+    assert( s3->isLine() ); // LineSites always inserted after PointSites. 
+                            // Thus we can only have s3=LineSite
+                            // or in the future s3 = ArcSite
     if (debug) 
         std::cout << "SEPSolver.\n";
     

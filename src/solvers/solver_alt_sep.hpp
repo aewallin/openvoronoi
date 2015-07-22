@@ -37,7 +37,7 @@ namespace solvers {
 // 
 // Two possibilities for s3:
 //   s3 (LineSite)   a3 x + b3 y + c3 + k3 t = 0           (1)
-//   s3 (PointSite)  (x-x3)^2 + (y-y3)^2 = t^2             (2)
+//   s3 (PointSite)  (x-x3)^2 + (y-y3)^2 = t^2             (2) really?? probably this never happens?
 // 
 // This configuration constrains the solution to lie on the separator edge.
 // The separator is given by

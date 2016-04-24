@@ -30,21 +30,21 @@ def regular_n_polygon(n=3,verbose=True):
     return check
 
 if __name__ == "__main__":
-    #regular_n_polygon(3) # OK
-    #regular_n_polygon(4) # warnings/errors when adding line 3
+    regular_n_polygon(3) # OK
+    regular_n_polygon(4) # warnings/errors when adding line 3
     #regular_n_polygon(5) # OK
     #regular_n_polygon(6) # warnings/errors when adding line 4
     #regular_n_polygon(7) # OK
     #regular_n_polygon(8) # warnings/errors when adding line 5
-    regular_n_polygon(9) # OK
+    #regular_n_polygon(9) # OK
     #regular_n_polygon(10) # warnings/errors when adding line 6
-    regular_n_polygon(11) # OK
-    regular_n_polygon(12) # OK (? no warning for line 7)
-    regular_n_polygon(13) # OK
-    regular_n_polygon(14) # OK (? no warning for line 8)
-    regular_n_polygon(15) # OK
-    regular_n_polygon(16) # warnings/errors when adding line 9
-    regular_n_polygon(17) # OK
-    regular_n_polygon(18) # OK (? no warning for line 10?)
-    regular_n_polygon(19) # OK
-    regular_n_polygon(20) # warnings/errors when adding line 11
+    #regular_n_polygon(11) # OK
+    #regular_n_polygon(12) # OK (? no warning for line 7)
+    #regular_n_polygon(13) # OK
+    #regular_n_polygon(14) # OK (? no warning for line 8)
+    #regular_n_polygon(15) # OK
+    #regular_n_polygon(16) # warnings/errors when adding line 9
+    #regular_n_polygon(17) # OK
+    #regular_n_polygon(18) # OK (? no warning for line 10?)
+    #regular_n_polygon(19) # OK
+    #regular_n_polygon(20) # warnings/errors when adding line 11

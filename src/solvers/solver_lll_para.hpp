@@ -51,18 +51,21 @@ public:
 // ab x + bb y + cb = 0
 // ab = a1
 // bb = b1
-// cb = (c1+c2)2
-// all points on the bisector have a t value
+// cb = (c1+c2)/2
+// all points on the bisector have a t value (distance to s1 and to s2)
 // tb = fabs(c1-c2)/2
 //
-// find intersection of bisector and offset of third site
+// now try to find intersection of bisector and offset of third site
 //  ab x + bb y + cb = 0
 //  a3 x + b3 y + c3 + k3 tb = 0
 //  or
 //  ( ab  bb ) ( x ) = ( -cb )
 //  ( a3  b3 ) ( y ) = ( -c3-k3*tb )
 //
-
+//  A x = b
+//
+//  Cramers rule x_i = det(A_i)/det(A)
+//  where A_i is A with column i replaced by b
 
 int solve( Site* s1, double k1, 
            Site* s2, double k2, 
@@ -80,9 +83,7 @@ int solve( Site* s1, double k1,
     Point n0(s1->a(), s1->b());
     Point n1(s2->a(), s2->b());
     if (n0.dot(n1) < 0.f) 
-	{
         s2c = -s2c;
-    }
     
     bisector.c = (s1->c() + s2c)*0.5;
     double tb = 0.5*fabs(s1->c() - s2c); // bisector offset distance
@@ -90,8 +91,7 @@ int solve( Site* s1, double k1,
     if (debug) {
         std::cout << " s1 : " << s1->a() << " " << s1->b() << " " << s1->c() << " " << s1->k() << "\n";
         std::cout << " s2 : " << s2->a() << " " << s2->b() << " " << s2->c() << " " << s2->k() << "\n";
-        if ( s3->isLine() )
-            std::cout << " s3 : " << s3->a() << " " << s3->b() << " " << s3->c() << " " << s3->k() << "\n";
+        std::cout << " s3 : " << s3->a() << " " << s3->b() << " " << s3->c() << " " << s3->k() << "\n";
         std::cout << " bisector: " << bisector.a << " " << bisector.b << " " << bisector.c << " \n";
     }
     //if ( s3->isLine() ) {
@@ -99,15 +99,22 @@ int solve( Site* s1, double k1,
         if ( two_by_two_solver(bisector.a, bisector.b, s3->a(), s3->b(), -bisector.c, -s3->c()-k3*tb, x,y) ) {
             Point psln(x, y);
             if (debug) std::cout << " Solution: t=" << tb << " " << psln << " k3=" << k3 << " \n";
+            /*
             if ((s1->end() - s1->start()).cross(psln - s1->start()) * k1 < 0 ||
                 (s2->end() - s2->start()).cross(psln - s2->start()) * k2 < 0 ||
                 (s3->end() - s3->start()).cross(psln - s3->start()) * k3 < 0) {
+                if (debug) {
+                    std::cout << " solution lies on the wrong side from one of the lines :\n";
+                    std::cout << " s1 : " << (s1->end() - s1->start()).cross(psln - s1->start()) * k1 << "\n";
+                    std::cout << " s2 : " << (s2->end() - s2->start()).cross(psln - s2->start()) * k2 << "\n";
+                    std::cout << " s3 : " << (s3->end() - s3->start()).cross(psln - s3->start()) * k3 << "\n";
+                }
                 // solution lies on the wrong side from one of the lines
                 return 0;
-            } else {
+            } else {*/
                 slns.push_back( Solution( Point( x, y ) , tb, k3 ) ); 
                 return 1;
-            }
+            //}
         } else {
             if (debug) std::cout << "LLLPARASolver. NO Solution!\n";    
             return 0;
@@ -153,14 +160,16 @@ bool two_by_two_solver( double a,
     //  [u]              [ d  -b ] [ e ]
     //  [v]  =  1/det *  [ -c  a ] [ f ]
     double det = a*d-c*b;
-    if ( fabs(det) < 1e-15 ) // TOLERANCE!!
+    if ( fabs(det) < 1e-15 ) {// TODO/FIXME hard-coded tolerance!
+        std::cout << "two_by_two_solver() determinant too small! det(A)=" << det << "\n";  
         return false;
+    }
     u = (1.0/det) * (d*e - b*f);
     v = (1.0/det) * (-c*e + a*f);
     return true;
 }
 
-};
+}; // LLLPARASolver
 
 } // solvers
 } // ovd

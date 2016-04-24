@@ -53,6 +53,9 @@ public:
 //
 //  Cramers rule x_i = det(A_i)/det(A)
 //  where A_i is A with column i replaced by b
+//
+//  the case when det(A) = 0  cannot be handled here
+//  see LLLPARASolver 
             
 int solve( Site* s1, double k1, 
            Site* s2, double k2, 

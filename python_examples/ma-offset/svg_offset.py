@@ -49,7 +49,10 @@ class SvgReader:
         Determine AABB, center and store transform
         """
         for path in self.paths:
-            self.polys.append(self.path_to_poly(path))
+            for continuous_subpath in path.continuous_subpaths():
+                poly = self.path_to_poly(continuous_subpath)
+                if poly:
+                    self.polys.append(poly)
 
         center = (self.maxx + self.minx/2, (self.maxy + self.miny)/2)
         self.radius = math.sqrt((self.minx-center[0])*(self.minx-center[0]) + (self.miny-center[1])*(self.miny-center[1]))
@@ -67,6 +70,7 @@ class SvgReader:
             for p in poly:
                 adjustedPoint = (p[0] - center[0],  p[1] - center[1])
                 ls.append(adjustedPoint)
+#            ls.reverse()
             adjusted.append(ls)
         self.polys = adjusted
 
@@ -213,7 +217,7 @@ if __name__ == "__main__":
     
     of = ovd.Offset( vd.getGraph() ) # pass the created graph to the Offset class
     step = svgr.radius *.01
-    ofs_dist= step;
+    ofs_dist= step
     ofs = []
     for n in range(50):
         ofsx = of.offset(ofs_dist) # generate offsets at the given distance.

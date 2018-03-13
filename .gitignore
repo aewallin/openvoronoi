@@ -78,3 +78,6 @@ python_examples/tile_test
 
 # picasa ini-file (created by picasa when a folder has images, e.g. screenshots from the tests/demos)
 Picasa.ini
+
+# IDE project data
+.idea/*

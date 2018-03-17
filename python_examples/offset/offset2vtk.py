@@ -12,8 +12,8 @@ def drawLine(myscreen, pt1, pt2, lineColor):
 
 def drawLinesegs(myscreen, points, lines):
     for l in lines:
-        pt1 = ovd.Point(points[l[0]][0], points[l[0]][1])
-        pt2 = ovd.Point(points[l[1]][0], points[l[1]][1])
+        pt1 = ovd.Point(points[l[0]].x, points[l[0]].y)
+        pt2 = ovd.Point(points[l[1]].x, points[l[1]].y)
         drawLine(myscreen, pt1, pt2, ovdvtk.yellow)
 
 

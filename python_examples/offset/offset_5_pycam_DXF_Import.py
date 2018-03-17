@@ -33,7 +33,7 @@ def _add_connected_point_set_to_diagram(point_set, line_set, dia):
     # add all points to the diagram
     vpoints = []
     for p in point_set:
-        ovp = openvoronoi.Point(*p[:2])
+        ovp = openvoronoi.Point(p.x, p.y)
         vpoints.append(dia.addVertexSite(ovp))
     _log.info("all vertices added to openvoronoi!")
     # now add all line-segments
@@ -186,6 +186,7 @@ if __name__ == "__main__":
 
     # draw the input geometry
     point_set, line_set = _polygons_to_line_set(model.get_polygons())
+    # print("point_set[0]:%s" % point_set[0])
     offset2vtk.drawLinesegs(myscreen, point_set, line_set)
 
     first_offset = 0.03

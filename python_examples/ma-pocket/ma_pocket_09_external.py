@@ -370,9 +370,9 @@ def drawOffsets2(myscreen, ofs, offsetcolor=ovdvtk.lgreen):
     linePolyData.SetPoints(oPoints)
     linePolyData.SetLines(lineCells)
     linePolyData.Modified()
-    linePolyData.Update()
+    # linePolyData.Update()
     mapper = vtk.vtkPolyDataMapper()
-    mapper.SetInput(linePolyData)
+    mapper.SetInputData(linePolyData)
     edge_actor = vtk.vtkActor()
     edge_actor.SetMapper(mapper)
     edge_actor.GetProperty().SetColor(offsetcolor)
@@ -708,5 +708,4 @@ if __name__ == "__main__":
     print "python done."
 
     myscreen.render()
-
     myscreen.iren.Start()

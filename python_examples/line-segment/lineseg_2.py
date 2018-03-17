@@ -77,7 +77,7 @@ def drawFrame(N=2, nframe=1):
     w2if = vtk.vtkWindowToImageFilter()
     w2if.SetInput(myscreen.renWin)
     lwr = vtk.vtkPNGWriter()
-    lwr.SetInput(w2if.GetOutput())
+    lwr.SetInputConnection(w2if.GetOutputPort())
     # lwr.SetFileName(filename)
 
     random.seed(42)
@@ -116,6 +116,7 @@ def drawFrame(N=2, nframe=1):
     vod.setAll()
     myscreen.render()
     # writeFrame( w2if, lwr, nframe )
+    # myscreen.iren.Start()
 
     print "PYTHON All DONE."
 

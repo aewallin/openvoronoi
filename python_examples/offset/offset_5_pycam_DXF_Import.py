@@ -198,5 +198,6 @@ if __name__ == "__main__":
     offset2vtk.drawOffsets2(myscreen, offset_loops)
 
     print "PYTHON All DONE."
+
     myscreen.render()
     myscreen.iren.Start()

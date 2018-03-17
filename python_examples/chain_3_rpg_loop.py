@@ -27,7 +27,7 @@ def draw_vd(vd, times):
     w2if = vtk.vtkWindowToImageFilter()
     w2if.SetInput(myscreen.renWin)
     lwr = vtk.vtkPNGWriter()
-    lwr.SetInput(w2if.GetOutput())
+    lwr.SetInputConnection(w2if.GetOutputPort())
     # w2if.Modified()
     # lwr.SetFileName("tux1.png")
 

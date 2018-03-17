@@ -178,8 +178,9 @@ if __name__ == "__main__":
     w2if = vtk.vtkWindowToImageFilter()
     w2if.SetInput(myscreen.renWin)
     lwr = vtk.vtkPNGWriter()
-    lwr.SetInput(w2if.GetOutput())
+    lwr.SetInputConnection(w2if.GetOutputPort())
     # w2if.Modified()
+    w2if.Update()
     # lwr.SetFileName("tux1.png")
 
     scale = 1
@@ -249,11 +250,17 @@ if __name__ == "__main__":
                 drawCircle(myscreen, mic[0], mic[1], ovdvtk.red)
             else:
                 drawCircle(myscreen, mic[0], mic[1], ovdvtk.green)
+
             w2if.Modified()
-            lwr.SetFileName("frames/%06d.png" % (nframe))
-            # lwr.Write()
+            w2if.Update()
+
+            lwr.SetFileName("frames/%06d.png" % nframe)
+            nframe += 1
+            lwr.Write()
+
             time.sleep(0.1)
             myscreen.render()
+
         print "mic done."
 
     """
@@ -277,5 +284,4 @@ if __name__ == "__main__":
     print "PYTHON All DONE."
 
     myscreen.render()
-
     myscreen.iren.Start()

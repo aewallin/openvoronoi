@@ -15,8 +15,6 @@ There are functions for:
 - voronoi-bisectors and verifying the parametric equations for bisectors
 - voronoi-vertex solvers (separator-solver)
 - bi-tangent lines/points (for medial-axis pocketing)
-
-
 """
 
 
@@ -401,9 +399,9 @@ def drawPointPointTest():
     myscreen.camera.SetFocalPoint(0, 0, 0)
     myscreen.camera.SetClippingRange(-100, 3000)
     w2if = vtk.vtkWindowToImageFilter()
-    w2if.SetInput(myscreen.renWin)
+    w2if.SetInputData(myscreen.renWin)
     lwr = vtk.vtkPNGWriter()
-    lwr.SetInput(w2if.GetOutput())
+    lwr.SetInputConnection(w2if.GetOutputPort())
     c1 = Circle(c=ovd.Point(-10, 20), r=0, cw=+1)  # first site
     drawVertex(myscreen, c1.c, ovdvtk.yellow)
     c2 = Circle(c=ovd.Point(20, 4), r=0, cw=+1)  # second site
@@ -421,9 +419,9 @@ def drawLineLineTest():
     myscreen.camera.SetFocalPoint(0, 0, 0)
     myscreen.camera.SetClippingRange(-100, 3000)
     w2if = vtk.vtkWindowToImageFilter()
-    w2if.SetInput(myscreen.renWin)
+    w2if.SetInputData(myscreen.renWin)
     lwr = vtk.vtkPNGWriter()
-    lwr.SetInput(w2if.GetOutput())
+    lwr.SetInputConnection(w2if.GetOutputPort())
 
     l1 = Line(math.cos(1), math.sin(1), 1, +1)  # first line-site
     drawLine(myscreen, l1, ovdvtk.yellow)
@@ -524,9 +522,9 @@ def drawSeparatorSolver1(alfa=6.4):
     myscreen.camera.SetClippingRange(-100, 3000)
 
     w2if = vtk.vtkWindowToImageFilter()
-    w2if.SetInput(myscreen.renWin)
+    w2if.SetInputData(myscreen.renWin)
     lwr = vtk.vtkPNGWriter()
-    lwr.SetInput(w2if.GetOutput())
+    lwr.SetInputConnection(w2if.GetOutputPort())
     #             a              b            c    k       
     l1 = Line(math.cos(1), math.sin(1), 1, -1)  # first line-site
     drawLine(myscreen, l1, ovdvtk.yellow)
@@ -578,9 +576,9 @@ def drawSeparatorSolver2(px=10, py=20):
     myscreen.camera.SetClippingRange(-100, 3000)
 
     w2if = vtk.vtkWindowToImageFilter()
-    w2if.SetInput(myscreen.renWin)
+    w2if.SetInputData(myscreen.renWin)
     lwr = vtk.vtkPNGWriter()
-    lwr.SetInput(w2if.GetOutput())
+    lwr.SetInputConnection(w2if.GetOutputPort())
     #             a              b            c    k       
     l1 = Line(math.cos(1), math.sin(1), 1, -1)  # first line-site
     drawLine(myscreen, l1, ovdvtk.yellow)

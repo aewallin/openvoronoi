@@ -1,3 +1,4 @@
+import openvoronoi as ovd
 import ovdvtk
 import math
 import vtk
@@ -98,9 +99,9 @@ def drawCurve2(myscreen, curve, curvecolor):
     linePolyData.SetPoints(oPoints)
     linePolyData.SetLines(lineCells)
     linePolyData.Modified()
-    linePolyData.Update()
+    # linePolyData.Update()
     mapper = vtk.vtkPolyDataMapper()
-    mapper.SetInput(linePolyData)
+    mapper.SetInputData(linePolyData)
     edge_actor = vtk.vtkActor()
     edge_actor.SetMapper(mapper)
     edge_actor.GetProperty().SetColor(curvecolor)
@@ -111,7 +112,7 @@ if __name__ == "__main__":
     w = 1024
     h = 1024
     myscreen = ovdvtk.VTKScreen(width=w, height=h)
-    # ovdvtk.drawOCLtext(myscreen, rev_text=ovd.version() )
+    ovdvtk.drawOCLtext(myscreen, rev_text=ovd.version() )
     # draw a unit-circle
     ca = ovdvtk.Circle(center=(0, 0, 0), radius=1, color=(0, 1, 1), resolution=50)
     myscreen.addActor(ca)

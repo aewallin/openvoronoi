@@ -10,7 +10,7 @@ import gzip
 import pickle
 
 import numpy as np
-import numpy.numarray as na
+from numpy import numarray as na
 import pylab as P
 
 

@@ -164,7 +164,7 @@ def ttt_segments(text, scale, subdivision=100):
     wr.scale = scale  # float(1)/float(scale)
     # "L" has 36 points by default
     # wr.conic_biarc_subdivision = 10 # this has no effect?
-    wr.conic_line_subdivision = subdivision  # =10 increasesn nr of points to 366, = 5 gives 729 pts
+    wr.conic_line_subdivision = subdivision  # =10 increases nr of points to 366, = 5 gives 729 pts
 
     # "C"  subd  points
     #       50   248
@@ -175,6 +175,7 @@ def ttt_segments(text, scale, subdivision=100):
     # wr.cubic_biarc_subdivision = 10 # no effect?
     # wr.cubic_line_subdivision = 10 # no effect?
     # wr.setFont(0)
+    # wr.setFontbyPath("/usr/share/fonts/truetype/freefont/FreeSerif.ttf")
     s3 = ttt.ttt(text, wr)
     exts = wr.extents
     # print exts

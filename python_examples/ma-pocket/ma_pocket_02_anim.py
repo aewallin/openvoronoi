@@ -31,8 +31,9 @@ if __name__ == "__main__":
     w2if = vtk.vtkWindowToImageFilter()
     w2if.SetInput(myscreen.renWin)
     lwr = vtk.vtkPNGWriter()
-    lwr.SetInput(w2if.GetOutput())
+    lwr.SetInputConnection(w2if.GetOutputPort())
     # w2if.Modified()
+    w2if.Update()
     # lwr.SetFileName("tux1.png")
 
     scale = 1
@@ -83,7 +84,7 @@ if __name__ == "__main__":
     for p in pts:
         id_list.append(vd.addVertexSite(p))
         # print m," added vertex", seg_id[0]
-        m = m + 1
+        m += 1
 
     t_after = time.time()
     times.append(t_after - t_before)
@@ -126,15 +127,21 @@ if __name__ == "__main__":
                 drawCircle(myscreen, mic[0], mic[1], ovdvtk.red)
             else:
                 drawCircle(myscreen, mic[0], mic[1], ovdvtk.green)
+
             w2if.Modified()
-            lwr.SetFileName("frames/%06d.png" % (nframe))
-            # lwr.Write()
+            w2if.Update()
+
+            lwr.SetFileName("frames/%06d.png" % nframe)
+            # print("Frame: %s" % lwr.GetFileName())
+            nframe += 1
+            lwr.Write()
+
             time.sleep(0.1)
             myscreen.render()
+
         print "mic done."
 
     print "PYTHON All DONE."
 
     myscreen.render()
-
     myscreen.iren.Start()

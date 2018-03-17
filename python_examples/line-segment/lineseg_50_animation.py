@@ -86,10 +86,10 @@ def drawFrame(Nmax, myscreen, vd, vod, framenr, anim, step):
             return
         else:
             seg_id.append(vd.addVertexSite(seg[0]))
-            anim_count = anim_count + 1
+            anim_count += 1
 
         if (anim_count == anim):
-            vd.addVertexSite(seg[1], step)
+            r2 = vd.addVertexSite(seg[1], step)
             vod.setAll()
             myscreen.render()
             writeFrame(w2if, lwr, framenr)
@@ -97,7 +97,7 @@ def drawFrame(Nmax, myscreen, vd, vod, framenr, anim, step):
             return
         else:
             seg_id.append(vd.addVertexSite(seg[1]))
-            anim_count = anim_count + 1
+            anim_count += 1
 
         # seg_id.append( vd.addVertexSite( seg[1] ) )
         id_list.append(seg_id)
@@ -159,7 +159,7 @@ if __name__ == "__main__":
     w2if = vtk.vtkWindowToImageFilter()
     w2if.SetInput(myscreen.renWin)
     lwr = vtk.vtkPNGWriter()
-    lwr.SetInput(w2if.GetOutput())
+    lwr.SetInputConnection(w2if.GetOutputPort())
 
     for npt in range(Nmax * 2):  # animate insertion of point-sites
         for step in [x + 1 for x in range(6)]:

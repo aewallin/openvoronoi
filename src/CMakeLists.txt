@@ -50,7 +50,7 @@ MESSAGE(STATUS " Your linker is = " ${CMAKE_LINKER})
 # #include'ing the boost graph-library creates deprecated warnings
 # thus we use now use -Wno-deprecated here.
 #
-if (UNIX)
+if (UNIX AND NOT APPLE)
   MESSAGE(STATUS "setting strict gcc options: -Wall -Werror etc...")
   add_definitions(-Werror -Wall -Wundef -Wno-error=uninitialized -Wshadow  -Wno-long-long -Wno-deprecated -pedantic -pedantic-errors)
 

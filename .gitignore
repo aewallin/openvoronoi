@@ -71,6 +71,9 @@ ovd_tst
 *.lyx~
 *.lyx#
 
+# used in the pycam DXF export example
+src/py/pycam/
+
 # python script output files etc
 python_examples/benchmark
 python_examples/*.csv

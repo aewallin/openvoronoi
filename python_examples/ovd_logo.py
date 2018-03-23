@@ -247,7 +247,7 @@ if __name__ == "__main__":
     camPos = far
     zmult = 3
     myscreen.camera.SetPosition(0, -camPos / float(1000), zmult * camPos)
-    myscreen.camera.SetClippingRange(-(zmult + 1) * camPos, (zmult + 1) * camPos)
+    # myscreen.camera.SetClippingRange(-(zmult + 1) * camPos, (zmult + 1) * camPos)
     myscreen.camera.SetFocalPoint(0.0, 0, 0)
 
     tscale = 20000

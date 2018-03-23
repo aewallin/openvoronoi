@@ -105,7 +105,7 @@ if __name__ == "__main__":
     myscreen.render()
 
     import sys
-    svg = "../../samples/rectangle.svg" if len(sys.argv) < 2 else sys.argv[1]
+    svg = "../samples/rectangle.svg" if len(sys.argv) < 2 else sys.argv[1]
     svgr = SvgReader(svg, error_threshold = .6)
     svgr.parse()
     svgr.centerPolys()

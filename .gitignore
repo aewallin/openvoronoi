@@ -71,10 +71,20 @@ ovd_tst
 *.lyx~
 *.lyx#
 
+# used in the pycam DXF export example
+src/py/pycam/
+
 # python script output files etc
-python_examples/frames
+python_examples/benchmark
 python_examples/*.csv
+python_examples/frames
+python_examples/*.nc
+python_examples/*.ngc
+python_examples/*.svg
 python_examples/tile_test
 
 # picasa ini-file (created by picasa when a folder has images, e.g. screenshots from the tests/demos)
 Picasa.ini
+
+# IDE project data
+.idea/*

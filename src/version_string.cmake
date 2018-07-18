@@ -25,9 +25,9 @@ if(GIT_FOUND)
     
 else()
     # if we don't have git, try to read git-tag from file instead
-    file(READ "git-tag.txt" GIT_COMMIT_ID)
+    #file(READ "git-tag.txt" GIT_COMMIT_ID)
     
-    #set( GIT_COMMIT_ID "unknown (git not found!)")
+    set( GIT_COMMIT_ID "unknown")
     message( STATUS "version_string.cmake read from file GIT_COMMIT_ID: " ${GIT_COMMIT_ID})
     #message( WARNING "Git not found. Reading tag from git-tag.txt instead: " ${GIT_COMMIT_ID})
 endif()

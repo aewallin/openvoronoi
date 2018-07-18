@@ -21,3 +21,5 @@ script:
   - make
   - make test ARGS="-R cpp"
 
+after_success:
+  - coveralls

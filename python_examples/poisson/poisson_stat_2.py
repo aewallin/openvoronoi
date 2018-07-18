@@ -50,8 +50,10 @@ if __name__ == "__main__":
     vd = ovd.VoronoiDiagram(far, 120)
     print ovd.version()
 
-    Nmax = 40000
-    print "calculating VD for ", Nmax, " point-sites..."
+    Nmax = 2000
+    us_guess = 250
+    cpu_seconds_guess = (us_guess/1.0e6)*Nmax * (math.log(Nmax) / math.log(2))
+    print "calculating VD for ", Nmax, " point-sites... (may take about %.1f seconds)" % cpu_seconds_guess
     plist = randomGenerators(far, Nmax)
     t_before = time.time()
     n = 0
@@ -63,7 +65,7 @@ if __name__ == "__main__":
     t_after = time.time()
     calctime = t_after - t_before
     print " VD done in ", calctime, " s, ", 1e6 * calctime / (
-            Nmax * (math.log(Nmax) / math.log(2))), " us per n*log2(n())"
+            Nmax * (math.log(Nmax) / math.log(2))), " us per n*log2(n)"
     stat = vd.getFaceStats()
     data = []
     for s in stat:

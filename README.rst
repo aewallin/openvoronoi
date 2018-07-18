@@ -2,7 +2,7 @@
     :target: https://travis-ci.org/aewallin/openvoronoi
 
 .. image:: https://coveralls.io/repos/github/aewallin/openvoronoi/badge.svg?branch=master
-:target: https://coveralls.io/github/aewallin/openvoronoi?branch=master
+    :target: https://coveralls.io/github/aewallin/openvoronoi?branch=master
 
 
 OpenVoronoi

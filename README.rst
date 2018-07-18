@@ -1,4 +1,10 @@
-OpenVoronoi README. Last update 2015-02-12.
+.. image:: https://travis-ci.org/aewallin/openvoronoi.svg?branch=master
+    :target: https://travis-ci.org/aewallin/openvoronoi
+
+OpenVoronoi
+===========
+
+Last (major) update 2015-02-12.
 
 The OpenVoronoi project aims to produce an algorithm for calculating
 the 2D voronoi-diagram for point, line-segment, and circular-arc sites.

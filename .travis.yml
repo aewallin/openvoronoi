@@ -8,6 +8,7 @@ before_install:
   - sudo apt-get install -y libqd-dev
   - sudo apt-get install -y libboost-graph-dev
   - sudo apt-get install -y git
+  - sudo apt-get install -y libboost-python-dev
 
 
 before_script:

@@ -16,4 +16,5 @@ before_script:
   - cd build
   - cmake ../src
 
-script: make
+script: make && make test ARGS="-R cpp"
+

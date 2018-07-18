@@ -67,7 +67,7 @@ endif ()
 # Release runs much faster than the others
 # Debug/Profile/Coverage run slower but are useful for testing
 
-# set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Release)
 # set(CMAKE_BUILD_TYPE Debug)
 # set(CMAKE_BUILD_TYPE Profile)
 # set(CMAKE_BUILD_TYPE Coverage)
@@ -80,8 +80,8 @@ option(BUILD_PYTHON_MODULE "Build python-module? " ON) # building the python-mod
 
 option(BUILD_DOC "Build doxygen documentation? " ON)
 
-option(BUILD_CPP_TESTS "Build c++ tests?" OFF) 
-option(BUILD_PY_TESTS "Build/configure Python tests?" OFF) 
+option(BUILD_CPP_TESTS "Build c++ tests?" ON) 
+option(BUILD_PY_TESTS "Build/configure Python tests?" ON) 
 
 
 if (CMAKE_BUILD_TYPE MATCHES "Profile")

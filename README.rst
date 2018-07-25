@@ -131,23 +131,21 @@ Other voronoi-diagram codes
 - CGAL, http://www.cgal.org/Manual/latest/doc_html/cgal_manual/Voronoi_diagram_2/Chapter_main.html
 - LEDA, http://www.algorithmic-solutions.info/leda_guide/geo_algs/voronoi.html
 - Boost.Polygon.Voronoi, http://www.boost.org/doc/libs/1_52_0/libs/polygon/doc/voronoi_main.htm
-This was a Google Summer of Code project in 2010.
+- VRONI/Martin Held. This code is commercial and not available, as far as we know. http://www.cosy.sbg.ac.at/~held/projects/vroni/vroni.html
+- Voro++, BSD-licensed code for 3D voronoi cell computation. May not be useful for 2D toolpath generation? http://math.lbl.gov/voro++/
+- Triangle http://www.cs.cmu.edu/~quake/triangle.html Really a mesh-generator for e.g. finite-element analysis. A constrained Delaunay triangulation could be used to generate a Voronoi diagram for point and line inputs.
+
+
+
+Boost.Polygon.Voronoi was a Google Summer of Code project in 2010.
 Integer input coordinates. Exact geometric predicates through geometric filtering. 
 Uses Fortune's sweepline algorithm.
 Boostcon video:
 "Sweep-Line Algorithm for Voronoi Diagrams of Points, Line Segments and Medial Axis of Polygons in the Plane"
 http://blip.tv/boostcon/sweep-line-algorithm-for-voronoi-diagrams-of-points-line-segments-and-medial-axis-of-polygons-in-the-plane-5368229
-- VRONI/Martin Held. This code is commercial and not available, as far as
-we know. 
-http://www.cosy.sbg.ac.at/~held/projects/vroni/vroni.html
-Patel (see References) seems to have independently implemented the
-same algorithm, we don't know where this code is or under what license it is.
-- Voro++
-BSD-licensed code for 3D voronoi cell computation. May not be useful for 2D toolpath generation?
-http://math.lbl.gov/voro++/
-- Triangle
-http://www.cs.cmu.edu/~quake/triangle.html
-Really a mesh-generator for e.g. finite-element analysis. A constrained Delaunay triangulation could be used to generate a Voronoi diagram for point and line inputs.
+
+Patel (see References) seems to have independently implemented the VRONI/Held algorithm, 
+bu we don't know where this code is or under what license it is.
 
 References
 ==========

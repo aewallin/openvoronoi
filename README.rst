@@ -72,9 +72,9 @@ Build/Install instructions
 
 From PPA::
 
-sudo add-apt-repository ppa:anders-e-e-wallin/cam
-sudo apt-get update
-sudo apt-get install openvoronoi
+ sudo add-apt-repository ppa:anders-e-e-wallin/cam
+ sudo apt-get update
+ sudo apt-get install openvoronoi
 
 From source::
 
@@ -106,15 +106,15 @@ Currently the tests do not produce any output (png or svg output could be an opt
 Organization
 ============
 
-doc/        has documentation in lyx format, with figures in asymptote format. 
+- doc/        has documentation in lyx format, with figures in asymptote format. 
             Build a PDF with the CMakeLists.txt in this directory.
-cpp_examples/ has c++ examples (more needed)
-python_examples/ has Python examples. Many use VTK and VTK's python bindingd for visualization.
-src/        has the source for the main algorithm
-src/solvers has vd-vertex solver code
-src/py      has python wrapping code
-src/common  has common classes not specific to voronoi diagrams
-src/utility input and output from OpenVoronoi to/from various formats
+- cpp_examples/ has c++ examples (more needed)
+- python_examples/ has Python examples. Many use VTK and VTK's python bindingd for visualization.
+- src/        has the source for the main algorithm
+- src/solvers has vd-vertex solver code
+- src/py      has python wrapping code
+- src/common  has common classes not specific to voronoi diagrams
+- src/utility input and output from OpenVoronoi to/from various formats
 
 Contributing
 ============
@@ -122,39 +122,30 @@ Contributing
 See the TODO file. Fork the github repo, create a feature branch, commit yor 
 changes, test. Make a short description of your changes and create a pull request.
 Follow the coding-style of the existing code. One fix/feature per pull request.
-Contributed code must comply with the GPL. Provide short doxygen-formatted 
+Contributed code must comply with the LGPL. Provide short doxygen-formatted 
 documentation in the code.
 
 Other voronoi-diagram codes
 ===========================
 
-CGAL
-http://www.cgal.org/Manual/latest/doc_html/cgal_manual/Voronoi_diagram_2/Chapter_main.html
-
-LEDA
-http://www.algorithmic-solutions.info/leda_guide/geo_algs/voronoi.html
-
-Boost.Polygon.Voronoi
-http://www.boost.org/doc/libs/1_52_0/libs/polygon/doc/voronoi_main.htm
+- CGAL, http://www.cgal.org/Manual/latest/doc_html/cgal_manual/Voronoi_diagram_2/Chapter_main.html
+- LEDA, http://www.algorithmic-solutions.info/leda_guide/geo_algs/voronoi.html
+- Boost.Polygon.Voronoi, http://www.boost.org/doc/libs/1_52_0/libs/polygon/doc/voronoi_main.htm
 This was a Google Summer of Code project in 2010.
 Integer input coordinates. Exact geometric predicates through geometric filtering. 
 Uses Fortune's sweepline algorithm.
-
 Boostcon video:
 "Sweep-Line Algorithm for Voronoi Diagrams of Points, Line Segments and Medial Axis of Polygons in the Plane"
 http://blip.tv/boostcon/sweep-line-algorithm-for-voronoi-diagrams-of-points-line-segments-and-medial-axis-of-polygons-in-the-plane-5368229
-
-VRONI/Martin Held. This code is commercial and not available, as far as
+- VRONI/Martin Held. This code is commercial and not available, as far as
 we know. 
 http://www.cosy.sbg.ac.at/~held/projects/vroni/vroni.html
 Patel (see References) seems to have independently implemented the
 same algorithm, we don't know where this code is or under what license it is.
-
-Voro++
+- Voro++
 BSD-licensed code for 3D voronoi cell computation. May not be useful for 2D toolpath generation?
 http://math.lbl.gov/voro++/
-
-Triangle
+- Triangle
 http://www.cs.cmu.edu/~quake/triangle.html
 Really a mesh-generator for e.g. finite-element analysis. A constrained Delaunay triangulation could be used to generate a Voronoi diagram for point and line inputs.
 

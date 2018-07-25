@@ -48,32 +48,36 @@ There is a gallery of voronoi diagrams produced with OpenVoronoi at
 https://picasaweb.google.com/106188605401091280402/OpenVoronoiExamples
 
 Required Dependencies:
-cmake
-libqd-dev             http://crd.lbl.gov/~dhbailey/mpdist/
-Boost graph library   
-graphviz  (visualization for graph algorithms)
+
+- cmake
+- libqd-dev             http://crd.lbl.gov/~dhbailey/mpdist/
+- Boost graph library   
+- graphviz  (visualization for graph algorithms)
 
 Optional Dependencies:
-git            (required only for the version-string)
-python         (if python bindings are built/used)
-Boost python   (if python bindings are built)
-doxygen        (for building documentation)
-asymptote      (to build white-paper figures)
-lyx            (to build white-paper)
-libvtk         (many python-scripts use VTK for visualization)
-python-vtk     (VTK python bindings)
-truetype-tracer https://github.com/aewallin/truetype-tracer (some tests)
-randompolygon   https://github.com/aewallin/randompolygon (some tests)
+
+- git            (required only for the version-string)
+- python         (if python bindings are built/used)
+- Boost python   (if python bindings are built)
+- doxygen        (for building documentation)
+- asymptote      (to build white-paper figures)
+- lyx            (to build white-paper)
+- libvtk         (many python-scripts use VTK for visualization)
+- python-vtk     (VTK python bindings)
+- truetype-tracer https://github.com/aewallin/truetype-tracer (some tests)
+- randompolygon   https://github.com/aewallin/randompolygon (some tests)
 
 Build/Install instructions
 ==========================
 
-From PPA
+From PPA::
+
 sudo add-apt-repository ppa:anders-e-e-wallin/cam
 sudo apt-get update
 sudo apt-get install openvoronoi
 
-From source
+From source::
+
 $ git clone git://github.com/aewallin/openvoronoi.git
 $ cd openvoronoi
 $ mkdir bld

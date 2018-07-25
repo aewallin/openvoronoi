@@ -8,7 +8,7 @@
 OpenVoronoi
 ===========
 
-Last (major) update 2015-02-12.
+Updates: 2018-07 (change to LGLP), 2015-02-12.
 
 The OpenVoronoi project aims to produce an algorithm for calculating
 the 2D voronoi-diagram for point, line-segment, and circular-arc sites.
@@ -18,11 +18,11 @@ algorithm is used (see References).
 
 The core algorithm is in C++ with python bindings using Boost Python. 
 There are many python examples that use VTK for visualization. As of 2018 VTK 6 is used for visualizations.
-The tests use a random polygon generator (https://github.com/aewallin/randompolygon) and a 
+Some tests use a random polygon generator (https://github.com/aewallin/randompolygon) and a 
 font-geometry generator based on FreeType (https://github.com/aewallin/truetype-tracer)
 
 OpenVoronoi is written by Anders Wallin (anders.e.e.wallin "at" gmail.com)
-and released under GPLv3 (see COPYING).
+and initially released under GPLv3. In July 2018, license was changed to LGPL2.1 (see COPYING) with permission and cooperation of all contributors (Issue #35).
 
 In February 2015 Rogach published a Java port called jopenvoronoi (https://github.com/Rogach/jopenvoronoi)
 
@@ -66,6 +66,7 @@ truetype-tracer https://github.com/aewallin/truetype-tracer (some tests)
 randompolygon   https://github.com/aewallin/randompolygon (some tests)
 
 Build/Install instructions
+==========================
 
 From PPA
 sudo add-apt-repository ppa:anders-e-e-wallin/cam
@@ -82,11 +83,15 @@ $ make
 $ sudo make install
 
 Documentation
+=============
+
 Doxygen documentation can be built with "make doc"
 A white-paper on the algorithm and solvers in LyX format is located in /doc. 
 It has its own CMakeLists.txt file which builds a PDF file.
 
 Tests
+=====
+
 Both c++ and python tests are found in src/test/. These are run with CTest.
 In the build-directory either "make test" or "ctest" will run all tests. 
 You can run only tests that have e.g. "ttt" in the test-name with
@@ -95,6 +100,8 @@ Currently the tests do not produce any output (png or svg output could be an opt
 
 
 Organization
+============
+
 doc/        has documentation in lyx format, with figures in asymptote format. 
             Build a PDF with the CMakeLists.txt in this directory.
 cpp_examples/ has c++ examples (more needed)
@@ -106,6 +113,8 @@ src/common  has common classes not specific to voronoi diagrams
 src/utility input and output from OpenVoronoi to/from various formats
 
 Contributing
+============
+
 See the TODO file. Fork the github repo, create a feature branch, commit yor 
 changes, test. Make a short description of your changes and create a pull request.
 Follow the coding-style of the existing code. One fix/feature per pull request.
@@ -113,6 +122,7 @@ Contributed code must comply with the GPL. Provide short doxygen-formatted
 documentation in the code.
 
 Other voronoi-diagram codes
+===========================
 
 CGAL
 http://www.cgal.org/Manual/latest/doc_html/cgal_manual/Voronoi_diagram_2/Chapter_main.html
@@ -144,7 +154,8 @@ Triangle
 http://www.cs.cmu.edu/~quake/triangle.html
 Really a mesh-generator for e.g. finite-element analysis. A constrained Delaunay triangulation could be used to generate a Voronoi diagram for point and line inputs.
 
-References, Voronoi Diagram algorithms
+References
+==========
 
 Sugihara and Iri, (1992) "construction of the voronoi diagram for one 
 million generators in single-precision arithmetic" 

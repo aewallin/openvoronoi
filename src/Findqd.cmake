@@ -2,7 +2,7 @@
 #  see: http://crd.lbl.gov/~dhbailey/mpdist/
 #
 #  QD_FOUND - system has QD
-#  QD_INCLUDE_DIR - the QGLViewer include directory
+#  QD_INCLUDE_DIR - the QD include directory
 #  QD_LIBRARY - Link these to use QD
 #
 

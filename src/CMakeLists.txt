@@ -273,7 +273,7 @@ IF( ${BUILD_PYTHON_MODULE} MATCHES ON)
   endif (NOT APPLE)
   # this figures out where to install the Python modules
   execute_process(
-    COMMAND python -c "from distutils.sysconfig import get_python_lib; print get_python_lib()"
+    COMMAND python -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())"
     OUTPUT_VARIABLE Python_site_packages
     OUTPUT_STRIP_TRAILING_WHITESPACE
     ) # on Ubuntu 11.10 this outputs: /usr/local/lib/python2.7/dist-packages

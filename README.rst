@@ -1,3 +1,6 @@
+.. image:: https://img.shields.io/badge/License-LGPL%20v2.1-blue.svg
+    :target: https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html
+    
 .. image:: https://travis-ci.org/aewallin/openvoronoi.svg?branch=master
     :target: https://travis-ci.org/aewallin/openvoronoi
 

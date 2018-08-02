@@ -6,9 +6,19 @@ import math
 import time
 import vtk
 
+"""
+    Example-script for openvoronoi
+    
+    - Get geometry from truetypetracer
+    - center, scale, and modify line-segments from truetypetracer
+    - create VD
+    - viszualize
+"""
+
 
 def drawLoops(myscreen, loops, loopColor):
-    # draw the loops
+    """ draw the loops
+    """
     nloop = 0
     for lop in loops:
         n = 0
@@ -33,14 +43,16 @@ def drawLoops(myscreen, loops, loopColor):
         nloop = nloop + 1
 
 
-def translate(segs, x, y):
+def translate(segs, dx, dy):
+    """ translate segments by dx, dy
+    """
     out = []
     for seg in segs:
         seg2 = []
         for p in seg:
             p2 = []
-            p2.append(p[0] + x)
-            p2.append(p[1] + y)
+            p2.append(p[0] + dx)
+            p2.append(p[1] + dy)
             seg2.append(p2)
             # seg2.append(seg[3] + y)
         out.append(seg2)
@@ -48,6 +60,8 @@ def translate(segs, x, y):
 
 
 def rotate(segs, angle):
+    """ rotate segments by angle (degrees)
+    """
     theta = 2 * math.pi * angle / float(360)
     out = []
     for seg in segs:
@@ -62,6 +76,8 @@ def rotate(segs, angle):
 
 
 def center(segs, exts, tscale):
+    """ translate segments so they are centered around (0,0)
+    """
     minx = tscale * exts.minx
     maxx = tscale * exts.maxx
     miny = tscale * exts.miny
@@ -73,6 +89,9 @@ def center(segs, exts, tscale):
 
 
 def insert_polygon_points(vd, polygon):
+    """ insert PointSites into VD
+        return list of vertex-indexes
+    """
     pts = []
     for p in polygon:
         pts.append(ovd.Point(p[0], p[1]))
@@ -88,6 +107,11 @@ def insert_polygon_points(vd, polygon):
 
 
 def insert_polygon_segments(vd, id_list):
+    """ insert LineSite into VD
+        
+        the polygon forms a loop:
+        id[-1] - id[0] - id[1] ... id[-2] - id[-1] - (back to beginning)
+    """
     j = 0
     # jmax=9999999 # for debugging, set jmax to the problematic case to stop algorithm in the middle
     print "inserting ", len(id_list), " line-segments:"
@@ -123,6 +147,11 @@ def insert_polygon_segments(vd, id_list):
 
 
 def modify_segments(segs):
+    """ modify truetype-segments
+        - delete duplicated point (fisrt==last)
+        - reverse order of points (reason?)
+    
+    """
     segs_mod = []
     for seg in segs:
         first = seg[0]
@@ -136,6 +165,10 @@ def modify_segments(segs):
 
 
 def insert_many_polygons(vd, segs):
+    """ insert many polygons into VD
+        - first insert all vertices
+        - second insert all line-segments
+    """
     polygon_ids = []
     t_before = time.time()
     for poly in segs:
@@ -155,6 +188,8 @@ def insert_many_polygons(vd, segs):
 
 
 def ttt_segments(text, scale, subdivision=100):
+    """ get geometry from truetypetracer
+    """
     wr = ttt.SEG_Writer()
 
     # wr.scale = 3

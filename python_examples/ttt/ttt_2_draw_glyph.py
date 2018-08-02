@@ -14,6 +14,7 @@ def drawLoops(myscreen, loops, loopColor):
         first_point = []
         previous = []
         for p in lop:
+            #print p
             if n == 0:  # don't draw anything on the first iteration
                 previous = p
                 first_point = p
@@ -25,6 +26,7 @@ def drawLoops(myscreen, loops, loopColor):
                     ovdvtk.Line(p1=(p[0], p[1], 0), p2=(first_point[0], first_point[1], 0), color=loopColor))
             else:
                 myscreen.addActor(ovdvtk.Line(p1=(previous[0], previous[1], 0), p2=(p[0], p[1], 0), color=loopColor))
+                print "line ", previous, " to ", p
                 previous = p
             n = n + 1
         print "rendered loop ", nloop, " with ", len(lop), " points"
@@ -111,6 +113,11 @@ if __name__ == "__main__":
     # draw a unit-circle
     ca = ovdvtk.Circle(center=(0, 0, 0), radius=1, color=(0, 1, 1), resolution=50)
     myscreen.addActor(ca)
+    #ca = ovdvtk.Circle(center=(0, 0, 0), radius=2, color=ovdvtk.yellow, resolution=50)
+    #myscreen.addActor(ca)
+    #ca = ovdvtk.Line(p1=(0, 0, 0), p2=(1,1,0), color=ovdvtk.yellow)
+    #myscreen.addActor(ca)
+        
     draw_ttt(myscreen, "A", 0, 0, 10000)
     # draw_ttt(myscreen, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", -0.5,0,80000)
     # draw_ttt(myscreen, "abcdefghijklmnopqrstuvwxyz", -0.5,-0.1,80000)

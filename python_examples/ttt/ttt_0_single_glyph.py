@@ -122,9 +122,9 @@ def insert_polygon_segments(vd, id_list):
 
         # if (j<jmax):
         # vd.debug_on()
-        # print " ",j,"inserting segement ",id_list[n]," - ",id_list[n_nxt]
+        # print " ",j,"inserting segment ",id_list[n]," - ",id_list[n_nxt]
         if 0:  # id_list[n]==304: #j == 0:
-            print " ", j, "inserting segement ", id_list[n], " - ", id_list[n_nxt]
+            print " ", j, "inserting segment ", id_list[n], " - ", id_list[n_nxt]
             vd.debug_on()
             vd.addLineSite(id_list[n], id_list[n_nxt])
             vod.setVDText2([1, 1])
@@ -141,14 +141,14 @@ def insert_polygon_segments(vd, id_list):
             myscreen.render()
             myscreen.iren.Start()
         else:
-            print " ", j, "inserting segement ", id_list[n], " - ", id_list[n_nxt]
+            print " ", j, "inserting segment ", id_list[n], " - ", id_list[n_nxt]
             vd.addLineSite(id_list[n], id_list[n_nxt])
         j = j + 1
 
 
 def modify_segments(segs):
     """ modify truetype-segments
-        - delete duplicated point (fisrt==last)
+        - delete duplicated point (first==last)
         - reverse order of points (reason?)
     
     """

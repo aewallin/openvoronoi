@@ -44,7 +44,7 @@ def insert_polygon_segments(vd, id_list):
         n_nxt = n + 1
         if n == (len(id_list) - 1):
             n_nxt = 0
-        print " ", j, "inserting segement ", id_list[n], " - ", id_list[n_nxt]
+        print " ", j, "inserting segment ", id_list[n], " - ", id_list[n_nxt]
 
         if 0:  # id_list[n] == 31921: #78238: # 47013:
             vd.debug_on()

@@ -14,7 +14,7 @@ configure_file(
 add_custom_target(uninstall
   COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
 
-# experimental use of clang, since it detects more warnings/erors than gcc
+# experimental use of clang, since it detects more warnings/errors than gcc
 option(USE_CLANG "build application with clang" OFF) # OFF is the default
 # Note: useful packages: clang, llvm, gcc-multilib
 # see: http://stackoverflow.com/questions/7031126/switching-between-gcc-and-clang-llvm-using-cmake
@@ -44,7 +44,7 @@ MESSAGE(STATUS " Your linker is = " ${CMAKE_LINKER})
 
 
 #
-# Turn compiler warnings up to 11, at least with gcc.  I dont know how to
+# Turn compiler warnings up to 11, at least with gcc.  I don't know how to
 # do this with other compilers we might support and I'm leaving it up to
 # the relevant platform maintainers...
 # #include'ing the boost graph-library creates deprecated warnings

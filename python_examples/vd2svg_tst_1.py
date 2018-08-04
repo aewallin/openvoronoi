@@ -41,7 +41,7 @@ def insert_polygon_segments(vd, id_list):
             n_nxt = 0
 
             # vd.debug_on()
-        # print " inserting segement ",id_list[n]," - ",id_list[n_nxt]
+        # print " inserting segment ",id_list[n]," - ",id_list[n_nxt]
         vd.addLineSite(id_list[n], id_list[n_nxt])
         # j=j+1
 

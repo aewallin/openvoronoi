@@ -477,7 +477,7 @@ class VD:
         if (edgeType == ovd.EdgeType.NULLEDGE):
             return white
         else:
-            print "UNKOWN edge type = ", edgeType
+            print "UNKNOWN edge type = ", edgeType
             return white
 
     def setEdges(self):

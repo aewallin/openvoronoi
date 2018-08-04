@@ -56,7 +56,7 @@ typedef std::vector<OffsetLoop> OffsetLoops;
 
 /// \brief From a voronoi-diagram, generate offsets.
 ///
-/// an offset is allways a closed loop.
+/// an offset is always a closed loop.
 /// the loop consists of offset-elements from each face that the loop visits.
 /// each face is associated with a Site, and the offset element from
 /// - a point-site is a circular arc

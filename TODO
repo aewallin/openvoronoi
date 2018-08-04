@@ -1,7 +1,7 @@
 Core algorithm
 - support "spikes", i.e. three or more line-segments connecting to the same vertex
   (this is illustrated in the failing test cpptest_spike)
-- add suport for arcs
+- add support for arcs
 - better logging (logging levels, where we log, etc)
 - better error handling (exceptions?)
 - refactor (?) to reduce voronoidiagram.cpp (almost 2000 lines)
@@ -32,7 +32,7 @@ LLLSolver
   -- points on the bisector of l1/l2 are now given by
   -- p1s + u1 p1t + t p1n     (p1s is the start-point of l1, p1t is a tangent-vector, p1n is a normal vector)
   -- u1 is in [0,1]
-  -- when we have the lenghts n1 and n2 the t-value can be calculated as a function of u1
+  -- when we have the lengths n1 and n2 the t-value can be calculated as a function of u1
   -- if the length of a normal from u1 is a, then t is
   -- t = a * (n2 / (n1+n2) )
   -- this gives the bisector point (xb, yb) and the offset distance t as a function of u1 along l1

@@ -62,7 +62,7 @@ int main(int argc,char *argv[]) {
         pts.push_back(p);
     }
     boost::timer tmr;
-    // try to optimize number of bins by changing binmult and seing what is fast.
+    // try to optimize number of bins by changing binmult and seeing what is fast.
     ovd::VoronoiDiagram* vd = new ovd::VoronoiDiagram(1,binmult*bins);
     
     BOOST_FOREACH(ovd::Point p, pts ) {

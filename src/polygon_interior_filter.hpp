@@ -36,7 +36,7 @@ namespace ovd
 /// all interior edges are marked valid=true
 /// all exterior edges are marked valid=false
 ///
-/// a polygon/pocket boundary shoud be specified in CW order
+/// a polygon/pocket boundary should be specified in CW order
 /// islands within the polygon should be specified in CCW order
 class polygon_interior_filter : public Filter {
 public:

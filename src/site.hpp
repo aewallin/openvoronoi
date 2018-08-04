@@ -56,7 +56,7 @@
  *  V4: generators(Li, Lj, pi1)  edges(E2, E3, E4)  E3-E4 tangent at V4
  *  V5: generators(pi, Lj, Lk) edges (E3, E3, E4)
  *  V6: generators(Li, Lj, Lk) edges(E4, E4, E4)
- *    - this is the incenter of a incircle inscribed by triangle Li,Lj,Lk (or sometiems excenter of excircle if V6 outside triangle?)
+ *    - this is the incenter of a incircle inscribed by triangle Li,Lj,Lk (or sometimes excenter of excircle if V6 outside triangle?)
  *    - The Cartesian coordinates of the incenter are a weighted average of the coordinates of the three vertices using the side 
  *       lengths of the triangle as weights. (The weights are positive so the incenter lies inside the triangle as stated above.) 
  *      If the three vertices are located at (xa,ya), (xb,yb), and (xc,yc), and the sides opposite these vertices have corresponding 
@@ -141,7 +141,7 @@ struct Eq {
         k = other.k;
         return *this;
     }
-    /// subtract two equations from eachother
+    /// subtract two equations from each other
     Eq<Scalar>& operator-=(const Eq<Scalar>& other) {
         a-=other.a;
         b-=other.b;

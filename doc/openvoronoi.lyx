@@ -1036,7 +1036,7 @@ t=-(a_{3}x_{2}+b_{3}y_{2}+c_{3})/(v_{x}a_{3}+v_{y}b_{3}+k_{3})
 
 \begin_layout Standard
 FIXME: what happens if we get divide by zero? this corresponds to the new
- line site l3 being parallell to the separator??
+ line site l3 being parallel to the separator??
 \end_layout
 
 \begin_layout Section
@@ -1277,7 +1277,7 @@ e_{LL}^{\pm}(t)=\left(x_{LL}^{\pm}(t),y_{LL}^{\pm}(t)\right)=p_{A}\pm\hat{vt},\l
 \end_layout
 
 \begin_layout Standard
-whe the apex 
+when the apex 
 \begin_inset Formula $p_{A}$
 \end_inset
 

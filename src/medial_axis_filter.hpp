@@ -46,7 +46,7 @@ struct medial_axis_filter : public Filter {
         if ( (*g)[e].type == LINESITE || (*g)[e].type == NULLEDGE) 
             return true; // we keep linesites and nulledges
         if ( (*g)[e].type == SEPARATOR)
-            return false; // separators are allways removed
+            return false; // separators are always removed
             
         if (both_endpoints_positive(e)) // these are interior edges which we keep.
             return true;

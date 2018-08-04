@@ -28,7 +28,7 @@ def insert_polygon_segments(vd,id_list):
         n_nxt = n+1
         if n==(len(id_list)-1):
             n_nxt=0
-        #print " ",j,"inserting segement ",id_list[n]," - ",id_list[n_nxt]
+        #print " ",j,"inserting segment ",id_list[n]," - ",id_list[n_nxt]
         vd.addLineSite( id_list[n], id_list[n_nxt])
         j=j+1
 
@@ -59,7 +59,7 @@ class NgcWriter:
     metric = True
     scale = 1
 
-    def __init__(self, filename="ouput.ngc"):
+    def __init__(self, filename="output.ngc"):
         self.filename = filename
         self.out = open(filename, 'w')
 

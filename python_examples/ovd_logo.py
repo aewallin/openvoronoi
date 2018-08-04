@@ -175,7 +175,7 @@ def insert_polygon_segments(vd, id_list):
 
         if (j < jmax):
             # vd.debug_on()
-            # print " ",j,"inserting segement ",id_list[n]," - ",id_list[n_nxt]
+            # print " ",j,"inserting segment ",id_list[n]," - ",id_list[n_nxt]
             vd.addLineSite(id_list[n], id_list[n_nxt])
         j = j + 1
 

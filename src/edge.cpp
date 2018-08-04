@@ -219,7 +219,7 @@ void EdgeProps::set_pl_parameters(Site* s1, Site* s2) {
     x[2]=s2->a(); //*kk;    // -alfa1 = - a2 * k2?
     x[3]=s2->b();       // alfa2 = b2
     x[4]=0;             // alfa4 = r1 (PointSite has zero radius)
-    x[5]=+1;            // lambda1 (allways positive offset from PointSite)
+    x[5]=+1;            // lambda1 (always positive offset from PointSite)
     x[6]=alfa3;         // alfa3= a2*xc1+b2*yc1+d2?
     x[7]=+1; //kk;            // -1 = k2 side of line??
 
@@ -228,7 +228,7 @@ void EdgeProps::set_pl_parameters(Site* s1, Site* s2) {
     y[2]=s2->b(); //*kk;    // -alfa2 = -b2
     y[3]=s2->a();       // alfa1 = a2
     y[4]=0;             // alfa4 = r1 (PointSite has zero radius)
-    y[5]=+1;            // lambda1 (allways positive offset from PointSite)
+    y[5]=+1;            // lambda1 (always positive offset from PointSite)
     y[6]=alfa3;         // alfa3
     y[7]=+1; //kk;            // -1 = k2 side of line??
 }
@@ -370,7 +370,7 @@ void EdgeProps::set_pa_parameters(Site* s1, Site* s2) {
     x[2] = alfa1*alfa4;
     x[3] = alfa2;
     x[4] = 0; //r1;  PointSite has zero radius
-    x[5] = +1; //lamb1; allways outward offset from PointSite
+    x[5] = +1; //lamb1; always outward offset from PointSite
     x[6] = alfa3;
     x[7] = alfa4;
     
@@ -379,7 +379,7 @@ void EdgeProps::set_pa_parameters(Site* s1, Site* s2) {
     y[2] = alfa2*alfa4;
     y[3] = alfa1;
     y[4] = 0; //r1;     PointSite has zero radius
-    y[5] = +1; //lamb1; allways outward offset from PointSite
+    y[5] = +1; //lamb1; always outward offset from PointSite
     y[6] = alfa3;
     y[7] = alfa4;
     //print_params();
@@ -429,7 +429,7 @@ void EdgeProps::set_la_parameters(Site* s1, Site* s2) {
 }
 
 
-/// \return minumum t-value for this edge
+/// \return minimum t-value for this edge
 /// this function dispatches to a helper-function based on the Site:s \a s1 and \a s2
 // used only for positioning APEX vertices?
 double EdgeProps::minimum_t( Site* s1, Site* s2) {
@@ -439,7 +439,7 @@ double EdgeProps::minimum_t( Site* s1, Site* s2) {
         return minimum_pl_t(s1,s2);
     else if (s2->isPoint() && s1->isLine())    // LP
         return minimum_pl_t(s2,s1);
-    else if (s1->isLine() && s2->isLine())     // LL, non-parallel lines allways cross somewhere..
+    else if (s1->isLine() && s2->isLine())     // LL, non-parallel lines always cross somewhere..
         return 0;
     else if (s1->isPoint() && s2->isArc() ) // PA
         return minimum_pa_t(s1,s2);

@@ -42,7 +42,7 @@ https://launchpad.net/~anders-e-e-wallin/+archive/cam
 
 Build, Test, and Code-coverage dashboard:
 http://my.cdash.org/index.php?project=OpenVoronoi
-(not updated regularly! ToDo: set up continous build/test server + website)
+(not updated regularly! ToDo: set up continuous build/test server + website)
 
 The mailing-list for OpenVoronoi is at
 https://groups.google.com/forum/?hl=en#!forum/opencamlib

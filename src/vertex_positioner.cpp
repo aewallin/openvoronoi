@@ -239,7 +239,7 @@ solvers::Solution VertexPositioner::position(Site* s1, double k1, Site* s2, doub
     // run the solver(s) one more time in order to print out un-filtered solution points for debugging
     std::vector<solvers::Solution> solutions2;
     solver_dispatch(s1,k1,s2,k2,s3,+1, solutions2);
-    if (!s3->isPoint()) // for points k3=+1 allways
+    if (!s3->isPoint()) // for points k3=+1 always
         solver_dispatch(s1,k1,s2,k2,s3,-1, solutions2); // for lineSite or ArcSite we try k3=-1 also    
     solver_debug(false);
     
@@ -375,7 +375,7 @@ int VertexPositioner::solver_dispatch(Site* s1, double k1,
         // find the PointSite that defines the SEPARATOR, so that one LineSite and one PointSite
         // can be submitted to the Solver.
         if ( s1->isLine() && s2->isLine() ) {
-            // the parallell lineseg case      v0 --s1 --> pt -- s2 --> v1
+            // the parallel lineseg case      v0 --s1 --> pt -- s2 --> v1
             // find t
             if ( g[edge].has_null_face ) {
                 s2 = g[ g[edge].null_face ].site;

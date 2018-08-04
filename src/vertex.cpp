@@ -81,7 +81,7 @@ void VoronoiVertex::init(Point p, VertexStatus st, VertexType t) {
     init(p,st);
     type = t;
 }
-/// set position, status, type, and clearance-disk through givem apex-point
+/// set position, status, type, and clearance-disk through given apex-point
 void VoronoiVertex::init(Point p, VertexStatus st, VertexType t, Point initDist) {
     init(p,st,t);
     init_dist(initDist);

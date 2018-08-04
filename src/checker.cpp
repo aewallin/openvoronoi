@@ -119,7 +119,7 @@ bool VoronoiDiagramChecker::faceVerticesConnected(  HEFace f, VertexStatus Vtype
             type_verts.push_back(v); // build a vector of all Vtype vertices
     }
     assert( !type_verts.empty() );
-    if (type_verts.size()==1) // set of 1 is allways connected
+    if (type_verts.size()==1) // set of 1 is always connected
         return true;
     
     // check that type_verts are connected
@@ -130,7 +130,7 @@ bool VoronoiDiagramChecker::faceVerticesConnected(  HEFace f, VertexStatus Vtype
     while (!done) { 
         HEVertex src = g.source( currentEdge );
         HEVertex trg = g.target( currentEdge );
-        if ( g[src].status != Vtype ) { // seach ?? - Vtype
+        if ( g[src].status != Vtype ) { // search ?? - Vtype
             if ( g[trg].status == Vtype ) { // we have found ?? - Vtype
                 startEdges.push_back( currentEdge );
             }
@@ -191,7 +191,7 @@ bool VoronoiDiagramChecker::face_ok(HEFace f, bool debug) {
         std::cout << " k= " << k << "\n";
         return false;
     }
-    if (g[f].site!=0) { // guard against null-faces that dont have Site
+    if (g[f].site!=0) { // guard against null-faces that don't have Site
         if ( g[f].site->isPoint() ) {
             if ( !(k==1) ) {
                 std::cout << " VoronoiDiagramChecker::face_ok() f=" << f << " ERROR:\n";

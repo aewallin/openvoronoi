@@ -33,7 +33,7 @@ namespace ovd {
 enum VertexStatus {
     OUT,          /*!< OUT-vertices will not be deleted */
     IN,           /*!< IN-vertices will be deleted */
-    UNDECIDED,    /*!< UNDECIDED-vertices have not been examied yet */
+    UNDECIDED,    /*!< UNDECIDED-vertices have not been examined yet */
     NEW           /*!< NEW-vertices are constructed on OUT-IN edges */
 };
 
@@ -80,7 +80,7 @@ public:
     VertexStatus status; ///< vertex status. updated/changed during an incremental graph update
     VertexType type; ///< The type of the vertex. Never(?) changes
     double max_error; ///< \todo what is this? remove?
-    bool in_queue; ///< flag for indicating wether vertex is in the vertexQueue
+    bool in_queue; ///< flag for indicating whether vertex is in the vertexQueue
     Point position; ///< the position of the vertex.
     double k3;  ///< the offset-direction {-1,+1} of this vertex to the newly inserted site.
     double alfa; ///< diangle for a null-vertex. only for debug-drawing

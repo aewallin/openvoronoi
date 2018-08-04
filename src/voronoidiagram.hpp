@@ -114,7 +114,7 @@ struct kd_point {
         return i == 0 ? p.x : p.y; 
     }
     Point p; ///< position of 2D PointSite
-    HEFace face; ///< the HEFace correspoinding to the PointSite
+    HEFace face; ///< the HEFace corresponding to the PointSite
 };
 
 /// type of the KD-tree used for nearest-neighbor search

@@ -47,7 +47,7 @@ def insert_polygon_segments(vd,id_list):
         
         if (j<jmax):
             #vd.debug_on()
-            print " ",j,"inserting segement ",id_list[n]," - ",id_list[n_nxt]
+            print " ",j,"inserting segment ",id_list[n]," - ",id_list[n_nxt]
             
             if id_list[n] == 115869: # 51456: 115869
                 vd.debug_on()

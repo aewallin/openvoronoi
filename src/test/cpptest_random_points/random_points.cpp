@@ -45,7 +45,7 @@ int main(int argc,char *argv[]) {
     int bins = std::min( 200, (int)sqrt(nmax) ); // more than 200x200 bins causes a lot of memory use, so limit.
     std::cout << "Using " << binmult*bins << " bins \n";
     
-    // try to optimize number of bins by changing binmult and seing what is fast.
+    // try to optimize number of bins by changing binmult and seeing what is fast.
     ovd::VoronoiDiagram* vd = new ovd::VoronoiDiagram(1,binmult*bins);
     
     std::cout << "version: " << ovd::version() << "\n";

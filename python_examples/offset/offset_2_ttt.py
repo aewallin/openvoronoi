@@ -15,7 +15,7 @@ import math
 def insert_polygon_points(vd, polygon):
     pts = []
     for p in polygon:
-        pts.append(ovd.Point(p[0], p[1]))  # this just converts (p[0], p[1]) format points intot ovd.Point
+        pts.append(ovd.Point(p[0], p[1]))  # this just converts (p[0], p[1]) format points into ovd.Point
     id_list = []
     print "inserting ", len(pts), " point-sites:"
     m = 0
@@ -39,7 +39,7 @@ def insert_polygon_segments(vd, id_list):
         n_nxt = n + 1
         if n == (len(id_list) - 1):
             n_nxt = 0
-        print " ", j, "inserting segement ", id_list[n], " - ", id_list[n_nxt]
+        print " ", j, "inserting segment ", id_list[n], " - ", id_list[n_nxt]
         # this inserts a line-segment id_list[n] -> id_list[n_nxt] into the VoronoiDiagram
         vd.addLineSite(id_list[n], id_list[n_nxt])
         j = j + 1
@@ -165,7 +165,7 @@ if __name__ == "__main__":
     myscreen.camera.SetClippingRange(-(zmult + 1) * camPos, (zmult + 1) * camPos)
     myscreen.camera.SetFocalPoint(0.0, 0, 0)
 
-    # craete a VoronoiDiagram
+    # create a VoronoiDiagram
     # use far=1.0 for now. This means all input geometry should fit within a unit circle!
     # 120 is a binning-parameter for nearest neighbor search. sqrt(n) where we have n points should be optimal
     vd = ovd.VoronoiDiagram(far, 120)

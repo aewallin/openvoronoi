@@ -627,7 +627,7 @@ void set_next_chain( std::list<Edge> list ) {
 std::pair<Edge,Edge> find_next_prev(Face f, Vertex endp) {
     Edge current = faces[f].edge;
     Edge start_edge = current;
-    Edge next_edge = current; // this causes unintialized warning: Edge next_edge = Edge();
+    Edge next_edge = current; // this causes uninitialized warning: Edge next_edge = Edge();
     Edge prev_edge = current; // uninitialized warning on ubuntu 11.04 ?
     do {
         Vertex src = source(current);

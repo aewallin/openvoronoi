@@ -61,7 +61,7 @@ enum VoronoiFaceStatus {
 struct FaceProps {
     FaceProps() {
         site = 0;
-        status = ovd::VoronoiFaceStatus::INCIDENT;
+        status = INCIDENT;
         idx = HEFace();
         null = false;
     }

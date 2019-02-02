@@ -277,7 +277,9 @@ bool VoronoiDiagram::insert_line_site(int idx1, int idx2, int step) {
     bool linesite_k_sign = left.is_right(src_se,trg_se); 
     #endif
     
-if (step==current_step) return false; current_step++;
+    if (step==current_step) 
+        return false;
+    current_step++;
 
     LineSite* pos_site;
     LineSite* neg_site;
@@ -291,7 +293,9 @@ if (step==current_step) return false; current_step++;
     neg_site = new LineSite( g[start].position, g[end  ].position , -1);
     //}
 
-if (step==current_step) return false; current_step++;
+    if (step==current_step) 
+        return false;
+    current_step++;
 
     HEFace seed_face = g[start].face; // assumes this point-site has a face!
     
@@ -300,7 +304,9 @@ if (step==current_step) return false; current_step++;
     if (debug) std::cout << " start face seed  = " << g[v_seed].index << "\n";
     mark_vertex( v_seed, pos_site  );
 
-if (step==current_step) return false; current_step++;
+    if (step==current_step) 
+        return false; 
+    current_step++;
 
     augment_vertex_set( pos_site  ); // it should not matter if we use pos_site or neg_site here
     // todo(?) sanity checks:
@@ -308,7 +314,9 @@ if (step==current_step) return false; current_step++;
     // check that tree (i.e. v0) includes end_face_seed ?
     if (debug) { std::cout << " delete-set |v0|="<< v0.size() <<" : ";  g.print_vertices(v0); }
 
-if (step==current_step) return false; current_step++;
+    if (step==current_step) 
+        return false; 
+    current_step++;
 
     // process the null-faces here
     HEVertex seg_start, seg_end; // new segment end-point vertices. these are created here.
@@ -332,7 +340,10 @@ if (step==current_step) return false; current_step++;
     if (end_to_null!=g.HFace())
         g[end_to_null].edge = g[end_null_face].edge; 
 
-if (step==current_step) return false; current_step++;
+    if (step==current_step) 
+        return false; 
+    current_step++;
+    
     // create LINESITE pseudo edges and faces
     HEFace pos_face, neg_face; 
     HEEdge pos_edge, neg_edge;
@@ -366,11 +377,15 @@ if (step==current_step) return false; current_step++;
         if (debug) std::cout << "created faces: pos_face=" << pos_face << " neg_face=" << neg_face << "\n";   
     }
 
-if (step==current_step) return false; current_step++;
+    if (step==current_step) 
+        return false; 
+    current_step++;
 
     add_vertices( pos_site );  // add NEW vertices on all IN-OUT edges.
 
-if (step==current_step) return false; current_step++;
+    if (step==current_step) 
+        return false; 
+    current_step++;
 
     { // add SEPARATORS
         // find SEPARATOR targets first
@@ -382,14 +397,18 @@ if (step==current_step) return false; current_step++;
         // add positive separator edge at start
         add_separator( g[start].face , start_null_face, pos_start_target, pos_sep_start, g[pos_face].site , g[neg_face].site );
         
-if (step==current_step) return false; current_step++;
+        if (step==current_step) 
+            return false; 
+        current_step++;
         
         // add negative separator edge at start
         add_separator( g[start].face , start_null_face, neg_start_target, neg_sep_start, g[pos_face].site , g[neg_face].site );
         g[ g[start].face ].status = NONINCIDENT; // face is now done.
         assert( vd_checker->face_ok( g[start].face ) );
         
-if (step==current_step) return false; current_step++;
+        if (step==current_step) 
+            return false; 
+        current_step++;
 
         SepTarget pos_end_target, neg_end_target;
         pos_end_target = find_separator_target( g[end].face ,  pos_sep_end);
@@ -397,7 +416,9 @@ if (step==current_step) return false; current_step++;
         // add positive separator edge at end
         add_separator( g[end].face , end_null_face, pos_end_target, pos_sep_end, g[pos_face].site , g[neg_face].site );
         
-if (step==current_step) return false; current_step++;
+        if (step==current_step) 
+            return false; 
+        current_step++;
         
         // add negative separator edge at end
         add_separator( g[end].face , end_null_face, neg_end_target, neg_sep_end, g[pos_face].site , g[neg_face].site );
@@ -407,7 +428,9 @@ if (step==current_step) return false; current_step++;
         if(debug) std::cout << "all separators  done.\n";
     } // end SEPARATORS
 
-if (step==current_step) return false; current_step++;
+    if (step==current_step) 
+        return false; 
+    current_step++;
 
 // add non-separator edges by calling add_edges on all INCIDENT faces
     {
@@ -424,7 +447,9 @@ if (step==current_step) return false; current_step++;
         if(debug) std::cout << "adding edges. DONE.\n";
     }
 
-if (step==current_step) return false; current_step++;
+    if (step==current_step) 
+        return false; 
+    current_step++;
 
 // new vertices and edges inserted. remove the delete-set, repair faces.
 
@@ -443,7 +468,9 @@ if (step==current_step) return false; current_step++;
     assert( vd_checker->face_ok( neg_face ) );
     if (debug) { std::cout << "faces repaired.\n"; }
 
-if (step==current_step) return false; current_step++;
+    if (step==current_step) 
+        return false; 
+    current_step++;
 
     // we are done and can remove split-vertices
     BOOST_FOREACH(HEFace f, incident_faces) {
@@ -484,7 +511,10 @@ void VoronoiDiagram::insert_arc_site(int idx1, int idx2, const Point& center, bo
         std::cout << " )\n";
         std::cout << " radius= " << radius << "\n";
     }
-if (step==current_step) return; current_step++;
+    
+    if (step==current_step) 
+        return; 
+    current_step++;
     
     ArcSite* pos_site;
     ArcSite* neg_site;
@@ -500,7 +530,10 @@ if (step==current_step) return; current_step++;
         std::cout << " pos site =  " << pos_site->str2() << "\n";
         std::cout << " neg site =  " << neg_site->str2() << "\n";
     }
-if (step==current_step) return; current_step++;
+    
+    if (step==current_step) 
+        return; 
+    current_step++;
 
     HEFace seed_face = g[start].face; // assumes this point-site has a face!
     // on the face of start-point, find the seed vertex
@@ -508,7 +541,9 @@ if (step==current_step) return; current_step++;
     if (debug) std::cout << " start face seed  = " << g[v_seed].index << "\n";
     mark_vertex( v_seed, pos_site  );
 
-if (step==current_step) return; current_step++;
+    if (step==current_step) 
+        return; 
+    current_step++;
     
     augment_vertex_set( pos_site  ); // it should not matter if we use pos_site or neg_site here
     // todo(?) sanity checks:
@@ -516,7 +551,10 @@ if (step==current_step) return; current_step++;
     // check that tree (i.e. v0) includes end_face_seed ?
     if (debug) { std::cout << " delete-set |v0|="<< v0.size() <<" : ";  g.print_vertices(v0); }
 
-if (step==current_step) return; current_step++;
+    if (step==current_step) 
+        return; 
+    current_step++;
+    
     // process the null-faces here
     HEVertex seg_start, seg_end; // new segment end-point vertices. these are created here.
     HEFace start_null_face, end_null_face; // either existing or new null-faces at endpoints
@@ -552,7 +590,10 @@ if (step==current_step) return; current_step++;
     if (end_to_null!=g.HFace())
         g[end_to_null].edge = g[end_null_face].edge; 
 
-if (step==current_step) return; current_step++;
+    if (step==current_step) 
+        return;
+    current_step++;
+
     // create pseudo edges (sites) and faces
     HEFace pos_face, neg_face; 
     HEEdge pos_edge, neg_edge;
@@ -584,11 +625,15 @@ if (step==current_step) return; current_step++;
         if (debug) std::cout << "created faces: pos_face=" << pos_face << " neg_face=" << neg_face << "\n";   
     }
 
-if (step==current_step) return; current_step++;
+    if (step==current_step) 
+        return; 
+    current_step++;
 
     add_vertices( pos_site );  // add NEW vertices on all IN-OUT edges.
     
-if (step==current_step) return; current_step++;
+    if (step==current_step) 
+        return; 
+    current_step++;
 
     { // add SEPARATORS
     
@@ -601,14 +646,18 @@ if (step==current_step) return; current_step++;
         // add positive separator edge at start
         add_separator( g[start].face , start_null_face, pos_start_target, pos_sep_start, g[pos_face].site , g[neg_face].site );
         
-if (step==current_step) return; current_step++;
+        if (step==current_step) 
+            return; 
+        current_step++;
         
         // add negative separator edge at start
         add_separator( g[start].face , start_null_face, neg_start_target, neg_sep_start, g[pos_face].site , g[neg_face].site );
         g[ g[start].face ].status = NONINCIDENT; // face is now done.
         assert( vd_checker->face_ok( g[start].face ) );
         
-if (step==current_step) return; current_step++;
+        if (step==current_step) 
+            return; 
+        current_step++;
 
         SepTarget pos_end_target, neg_end_target;
         pos_end_target = find_separator_target( g[end].face ,  pos_sep_end);
@@ -616,7 +665,9 @@ if (step==current_step) return; current_step++;
         // add positive separator edge at end
         add_separator( g[end].face , end_null_face, pos_end_target, pos_sep_end, g[pos_face].site , g[neg_face].site );
         
-if (step==current_step) return; current_step++;
+        if (step==current_step) 
+            return; 
+        current_step++;
         
         // add negative separator edge at end
         add_separator( g[end].face , end_null_face, neg_end_target, neg_sep_end, g[pos_face].site , g[neg_face].site );
@@ -626,7 +677,10 @@ if (step==current_step) return; current_step++;
         if(debug) std::cout << "all separators  done.\n";
     } // end SEPARATORS
 
-if (step==current_step) return; current_step++;
+    if (step==current_step) 
+        return; 
+    current_step++;
+    
 // add non-separator edges by calling add_edges on all INCIDENT faces
     {
         if(debug) std::cout << "adding edges.\n";
@@ -642,7 +696,9 @@ if (step==current_step) return; current_step++;
         if(debug) std::cout << "adding edges. DONE.\n";
     }
 
-if (step==current_step) return; current_step++;
+    if (step==current_step) 
+        return; 
+    current_step++;
 
 // new vertices and edges inserted. remove the delete-set, repair faces.
 
@@ -661,7 +717,9 @@ if (step==current_step) return; current_step++;
     assert( vd_checker->face_ok( neg_face ) );
     if (debug) { std::cout << "faces repaired.\n"; }
 
-if (step==current_step) return; current_step++;
+    if (step==current_step) 
+        return; 
+    current_step++;
 
     // we are done and can remove split-vertices
     BOOST_FOREACH(HEFace f, incident_faces) {

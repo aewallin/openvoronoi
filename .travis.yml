@@ -15,7 +15,7 @@ before_install:
 before_script:
   - mkdir build
   - cd build
-  - cmake -D CMAKE_BUILD_TYPE=Debug ../src
+  - cmake -D CMAKE_BUILD_TYPE=Coverage ../src
 
 script: 
   - make

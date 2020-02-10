@@ -3,7 +3,7 @@
 # message(STATUS " called with version  = " ${MY_VERSION})
 message(STATUS "package_details.cmake: Configuring debian package details.")
 
-set(CPACK_GENERATOR "DEB" CACHE string "generator" )
+set(CPACK_GENERATOR "DEB" CACHE STRING "generator" )
 set(CPACK_PACKAGE_CONTACT "Anders Wallin <anders.e.e.wallin@gmail.com>" CACHE STRING "email")
 set(CPACK_PACKAGE_NAME "openvoronoi" CACHE STRING "name")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "2D voronoi diagram algorithm" CACHE STRING "name")
@@ -11,7 +11,7 @@ set(CPACK_PACKAGE_VENDOR https://github.com/aewallin/openvoronoi CACHE STRING "w
 set(CPACK_DEBIAN_PACKAGE_SECTION "science" CACHE STRING "name3")
 
 # the debian source-package builder wants dependencies as an array
-set(DEBSRC_BUILD_DEPENDS debhelper python git cmake libboost-dev "libqd0 | libqd2c2a" libqd-dev libboost-python-dev libgomp1 CACHE STRINGS "name")
+set(DEBSRC_BUILD_DEPENDS debhelper python git cmake libboost-dev "libqd0 | libqd2c2a" libqd-dev libboost-python-dev libgomp1 CACHE STRING "name")
 
 # we need to explicitly list the libboost-python versions here. why??
 # quantal has 1.49.0

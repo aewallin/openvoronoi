@@ -112,7 +112,7 @@ endif (CMAKE_BUILD_TYPE MATCHES "Coverage")
 # header file search path
 MESSAGE(STATUS "Your system is: ${CMAKE_SYSTEM_NAME}")
 IF( ${BUILD_PYTHON_MODULE} MATCHES ON)
-  find_package (PythonLibs 2.7 EXACT REQUIRED) 
+  find_package (PythonLibs) # 2.7 EXACT REQUIRED 
   include_directories(${PYTHON_INCLUDE_DIRS})
   MESSAGE(STATUS "Python includes: " ${PYTHON_INCLUDE_DIRS})
 ENDIF()

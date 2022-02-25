@@ -123,7 +123,7 @@ def drawOffsets(myscreen, ofs):
                 # myscreen.addActor( ovdvtk.Line(p1=(previous.x,previous.y,0),p2=(p.x,p.y,0),color=loopColor) )
                 previous = p
             n = n + 1
-        print "rendered loop ", nloop, " with ", len(lop), " points"
+        print("rendered loop ", nloop, " with ", len(lop), " points")
         nloop = nloop + 1
 
 
@@ -318,7 +318,7 @@ class VD:
             err = pt[5]
             if err > 1e-6:
                 # id_text = str(idx)
-                print "drawErrorVertex ", idx, " pos= ", p, " err=", err
+                print("drawErrorVertex ", idx, " pos= ", p, " err=", err)
                 # factor = FollowerText( text=id_text,center=(p.x,p.y,0), scale = self.textScale, color=vcolor)
                 # self.verts.append(factor)
                 actor = Sphere(center=(p.x, p.y, 0), radius=self.vertexRadius, color=pink)
@@ -477,7 +477,7 @@ class VD:
         if (edgeType == ovd.EdgeType.NULLEDGE):
             return white
         else:
-            print "UNKNOWN edge type = ", edgeType
+            print("UNKNOWN edge type = ", edgeType)
             return white
 
     def setEdges(self):
@@ -988,7 +988,7 @@ class Circle(CamvtkActor):
         lines = vtk.vtkCellArray()
         id = 0
         points = vtk.vtkPoints()
-        for n in xrange(0, resolution):
+        for n in range(0, resolution):
             line = vtk.vtkLine()
             angle1 = (float(n) / (float(resolution))) * 2 * math.pi
             angle2 = (float(n + 1) / (float(resolution))) * 2 * math.pi

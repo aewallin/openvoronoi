@@ -17,12 +17,12 @@ def insert_polygon_points(vd, polygon):
     for p in polygon:
         pts.append(ovd.Point(p[0], p[1]))  # this just converts (p[0], p[1]) format points into ovd.Point
     id_list = []
-    print "inserting ", len(pts), " point-sites:"
+    print("inserting ", len(pts), " point-sites:")
     m = 0
     # pts = [pt1, pt2, pt3, pt4, pt5]  where each pt is of class ovd.Point
     for p in pts:
         id_list.append(vd.addVertexSite(p))  # note we store and return the Point ID returned here!
-        print " ", m, " added vertex ", id_list[len(id_list) - 1]
+        print(" ", m, " added vertex ", id_list[len(id_list) - 1])
         m = m + 1
     return id_list
 
@@ -34,12 +34,12 @@ def insert_polygon_points(vd, polygon):
 #
 def insert_polygon_segments(vd, id_list):
     j = 0
-    print "inserting ", len(id_list), " line-segments:"
+    print("inserting ", len(id_list), " line-segments:")
     for n in range(len(id_list)):
         n_nxt = n + 1
         if n == (len(id_list) - 1):
             n_nxt = 0
-        print " ", j, "inserting segment ", id_list[n], " - ", id_list[n_nxt]
+        print(" ", j, "inserting segment ", id_list[n], " - ", id_list[n_nxt])
         # this inserts a line-segment id_list[n] -> id_list[n_nxt] into the VoronoiDiagram
         vd.addLineSite(id_list[n], id_list[n_nxt])
         j = j + 1
@@ -191,8 +191,8 @@ if __name__ == "__main__":
 
     # build a VD from the input geometry
     times = insert_many_polygons(vd, segs)
-    print "all sites inserted. "
-    print "VD check: ", vd.check()  # sanity check
+    print("all sites inserted. ")
+    print("VD check: ", vd.check())  # sanity check
 
     # this filters the diagram so we are left with only the interior or the exterior
     # of the polygon. If the filtering is omitted we get offsets on both sides of the input geometry.
@@ -224,10 +224,10 @@ if __name__ == "__main__":
     #    cw = clockwise/anticlockwise True/False flag for arcs
 
     # now we draw the offsets in VTK
-    print len(ofs_list), " offsets to draw:"
+    print(len(ofs_list), " offsets to draw:")
     m = 0
     for ofs in ofs_list:
-        print m, " / ", len(ofs_list)
+        print(m, " / ", len(ofs_list))
         offset2vtk.drawOffsets2(myscreen, ofs)
         m = m + 1
 
@@ -246,6 +246,6 @@ if __name__ == "__main__":
     # display timing-info on how long the VD build took
     vod.setVDText2(times)
     vod.setAll()
-    print "PYTHON All DONE."
+    print("PYTHON All DONE.")
     myscreen.render()
     myscreen.iren.Start()

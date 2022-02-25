@@ -98,7 +98,7 @@ def drawOffsets(myscreen, ofs):
                     drawArc(myscreen, previous, pt, r, cen, cw, arcColor)
                 previous = pt
             n = n + 1
-        print "rendered loop ", nloop, " with ", len(lop), " points"
+        print("rendered loop ", nloop, " with ", len(lop), " points")
         nloop = nloop + 1
 
 
@@ -185,7 +185,7 @@ def drawOffsets2(myscreen, ofs):
     oPoints = vtk.vtkPoints()
     lineCells = vtk.vtkCellArray()
     # self.colorLUT = vtk.vtkLookupTable()
-    print "offset2vtk.drawOffsets2(): ", len(ofs_points), " loops to render:"
+    print("offset2vtk.drawOffsets2(): ", len(ofs_points), " loops to render:")
     idx = 0
     last_idx = 0
 
@@ -193,7 +193,7 @@ def drawOffsets2(myscreen, ofs):
         epts = of
         segs = []
         first = 1
-        print " loop with ", len(epts), " points"
+        print(" loop with ", len(epts), " points")
         for p in epts:
             oPoints.InsertNextPoint(p.x, p.y, 0)
             if first == 0:
@@ -247,7 +247,7 @@ if __name__ == "__main__":
     myscreen.camera.SetFocalPoint(0.0, 0, 0)
 
     vd = ovd.VoronoiDiagram(far, 120)
-    print ovd.version()
+    print(ovd.version())
 
     # for vtk visualization
     vod = ovdvtk.VD(myscreen, vd, float(scale), textscale=0.01, vertexradius=0.003)
@@ -284,8 +284,8 @@ if __name__ == "__main__":
 
     t_after = time.time()
     times.append(t_after - t_before)
-    print "all point sites inserted. "
-    print "VD check: ", vd.check()
+    print("all point sites inserted. ")
+    print("VD check: ", vd.check())
 
     t_before = time.time()
     # now add line-segments, by using the integer indexes returned by vd.addVertexSite() above
@@ -312,6 +312,6 @@ if __name__ == "__main__":
 
     vod.setVDText2(times)
     vod.setAll()
-    print "PYTHON All DONE."
+    print("PYTHON All DONE.")
     myscreen.render()
     myscreen.iren.Start()

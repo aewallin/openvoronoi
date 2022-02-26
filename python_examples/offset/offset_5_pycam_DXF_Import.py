@@ -180,7 +180,7 @@ if __name__ == "__main__":
 
     import pycam.Importers.DXFImporter as importer
 
-    print "reading from DXF-file: ", sys.argv[1]
+    print("reading from DXF-file: ", sys.argv[1])
     model = importer.import_model(sys.argv[1])
     model.revise_directions()
 
@@ -198,7 +198,7 @@ if __name__ == "__main__":
 
     offset2vtk.drawOffsets2(myscreen, offset_loops)
 
-    print "PYTHON All DONE."
+    print("PYTHON All DONE.")
 
     myscreen.render()
     myscreen.iren.Start()

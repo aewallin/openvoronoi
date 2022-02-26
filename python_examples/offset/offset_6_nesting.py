@@ -29,7 +29,7 @@ if __name__ == "__main__":
     myscreen.camera.SetFocalPoint(0.0, 0, 0)
 
     vd = ovd.VoronoiDiagram(far, 120)
-    print ovd.version()
+    print(ovd.version())
 
     # for vtk visualization
     vod = ovdvtk.VD(myscreen, vd, float(scale), textscale=0.01, vertexradius=0.003)
@@ -66,8 +66,8 @@ if __name__ == "__main__":
 
     t_after = time.time()
     times.append(t_after - t_before)
-    print "all point sites inserted. "
-    print "VD check: ", vd.check()
+    print("all point sites inserted. ")
+    print("VD check: ", vd.check())
 
     t_before = time.time()
     # now add line-segments, by using the integer indexes returned by vd.addVertexSite() above
@@ -94,7 +94,7 @@ if __name__ == "__main__":
     for d in dists:
         ofs_loops.extend(of.offset(d))
         ofsl.extend(of.offset_loop_list(d))
-    print ofsl
+    print(ofsl)
 
     sorter = ovd.OffsetSorter(vd.getGraph())
     for loop in ofsl:
@@ -103,15 +103,15 @@ if __name__ == "__main__":
     sorter.sort_loops()
 
     offset2vtk.drawOffsets(myscreen, ofs_loops)  # draw the generated offsets
-    print "number of loops= ", len(ofs_loops)
+    print("number of loops= ", len(ofs_loops))
     for loop in ofs_loops:
         first_vert = loop[0]
-        print "loop at dist=", first_vert[2], " with ", len(loop), " vertices:"
+        print("loop at dist=", first_vert[2], " with ", len(loop), " vertices:")
         for v in loop[1:]:
-            print " face ", v[4]
+            print(" face ", v[4])
 
     vod.setVDText2(times)
     vod.setAll()
-    print "PYTHON All DONE."
+    print("PYTHON All DONE.")
     myscreen.render()
     myscreen.iren.Start()

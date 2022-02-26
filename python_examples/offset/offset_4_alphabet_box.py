@@ -33,18 +33,18 @@ def insert_polygon_points(vd, polygon):
         id_list.append(vd.addVertexSite(p))
         # print " ",m," added vertex ", id_list[ len(id_list) -1 ]
         m = m + 1
-    print m, " point-sites inserted."  # inserting ",len(pts)," point-sites:"
+    print(m, " point-sites inserted.")  # inserting ",len(pts)," point-sites:"
     return id_list
 
 
 def insert_polygon_segments(vd, id_list):
     j = 0
-    print "inserting ", len(id_list), " line-segments:"
+    print("inserting ", len(id_list), " line-segments:")
     for n in range(len(id_list)):
         n_nxt = n + 1
         if n == (len(id_list) - 1):
             n_nxt = 0
-        print " ", j, "inserting segment ", id_list[n], " - ", id_list[n_nxt]
+        print(" ", j, "inserting segment ", id_list[n], " - ", id_list[n_nxt])
 
         if 0:  # id_list[n] == 31921: #78238: # 47013:
             vd.debug_on()
@@ -61,7 +61,7 @@ def insert_polygon_segments(vd, id_list):
             # f4792   f4795
             for v in vd.getFaceVertices(18924):
                 vod.drawVertexIdx(v)
-            print "PYTHON All DONE."
+            print("PYTHON All DONE.")
             # f = ovd.Point(0.055,-0.2437)
             # myscreen.camera.SetPosition(f.x, f.y-float(1)/float(1000), 0.3) 
             # myscreen.camera.SetClippingRange(-(zmult+1)*camPos,(zmult+1)*camPos)
@@ -191,7 +191,7 @@ if __name__ == "__main__":
     segs5 = modify_segments(segs5)
 
     vd = ovd.VoronoiDiagram(far, 400)
-    print ovd.version()
+    print(ovd.version())
 
     vod = ovdvtk.VD(myscreen, vd, float(1), textscale=0.01, vertexradius=0.003)
     vod.drawFarCircle()
@@ -233,7 +233,7 @@ if __name__ == "__main__":
     t_after = time.time()
     oftime = t_after - t_before
 
-    print "offset done in ", oftime
+    print("offset done in ", oftime)
 
     for ofs in ofs_list:
         offset2vtk.drawOffsets2(myscreen, ofs)
@@ -257,14 +257,14 @@ if __name__ == "__main__":
 
     err = vd.getStat()
     # print err 
-    print "got errorstats for ", len(err), " points"
+    print("got errorstats for ", len(err), " points")
     if len(err) > 1:
         minerr = min(err)
         maxerr = max(err)
-        print "min error= ", minerr
-        print "max error= ", maxerr
+        print("min error= ", minerr)
+        print("max error= ", maxerr)
 
-    print "PYTHON All DONE."
+    print("PYTHON All DONE.")
 
     myscreen.render()
     # w2if.Modified()

@@ -13,23 +13,23 @@ def insert_polygon_points(vd, polygon):
     for p in polygon:
         pts.append(ovd.Point(p[0], p[1]))
     id_list = []
-    print "inserting ", len(pts), " point-sites:"
+    print("inserting ", len(pts), " point-sites:")
     m = 0
     for p in pts:
         id_list.append(vd.addVertexSite(p))
-        print " ", m, " added vertex ", id_list[len(id_list) - 1]
+        print(" ", m, " added vertex ", id_list[len(id_list) - 1])
         m = m + 1
     return id_list
 
 
 def insert_polygon_segments(vd, id_list):
     j = 0
-    print "inserting ", len(id_list), " line-segments:"
+    print("inserting ", len(id_list), " line-segments:")
     for n in range(len(id_list)):
         n_nxt = n + 1
         if n == (len(id_list) - 1):
             n_nxt = 0
-        print " ", j, "inserting segment ", id_list[n], " - ", id_list[n_nxt]
+        print(" ", j, "inserting segment ", id_list[n], " - ", id_list[n_nxt])
         vd.addLineSite(id_list[n], id_list[n_nxt])
         j = j + 1
 
@@ -120,7 +120,7 @@ if __name__ == "__main__":
     myscreen.camera.SetFocalPoint(0.0, 0, 0)
 
     vd = ovd.VoronoiDiagram(far, 120)
-    print ovd.version()
+    print(ovd.version())
 
     # for vtk visualization
     vod = ovdvtk.VD(myscreen, vd, float(scale), textscale=0.01, vertexradius=0.003)
@@ -136,8 +136,8 @@ if __name__ == "__main__":
     # null-edges are an internal openvoronoi construction to avoid high-degree vertices in the VD-graph
     # they are not relevant for upstream or downstream algorithms
 
-    print "all sites inserted. "
-    print "VD check: ", vd.check()
+    print("all sites inserted. ")
+    print("VD check: ", vd.check())
 
     # segments from ttt
     segs = ttt_segments("H", 30000)
@@ -179,7 +179,7 @@ if __name__ == "__main__":
     # to generate a png image run
     #  dot -Tpng test.dot > test.png
     ofs_loops2 = sorter.get_loops()
-    print "number of loops= ", len(ofs_loops2)
+    print("number of loops= ", len(ofs_loops2))
 
     offset2vtk.drawOffsets(myscreen, ofs_loops2)  # draw the generated offsets
 
@@ -192,6 +192,6 @@ if __name__ == "__main__":
     """
     vod.setVDText2(times)
     vod.setAll()
-    print "PYTHON All DONE."
+    print("PYTHON All DONE.")
     myscreen.render()
     myscreen.iren.Start()

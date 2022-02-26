@@ -77,7 +77,7 @@ def drawOffsets(myscreen, ofs):
                 # myscreen.addActor( ovdvtk.Line(p1=(previous.x,previous.y,0),p2=(p.x,p.y,0),color=loopColor) )
                 previous = p
             n = n + 1
-        print "rendered loop ", nloop, " with ", len(lop), " points"
+        print("rendered loop ", nloop, " with ", len(lop), " points")
         nloop = nloop + 1
 
 
@@ -170,7 +170,7 @@ def drawOffsets2(myscreen, ofs):
     oPoints = vtk.vtkPoints()
     lineCells = vtk.vtkCellArray()
     # self.colorLUT = vtk.vtkLookupTable()
-    print len(ofs_points), " loops to render:"
+    print(len(ofs_points), " loops to render:")
     idx = 0
     last_idx = 0
 
@@ -178,7 +178,7 @@ def drawOffsets2(myscreen, ofs):
         epts = of
         segs = []
         first = 1
-        print " loop with ", len(epts), " points"
+        print(" loop with ", len(epts), " points")
         for p in epts:
             oPoints.InsertNextPoint(p.x, p.y, 0)
             if first == 0:
@@ -214,7 +214,7 @@ def insert_polygon_points(vd, polygon):
     for p in polygon:
         pts.append(ovd.Point(p[0], p[1]))
     id_list = []
-    print "inserting ", len(pts), " point-sites:"
+    print("inserting ", len(pts), " point-sites:")
     m = 0
     for p in pts:
         id_list.append(vd.addVertexSite(p))
@@ -225,7 +225,7 @@ def insert_polygon_points(vd, polygon):
 
 def insert_polygon_segments(vd, id_list):
     j = 0
-    print "inserting ", len(id_list), " line-segments:"
+    print("inserting ", len(id_list), " line-segments:")
     for n in range(len(id_list)):
         n_nxt = n + 1
         if n == (len(id_list) - 1):
@@ -322,7 +322,7 @@ if __name__ == "__main__":
     myscreen.camera.SetFocalPoint(0.0, 0, 0)
 
     vd = ovd.VoronoiDiagram(far, 120)
-    print ovd.version()
+    print(ovd.version())
 
     # for vtk visualization
     vod = ovdvtk.VD(myscreen, vd, float(scale), textscale=0.01, vertexradius=0.003)
@@ -342,8 +342,8 @@ if __name__ == "__main__":
     segs = modify_segments(segs)
 
     times = insert_many_polygons(vd, segs)
-    print "all sites inserted. "
-    print "VD check: ", vd.check()
+    print("all sites inserted. ")
+    print("VD check: ", vd.check())
 
     pi = ovd.PolygonInterior(True)
     vd.filter_graph(pi)
@@ -352,6 +352,6 @@ if __name__ == "__main__":
 
     vod.setVDText2(times)
     vod.setAll()
-    print "PYTHON All DONE."
+    print("PYTHON All DONE.")
     myscreen.render()
     myscreen.iren.Start()

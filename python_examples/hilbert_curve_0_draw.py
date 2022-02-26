@@ -68,7 +68,7 @@ def drawCurve(myscreen, curve, loopColor):
             myscreen.addActor(ovdvtk.Line(p1=(previous[0], previous[1], 0), p2=(p[0], p[1], 0), color=loopColor))
             previous = p
         n = n + 1
-    print "rendered curve  with ", len(curve), " points"
+    print("rendered curve  with ", len(curve), " points")
 
 
 def drawCurve2(myscreen, curve, curvecolor):
@@ -78,7 +78,7 @@ def drawCurve2(myscreen, curve, curvecolor):
     last_idx = 0
     segs = []
     first = 1
-    print " curve with ", len(curve), " points"
+    print(" curve with ", len(curve), " points")
     for p in curve:
         oPoints.InsertNextPoint(p[0], p[1], 0)
         if first == 0:
@@ -141,7 +141,7 @@ if __name__ == "__main__":
     # print pts
     drawCurve2(myscreen, pts, ovdvtk.yellow)
 
-    print "PYTHON All DONE."
+    print("PYTHON All DONE.")
 
     myscreen.render()
     myscreen.iren.Start()

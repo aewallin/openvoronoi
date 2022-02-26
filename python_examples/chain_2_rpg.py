@@ -43,7 +43,7 @@ if __name__ == "__main__":
     myscreen.camera.SetFocalPoint(0.0, 0, 0)
 
     vd = ovd.VoronoiDiagram(far, 120)
-    print ovd.version()
+    print(ovd.version())
 
     # for vtk visualization
     vod = ovdvtk.VD(myscreen, vd, float(scale), textscale=0.01, vertexradius=0.003)
@@ -75,17 +75,17 @@ if __name__ == "__main__":
     t_before = time.time()
     for p in pts:
         id_list.append(vd.addVertexSite(p))
-        print m, " added vertex "
+        print(m, " added vertex ")
         m = m + 1
-    print "polygon is: "
+    print("polygon is: ")
     for idx in id_list:
-        print idx, "-",
-    print "."
+        print(idx, "-", end=' ')
+    print(".")
 
     t_after = time.time()
     times.append(t_after - t_before)
 
-    print "all point sites inserted. ",
+    print("all point sites inserted. ", end=' ')
     vd.check()
     # vd.debug_on()
 
@@ -105,7 +105,7 @@ if __name__ == "__main__":
                 vod.setAll()
                 myscreen.render()
                 myscreen.iren.Start()
-                raw_input("Press ENTER to exit")
+                input("Press ENTER to exit")
             else:
                 vd.addLineSite(id_list[n], id_list[n_nxt])
     vd.check()
@@ -138,21 +138,21 @@ if __name__ == "__main__":
 
     err = vd.getStat()
     # print err
-    print "got errorstats for ", len(err), " points"
+    print("got errorstats for ", len(err), " points")
     if len(err) > 1:
         minerr = min(err)
         maxerr = max(err)
-        print "min error= ", minerr
-        print "max error= ", maxerr
+        print("min error= ", minerr)
+        print("max error= ", maxerr)
 
-    print "num vertices: ", vd.numVertices()
-    print "num SPLIT vertices: ", vd.numSplitVertices()
+    print("num vertices: ", vd.numVertices())
+    print("num SPLIT vertices: ", vd.numSplitVertices())
 
     calctime = t_after - t_before
 
     vod.setAll()
 
-    print "PYTHON All DONE."
+    print("PYTHON All DONE.")
 
     myscreen.render()
     # w2if.Modified()

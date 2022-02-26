@@ -43,7 +43,7 @@ if __name__ == "__main__":
     myscreen.camera.SetFocalPoint(0.0, 0, 0)
 
     vd = ovd.VoronoiDiagram(far, 120)
-    print ovd.version(), ovd.build_type()
+    print(ovd.version(), ovd.build_type())
 
     # for vtk visualization
     vod = ovdvtk.VD(myscreen, vd, float(scale), textscale=0.01, vertexradius=0.003)
@@ -76,27 +76,27 @@ if __name__ == "__main__":
     id_list = []
     m = 0
     t_before = time.time()
-    print "inserting %d VertexSites one by one: " % len(pts)
+    print("inserting %d VertexSites one by one: " % len(pts))
     for p in pts:
         id_list.append(vd.addVertexSite(p))
-        print "  %02d added vertex %3d at ( %1.3f, %1.3f )" % (m, id_list[m], p.x, p.y)
+        print("  %02d added vertex %3d at ( %1.3f, %1.3f )" % (m, id_list[m], p.x, p.y))
         m = m + 1
 
     t_after = time.time()
     times.append(t_after - t_before)
-    print "all VertexSites inserted."
+    print("all VertexSites inserted.")
 
     vd.check()
 
     t_before = time.time()
 
     # vd.debug_on()
-    print "inserting %d LineSites one by one: " % (len(id_list))
+    print("inserting %d LineSites one by one: " % (len(id_list)))
 
     for n in range(len(id_list)):
-        print "  %02d source - target = %02d - %02d " % (n, id_list[n - 1], id_list[n])
+        print("  %02d source - target = %02d - %02d " % (n, id_list[n - 1], id_list[n]))
         vd.addLineSite(id_list[n - 1], id_list[n])
-    print "all LineSites inserted."
+    print("all LineSites inserted.")
     vd.check()
 
     t_after = time.time()
@@ -109,21 +109,21 @@ if __name__ == "__main__":
 
     err = vd.getStat()
 
-    print "getStat() got errorstats for ", len(err), " points"
+    print("getStat() got errorstats for ", len(err), " points")
     if len(err) > 1:
         minerr = min(err)
         maxerr = max(err)
-        print "  min error= ", minerr
-        print "  max error= ", maxerr
+        print("  min error= ", minerr)
+        print("  max error= ", maxerr)
 
-    print "  num vertices: ", vd.numVertices()
-    print "  num SPLIT vertices: ", vd.numSplitVertices()
+    print("  num vertices: ", vd.numVertices())
+    print("  num SPLIT vertices: ", vd.numSplitVertices())
 
     calctime = t_after - t_before
 
     vod.setAll()
 
-    print "PYTHON All DONE."
+    print("PYTHON All DONE.")
 
     myscreen.render()
     # w2if.Modified()

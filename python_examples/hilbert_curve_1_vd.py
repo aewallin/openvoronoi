@@ -61,29 +61,29 @@ def insert_curve(vd, curve):
     for p in curve:
         pts.append(ovd.Point(p[0], p[1]))
     id_list = []
-    print "inserting ", len(pts), " point-sites...",
+    print("inserting ", len(pts), " point-sites...", end=' ')
     m = 0
     t_before = time.time()
     for p in pts:
         id_list.append(vd.addVertexSite(p))
-        print " ", m, " added vertex ", id_list[len(id_list) - 1]
+        print(" ", m, " added vertex ", id_list[len(id_list) - 1])
         m = m + 1
     t_after = time.time()
     pt_time = t_after - t_before
-    print "done."
+    print("done.")
     j = 0
     t_before = time.time()
-    print "inserting ", len(id_list), " line-segments..."
+    print("inserting ", len(id_list), " line-segments...")
     for n in range(len(id_list) - 1):
         n_nxt = n + 1
         # if n==(len(id_list)-1):
         #    n_nxt=0
-        print " ", j, "inserting segment ", id_list[n], " - ", id_list[n_nxt]
+        print(" ", j, "inserting segment ", id_list[n], " - ", id_list[n_nxt])
         vd.addLineSite(id_list[n], id_list[n_nxt])
         j = j + 1
     t_after = time.time()
     seg_time = t_after - t_before
-    print "done."
+    print("done.")
     return [pt_time, seg_time]
 
 
@@ -120,10 +120,10 @@ if __name__ == "__main__":
     step = size / math.pow(2, level)
 
     Hilbert(0, level, 90, step, startpt)
-    print "Generated hilbert curve, level= ", level
+    print("Generated hilbert curve, level= ", level)
 
     vd = ovd.VoronoiDiagram(far, 120)
-    print ovd.version()
+    print(ovd.version())
 
     # for vtk visualization
     vod = ovdvtk.VD(myscreen, vd, float(scale), textscale=0.01, vertexradius=0.03)
@@ -144,7 +144,7 @@ if __name__ == "__main__":
     # drawCurve2(myscreen,pts,ovdvtk.yellow)
     vod.setVDText2(times)
     vod.setAll()
-    print "PYTHON All DONE."
+    print("PYTHON All DONE.")
 
     myscreen.render()
     myscreen.iren.Start()

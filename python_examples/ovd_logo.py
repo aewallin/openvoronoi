@@ -96,7 +96,7 @@ def drawOffsets2(myscreen, ofs):
     oPoints = vtk.vtkPoints()
     lineCells = vtk.vtkCellArray()
     # self.colorLUT = vtk.vtkLookupTable()
-    print len(ofs_points), " loops to render:"
+    print(len(ofs_points), " loops to render:")
     idx = 0
     last_idx = 0
 
@@ -104,7 +104,7 @@ def drawOffsets2(myscreen, ofs):
         epts = of
         segs = []
         first = 1
-        print " loop with ", len(epts), " points"
+        print(" loop with ", len(epts), " points")
         for p in epts:
             oPoints.InsertNextPoint(p.x, p.y, 0)
             if first == 0:
@@ -154,20 +154,20 @@ def insert_polygon_points(vd, polygon):
     for p in polygon:
         pts.append(ovd.Point(p[0], p[1]))
     id_list = []
-    print "inserting ", len(pts), " point-sites:"
+    print("inserting ", len(pts), " point-sites:")
     m = 0
     for p in pts:
         id_list.append(vd.addVertexSite(p))
         # print " ",m," added vertex ", id_list[ len(id_list) -1 ]
         m = m + 1
-    print vd.numFaces(), " faces after all points inserted"
+    print(vd.numFaces(), " faces after all points inserted")
     return id_list
 
 
 def insert_polygon_segments(vd, id_list):
     j = 0
     jmax = 9999999  # for debugging, set jmax to the problematic case to stop algorithm in the middle
-    print "inserting ", len(id_list), " line-segments:"
+    print("inserting ", len(id_list), " line-segments:")
     for n in range(len(id_list)):
         n_nxt = n + 1
         if n == (len(id_list) - 1):
@@ -259,7 +259,7 @@ if __name__ == "__main__":
     segs2 = modify_segments(segs2)
 
     vd = ovd.VoronoiDiagram(far, 120)
-    print ovd.version()
+    print(ovd.version())
 
     vod = ovdvtk.VD(myscreen, vd, float(scale), textscale=0.01, vertexradius=0.003)
     vod.drawFarCircle()
@@ -322,6 +322,6 @@ if __name__ == "__main__":
     for ofs in ofs_list:
         drawOffsets2(myscreen, ofs)
 
-    print "PYTHON All DONE."
+    print("PYTHON All DONE.")
     myscreen.render()
     myscreen.iren.Start()

@@ -1,11 +1,12 @@
 .. image:: https://img.shields.io/badge/License-LGPL%20v2.1-blue.svg
     :target: https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html
     
-.. image:: https://travis-ci.org/aewallin/openvoronoi.svg?branch=master
-    :target: https://travis-ci.org/aewallin/openvoronoi
+.. image:: https://github.com/aewallin/openvoronoi/actions/workflows/cmake-build.yml/badge.svg
+    :target: https://github.com/aewallin/openvoronoi/actions/workflows/cmake-build.yml
 
 .. image:: https://coveralls.io/repos/github/aewallin/openvoronoi/badge.svg?branch=master
     :target: https://coveralls.io/github/aewallin/openvoronoi?branch=master
+
 
 
 OpenVoronoi

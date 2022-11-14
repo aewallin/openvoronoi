@@ -4,6 +4,9 @@
 .. image:: https://github.com/aewallin/openvoronoi/actions/workflows/cmake-build.yml/badge.svg
     :target: https://github.com/aewallin/openvoronoi/actions/workflows/cmake-build.yml
 
+.. image:: https://github.com/aewallin/openvoronoi/actions/workflows/cmake-build-and-test.yml/badge.svg
+    :target: https://github.com/aewallin/openvoronoi/actions/workflows/cmake-build-and-test.yml
+
 .. image:: https://coveralls.io/repos/github/aewallin/openvoronoi/badge.svg?branch=master
     :target: https://coveralls.io/github/aewallin/openvoronoi?branch=master
 

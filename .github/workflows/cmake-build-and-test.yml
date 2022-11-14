@@ -35,7 +35,17 @@ jobs:
         repository: aewallin/randompolygon
         path: randompolygon
         ref: master
+        
+    - name: Configure randompolygon repository
+      run: cmake ./randompolygon/src -B ${{github.workspace}}/rpg_build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
+    - name: Build randompolygon
+      # Build your program with the given configuration
+      run: cmake --build ${{github.workspace}}/rpg_build --config ${{env.BUILD_TYPE}}
+
+    - name: Install randompolygon
+      working-directory: ${{github.workspace}}/rpg_build
+      run: sudo make install
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.

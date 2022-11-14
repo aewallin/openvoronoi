@@ -26,28 +26,28 @@ def rpg_vd(Npts, seed, debug):
         if n==(len(id_list)-1):
             n_nxt=0 # point 0 is the endpoint of the last segment
         vd.addLineSite( id_list[n], id_list[n_nxt])
-    print " all segs inserted."
+    print(" all segs inserted.")
     is_valid = vd.check()
-    print " vd-check: ", is_valid
+    print(" vd-check: ", is_valid)
     
     return is_valid
 
 def loop_run(Npts, max_seed, debug=False, debug_seed=-1):
-    seed_range = range(max_seed)
+    seed_range = list(range(max_seed))
     for seed in seed_range:
         debug2=debug
         if (seed==debug_seed):
-            print "debug seed!"
+            print("debug seed!")
             debug2 = True
         result = rpg_vd(Npts,seed,debug2)
-        print "N=",Npts," s=",seed, " ok?=",result
+        print("N=",Npts," s=",seed, " ok?=",result)
         assert( result == True )
         if ( not result ):
             exit(-1)
 
 def single_run(Npts, seed, debug=False):
     result = rpg_vd(Npts,seed,debug)
-    print "N=",Npts," s=",seed, " ok?=",result
+    print("N=",Npts," s=",seed, " ok?=",result)
     assert( result == True )
     return result
 

@@ -78,7 +78,7 @@ typedef boost::graph_traits<MachiningGraph>::vertex_iterator   MGVertexItr;
 class OffsetLoopCompare {
 public:
     /// sort predicate
-    bool operator() (OffsetLoop l1, OffsetLoop l2) {
+    bool operator() (OffsetLoop l1, OffsetLoop l2) const {
         return (l1.offset_distance > l2.offset_distance);
     }
 };

@@ -1,9 +1,32 @@
-project(OpenVoronoi)
+cmake_minimum_required(VERSION 3.15)
 
-cmake_minimum_required(VERSION 3.0)
+# Set modern CMake policies
+if(POLICY CMP0148)
+  cmake_policy(SET CMP0148 NEW) # FindPythonInterp and FindPythonLibs are removed
+endif()
+if(POLICY CMP0167)
+  cmake_policy(SET CMP0167 OLD) # Keep using FindBoost for now to maintain compatibility
+endif()
+if(POLICY CMP0153)
+  cmake_policy(SET CMP0153 NEW) # exec_program is deprecated
+endif()
+if(POLICY CMP0175)
+  cmake_policy(SET CMP0175 NEW) # add_custom_command() rejects invalid arguments
+endif()
+
+project(OpenVoronoi
+  VERSION 1.0.0
+  DESCRIPTION "2D Voronoi diagram library for point, line-segment, and circular-arc sites"
+  LANGUAGES CXX
+)
+
+# Set C++ standard
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # figure out the gcc version
-INCLUDE(gcc_version.cmake)
+include(gcc_version.cmake)
 
 # uninstall target
 configure_file(
@@ -39,8 +62,8 @@ if(USE_CLANG)
   add_definitions(-fPIC)
 endif()
 
-MESSAGE(STATUS " Your compiler is = " ${CMAKE_CXX_COMPILER})
-MESSAGE(STATUS " Your linker is = " ${CMAKE_LINKER})
+message(STATUS " Your compiler is = " ${CMAKE_CXX_COMPILER})
+message(STATUS " Your linker is = " ${CMAKE_LINKER})
 
 
 #
@@ -51,7 +74,7 @@ MESSAGE(STATUS " Your linker is = " ${CMAKE_LINKER})
 # thus we use now use -Wno-deprecated here.
 #
 if (UNIX AND NOT APPLE)
-  MESSAGE(STATUS "setting strict gcc options: -Wall -Werror etc...")
+  message(STATUS "setting strict gcc options: -Wall -Werror etc...")
   add_definitions(-Werror -Wall -Wundef -Wno-error=uninitialized -Wshadow  -Wno-long-long -Wno-deprecated -pedantic -pedantic-errors)
 
   # some reasons why we don't enable certain errors:
@@ -71,7 +94,7 @@ endif ()
 # set(CMAKE_BUILD_TYPE Debug)
 # set(CMAKE_BUILD_TYPE Profile)
 # set(CMAKE_BUILD_TYPE Coverage)
-MESSAGE(STATUS " CMAKE_BUILD_TYPE  = " ${CMAKE_BUILD_TYPE})
+message(STATUS " CMAKE_BUILD_TYPE  = " ${CMAKE_BUILD_TYPE})
 
 option(BUILD_PYTHON_MODULE "Build python-module? " ON) # building the python-module optional, ON by default
 # when we build only the pure c++ library we do not need boost-ptyhon
@@ -86,35 +109,36 @@ option(BUILD_PY_TESTS "Build/configure Python tests?" ON)
 
 if (CMAKE_BUILD_TYPE MATCHES "Profile")
   set(CMAKE_CXX_FLAGS_PROFILE "-p -g -DNDEBUG")
-  MESSAGE(STATUS " CMAKE_CXX_FLAGS_PROFILE = " ${CMAKE_CXX_FLAGS_PROFILE})
+  message(STATUS " CMAKE_CXX_FLAGS_PROFILE = " ${CMAKE_CXX_FLAGS_PROFILE})
   set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS_PROFILE})
 endif (CMAKE_BUILD_TYPE MATCHES "Profile")
 
 
 if (CMAKE_BUILD_TYPE MATCHES "Release")
-  MESSAGE(STATUS " CMAKE_CXX_FLAGS_RELEASE = " ${CMAKE_CXX_FLAGS_RELEASE})
+  message(STATUS " CMAKE_CXX_FLAGS_RELEASE = " ${CMAKE_CXX_FLAGS_RELEASE})
   set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS_RELEASE})
 endif (CMAKE_BUILD_TYPE MATCHES "Release")
 
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
-  MESSAGE(STATUS " CMAKE_CXX_FLAGS_DEBUG = " ${CMAKE_CXX_FLAGS_DEBUG})
-  #MESSAGE(STATUS " CMAKE_CXX_FLAGS = " ${CMAKE_CXX_FLAGS})
+  message(STATUS " CMAKE_CXX_FLAGS_DEBUG = " ${CMAKE_CXX_FLAGS_DEBUG})
+  #message(STATUS " CMAKE_CXX_FLAGS = " ${CMAKE_CXX_FLAGS})
 endif (CMAKE_BUILD_TYPE MATCHES "Debug")
-MESSAGE(STATUS " CMAKE_CXX_FLAGS = " ${CMAKE_CXX_FLAGS})
+message(STATUS " CMAKE_CXX_FLAGS = " ${CMAKE_CXX_FLAGS})
 
 # build the library for code-coverage testing
 if (CMAKE_BUILD_TYPE MATCHES "Coverage")
   set(CMAKE_CXX_FLAGS "-O0 -fprofile-arcs -ftest-coverage -fno-inline ${CMAKE_CXX_FLAGS_DEBUG}")
-  MESSAGE(STATUS " CMAKE_CXX_FLAGS = " ${CMAKE_CXX_FLAGS})
+  message(STATUS " CMAKE_CXX_FLAGS = " ${CMAKE_CXX_FLAGS})
 endif (CMAKE_BUILD_TYPE MATCHES "Coverage")
 
 # this figures out the Python include directories and adds them to the
 # header file search path
-MESSAGE(STATUS "Your system is: ${CMAKE_SYSTEM_NAME}")
+message(STATUS "Your system is: ${CMAKE_SYSTEM_NAME}")
 IF( ${BUILD_PYTHON_MODULE} MATCHES ON)
-  find_package (PythonLibs) # 2.7 EXACT REQUIRED 
-  include_directories(${PYTHON_INCLUDE_DIRS})
-  MESSAGE(STATUS "Python includes: " ${PYTHON_INCLUDE_DIRS})
+  find_package(Python3 3.8 REQUIRED COMPONENTS Interpreter Development)
+  include_directories(${Python3_INCLUDE_DIRS})
+  message(STATUS "Python includes: " ${Python3_INCLUDE_DIRS})
+  message(STATUS "Python libraries: " ${Python3_LIBRARIES})
 ENDIF()
 
 
@@ -122,17 +146,17 @@ ENDIF()
 find_package( Boost REQUIRED )
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
-  MESSAGE(STATUS "Boost_LIB_VERSION: " ${Boost_LIB_VERSION})
-  MESSAGE(STATUS "Boost_INCLUDE_DIRS are: " ${Boost_INCLUDE_DIRS})
-  MESSAGE(STATUS "boost_LIBRARY_DIRS is: " ${Boost_LIBRARY_DIRS})
-  MESSAGE(STATUS "Boost_LIBRARIES is: " ${Boost_LIBRARIES})
+  message(STATUS "Boost_LIB_VERSION: " ${Boost_LIB_VERSION})
+  message(STATUS "Boost_INCLUDE_DIRS are: " ${Boost_INCLUDE_DIRS})
+  message(STATUS "boost_LIBRARY_DIRS is: " ${Boost_LIBRARY_DIRS})
+  message(STATUS "Boost_LIBRARIES is: " ${Boost_LIBRARIES})
   
 endif()
 
 # find boost-python
 IF( ${BUILD_PYTHON_MODULE} MATCHES ON)
   find_package( Boost COMPONENTS python REQUIRED)
-  MESSAGE(STATUS "Boost_PYTHON_LIBRARY is: " ${Boost_PYTHON_LIBRARY})
+  message(STATUS "Boost_PYTHON_LIBRARY is: " ${Boost_PYTHON_LIBRARY})
 ENDIF()
 
 # find the qd library
@@ -230,7 +254,7 @@ if (NOT APPLE)
 endif (NOT APPLE)
 # link against libqd here. 
 # an alternative is to link libqd when an application using openvoronoi is built.
-target_link_libraries(libopenvoronoi ${Boost_LIBRARIES} ${QD_LIBRARY}) 
+target_link_libraries(libopenvoronoi ${QD_LIBRARY}) 
 
 # c++lib for coverage testing
 add_library(
@@ -250,9 +274,9 @@ set_target_properties( libopenvoronoi-coverage
 # the Python module
 IF( ${BUILD_PYTHON_MODULE} MATCHES ON)
 
-  message(STATUS "PYTHON_LIBRARIES = ${PYTHON_LIBRARIES}")
-  message(STATUS "PYTHON_EXECUTABLE = ${PYTHON_EXECUTABLE}")
-  message(STATUS "PYTHON_INCLUDE_DIRS = ${PYTHON_INCLUDE_DIRS}")
+  message(STATUS "PYTHON_LIBRARIES = ${Python3_LIBRARIES}")
+  message(STATUS "PYTHON_EXECUTABLE = ${Python3_EXECUTABLE}")
+  message(STATUS "PYTHON_INCLUDE_DIRS = ${Python3_INCLUDE_DIRS}")
   # static c++ library, linked with the python module below
   add_library(
     openvoronoi_static
@@ -266,29 +290,21 @@ IF( ${BUILD_PYTHON_MODULE} MATCHES ON)
     MODULE
     py/open_voronoi_py.cpp
     )
-  target_link_libraries(openvoronoi openvoronoi_static ${Boost_LIBRARIES} ${QD_LIBRARY} ${PYTHON_LIBRARIES}) 
+  target_link_libraries(openvoronoi openvoronoi_static ${Boost_LIBRARIES} ${QD_LIBRARY} ${Python3_LIBRARIES}) 
   set_target_properties(openvoronoi PROPERTIES PREFIX "") 
   if (NOT APPLE)
     set_target_properties(openvoronoi PROPERTIES VERSION ${MY_VERSION}) 
   endif (NOT APPLE)
   # this figures out where to install the Python modules
-  execute_process(
-    COMMAND python -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())"
-    OUTPUT_VARIABLE Python_site_packages
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-    ) # on Ubuntu 11.10 this outputs: /usr/local/lib/python2.7/dist-packages
-
-  # strip away /usr/local/  because that is what CMAKE_INSTALL_PREFIX is set to
-  # also, since there is no leading "/", it makes ${Python_site_packages} a relative path.
-  # STRING(REGEX REPLACE "/usr/local/(.*)$" "\\1" Python_site_packages "${Python_site_packages}" )
-  MESSAGE(STATUS "CMAKE_INSTALL_PREFIX is : " ${CMAKE_INSTALL_PREFIX})
-  MESSAGE(STATUS "Python libraries will be installed to: " ${Python_site_packages})
+  set(Python_site_packages ${Python3_SITEARCH})
+  
+  message(STATUS "CMAKE_INSTALL_PREFIX is : " ${CMAKE_INSTALL_PREFIX})
+  message(STATUS "Python libraries will be installed to: " ${Python_site_packages})
 
   # this installs the python library
   install(
     TARGETS openvoronoi
-    LIBRARY 
-    DESTINATION ${Python_site_packages}
+    LIBRARY DESTINATION ${Python_site_packages}
     )
 
   # this installs the python VTK-visualization helper py-files

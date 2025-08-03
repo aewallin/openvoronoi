@@ -10,7 +10,7 @@
 #include "utility/vd2svg.hpp"
 
 #include <boost/random.hpp>
-#include <boost/timer.hpp>
+#include <boost/timer/timer.hpp>
 #include <boost/foreach.hpp>
 #include <boost/program_options.hpp>
 
@@ -127,29 +127,29 @@ int main(int argc,char *argv[]) {
     boost::mt19937 rng(42);
     boost::uniform_01<boost::mt19937> rnd(rng);
     std::cout << "Waiting for " << nmax << " random line segments..."<< std::flush;
-    boost::timer tmr;
+    boost::timer::cpu_timer tmr;
     std::vector<segment> segs = random_segments(1,nmax); // creante nmax random non-intersecting segments.
-    std::cout << "done in " << tmr.elapsed() << " seconds\n" << std::flush;
+    std::cout << "done in " << static_cast<double>(tmr.elapsed().wall) / 1e9 << " seconds\n" << std::flush;
     std::cout << "number of segs: " << segs.size() << "\n" << std::flush;
     typedef std::pair<int,int> IdSeg; // the int-handles for a segment
     typedef std::vector< IdSeg > IdSegments; // all the segments stored in this vector
     IdSegments segment_ids;
     
-    tmr.restart();
+    tmr.start();
     BOOST_FOREACH(segment s, segs ) {
         IdSeg id;
         id.first = vd->insert_point_site(s.first);   // insert the start-point of the segment
         id.second = vd->insert_point_site(s.second); // insert the endpoint of the segment.
         segment_ids.push_back(id); // store the int-handles returned by insert_point_site()
     }
-    double t_points = tmr.elapsed();
+    double t_points = static_cast<double>(tmr.elapsed().wall) / 1e9;
     std::cout << "all point-sites inserted !\n"<< std::flush;
     // now we insert line-segments
-    tmr.restart();
+    tmr.start();
     BOOST_FOREACH(IdSeg id, segment_ids ) {
         vd->insert_line_site(id.first,id.second); // NOTE: arguments are the int-handles we got from VoronoiDiagram::insert_point_site() above!
     }
-    double t_lines = tmr.elapsed();
+    double t_lines = static_cast<double>(tmr.elapsed().wall) / 1e9;
     std::cout << "all line-sites inserted !\n"<< std::flush;
     
     std::cout << "Points: " << t_points << " seconds \n";

@@ -60,9 +60,33 @@ Thumbs.db
 #screenshots
 *.png
 
-# build directories
+# Build directories (modern CMake and Python)
 build/
 bld/
+out/
+_build/
+_skbuild/
+
+# Python packaging artifacts
+dist/
+*.egg-info/
+.eggs/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.venv/
+venv/
+ENV/
+env/
+.env
+
+# CMake modern artifacts
+CMakeUserPresets.json
+CTestCustom.cmake
 
 # commonly-named test executables
 ovd_tst

@@ -20,10 +20,7 @@ Voronoi diagrams are used for many purposes in computational geometry, but the m
 ## Links
 
 - **Project repository:** https://github.com/aewallin/openvoronoi
-- **Launchpad PPA** (not updated regularly): https://launchpad.net/~anders-e-e-wallin/+archive/cam
-- **Build dashboard** (not updated regularly): http://my.cdash.org/index.php?project=OpenVoronoi
 - **Mailing list:** https://groups.google.com/forum/?hl=en#!forum/opencamlib
-- **Gallery:** https://picasaweb.google.com/106188605401091280402/OpenVoronoiExamples
 
 ## Dependencies
 
@@ -49,13 +46,6 @@ Voronoi diagrams are used for many purposes in computational geometry, but the m
 
 ## Build/Install Instructions
 
-### From PPA
-
-```bash
-sudo add-apt-repository ppa:anders-e-e-wallin/cam
-sudo apt-get update
-sudo apt-get install openvoronoi
-```
 
 ### From Source
 

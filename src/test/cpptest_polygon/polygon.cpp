@@ -12,7 +12,7 @@
 #include "utility/vd2svg.hpp"
 
 #include <boost/random.hpp>
-#include <boost/timer.hpp>
+#include <boost/timer/timer.hpp>
 #include <boost/foreach.hpp>
 #include <boost/program_options.hpp>
 namespace po = boost::program_options;

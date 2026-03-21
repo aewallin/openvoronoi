@@ -6,7 +6,7 @@ add_executable(${test_name} ${SOURCE_FILES})
 add_dependencies(${test_name}  libopenvoronoi)
 
 set(Boost_LIBRARIES) # required because this contains boost-python when we come here
-find_package( Boost COMPONENTS program_options REQUIRED)
+find_package( Boost COMPONENTS program_options timer REQUIRED)
 target_link_libraries(${test_name} libopenvoronoi ${Boost_LIBRARIES})
 
 ADD_TEST(${test_name} ${test_name}) # must provide --n option!

@@ -34,10 +34,10 @@ else()
 endif()
 
 # get the compiler and its version
-exec_program(
-  ${CMAKE_CXX_COMPILER}
-  ARGS                    --version
+execute_process(
+  COMMAND ${CMAKE_CXX_COMPILER} --version
   OUTPUT_VARIABLE _compiler_output
+  ERROR_QUIET
 )
 # we want only the first line of output
 string(REGEX MATCH "^([^\n]+)" 

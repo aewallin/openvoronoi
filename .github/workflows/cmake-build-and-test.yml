@@ -18,19 +18,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
-    - name: Install boost
-      run: sudo apt-get install -y libboost-all-dev
-
-    - name: Install libqd
-      run: sudo apt-get install -y libqd-dev
-
-    - name: Install CGAL
-      run: sudo apt-get install -y libcgal-dev
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libboost-all-dev libqd-dev libcgal-dev
       
     - name: Clone randompolygon repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: aewallin/randompolygon
         path: randompolygon

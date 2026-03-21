@@ -29,7 +29,7 @@ IF (DOXYGEN_FOUND)
             doc/latex/index.tex
             doc/html/index.html
         COMMAND ${DOXYGEN_EXECUTABLE} ${DOXY_CONFIG}
-        COMMENT building LaTex & HTML docs
+        COMMENT "building LaTex & HTML docs"
     )
 
     add_custom_target(

@@ -9,7 +9,7 @@
 #include "utility/vd2svg.hpp"
 
 #include <boost/random.hpp>
-#include <boost/timer.hpp>
+#include <boost/timer/timer.hpp>
 #include <boost/foreach.hpp>
 #include <boost/program_options.hpp>
 
@@ -60,11 +60,11 @@ int main(int argc,char *argv[]) {
         ovd::Point p(x,y);
         pts.push_back(p);
     }
-    boost::timer tmr;
+    boost::timer::cpu_timer tmr;
     BOOST_FOREACH(ovd::Point p, pts ) {
         vd->insert_point_site(p); // insert each point. This returns an int-handle which we do not use here.
     }
-    double t = tmr.elapsed();
+    double t = static_cast<double>(tmr.elapsed().wall) / 1e9; // convert nanoseconds to seconds
     std::cout << t << " seconds \n";
     double norm = nmax*log((double)nmax)/log(2.0);
     std::cout << 1e6*t/norm << " us * n*log2(n)\n";

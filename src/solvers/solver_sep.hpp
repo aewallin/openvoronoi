@@ -41,11 +41,14 @@ namespace solvers {
 //   s3 (PointSite)  (x-x3)^2 + (y-y3)^2 = t^2 
 // 
 // This configuration constrains the solution to lie on the separator edge.
-// The separator is given by
-// SEP = p2 + t*sv
-// where p2 is the location of s2, and the separator direction sv is 
-// sv = (-a1,-b1)  if k1=-1
-// sv = (a1,b1)    if k1=+1 
+// In the abstract derivation the separator direction can be written with either
+// sign depending on how the line-site offset is parameterized. The VD
+// construction used here never sends that general case to this solver: for the
+// SEPARATOR half-edge that arrives here the geometric invariant is always
+//   SEP = p2 + t*sv
+// with p2 at s2 and sv = (-a1,-b1).
+// The k1 value stored on the Voronoi half-edge describes face-side
+// information; it is not the sign selector from the abstract derivation.
 // thus points on the separator are located at:
 //
 //  x_sep = x2 + t*sv.x
@@ -82,7 +85,7 @@ int solve( Site* s1, double k1,
     if (debug) 
         std::cout << "SEPSolver.\n";
     
-    // separator direction
+    // separator direction fixed by the SEPARATOR-edge construction
     Point sv(-s1->a(),-s1->b());
     if (debug) std::cout << " SEPSolver sv= "<< sv << "\n";
     

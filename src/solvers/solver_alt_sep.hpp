@@ -41,11 +41,14 @@ namespace solvers {
 //   s3 (PointSite)  (x-x3)^2 + (y-y3)^2 = t^2             (2) really?? probably this never happens?
 // 
 // This configuration constrains the solution to lie on the separator edge.
+// In the abstract derivation the separator direction can be written with either
+// sign depending on parameterization. The VD construction that dispatches to
+// this solver has already normalized the separator case, so the implementation
+// chooses sv from the constructed line/point pair instead of from the solve()
+// argument named k1. The incoming k-values describe Voronoi face-side
+// information, not the abstract sign choice.
 // The separator is given by
 // SEP = p2 + t* sv
-// where p2 is the location of s2, and the separator direction sv is 
-// sv = (-a1,-b1)   if k1=-1
-// sv = (a1,b1)   if k1=+1 
 // thus points on the separator are located at:
 //
 //  x_sep = x2 + t*sv.x
@@ -94,7 +97,7 @@ int solve( Site* s1, double k1,
         exit(-1);
         return 0;
     }
-    // separator direction
+    // separator direction chosen from the normalized separator construction
     Point sv = (k3 == - 1) ? Point(lsite->a(),lsite->b()) : Point(-lsite->a(),-lsite->b());
     
     if (debug && !silent) {

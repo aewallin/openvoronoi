@@ -978,25 +978,30 @@ p_{separator}=p_{2}+v_{separator}t
 \end_layout
 
 \begin_layout Standard
-where the separator direction is give by
+In the abstract derivation the separator direction can be written with either
+ sign, depending on how the line-site offset is parameterized. In the actual
+ VD construction used by OpenVoronoi the separator case is already normalized
+ before it reaches the solver, so the implementation uses
 \end_layout
 
 \begin_layout Standard
 \begin_inset Formula 
 \begin{equation}
-\begin{cases}
-\begin{array}{c}
-v_{separator}=(-a_{1},-b_{1})\\
-v_{separator}=(a_{1},b_{1})
-\end{array} & \begin{array}{c}
-k_{1}=-1\\
-k_{1}=+1
-\end{array}\end{cases}
+v_{separator}=(-a_{1},-b_{1})
 \end{equation}
 
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+The 
+\begin_inset Formula $k_{1}$
+\end_inset
+
+ value stored on the Voronoi half-edge records face-side information; it does
+ not choose the separator direction.
 \end_layout
 
 \begin_layout Standard

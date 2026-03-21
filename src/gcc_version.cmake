@@ -3,17 +3,16 @@
 
 if(CMAKE_COMPILER_IS_GNUCXX)
 
-  exec_program(
-      ${CMAKE_CXX_COMPILER}
-      ARGS                    --version
+  execute_process(
+      COMMAND ${CMAKE_CXX_COMPILER}  --version
       OUTPUT_VARIABLE _compiler_output)
       string(REGEX REPLACE ".*([0-9]\\.[0-9]\\.[0-9]).*" "\\1"
-      gcc_compiler_version 
+      gcc_compiler_version
       "${_compiler_output}"
       )
-  
+
   message(STATUS "gcc_version.cmake: C++ compiler version: ${gcc_compiler_version} [${CMAKE_CXX_COMPILER}]")
-  
+
   IF(${gcc_compiler_version} MATCHES ".*4\\.[6789]\\.[0-9].*")
     #MESSAGE("gcc >= 4.6")
     set(GCC_4_6 TRUE)
